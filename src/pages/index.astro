@@ -3,6 +3,16 @@ import GamerCard from "../components/GamerCard.astro";
 import LightningIcon from "../components/LightningIcon.astro";
 import Layout from "../layouts/Layout.astro";
 import { gamers } from "../gamers";
+
+const renderTime = Date.now();
+const revealTimestamp = 1695412800; // 2023-09-22T20:00:00.000Z
+
+/**
+ * @param revealTimestamp Unix timestamp in seconds for reveal time
+ */
+function isRevealed(revealTimestamp: number) {
+  return revealTimestamp * 1000 < renderTime;
+}
 ---
 
 <Layout title='Gamernes Gamer'>
@@ -30,6 +40,7 @@ import { gamers } from "../gamers";
                 imagePath={gamer.imagePath}
                 overallRating={gamer.overallRating}
                 stats={gamer.stats}
+                revealed={isRevealed(revealTimestamp)}
               />
             </li>
           ))

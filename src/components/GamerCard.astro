@@ -8,9 +8,11 @@ interface Props {
   overallRating: number;
   stats: GamerStats;
   imagePath: string;
+  revealed: boolean;
 }
 
-const { name, nickname, stats, imagePath, overallRating } = Astro.props;
+const { name, nickname, stats, imagePath, overallRating, revealed } =
+  Astro.props;
 
 function capitalizeFirst(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1);
@@ -42,30 +44,55 @@ function capitalizeFirst(s: string) {
       d='M51.7496 206.5H263.862C271.041 206.5 276.862 212.32 276.862 219.5V223.413C276.862 230.593 271.041 236.413 263.862 236.413H51.7496V206.5Z'
       fill='#1D1A1F'></path>
   </svg>
-  <div
-    class='z-10 w-full h-full absolute top-0 left-0 cardGrid pl-[16%] pr-[15%] pb-[15%]'
-  >
-    <p class='font-quantico text-6xl gridRating self-end justify-self-center'>
-      {overallRating}
-    </p>
-    <p class='font-quantico text-xl gridOverall justify-self-center self-start'>
-      Overall
-    </p>
-    <img class='w-full gridImage' src={imagePath} alt={`Bilde av ${name}`} />
-    <p
-      class='gridNickname text-sm font-quantico self-end justify-self-center px-1'
-    >
-      {nickname}
-    </p>
-    <p class='gridName font-quantico text-sm self-center pl-1'>{name}</p>
-    <div class='gridStats grid grid-cols-2 gap-x-2 p-2'>
-      {
-        Object.entries(stats).map((stat) => (
-          <Statbar statName={capitalizeFirst(stat[0])} statValue={stat[1]} />
-        ))
-      }
-    </div>
-  </div>
+  {
+    revealed ? (
+      <div class='z-10 w-full h-full absolute top-0 left-0 cardGrid pl-[16%] pr-[15%] pb-[15%]'>
+        <p class='font-quantico text-6xl gridRating self-end justify-self-center'>
+          {overallRating}
+        </p>
+        <p class='font-quantico text-xl gridOverall justify-self-center self-start'>
+          Overall
+        </p>
+        <img
+          class='w-full gridImage'
+          src={imagePath}
+          alt={`Bilde av ${name}`}
+        />
+        <p class='gridNickname text-sm font-quantico self-end justify-self-center px-1'>
+          {nickname}
+        </p>
+        <p class='gridName font-quantico text-sm self-center pl-1'>{name}</p>
+        <div class='gridStats grid grid-cols-2 gap-x-2 p-2'>
+          {Object.entries(stats).map((stat) => (
+            <Statbar statName={capitalizeFirst(stat[0])} statValue={stat[1]} />
+          ))}
+        </div>
+      </div>
+    ) : (
+      <div class='z-10 w-full h-full absolute top-0 left-0 cardGrid pl-[16%] pr-[15%] pb-[15%]'>
+        <p class='font-quantico text-6xl gridRating self-end justify-self-center'>
+          ?
+        </p>
+        <p class='font-quantico text-xl gridOverall justify-self-center self-start'>
+          Overall
+        </p>
+        <p class='w-full gridImage text-9xl font-quantico place-self-end text-center'>
+          ?
+        </p>
+        <p class='gridNickname text-sm font-quantico self-end justify-self-center px-1'>
+          ???
+        </p>
+        <p class='gridName font-quantico text-sm self-center pl-1'>
+          Denne personen avsløres snart!
+        </p>
+        <div class='gridStats grid grid-cols-2 gap-x-2 p-2'>
+          {Object.entries(stats).map((stat) => (
+            <Statbar statName={capitalizeFirst(stat[0])} statValue={"?"} />
+          ))}
+        </div>
+      </div>
+    )
+  }
 </div>
 
 <style>
@@ -96,5 +123,10 @@ function capitalizeFirst(s: string) {
   }
   .gridStats {
     grid-area: stats;
+  }
+  .hiddenCardGrid {
+    height: 100%;
+    display: grid;
+    grid-template-rows: 58% auto;
   }
 </style>
