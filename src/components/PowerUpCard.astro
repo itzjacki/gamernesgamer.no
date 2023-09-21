@@ -1,0 +1,22 @@
+---
+import { type PowerUp } from '../power-ups';
+import LightningIcon from './LightningIcon.astro';
+
+interface Props extends PowerUp {}
+
+const { name, description, imagePath } = Astro.props;
+---
+
+<div
+  class="flex flex-col w-64 p-4 pb-6 gap-4 bg-darkblueish h-full rounded-2xl"
+>
+  <img src={imagePath} alt="" class="rounded-2xl min-h-[8rem]" />
+  <div class="flex justify-center gap-4 items-center">
+    <LightningIcon color="reddish" />
+    <h3 class="font-quantico text-xl text-center">
+      {name}
+    </h3>
+    <LightningIcon color="reddish" />
+  </div>
+  <p>{description}</p>
+</div>

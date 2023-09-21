@@ -1,0 +1,44 @@
+---
+import LightningIcon from './LightningIcon.astro';
+interface Props {
+  title: string;
+  thumbnailPath: string;
+  chosenBy: string;
+  duration: string;
+  shortDescription: string;
+  revealed: boolean;
+}
+
+const { title, thumbnailPath, chosenBy, duration, shortDescription, revealed } =
+  Astro.props;
+---
+
+{
+  revealed ? (
+    <div class="flex flex-col max-w-[16rem] items-center gap-2">
+      <img src={thumbnailPath} alt={title} class="rounded-3xl" />
+      <h3 class="font-quantico text-xl">{title}</h3>
+      <div class="flex font-quantico gap-4 text-reddish">
+        <p>{chosenBy}</p>
+        <LightningIcon color="blueish" />
+        <p>{duration}</p>
+      </div>
+      <p class="text-center">{shortDescription}</p>
+    </div>
+  ) : (
+    <div class="flex flex-col max-w-[16rem] items-center gap-2">
+      <div class="rounded-3xl w-64 h-40 bg-darkblueish grid place-items-center font-quantico text-9xl">
+        ?
+      </div>
+      <h3 class="font-quantico text-xl">Mystisk spill</h3>
+      <div class="flex font-quantico gap-4 text-reddish">
+        <p>-</p>
+        <LightningIcon color="blueish" />
+        <p>-</p>
+      </div>
+      <p class="text-center">
+        Når spillene har blitt avslørt kommer de til å vises her!
+      </p>
+    </div>
+  )
+}

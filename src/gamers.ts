@@ -18,9 +18,9 @@ export interface GamerStats {
 
 export const gamers: Gamer[] = [
   {
-    name: "Jakob Endrestad Kielland",
-    nickname: "The Man",
-    imagePath: "images/image.png",
+    name: 'Jakob Endrestad Kielland',
+    nickname: 'The Man',
+    imagePath: 'images/image.png',
     stats: {
       focus: 74,
       strategy: 99,
@@ -33,9 +33,9 @@ export const gamers: Gamer[] = [
     overallRating: 87,
   },
   {
-    name: "Jørgen Endrestad Kielland",
-    nickname: "The Dude",
-    imagePath: "images/image.png",
+    name: 'Jørgen Endrestad Kielland',
+    nickname: 'The Dude',
+    imagePath: 'images/image.png',
     stats: {
       focus: 96,
       strategy: 87,
@@ -48,9 +48,9 @@ export const gamers: Gamer[] = [
     overallRating: 87,
   },
   {
-    name: "Tobias Knapp Eliassen",
-    nickname: "The Male",
-    imagePath: "images/image.png",
+    name: 'Tobias Knapp Eliassen',
+    nickname: 'The Male',
+    imagePath: 'images/image.png',
     stats: {
       focus: 99,
       strategy: 89,
@@ -63,9 +63,9 @@ export const gamers: Gamer[] = [
     overallRating: 91,
   },
   {
-    name: "William Grimholt",
-    nickname: "The Guy",
-    imagePath: "images/image.png",
+    name: 'William Grimholt',
+    nickname: 'The Guy',
+    imagePath: 'images/image.png',
     stats: {
       focus: 93,
       strategy: 73,
@@ -78,9 +78,9 @@ export const gamers: Gamer[] = [
     overallRating: 84,
   },
   {
-    name: "Kristin Helene Lie Størkson",
-    nickname: "The Gal",
-    imagePath: "images/image.png",
+    name: 'Kristin Helene Lie Størkson',
+    nickname: 'The Gal',
+    imagePath: 'images/image.png',
     stats: {
       focus: 80,
       strategy: 93,

@@ -1,7 +1,7 @@
 ---
 interface Props {
   statName: string;
-  statValue: number | "?";
+  statValue: number | '?';
   statMin?: number;
   statMax?: number;
 }
@@ -9,17 +9,17 @@ interface Props {
 const { statName, statValue, statMin = 50, statMax = 99 }: Props = Astro.props;
 
 function getBarWidth() {
-  if (statValue === "?") return 0;
+  if (statValue === '?') return 0;
   return Math.round(((statValue - statMin) / (statMax - statMin)) * 100);
 }
 ---
 
-<div class='grid-cols-2 grid text-xs h-fit'>
+<div class="grid-cols-2 grid text-xs h-fit">
   <p>{statName}</p>
-  <p class='text-right'>{statValue}</p>
-  <div class='w-full h-1 bg-white col-span-2 relative'>
+  <p class="text-right">{statValue}</p>
+  <div class="w-full h-1 bg-white col-span-2 relative">
     <div
-      class='h-full absolute top-0 left-0 bg-reddish'
+      class="h-full absolute top-0 left-0 bg-reddish"
       style=`width: ${getBarWidth()}%`
     >
     </div>
