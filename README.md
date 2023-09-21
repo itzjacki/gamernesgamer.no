@@ -1,1 +1,1 @@
-Website for a gaming tournament I organize between me and my friends. Is hosted on vercel, cause that shit's ridiculously easy.
+Website for a gaming tournament I organize between me and my friends. Made with astro and hosted on vercel because that's a combo made from pure dopamine. The fact that I can click 2 buttons to have my site set up with CD and a custom domain is fucking bonkers. Back in my day we -
