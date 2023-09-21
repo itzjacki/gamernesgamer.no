@@ -25,4 +25,13 @@ const { title } = Astro.props;
   <body class='bg-grayish text-white'>
     <slot />
   </body>
+  <style is:global>
+    * {
+      box-sizing: border-box;
+    }
+    body,
+    html {
+      margin: 0;
+    }
+  </style>
 </html>
