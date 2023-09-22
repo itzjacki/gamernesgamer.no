@@ -19,7 +19,7 @@ export interface GamerStats {
 export const gamers: Gamer[] = [
   {
     name: 'Jakob Endrestad Kielland',
-    nickname: 'The Man',
+    nickname: '"The Professor"',
     imagePath: 'images/image.png',
     stats: {
       focus: 74,
@@ -34,7 +34,7 @@ export const gamers: Gamer[] = [
   },
   {
     name: 'Jørgen Endrestad Kielland',
-    nickname: 'The Dude',
+    nickname: '"All in"',
     imagePath: 'images/image.png',
     stats: {
       focus: 96,
@@ -49,7 +49,7 @@ export const gamers: Gamer[] = [
   },
   {
     name: 'Tobias Knapp Eliassen',
-    nickname: 'The Male',
+    nickname: '"The Maestro"',
     imagePath: 'images/image.png',
     stats: {
       focus: 99,
@@ -64,7 +64,7 @@ export const gamers: Gamer[] = [
   },
   {
     name: 'William Grimholt',
-    nickname: 'The Guy',
+    nickname: '"Iron Will"',
     imagePath: 'images/image.png',
     stats: {
       focus: 93,
@@ -79,7 +79,7 @@ export const gamers: Gamer[] = [
   },
   {
     name: 'Kristin Helene Lie Størkson',
-    nickname: 'The Gal',
+    nickname: '"Sleeping Tiger"',
     imagePath: 'images/image.png',
     stats: {
       focus: 80,
