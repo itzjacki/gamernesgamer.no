@@ -1,0 +1,65 @@
+---
+import LightningIcon from '../../components/LightningIcon.astro';
+import { games } from '../../games';
+import Layout from '../../layouts/Layout.astro';
+
+export function getStaticPaths() {
+  return games.map((game) => {
+    return { params: { game: game.slug } };
+  });
+}
+
+const gameSlug = Astro.params.game;
+
+const game = games.find((game) => game.slug === gameSlug)!;
+---
+
+<Layout title={game.title}>
+  <section class="max-w-prose w-full gap-2 flex flex-col">
+    <a href="/" class="block group"
+      ><span
+        class="text-xl text-blueish pr-2 group-hover:text-reddish transition-colors duration-200"
+        >←</span
+      ><span class="">Gå tilbake</span></a
+    >
+    <h1 class="text-4xl sm:text-6xl font-quantico self-start mb-8">
+      {game.title}
+    </h1>
+
+    <img
+      class="w-fit mb-12 rounded-2xl drop-shadow-[1rem_1rem_0px_#334D51]"
+      src={game.thumbnailPath}
+      alt={`Skjermdump fra ${game.title}`}
+    />
+
+    <div class="flex items-center gap-2">
+      <LightningIcon color="reddish" />
+      <p class="font-quantico text-xl">
+        Valgt av: {game.chosenBy}
+      </p>
+    </div>
+    <div class="flex items-center gap-2">
+      <LightningIcon color="blueish" />
+      <p class="font-quantico text-xl">
+        Varighet: {game.duration}
+      </p>
+    </div>
+
+    <h2 class="text-2xl sm:text-4xl font-quantico self-start mt-8 mb-4">
+      Beskrivelse & regler
+    </h2>
+    {
+      game.longDescription ? (
+        <article set:html={game.longDescription} />
+      ) : (
+        <>
+          <em class="mb-4 block">
+            Vær litt mer tålmodig, utfyllende beskrivelse og regler kommer
+            snart!
+          </em>
+          <p>{game.shortDescription}</p>
+        </>
+      )
+    }
+  </section>
+</Layout>

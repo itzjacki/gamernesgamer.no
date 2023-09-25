@@ -14,111 +14,104 @@ const revealVideo = true;
 ---
 
 <Layout title="Gamernes Gamer">
-  <main
-    class="flex flex-col p-4 items-center mx-auto gap-28 sm:gap-36 mb-20 scroll-smooth"
-  >
-    <section class="flex flex-col gap-4 items-center max-w-prose">
-      <h1 class="text-4xl sm:text-6xl mt-4 sm:mt-16 font-quantico">
-        Gamernes Gamer
-      </h1>
-      <div class="flex gap-4">
-        <LightningIcon color="reddish" />
-        <LightningIcon color="blueish" />
-        <LightningIcon color="reddish" />
-      </div>
-      <p class="font-quantico">07/10/2023</p>
-      <div class="border-t-blueish border-t-2 w-1/6 mb-8"></div>
+  <section class="flex flex-col gap-4 items-center max-w-prose">
+    <h1 class="text-4xl sm:text-6xl font-quantico">Gamernes Gamer</h1>
+    <div class="flex gap-4">
+      <LightningIcon color="reddish" />
+      <LightningIcon color="blueish" />
+      <LightningIcon color="reddish" />
+    </div>
+    <p class="font-quantico">07/10/2023</p>
+    <div class="border-t-blueish border-t-2 w-1/6 mb-8"></div>
 
-      <p class="mb-4">
-        Gamernes Gamer er tilbake med en ny sesong etter braksuksessen i sesong
-        1! <a
-          class="border-b-reddish border-b-2 hover:text-blueish transition-all"
-          href="#participants">Fire utøvere</a
-        > skal kjempe om å få tak i den gjeve GG-pokalen og tittelen som
-        selveste Gamernes Gamer. Denne sesongen endres formatet gjennom
-        introduksjonen av <a
-          class="border-b-reddish border-b-2 hover:text-blueish transition-all"
-          href="#power-ups">3 kraftige power-ups</a
-        > som kan snu poengsituasjonen på hodet. Dette vil du ikke gå glipp av!
-        Tune inn på Twitch den 7. oktober.
-      </p>
+    <p class="mb-4">
+      Gamernes Gamer er tilbake med en ny sesong etter braksuksessen i sesong 1!
 
-      <p class="mb-4">
-        Fikk du ikke med deg sesong 1, eller vil du bare gjenoppleve minnene?
-        Sjekk ut dette tilbakeblikket på hvordan turneringa gikk:
-      </p>
+
+      <a
+        class="border-b-reddish border-b-2 hover:text-blueish transition-all"
+        href="#participants">Fire utøvere</a
+      > skal kjempe om å få tak i den gjeve GG-pokalen og tittelen som selveste
+      Gamernes Gamer. Denne sesongen endres formatet gjennom introduksjonen av <a
+        class="border-b-reddish border-b-2 hover:text-blueish transition-all"
+        href="#power-ups">3 kraftige power-ups</a
+      > som kan snu poengsituasjonen på hodet. Dette vil du ikke gå glipp av!
+      Tune inn på Twitch den 7. oktober.
+    </p>
+
+    <p class="mb-4">
+      Fikk du ikke med deg sesong 1, eller vil du bare gjenoppleve minnene?
+      Sjekk ut dette tilbakeblikket på hvordan turneringa gikk:
+    </p>
+    {
+      revealVideo ? (
+        <iframe
+          class="w-5/6 aspect-video rounded-2xl"
+          src="https://www.youtube.com/embed/m0ARGEpN5kg?si=GCYOdAjOgLq_xETi"
+          title="YouTube video player"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+        />
+      ) : (
+        <div class=" bg-darkblueish w-5/6 aspect-video rounded-2xl grid place-items-center">
+          Denne videoen slippes snart!
+        </div>
+      )
+    }
+  </section>
+
+  <section id="participants" class="flex flex-col items-center gap-8 max-w-4xl">
+    <h2 class="text-3xl sm:text-4xl font-quantico">Utøvere</h2>
+    <ul class="flex flex-wrap gap-16 justify-center">
       {
-        revealVideo ? (
-          <iframe
-            class="w-5/6 aspect-video rounded-2xl"
-            src="https://www.youtube.com/embed/m0ARGEpN5kg?si=GCYOdAjOgLq_xETi"
-            title="YouTube video player"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowfullscreen
-          />
-        ) : (
-          <div class=" bg-darkblueish w-5/6 aspect-video rounded-2xl grid place-items-center">
-            Denne videoen slippes snart!
-          </div>
-        )
+        gamers.map((gamer) => (
+          <li>
+            <GamerCard
+              name={gamer.name}
+              nickname={gamer.nickname}
+              imagePath={gamer.imagePath}
+              overallRating={gamer.overallRating}
+              stats={gamer.stats}
+              revealed={revealGamerCards}
+            />
+          </li>
+        ))
       }
-    </section>
+    </ul>
+  </section>
 
-    <section
-      id="participants"
-      class="flex flex-col items-center gap-8 max-w-4xl"
-    >
-      <h2 class="text-3xl sm:text-4xl font-quantico">Utøvere</h2>
-      <ul class="flex flex-wrap gap-16 justify-center">
-        {
-          gamers.map((gamer) => (
-            <li>
-              <GamerCard
-                name={gamer.name}
-                nickname={gamer.nickname}
-                imagePath={gamer.imagePath}
-                overallRating={gamer.overallRating}
-                stats={gamer.stats}
-                revealed={revealGamerCards}
-              />
-            </li>
-          ))
-        }
-      </ul>
-    </section>
+  <section id="games" class="flex flex-col items-center gap-8 max-w-5xl">
+    <h2 class="text-3xl sm:text-4xl font-quantico">Spill</h2>
+    <ul class="flex flex-wrap gap-x-20 gap-y-16 justify-center">
+      {
+        games.map((game) => (
+          <li>
+            <GameCard
+              title={game.title}
+              slug={game.slug}
+              thumbnailPath={game.thumbnailPath}
+              chosenBy={game.chosenBy}
+              duration={game.duration}
+              shortDescription={game.shortDescription}
+              revealed={revealGames}
+            />
+          </li>
+        ))
+      }
+    </ul>
+  </section>
 
-    <section id="games" class="flex flex-col items-center gap-8 max-w-5xl">
-      <h2 class="text-3xl sm:text-4xl font-quantico">Spill</h2>
-      <ul class="flex flex-wrap gap-x-20 gap-y-16 justify-center">
-        {
-          games.map((game) => (
-            <li>
-              <GameCard
-                title={game.title}
-                thumbnailPath={game.thumbnailPath}
-                chosenBy={game.chosenBy}
-                duration={game.duration}
-                shortDescription={game.shortDescription}
-                revealed={revealGames}
-              />
-            </li>
-          ))
-        }
-      </ul>
-    </section>
-
-    <section id="power-ups" class="flex flex-col items-center gap-8 max-w-5xl">
-      <h2 class="text-3xl sm:text-4xl font-quantico">Power-ups</h2>
-      <ul class="flex flex-wrap gap-8 justify-center">
-        {
-          powerUps.map((powerUp) => (
-            <li>
-              <PowerUpCard {...powerUp} />
-            </li>
-          ))
-        }
-      </ul>
-    </section>
-  </main>
+  <section id="power-ups" class="flex flex-col items-center gap-8 max-w-5xl">
+    <h2 class="text-3xl sm:text-4xl font-quantico">Power-ups</h2>
+    <ul class="flex flex-wrap gap-8 justify-center">
+      {
+        powerUps.map((powerUp) => (
+          <li>
+            <PowerUpCard {...powerUp} />
+          </li>
+        ))
+      }
+    </ul>
+  </section>
 </Layout>
