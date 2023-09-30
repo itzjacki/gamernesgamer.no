@@ -2,11 +2,11 @@ export interface Game {
   title: string;
   slug: string;
   thumbnailPath: string;
-  heroPath: string;
   chosenBy: string;
   duration: string;
   shortDescription: string;
   longDescription?: string;
+  videoEmbedUrl?: string;
 }
 
 export const games: Game[] = [
@@ -14,7 +14,6 @@ export const games: Game[] = [
     title: 'Hearthstone',
     slug: 'hearthstone',
     thumbnailPath: '/images/game-thumbnails/hearthstone.jpg',
-    heroPath: 'https://i.imgur.com/5YQqZ5M.png',
     chosenBy: 'William',
     duration: '30 min',
     shortDescription:
@@ -24,7 +23,6 @@ export const games: Game[] = [
     title: 'Curve Fever',
     slug: 'curve-fever',
     thumbnailPath: '/images/game-thumbnails/curve-fever.jpg',
-    heroPath: 'https://i.imgur.com/5YQqZ5M.png',
     chosenBy: 'Tobias',
     duration: '30 min',
     shortDescription:
@@ -34,7 +32,8 @@ export const games: Game[] = [
     title: 'The Sims 4',
     slug: 'the-sims-4',
     thumbnailPath: '/images/game-thumbnails/the-sims-4.jpg',
-    heroPath: 'https://i.imgur.com/5YQqZ5M.png',
+    videoEmbedUrl:
+      'https://www.youtube.com/embed/TdZfbh7AdCM?si=5KXcv52O3s0yggRO',
     chosenBy: 'Jakob',
     duration: '30 min',
     shortDescription:
@@ -68,7 +67,6 @@ export const games: Game[] = [
     title: 'Warcraft 3',
     slug: 'warcraft-3',
     thumbnailPath: '/images/game-thumbnails/warcraft-3.jpg',
-    heroPath: 'https://i.imgur.com/5YQqZ5M.png',
     chosenBy: 'William',
     duration: '60 min',
     shortDescription: '4-way Free for all. Om å gjøre å overleve lengst.',
@@ -77,7 +75,6 @@ export const games: Game[] = [
     title: "Poker - Texas Hold'em",
     slug: 'poker',
     thumbnailPath: '/images/game-thumbnails/poker.jpg',
-    heroPath: 'https://i.imgur.com/5YQqZ5M.png',
     chosenBy: 'Jørgen',
     duration: '60 min',
     shortDescription:
@@ -87,7 +84,6 @@ export const games: Game[] = [
     title: 'Wreckfest',
     slug: 'wreckfest',
     thumbnailPath: '/images/game-thumbnails/wreckfest.jpg',
-    heroPath: 'https://i.imgur.com/5YQqZ5M.png',
     chosenBy: 'Tobias',
     duration: '60 min',
     shortDescription:
@@ -97,7 +93,8 @@ export const games: Game[] = [
     title: 'Total War: Empire',
     slug: 'total-war-empire',
     thumbnailPath: '/images/game-thumbnails/total-war-empire.jpg',
-    heroPath: 'https://i.imgur.com/5YQqZ5M.png',
+    videoEmbedUrl:
+      'https://www.youtube.com/embed/WSD3k5_TgH4?si=FQulanI70-yWG3Cd',
     chosenBy: 'Jakob',
     duration: '60 min',
     shortDescription:
@@ -149,7 +146,6 @@ export const games: Game[] = [
     title: 'League of Legends',
     slug: 'league-of-legends',
     thumbnailPath: '/images/game-thumbnails/league-of-legends.jpg',
-    heroPath: 'https://i.imgur.com/5YQqZ5M.png',
     chosenBy: 'Jørgen',
     duration: '30 min',
     shortDescription:

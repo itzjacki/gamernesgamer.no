@@ -1,6 +1,6 @@
 ---
 import LightningIcon from '../../components/LightningIcon.astro';
-import { games } from '../../games';
+import { games, type Game } from '../../games';
 import Layout from '../../layouts/Layout.astro';
 
 export function getStaticPaths() {
@@ -26,11 +26,29 @@ const game = games.find((game) => game.slug === gameSlug)!;
       {game.title}
     </h1>
 
-    <img
-      class="w-fit mb-12 rounded-2xl drop-shadow-[1rem_1rem_0px_#334D51]"
-      src={game.thumbnailPath}
-      alt={`Skjermdump fra ${game.title}`}
-    />
+    {
+      game.videoEmbedUrl ? (
+        <div>
+          <iframe
+            class="mb-8"
+            width="560"
+            height="315"
+            src={game.videoEmbedUrl}
+            title="YouTube video player"
+            allow="accelerometer;
+        autoplay; clipboard-write; encrypted-media; gyroscope;
+        picture-in-picture; web-share"
+            allowfullscreen
+          />
+        </div>
+      ) : (
+        <img
+          class="w-fit mb-12 rounded-2xl drop-shadow-[1rem_1rem_0px_#334D51]"
+          src={game.thumbnailPath}
+          alt={`Skjermdump fra ${game.title}`}
+        />
+      )
+    }
 
     <div class="flex items-center gap-2">
       <LightningIcon color="reddish" />
