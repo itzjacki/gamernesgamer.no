@@ -79,6 +79,14 @@ export const games: Game[] = [
     duration: '60 min',
     shortDescription:
       'Cash game, stacks på 200 og 1/2 blinds. Blinds dobler hvert 20. minutt. Om å gjøre å sitte igjen med mest penger etter 60 minutter.',
+    longDescription: `
+      <p>
+      Vi spiller cash game med Texas Hold'em der alle starter med stacks på 200.
+      Blinds starter på 1/2 og dobler seg hvert 20. minutt. Det er om å gjøre å
+      sitte igjen med mest penger etter 60 minutter. Dersom flere ryker ut er 
+      det rekkefølgen man ryker ut som gjelder.
+      </p>
+    `,
   },
   {
     title: 'Wreckfest',
@@ -150,5 +158,29 @@ export const games: Game[] = [
     duration: '30 min',
     shortDescription:
       'Mundo dodgball i baron pit. Round-robin for seeding etterfulgt av head-to-head-turnering.',
+    longDescription: `
+    <p>
+    Vi spiller Mundo Dodgeball. Wards plasseres i midten av baron pit for å
+    lage en grense mellom de to sidene, og man kaster Q på hverandre til en
+    person dør.
+    </p>
+    <br />
+    <p>Regler:</p>
+    <ul>
+      <li>- Best of 3</li>
+      <li>- Man bytter side annenhver gang</li>
+      <li>
+        - Man kjøper boots + 2 control wards + Yellow trinket på starten av
+        spillet. Kjøper ingenting mer
+      </li>
+      <li>- Summoner spells: Flash + Ghost</li>
+      <li>- Summoner spells brukes fritt i duellene</li>
+      <li>- Standardisert runepage:</li>
+    </ul>
+    <br />
+    <img
+      src="/images/game-detail-images/mundo-dodgeball-runes.png"
+      alt="Runes til mundo-dodgeball"
+    />`,
   },
 ];
