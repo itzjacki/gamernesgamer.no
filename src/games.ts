@@ -52,7 +52,7 @@ export const games: Game[] = [
       </p>
       <ul>
       <li>- Å bruke juksekoder eller åpenbare exploits/bugs</li>
-      <li>- Å flytte inn med/flytte inn med en annen sim</li>
+      <li>- Å flytte inn med en annen sim</li>
       <li>- Å lage malerier</li>
       </ul>
       <br>
