@@ -129,9 +129,9 @@ export const games: Game[] = [
     <p>
       Alle spiller mot en AI <em>før</em> turneringsdagen der man prøver å vinne 
       så fort som mulig. Tiden måles av praktiske årsaker med stoppeklokke på
-      telefon/pc, man må derfor ikke sette spillet på høyere speed enn 1x. 
-      Man kan prøve så mange ganger man vil, beste tid sendes inn innen fredag 
-      6. oktober 16:00 og bestemmer seeding i H2H-turneringa.
+      telefon/pc, man kan derfor ikke sette spillet på høyere speed enn 1x. 
+      Man kan prøve så mange ganger man vil, beste tid sendes inn innen lørdag 
+      7. oktober 08:00 og bestemmer seeding i H2H-turneringa.
       <br>
       <br>
       I AI-matchen spiller man mot en easy AI som bruker følgende army:
