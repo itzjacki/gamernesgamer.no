@@ -95,6 +95,13 @@ export const games: Game[] = [
     chosenBy: 'William',
     duration: '60 min',
     shortDescription: '4-way Free for all. Om å gjøre å overleve lengst.',
+    longDescription: `
+      <p>
+        Vi spiller 4-way Free for all, last man standing. Spilles på 
+        duskwood-banen. Det er ikke lov til å lære seg "cheese strats" på 
+        forhånd ved å researche på nettet.
+      </p>
+    `,
   },
   {
     title: "Poker - Texas Hold'em",
