@@ -52,6 +52,14 @@ export const games: Game[] = [
     duration: '30 min',
     shortDescription:
       'Så mange free-for-alls vi rekker på 30 minutter med poengscoring basert på plassering.',
+    longDescription: `
+      Vi spiller så mange runder vi rekker på 30 minutter, vinneren av hver 
+      runde får 4 poeng, andreplass får 3, tredjeplass 2 og sisteplass får 1 
+      poeng. Den som har flest poeng etter 30 minutter har vunnet. Det er bare 
+      lov til å bruke homing missile og jump som abilites.
+    `,
+    videoEmbedUrl:
+      'https://www.youtube.com/embed/8RGefKTBFV4?si=6NonpAVheLjbiQaJ',
   },
   {
     title: 'The Sims 4',
