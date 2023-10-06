@@ -1,0 +1,33 @@
+<!-- Mega scuffed component stolen from w3schools. This really oughta be svelte or something (not to mention that I should make it ts compliant) -->
+<p class="">Gamernes gamer starter om:</p>
+<p id="demo" class="font-quantico bg-darkblueish text-2xl p-8 rounded-2xl">
+  -- timer, -- minutter og -- sekunder
+</p>
+
+<script>
+  var countDownDate = new Date('Oct 7, 2023 10:00:00').getTime();
+
+  var x = setInterval(function () {
+    var now = new Date().getTime();
+
+    var distance = countDownDate - now;
+
+    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    var hours = Math.floor(
+      (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+    );
+    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    document.getElementById('demo')!.innerHTML = `${hours} ${
+      hours === 1 ? 'time' : 'timer'
+    }, ${minutes} ${minutes === 1 ? 'minutt' : 'minutter'} og ${seconds} ${
+      seconds === 1 ? 'sekund' : 'sekunder'
+    }`;
+
+    if (distance < 0) {
+      clearInterval(x);
+      document.getElementById('demo')!.innerHTML = 'EXPIRED';
+    }
+  }, 1000);
+</script>
