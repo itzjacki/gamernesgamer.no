@@ -1,8 +1,11 @@
-<!-- Mega scuffed component stolen from w3schools. This really oughta be svelte or something (not to mention that I should make it ts compliant) -->
-<p class="">Gamernes gamer starter om:</p>
+<!-- Mega scuffed component stolen from w3schools. This really oughta be svelte or something (not to mention that I should make it ts compliant) -->(<p
+  class=""
+>
+  Gamernes gamer starter om:
+</p>
 <p id="demo" class="font-quantico bg-darkblueish text-2xl p-8 rounded-2xl">
   -- timer, -- minutter og -- sekunder
-</p>
+</p>)
 
 <script>
   var countDownDate = new Date('Oct 7, 2023 11:00:00').getTime();
@@ -27,7 +30,7 @@
 
     if (distance < 0) {
       clearInterval(x);
-      document.getElementById('demo')!.innerHTML = 'EXPIRED';
+      document.getElementById('demo')!.innerHTML = 'Turneringen har starta!';
     }
   }, 1000);
 </script>
