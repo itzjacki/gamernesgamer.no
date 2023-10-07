@@ -127,6 +127,8 @@ export const games: Game[] = [
       det rekkefølgen man ryker ut som gjelder.
       </p>
     `,
+    videoEmbedUrl:
+      'https://www.youtube.com/embed/h7wfklQCyRo?si=_LI-rJ9rSK_Tf7mH',
   },
   {
     title: 'Wreckfest',
@@ -281,5 +283,7 @@ export const games: Game[] = [
       src="/images/game-detail-images/mundo-dodgeball-runes.png"
       alt="Runes til mundo-dodgeball"
     />`,
+    videoEmbedUrl:
+      'https://www.youtube.com/embed/UaC0OBF018I?si=piqCgvapeRlkYN6v',
   },
 ];
