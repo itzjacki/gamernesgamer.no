@@ -42,6 +42,8 @@ export const games: Game[] = [
       Death knight er bannet.
     </p>
     `,
+    videoEmbedUrl:
+      'https://www.youtube.com/embed/p-JmssuWe08?si=gbioTwQtvy1ygeO7',
   },
   {
     title: 'Curve Fever',
@@ -109,6 +111,8 @@ export const games: Game[] = [
         forhånd ved å researche på nettet.
       </p>
     `,
+    videoEmbedUrl:
+      'https://www.youtube.com/embed/jJWT3VvxmLo?si=5GUHwpe7GIgHhTNA',
   },
   {
     title: "Poker - Texas Hold'em",
