@@ -16,8 +16,7 @@ export const games: Game[] = [
     thumbnailPath: '/images/game-thumbnails/hearthstone.jpg',
     chosenBy: 'William',
     duration: '30 min',
-    shortDescription:
-      'Head-to-Head-turnering med decks laget av kun basickortene som alle har.',
+    shortDescription: 'Head-to-Head-turnering med decks på helt nye brukere.',
     longDescription: `
     <p>
       Hver utøver har mulighet til å lage opptil 2 standard-deck på helt nye 
