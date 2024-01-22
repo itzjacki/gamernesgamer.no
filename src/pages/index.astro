@@ -39,13 +39,59 @@ const revealVideo = true;
     </p>
 
     <!-- <ScuffedCountdown /> -->
+  </section>
+  <h1>Sesong 2:</h1>
+  <section id="participants" class="flex flex-col items-center gap-8 max-w-4xl">
+    <h2 class="text-3xl sm:text-4xl font-quantico">Utøvere</h2>
+    <ul class="flex flex-wrap gap-16 justify-center">
+      {
+        gamers.map((gamer) => (
+          <li>
+            <GamerCard
+              name={gamer.name}
+              nickname={gamer.nickname}
+              imagePath={gamer.imagePath}
+              overallRating={gamer.overallRating}
+              stats={gamer.stats}
+              revealed={revealGamerCards}
+            />
+          </li>
+        ))
+      }
+    </ul>
+  </section>
 
-    <a href="/sesong/2" class="mb-24 mt-8">
-      <button
-        class="bg-reddish text-grayish font-quantico text-xl px-12 py-4 transition-all drop-shadow-[0.25rem_0.25rem_0px_#73C9BB] hover:drop-shadow-[0.5rem_0.5rem_0px_#73C9BB] rounded-2xl"
-      >
-        Vis meg siden for sesong 2
-      </button>
-    </a>
+  <section id="games" class="flex flex-col items-center gap-8 max-w-5xl">
+    <h2 class="text-3xl sm:text-4xl font-quantico">Spill</h2>
+    <ul class="flex flex-wrap gap-x-20 gap-y-16 justify-center">
+      {
+        games.map((game) => (
+          <li>
+            <GameCard
+              title={game.title}
+              slug={game.slug}
+              thumbnailPath={game.thumbnailPath}
+              chosenBy={game.chosenBy}
+              duration={game.duration}
+              shortDescription={game.shortDescription}
+              revealed={revealGames}
+            />
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section id="power-ups" class="flex flex-col items-center gap-8 max-w-5xl">
+    <h2 class="text-3xl sm:text-4xl font-quantico">Power-ups</h2>
+    <ul class="flex flex-wrap gap-8 justify-center">
+      {
+        powerUps.map((powerUp) => (
+          <li>
+            <PowerUpCard {...powerUp} />
+          </li>
+        ))
+      }
+    </ul>
   </section>
 </Layout>
