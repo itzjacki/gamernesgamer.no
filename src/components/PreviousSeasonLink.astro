@@ -1,0 +1,14 @@
+---
+interface Props {
+  season: number;
+}
+
+const { season } = Astro.props;
+---
+
+<a
+  href=`/sesong/${season >= 10 ? season : "0" + season}`
+  class="border-2 hover:bg-[#2a252c] border-darkblueish h-full p-4 rounded-2xl transition-all block w-32 text-center"
+>
+  Sesong {season}
+</a>

@@ -2,21 +2,28 @@
 import GamerCard from '../../../components/GamerCard.astro';
 import LightningIcon from '../../../components/LightningIcon.astro';
 import Layout from '../../../layouts/Layout.astro';
-import { gamers } from '../../../gamers';
 import GameCard from '../../../components/GameCard.astro';
-import { games } from '../../../games';
-import { powerUps } from '../../../power-ups';
+import { gamers } from './gamers';
+import { games } from './games';
+import { powerUps } from './power-ups';
 import PowerUpCard from '../../../components/PowerUpCard.astro';
 import ScuffedCountdown from '../../../components/ScuffedCountdown.astro';
 
 const revealGamerCards = true;
 const revealGames = true;
-const revealVideo = true;
+const revealVideo = false;
+const revealPowerups = true;
 ---
 
-<Layout title="Gamernes Gamer">
-  <section class="flex flex-col gap-4 items-center max-w-prose">
-    <h1 class="text-4xl sm:text-6xl font-quantico">Gamernes Gamer</h1>
+<Layout title="Sesong 2 - Gamernes Gamer">
+  <section class="flex flex-col gap-4 items-center max-w-prose w-full">
+    <a href="/" class="block group self-start"
+      ><span
+        class="text-xl text-blueish pr-2 group-hover:text-reddish transition-colors duration-200"
+        >←</span
+      ><span class="">Gå tilbake</span></a
+    >
+    <h1 class="text-4xl sm:text-6xl font-quantico">Sesong 2</h1>
     <div class="flex gap-4">
       <LightningIcon color="reddish" />
       <LightningIcon color="blueish" />
@@ -25,38 +32,6 @@ const revealVideo = true;
     <p class="font-quantico">07/10/2023</p>
     <div class="border-t-blueish border-t-2 w-1/6 mb-8"></div>
 
-    <p class="mb-24">
-      Gamernes Gamer er tilbake med en ny sesong etter braksuksessen i sesong 1!
-
-
-      <a
-        class="border-b-reddish border-b-2 hover:text-blueish transition-all"
-        href="#participants">Fire utøvere</a
-      > skal kjempe om å få tak i den gjeve GG-pokalen og tittelen som selveste
-      Gamernes Gamer. Denne sesongen endres formatet gjennom introduksjonen av <a
-        class="border-b-reddish border-b-2 hover:text-blueish transition-all"
-        href="#power-ups">3 kraftige power-ups</a
-      > som kan snu poengsituasjonen på hodet. Dette vil du ikke gå glipp av!
-      Tune inn på Twitch den 7. oktober.
-    </p>
-
-    <!-- <ScuffedCountdown /> -->
-
-    <a
-      href="https://twitchtheater.tv/itzjacki/hypotermal/knappis98/everlasthd"
-      class="mb-24 mt-8"
-    >
-      <button
-        class="bg-reddish text-grayish font-quantico text-xl px-12 py-4 transition-all drop-shadow-[0.25rem_0.25rem_0px_#73C9BB] hover:drop-shadow-[0.5rem_0.5rem_0px_#73C9BB] rounded-2xl"
-      >
-        Se på Twitch
-      </button>
-    </a>
-
-    <p class="mb-4">
-      Fikk du ikke med deg sesong 1, eller vil du bare gjenoppleve minnene?
-      Sjekk ut dette tilbakeblikket på hvordan turneringa gikk:
-    </p>
     {
       revealVideo ? (
         <iframe
@@ -69,7 +44,7 @@ const revealVideo = true;
         />
       ) : (
         <div class=" bg-darkblueish w-5/6 aspect-video rounded-2xl grid place-items-center">
-          Denne videoen slippes snart!
+          Sesongens video slippes snart!
         </div>
       )
     }
@@ -103,7 +78,7 @@ const revealVideo = true;
           <li>
             <GameCard
               title={game.title}
-              slug={game.slug}
+              slug={'/sesong/02/games/' + game.slug}
               thumbnailPath={game.thumbnailPath}
               chosenBy={game.chosenBy}
               duration={game.duration}
@@ -122,7 +97,7 @@ const revealVideo = true;
       {
         powerUps.map((powerUp) => (
           <li>
-            <PowerUpCard {...powerUp} />
+            <PowerUpCard {...powerUp} revealed={revealPowerups} />
           </li>
         ))
       }

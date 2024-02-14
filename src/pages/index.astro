@@ -1,17 +1,19 @@
 ---
-import GamerCard from '../components/GamerCard.astro';
-import LightningIcon from '../components/LightningIcon.astro';
-import Layout from '../layouts/Layout.astro';
-import { gamers } from '../gamers';
-import GameCard from '../components/GameCard.astro';
-import { games } from '../games';
-import { powerUps } from '../power-ups';
-import PowerUpCard from '../components/PowerUpCard.astro';
+import Layout from '@/layouts/Layout.astro';
+import GamerCard from '@/components/GamerCard.astro';
+import LightningIcon from '@/components/LightningIcon.astro';
+import PowerUpCard from '@/components/PowerUpCard.astro';
+import GameCard from '@/components/GameCard.astro';
+import { gamers } from './sesong/03/gamers';
+import { games } from './sesong/03/games';
+import { powerUps } from './sesong/03/power-ups';
 import ScuffedCountdown from '../components/ScuffedCountdown.astro';
+import PreviousSeasonLink from '@/components/PreviousSeasonLink.astro';
 
-const revealGamerCards = true;
-const revealGames = true;
-const revealVideo = true;
+const revealGamerCards = false;
+const revealGames = false;
+const revealVideo = false;
+const revealPowerups = false;
 ---
 
 <Layout title="Gamernes Gamer">
@@ -25,7 +27,7 @@ const revealVideo = true;
     <p class="font-quantico">02/03/2024 - 03/03/2024</p>
     <div class="border-t-blueish border-t-2 w-1/6 mb-8"></div>
 
-    <p class="mb-24">
+    <p>
       Gamernes Gamer er tilbake med sesong 3, og den største GG noen sinne!
 
       <a
@@ -39,8 +41,29 @@ const revealVideo = true;
     </p>
 
     <!-- <ScuffedCountdown /> -->
+
+    <p>
+      Gikk du glipp av forrige sesong med Gamernes Gamer, eller er du litt
+      nostalgisk? Sjekk ut oppsummeringsvideoen til sesong 2 under.
+    </p>
+
+    {
+      revealVideo ? (
+        <iframe
+          class="w-5/6 aspect-video rounded-2xl"
+          src="https://www.youtube.com/embed/m0ARGEpN5kg?si=GCYOdAjOgLq_xETi"
+          title="YouTube video player"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+        />
+      ) : (
+        <div class=" bg-darkblueish w-5/6 aspect-video rounded-2xl grid place-items-center">
+          Videoen slippes snart!
+        </div>
+      )
+    }
   </section>
-  <h1 class="text-4xl sm:text-6xl font-quantico">Sesong 2:</h1>
   <section id="participants" class="flex flex-col items-center gap-8 max-w-4xl">
     <h2 class="text-3xl sm:text-4xl font-quantico">Utøvere</h2>
     <ul class="flex flex-wrap gap-16 justify-center">
@@ -69,7 +92,7 @@ const revealVideo = true;
           <li>
             <GameCard
               title={game.title}
-              slug={game.slug}
+              slug={'sesong/03/games/' + game.slug}
               thumbnailPath={game.thumbnailPath}
               chosenBy={game.chosenBy}
               duration={game.duration}
@@ -88,10 +111,22 @@ const revealVideo = true;
       {
         powerUps.map((powerUp) => (
           <li>
-            <PowerUpCard {...powerUp} />
+            <PowerUpCard {...powerUp} revealed={revealPowerups} />
           </li>
         ))
       }
+    </ul>
+  </section>
+
+  <section id="power-ups" class="flex flex-col items-center gap-8 max-w-5xl">
+    <h2 class="text-3xl sm:text-4xl font-quantico">Tidligere sesonger</h2>
+    <ul class="flex flex-wrap gap-8 justify-center">
+      <li>
+        <PreviousSeasonLink season={1} />
+      </li>
+      <li>
+        <PreviousSeasonLink season={2} />
+      </li>
     </ul>
   </section>
 </Layout>

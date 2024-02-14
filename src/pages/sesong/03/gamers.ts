@@ -1,0 +1,80 @@
+import type { Gamer } from '@/components/GamerCard.astro';
+
+export const gamers: Gamer[] = [
+  {
+    name: 'Tobias Knapp Eliassen',
+    nickname: '"The Maestro"',
+    imagePath: '/images/gamers/tobias.png',
+    stats: {
+      focus: 99,
+      strategy: 89,
+      mechanics: 92,
+      mental: 89,
+      versatility: 92,
+      consistency: 94,
+      tactics: 95,
+    },
+    overallRating: 93,
+  },
+  {
+    name: 'Kristin Helene Lie Størkson',
+    nickname: '"Sleeping Tiger"',
+    imagePath: '/images/gamers/kristin.png',
+    stats: {
+      focus: 80,
+      strategy: 94,
+      mechanics: 80,
+      mental: 94,
+      versatility: 95,
+      consistency: 96,
+      tactics: 84,
+    },
+    overallRating: 89,
+  },
+  {
+    name: 'Jørgen Endrestad Kielland',
+    nickname: '"All in"',
+    imagePath: '/images/gamers/jorgen.png',
+    stats: {
+      focus: 95,
+      strategy: 86,
+      mechanics: 99,
+      mental: 79,
+      versatility: 78,
+      consistency: 84,
+      tactics: 94,
+    },
+    overallRating: 88,
+  },
+
+  {
+    name: 'Jakob Endrestad Kielland',
+    nickname: '"The Professor"',
+    imagePath: '/images/gamers/jakob.png',
+    stats: {
+      focus: 79,
+      strategy: 99,
+      mechanics: 78,
+      mental: 83,
+      versatility: 96,
+      consistency: 84,
+      tactics: 95,
+    },
+    overallRating: 88,
+  },
+  {
+    name: 'William Grimholt',
+    nickname: '"Iron Will"',
+    imagePath: '/images/gamers/william.png',
+    stats: {
+      focus: 97,
+      strategy: 72,
+      mechanics: 96,
+      mental: 99,
+      versatility: 76,
+      consistency: 79,
+      tactics: 83,
+    },
+    overallRating: 86,
+  },
+];

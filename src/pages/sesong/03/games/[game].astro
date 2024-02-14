@@ -1,6 +1,6 @@
 ---
 import LightningIcon from '@/components/LightningIcon.astro';
-import { games } from '../sesong/03/games';
+import { games } from '../games';
 import Layout from '@/layouts/Layout.astro';
 
 export function getStaticPaths() {
@@ -82,4 +82,3 @@ const game = games.find((game) => game.slug === gameSlug)!;
     }
   </section>
 </Layout>
- ../../season-data/02/games ../../games
