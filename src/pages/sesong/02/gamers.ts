@@ -4,7 +4,7 @@ export const gamers: Gamer[] = [
   {
     name: 'Tobias Knapp Eliassen',
     nickname: '"The Maestro"',
-    imagePath: '/images/gamers/tobias.png',
+    imagePath: '/images/gamers/02/tobias.png',
     stats: {
       focus: 99,
       strategy: 89,
@@ -19,7 +19,7 @@ export const gamers: Gamer[] = [
   {
     name: 'Jørgen Endrestad Kielland',
     nickname: '"All in"',
-    imagePath: '/images/gamers/jorgen.png',
+    imagePath: '/images/gamers/02/jorgen.png',
     stats: {
       focus: 96,
       strategy: 87,
@@ -35,7 +35,7 @@ export const gamers: Gamer[] = [
   {
     name: 'Jakob Endrestad Kielland',
     nickname: '"The Professor"',
-    imagePath: '/images/gamers/jakob.png',
+    imagePath: '/images/gamers/02/jakob.png',
     stats: {
       focus: 74,
       strategy: 99,
@@ -50,7 +50,7 @@ export const gamers: Gamer[] = [
   {
     name: 'William Grimholt',
     nickname: '"Iron Will"',
-    imagePath: '/images/gamers/william.png',
+    imagePath: '/images/gamers/02/william.png',
     stats: {
       focus: 93,
       strategy: 73,
