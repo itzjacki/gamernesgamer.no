@@ -35,7 +35,7 @@ function capitalizeFirst(s: string) {
 }
 ---
 
-<div class="relative">
+<div class="relative" data-type="card">
   <svg
     width="340"
     height="413"
@@ -146,3 +146,58 @@ function capitalizeFirst(s: string) {
     grid-template-rows: 58% auto;
   }
 </style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const cards = document.querySelectorAll('[data-type="card"]');
+
+    cards.forEach((card) => {
+      if (!(card instanceof HTMLElement)) return;
+
+      let targetRotateX = 0;
+      let targetRotateY = 0;
+      let currentRotateX = 0;
+      let currentRotateY = 0;
+
+      const animate = () => {
+        currentRotateX += (targetRotateX - currentRotateX) * 0.1;
+        currentRotateY += (targetRotateY - currentRotateY) * 0.1;
+
+        card.style.transformOrigin = 'center';
+        card.style.transform = `perspective(1000px) rotateX(${currentRotateX}deg) rotateY(${currentRotateY}deg)`;
+
+        requestAnimationFrame(animate);
+      };
+
+      animate();
+
+      const handleMouseMove = (e) => {
+        const cardRect = card.getBoundingClientRect();
+        const { clientX, clientY } = e;
+
+        const centerX = cardRect.left + cardRect.width / 2;
+        const centerY = cardRect.top + cardRect.height / 2;
+        const mouseX = clientX - centerX;
+        const mouseY = clientY - centerY;
+
+        targetRotateX = Math.max(
+          Math.min(-(mouseY / (cardRect.height / 2)) * 20, 40),
+          -40,
+        );
+        targetRotateY = Math.max(
+          Math.min((mouseX / (cardRect.width / 2)) * 20, 40),
+          -40,
+        );
+      };
+
+      card.addEventListener('mouseover', () => {
+        card.addEventListener('mousemove', handleMouseMove);
+      });
+
+      card.addEventListener('mouseout', () => {
+        targetRotateX = 0;
+        targetRotateY = 0;
+      });
+    });
+  });
+</script>
