@@ -2,21 +2,21 @@ import type { PowerUp } from '@/components/PowerUpCard.astro';
 
 export const powerUps: PowerUp[] = [
   {
-    name: 'Double Up',
+    name: 'Double-Edged Sword',
     description:
-      'Dobbelt poeng for neste spill. Man kan ikke velge sitt eget spill',
+      'Man bruker 3 poeng for å få doble poeng fra neste spill. Man kan ikke velge sitt eget spill',
     imagePath: '/images/power-ups/double-up.svg',
   },
   {
-    name: 'Safety Net',
+    name: "Crystal Ballin'",
     description:
-      'Få mer poeng for siste (+2) og nest siste (+1) plass, men få mindre poeng for første (-2) og andre (-1) plass.',
+      'Man gjetter rekkefølgen som alle kommer på i et spill før spillet. Man får 2 poeng dersom man treffer på alle.',
     imagePath: '/images/power-ups/safety-net.svg',
   },
   {
-    name: 'Gamba Time',
+    name: 'Accounting Error',
     description:
-      'Gjett på hvem som kommer til å vinne neste spill, om personen vinner får man 3 poeng. Man kan ikke velge seg selv eller personen som valgte spillet.',
+      'Man får en liten forbedring i resultatet i et spill, som avhenger av spillet power-upen brukes i.',
     imagePath: '/images/power-ups/gamba-time.svg',
   },
 ];

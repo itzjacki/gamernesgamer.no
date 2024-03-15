@@ -16,21 +16,7 @@ export const gamers: Gamer[] = [
     },
     overallRating: 93,
   },
-  {
-    name: 'Kristin Helene Lie Størkson',
-    nickname: '"Sleeping Tiger"',
-    imagePath: '/images/gamers/03/kristin.png',
-    stats: {
-      focus: 80,
-      strategy: 94,
-      mechanics: 80,
-      mental: 94,
-      versatility: 95,
-      consistency: 96,
-      tactics: 84,
-    },
-    overallRating: 89,
-  },
+
   {
     name: 'Jørgen Endrestad Kielland',
     nickname: '"All in"',
@@ -46,7 +32,6 @@ export const gamers: Gamer[] = [
     },
     overallRating: 88,
   },
-
   {
     name: 'Jakob Endrestad Kielland',
     nickname: '"The Professor"',
@@ -76,5 +61,20 @@ export const gamers: Gamer[] = [
       tactics: 83,
     },
     overallRating: 86,
+  },
+  {
+    name: 'Kristin Helene Lie Størkson',
+    nickname: '"Sleeping Tiger"',
+    imagePath: '/images/gamers/03/kristin.png',
+    stats: {
+      focus: 80,
+      strategy: 94,
+      mechanics: 80,
+      mental: 94,
+      versatility: 95,
+      consistency: 96,
+      tactics: 84,
+    },
+    overallRating: 89,
   },
 ];
