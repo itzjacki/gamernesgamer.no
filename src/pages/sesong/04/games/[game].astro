@@ -1,6 +1,6 @@
 ---
 import LightningIcon from '@/components/LightningIcon.astro';
-import { games } from '../sesong/03/games';
+import { games } from '../games';
 import Layout from '@/layouts/Layout.astro';
 
 export function getStaticPaths() {
@@ -16,7 +16,7 @@ const game = games.find((game) => game.slug === gameSlug)!;
 
 <Layout title={game.title}>
   <section class="max-w-prose w-full gap-2 flex flex-col">
-    <a href="/" class="block group"
+    <a href="/sesong/03" class="block group"
       ><span
         class="text-xl text-blueish pr-2 group-hover:text-reddish transition-colors duration-200"
         >←</span
@@ -82,4 +82,3 @@ const game = games.find((game) => game.slug === gameSlug)!;
     }
   </section>
 </Layout>
- ../../season-data/02/games ../../games

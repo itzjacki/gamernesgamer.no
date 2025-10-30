@@ -1,9 +1,9 @@
 ---
-import GamerCard from '../../../components/GamerCard.astro';
-import LightningIcon from '../../../components/LightningIcon.astro';
-import Layout from '../../../layouts/Layout.astro';
-import GameCard from '../../../components/GameCard.astro';
-import { gamers } from './gamers';
+import GamerCard from '@/components/GamerCard.astro';
+import LightningIcon from '@/components/LightningIcon.astro';
+import Layout from '@/layouts/Layout.astro';
+import GameCard from '@/components/GameCard.astro';
+import { gamers } from '../../gamers/sesong/02';
 import { games } from './games';
 import { powerUps } from './power-ups';
 import PowerUpCard from '../../../components/PowerUpCard.astro';
@@ -21,7 +21,7 @@ const revealPowerups = true;
       ><span
         class="text-xl text-blueish pr-2 group-hover:text-reddish transition-colors duration-200"
         >←</span
-      ><span class="">Gå tilbake</span></a
+      ><span>Gå tilbake</span></a
     >
     <h1 class="text-4xl sm:text-6xl font-quantico">Sesong 2</h1>
     <div class="flex gap-4">

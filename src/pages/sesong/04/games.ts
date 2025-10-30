@@ -89,26 +89,4 @@ export const games: Game[] = [
     longDescription: undefined,
     videoEmbedUrl: undefined,
   },
-  {
-    title: 'Pummel Party',
-    slug: 'pummel-party',
-    thumbnailPath: '/images/game-thumbnails/03/pummel-party.jpg',
-    chosenBy: 'Tobias',
-    duration: '60 min',
-    shortDescription:
-      'Vi spiller minigames i Pummel Party. Beste sammenlagte score vinner.',
-    longDescription: undefined,
-    videoEmbedUrl: undefined,
-  },
-  {
-    title: "PlayerUnknown's Battlegrounds",
-    slug: 'pubg',
-    thumbnailPath: '/images/game-thumbnails/03/pubg.jpg',
-    chosenBy: 'William',
-    duration: '60 min',
-    shortDescription:
-      'Vi spiller en 5-spiller runde Battle Royale. Siste person i live vinner.',
-    longDescription: undefined,
-    videoEmbedUrl: undefined,
-  },
 ];
