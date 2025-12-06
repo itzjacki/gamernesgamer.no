@@ -2,7 +2,7 @@ import type { Gamer } from '@/components/GamerCard.astro';
 
 export const gamers: Gamer[] = [
   {
-    name: 'Tobias Knapp Eliassen',
+    name: 'Tobias',
     nickname: '"The Maestro"',
     imagePath: '/images/gamers/03/tobias.png',
     stats: {
@@ -18,7 +18,7 @@ export const gamers: Gamer[] = [
   },
 
   {
-    name: 'Jørgen Endrestad Kielland',
+    name: 'Jørgen',
     nickname: '"All in"',
     imagePath: '/images/gamers/03/jorgen.png',
     stats: {
@@ -33,7 +33,7 @@ export const gamers: Gamer[] = [
     overallRating: 88,
   },
   {
-    name: 'Jakob Endrestad Kielland',
+    name: 'Jakob',
     nickname: '"The Professor"',
     imagePath: '/images/gamers/03/jakob.png',
     stats: {
@@ -48,7 +48,7 @@ export const gamers: Gamer[] = [
     overallRating: 88,
   },
   {
-    name: 'William Grimholt',
+    name: 'William',
     nickname: '"Iron Will"',
     imagePath: '/images/gamers/03/william.png',
     stats: {
@@ -62,19 +62,19 @@ export const gamers: Gamer[] = [
     },
     overallRating: 86,
   },
-  {
-    name: 'Kristin Helene Lie Størkson',
-    nickname: '"Sleeping Tiger"',
-    imagePath: '/images/gamers/03/kristin.png',
-    stats: {
-      focus: 80,
-      strategy: 94,
-      mechanics: 80,
-      mental: 94,
-      versatility: 95,
-      consistency: 96,
-      tactics: 84,
-    },
-    overallRating: 89,
-  },
+  // {
+  //   name: 'Kristin',
+  //   nickname: '"Sleeping Tiger"',
+  //   imagePath: '/images/gamers/03/kristin.png',
+  //   stats: {
+  //     focus: 80,
+  //     strategy: 94,
+  //     mechanics: 80,
+  //     mental: 94,
+  //     versatility: 95,
+  //     consistency: 96,
+  //     tactics: 84,
+  //   },
+  //   overallRating: 89,
+  // },
 ];

@@ -247,7 +247,7 @@ export const games: Game[] = [
   },
   {
     title: 'League of Legends',
-    slug: 'league-of-legends',
+    slug: 'league-of-legends-02',
     thumbnailPath: '/images/game-thumbnails/02/league-of-legends.jpg',
     chosenBy: 'Jørgen',
     duration: '30 min',

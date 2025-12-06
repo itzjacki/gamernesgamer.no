@@ -2,7 +2,7 @@ import type { Gamer } from '@/components/GamerCard.astro';
 
 export const gamers: Gamer[] = [
   {
-    name: 'Tobias Knapp Eliassen',
+    name: 'Tobias',
     nickname: '"The Maestro"',
     imagePath: '/images/gamers/02/tobias.png',
     stats: {
@@ -17,7 +17,7 @@ export const gamers: Gamer[] = [
     overallRating: 91,
   },
   {
-    name: 'Jørgen Endrestad Kielland',
+    name: 'Jørgen',
     nickname: '"All in"',
     imagePath: '/images/gamers/02/jorgen.png',
     stats: {
@@ -33,7 +33,7 @@ export const gamers: Gamer[] = [
   },
 
   {
-    name: 'Jakob Endrestad Kielland',
+    name: 'Jakob',
     nickname: '"The Professor"',
     imagePath: '/images/gamers/02/jakob.png',
     stats: {
@@ -48,7 +48,7 @@ export const gamers: Gamer[] = [
     overallRating: 87,
   },
   {
-    name: 'William Grimholt',
+    name: 'William',
     nickname: '"Iron Will"',
     imagePath: '/images/gamers/02/william.png',
     stats: {
@@ -63,7 +63,7 @@ export const gamers: Gamer[] = [
     overallRating: 84,
   },
   // {
-  //   name: 'Kristin Helene Lie Størkson',
+  //   name: 'Kristin',
   //   nickname: '"Sleeping Tiger"',
   //   imagePath: 'images/image.png',
   //   stats: {

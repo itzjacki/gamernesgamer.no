@@ -35,73 +35,69 @@ function capitalizeFirst(s: string) {
 }
 ---
 
-<div class="relative" data-type="card">
+<div class='relative' data-type='card'>
   <svg
-    width="340"
-    height="413"
-    viewBox="0 0 340 413"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
+    width='340'
+    height='413'
+    viewBox='0 0 340 413'
+    fill='none'
+    xmlns='http://www.w3.org/2000/svg'
   >
     <rect
-      width="201.894"
-      height="580.067"
-      rx="5"
-      transform="matrix(0.877421 0.479722 -0.535829 0.844327 224.626 -62.0838)"
-      fill="#DB5461"></rect>
+      width='201.894'
+      height='580.067'
+      rx='5'
+      transform='matrix(0.877421 0.479722 -0.535829 0.844327 224.626 -62.0838)'
+      fill='#DB5461'></rect>
     <rect
-      x="51.7496"
-      y="35.8591"
-      width="241.888"
-      height="331.231"
-      rx="23"
-      fill="#334D51"></rect>
+      x='51.7496'
+      y='35.8591'
+      width='241.888'
+      height='331.231'
+      rx='23'
+      fill='#334D51'></rect>
     <path
-      d="M51.7496 206.5H263.862C271.041 206.5 276.862 212.32 276.862 219.5V223.413C276.862 230.593 271.041 236.413 263.862 236.413H51.7496V206.5Z"
-      fill="#1D1A1F"></path>
+      d='M51.7496 206.5H263.862C271.041 206.5 276.862 212.32 276.862 219.5V223.413C276.862 230.593 271.041 236.413 263.862 236.413H51.7496V206.5Z'
+      fill='#1D1A1F'></path>
   </svg>
   {
     revealed ? (
-      <div class="z-10 w-full h-full absolute top-0 left-0 cardGrid pl-[16%] pr-[15%] pb-[15%]">
-        <p class="font-quantico text-6xl gridRating self-end justify-self-center">
+      <div class='z-10 w-full h-full absolute top-0 left-0 cardGrid pl-[16%] pr-[15%] pb-[15%]'>
+        <p class='font-quantico text-6xl gridRating self-end justify-self-center'>
           {overallRating}
         </p>
-        <p class="font-quantico text-xl gridOverall justify-self-center self-start">
+        <p class='font-quantico text-xl gridOverall justify-self-center self-start'>
           Overall
         </p>
         <img
-          class="w-full gridImage self-end mb-[-1px] ml-[-3px]"
+          class='w-full gridImage self-end mb-[-1px] ml-[-3px]'
           src={imagePath}
           alt={`Bilde av ${name}`}
         />
-        <p class="gridNickname text-sm font-quantico self-end justify-self-center px-1 text-center">
-          {nickname}
+        <p class='gridName font-quantico text-sm self-center pl-1'>
+          {name} – {nickname}
         </p>
-        <p class="gridName font-quantico text-sm self-center pl-1">{name}</p>
-        <div class="gridStats grid grid-cols-2 gap-x-2 p-2">
+        <div class='gridStats grid grid-cols-2 gap-x-2 p-2'>
           {Object.entries(stats).map((stat) => (
             <Statbar statName={capitalizeFirst(stat[0])} statValue={stat[1]} />
           ))}
         </div>
       </div>
     ) : (
-      <div class="z-10 w-full h-full absolute top-0 left-0 cardGrid pl-[16%] pr-[15%] pb-[15%]">
-        <p class="font-quantico text-6xl gridRating self-end justify-self-center">
+      <div class='z-10 w-full h-full absolute top-0 left-0 cardGrid pl-[16%] pr-[15%] pb-[15%]'>
+        <p class='font-quantico text-6xl gridRating self-end justify-self-center'>
           ?
         </p>
-        <p class="font-quantico text-xl gridOverall justify-self-center self-start">
+        <p class='font-quantico text-xl gridOverall justify-self-center self-start'>
           Overall
         </p>
-        <p class="w-full gridImage text-9xl font-quantico place-self-end text-center">
+        <p class='w-full gridImage text-9xl font-quantico place-self-end text-center'>
           ?
         </p>
-        <p class="gridNickname text-sm font-quantico self-end justify-self-center px-1">
-          ???
-        </p>
-        <p class="gridName font-quantico text-sm self-center pl-1">
+        <p class='gridName font-quantico text-sm self-center pl-1'>
           Denne personen avsløres snart!
         </p>
-        <div class="gridStats grid grid-cols-2 gap-x-2 p-2">
+        <div class='gridStats grid grid-cols-2 gap-x-2 p-2'>
           {Object.entries(stats).map((stat) => (
             <Statbar statName={capitalizeFirst(stat[0])} statValue={'?'} />
           ))}
@@ -117,7 +113,7 @@ function capitalizeFirst(s: string) {
     grid-template:
       'image rating' 35%
       'image overall' 10%
-      'image nickname' 12%
+      'image .' 12%
       'name name' 8%
       'stats stats'
       / 55% 45%;
@@ -171,7 +167,7 @@ function capitalizeFirst(s: string) {
 
       animate();
 
-      const handleMouseMove = (e) => {
+      const handleMouseMove = (e: MouseEvent) => {
         const cardRect = card.getBoundingClientRect();
         const { clientX, clientY } = e;
 
@@ -182,11 +178,11 @@ function capitalizeFirst(s: string) {
 
         targetRotateX = Math.max(
           Math.min(-(mouseY / (cardRect.height / 2)) * 20, 40),
-          -40,
+          -40
         );
         targetRotateY = Math.max(
           Math.min((mouseX / (cardRect.width / 2)) * 20, 40),
-          -40,
+          -40
         );
       };
 

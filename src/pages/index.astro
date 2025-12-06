@@ -6,12 +6,12 @@ import PowerUpCard from '@/components/PowerUpCard.astro';
 import GameCard from '@/components/GameCard.astro';
 import { gamers } from './gamers/sesong/04';
 import { games } from './sesong/04/games';
-import { powerUps } from './sesong/04/power-ups';
+import { curses, powerUps } from './sesong/04/power-ups';
 import ScuffedCountdown from '../components/ScuffedCountdown.astro';
 import PreviousSeasonLink from '@/components/PreviousSeasonLink.astro';
 
-const revealGamerCards = false;
-const revealGames = false;
+const revealGamerCards = true;
+const revealGames = true;
 const revealPowerups = false;
 ---
 
@@ -31,8 +31,8 @@ const revealPowerups = false;
       <a
         class='border-b-reddish border-b-2 hover:text-blueish transition-all'
         href='#participants'>Fire utøvere</a
-      > skal konkurrere i 8 spill om den gjeve GG-pokalen. Kommer Tobias seg 
-      tilbake på tronen, beholder Jakob pokalen, eller får vi se en ny Gamernes 
+      > skal konkurrere i 8 spill om den gjeve GG-pokalen. Kommer Tobias seg
+      tilbake på tronen, beholder Jakob pokalen, eller får vi se en ny Gamernes
       Gamer?
     </p>
 
@@ -87,11 +87,26 @@ const revealPowerups = false;
 
   <section id='power-ups' class='flex flex-col items-center gap-8 max-w-5xl'>
     <h2 class='text-3xl sm:text-4xl font-quantico'>Power-ups</h2>
+    <p>
+      I sesong 4 av Gamernes Gamer vil hver deltaker fritt kunne velge tre
+      power-ups fra et større utvalg. Disse kan gi en kjempefordel om de brukes
+      riktig, så det å velge riktig power-ups er kritisk. I tillegg må hver
+      spiller velge én <em>curse</em>, som gir de en betydelig ulempe.
+    </p>
     <ul class='flex flex-wrap gap-8 justify-center'>
       {
         powerUps.map((powerUp) => (
           <li>
             <PowerUpCard {...powerUp} revealed={revealPowerups} />
+          </li>
+        ))
+      }
+    </ul>
+    <ul class='flex flex-wrap gap-8 justify-center'>
+      {
+        curses.map((curse) => (
+          <li>
+            <PowerUpCard {...curse} revealed={revealPowerups} />
           </li>
         ))
       }
