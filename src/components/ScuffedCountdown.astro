@@ -5,7 +5,7 @@
 </p>
 
 <script>
-  var countDownDate = new Date('March 16, 2024 12:00:00').getTime();
+  var countDownDate = new Date('December 13, 2025 11:00:00').getTime();
 
   var x = setInterval(function () {
     var now = new Date().getTime();
@@ -19,11 +19,11 @@
     var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
     var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-    document.getElementById('demo')!.innerHTML = `${hours} ${
-      hours === 1 ? 'time' : 'timer'
-    }, ${minutes} ${minutes === 1 ? 'minutt' : 'minutter'} og ${seconds} ${
-      seconds === 1 ? 'sekund' : 'sekunder'
-    }`;
+    document.getElementById('demo')!.innerHTML = `${days} ${
+      days === 1 ? 'dag' : 'dager'
+    }, ${hours} ${hours === 1 ? 'time' : 'timer'}, ${minutes} ${
+      minutes === 1 ? 'minutt' : 'minutter'
+    } og ${seconds} ${seconds === 1 ? 'sekund' : 'sekunder'}`;
 
     if (distance < 0) {
       clearInterval(x);
