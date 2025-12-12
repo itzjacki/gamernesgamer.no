@@ -45,7 +45,7 @@ export const games: Game[] = [
     shortDescription:
       'Fellesspill av 8 sanger om poeng, etterfulgt 1v1 i finalen og bronsefinalen.',
     longDescription:
-      'Alle spillerne banner en sang hver, så velger de sang etter hverandre i den lette kategorien, deretter gjør vi det samme i den medium kategorien. Vi teller poeng ut ifra plassering på hver enkelt sang. De to med mest poeng er i finalen og de to med minst poeng er i bronsefinalen. I finalene spilles det fra den vanskeligste kategorien. Spiller 1 banner en sang også velger spiller 2 sangen dere skal spille. Deretter snur rollene. Dersom det er 1-1 spilles sailors hornpipe.',
+      "Alle spillerne banner en sang hver, så velger de sang etter hverandre i den lette kategorien (1-4 stjerner), deretter gjør vi det samme i medium-kategorien (5-7 stjerner). Vi teller poeng ut ifra plassering på hver enkelt sang. De to med mest poeng er i finalen og de to med minst poeng er i bronsefinalen. I finalene spilles det fra den vanskeligste kategorien (8-10 stjerner, unntatt Sailor's Hornpipe). Spiller 1 banner en sang også velger spiller 2 sangen dere skal spille. Deretter snur rollene. Dersom det er 1-1 spilles sailors hornpipe.",
     videoEmbedUrl: undefined,
   },
   {
