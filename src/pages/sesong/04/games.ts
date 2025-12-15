@@ -33,7 +33,8 @@ export const games: Game[] = [
     duration: '75 min',
     shortDescription:
       'Vi spiller en rekke deathmatches, poeng gis for plassering per match.',
-    longDescription: undefined,
+    longDescription:
+      'Det spiller runder på 10 minutter på ulike baner hvor det er om å gjøre å få flest kills per runde. Det skal spilles 6 baner. Det gis 4-3-2-1 poeng i hver runde ut ifra hvem som fikk flest kills. Førsteplass (flest kills i en runde) får 4 poeng. Du samler opp poengene dine gjennom alle rundene også ser vi hvem som har flest poeng da alle 6 rundene er spilt. Tiebreaker: Står 2 spillere på like poengsum til slutt blir det spilt en 1v1 hvor det er om å gjøre å komme til 10 kills først.',
     videoEmbedUrl: undefined,
   },
   {
@@ -56,7 +57,8 @@ export const games: Game[] = [
     duration: '75 min',
     shortDescription:
       'Vi spiller en parkour map som fokuserer på CS movement. Om å gjøre å komme lengst på 75 minutter.',
-    longDescription: undefined,
+    longDescription:
+      'Det spilles et KZ map. Her handler det ikke om skyting, men om å komme lengst mulig på banen i løpet av 75 minutter. Vi skal spille på et map som er etterlignet "only up”. Her er det stor sjanse for å falle ned og det er ingen checkpoints. Den som AVSLUTTER høyest vinner. Tiebreaker: Om to spillere er på samme hindring/plattform når tiden går ut får begge spillerne en sjanse til å forsøke neste hindring hvor det er sudden death. Om en spiller klarer hindringen og den andre ikke vinner den umiddelbart. Om begge spillere klarer hindringen gjelder samme regler for neste hinder helt til en feiler. Om begge spillerne feiler så handler det om å lande høyest. Om begge lander på samme plattform (eller bunnen) gjelder “sudden death” fortsatt.',
     videoEmbedUrl: undefined,
   },
   {
