@@ -1,4 +1,6 @@
 ---
+import SeasonHeader from '@/components/SeasonHeader.astro';
+
 interface Props {
   title: string;
 }
@@ -7,27 +9,30 @@ const { title } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="no">
+<html lang='no'>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="description" content="Gamernes Gamer" />
-    <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="generator" content={Astro.generator} />
+    <meta charset='UTF-8' />
+    <meta name='description' content='Gamernes Gamer' />
+    <meta name='viewport' content='width=device-width' />
+    <link rel='icon' type='image/svg+xml' href='/favicon.svg' />
+    <meta name='generator' content={Astro.generator} />
     <title>{title}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel='preconnect' href='https://fonts.googleapis.com' />
+    <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Quantico:wght@400;700&display=swap"
-      rel="stylesheet"
+      href='https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Quantico:wght@400;700&display=swap'
+      rel='stylesheet'
     />
   </head>
-  <body class="bg-grayish text-white">
-    <main
-      class="flex flex-col p-4 items-center mx-auto gap-28 sm:gap-36 mb-20 scroll-smooth mt-4 sm:mt-16"
+  <body class='bg-grayish text-white'>
+    <div
+      class='flex flex-col p-4 items-center mx-auto mb-20 scroll-smooth mt-4 sm:mt-16'
     >
-      <slot />
-    </main>
+      <SeasonHeader />
+      <main class='flex flex-col items-center gap-20 sm:gap-28'>
+        <slot />
+      </main>
+    </div>
   </body>
   <style is:global>
     * {

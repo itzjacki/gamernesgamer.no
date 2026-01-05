@@ -1,0 +1,26 @@
+---
+const links = [
+  { label: 'Sesong 1', href: '/sesong/01' },
+  { label: 'Sesong 2', href: '/sesong/02' },
+  { label: 'Sesong 3', href: '/sesong/03' },
+  { label: 'Sesong 4', href: '/' },
+];
+---
+
+<header>
+  <nav>
+    <ul
+      class='flex flex-wrap justify-center bg-darkblueish rounded-2xl mb-8 px-2'
+    >
+      {
+        links.map((link) => (
+          <li class='border-r-2 border-grayish last:border-r-0 border-y-2 hover:border-y-reddish transition-all duration-200 text-sm'>
+            <a href={link.href} class=' p-2 block'>
+              {link.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</header>
