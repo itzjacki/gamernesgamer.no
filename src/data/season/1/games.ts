@@ -54,7 +54,7 @@ export const games: Game[] = [
     chosenBy: 'Jørgen',
     duration: '60 min',
     shortDescription:
-      'Double battles i i Underused-klassen (UU). Man lager lag før dagen som en del av prep. Single round robin inn i single elimination.',
+      'Double battles i Underused-klassen (UU). Man lager lag før dagen som en del av prep. Single round robin inn i single elimination.',
   },
   {
     title: 'Trackmania',
