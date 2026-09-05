@@ -1,18 +1,15 @@
-# Review TODO
-
-Found during code review, 2026-09-05.
-
 ## Bugs
 
-- [ ] `sesong/01/games/[game].astro` — "Gå tilbake" link points to `/sesong/03` instead of `/sesong/01`
-- [ ] `sesong/04/games/[game].astro` — "Gå tilbake" link points to `/sesong/03` instead of `/sesong/04`
-- [ ] `src/data/sesong/01/gamers.ts` — season 1 has no stats; the file is a copy of sesong 02's data as a workaround
+- [x] `sesong/01/games/[game].astro` — "Gå tilbake" link points to `/sesong/03` instead of `/sesong/01`
+- [x] `sesong/04/games/[game].astro` — "Gå tilbake" link points to `/sesong/03` instead of `/sesong/04`
 
 ## Structural
 
-- [ ] `[game].astro` is duplicated across all four seasons with only the data import and back-link varying
+- [x] `[game].astro` is duplicated across all four seasons with only the data import and back-link varying
 - [x] Types (`Gamer`, `GamerStats`, `PowerUp`) were defined inside components and imported by data files — moved to `src/types/`
 - [ ] `revealGamerCards`, `revealGames`, `revealPowerups` flags are copy-pasted across every season page
+
+- [ ] `src/data/sesong/01/gamers.ts` — season 1 has no stats; the file is a copy of sesong 02's data as a workaround
 
 ## Polish
 

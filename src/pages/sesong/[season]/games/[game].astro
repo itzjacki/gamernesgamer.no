@@ -1,22 +1,24 @@
 ---
 import LightningIcon from '@/components/LightningIcon.astro';
-import { games } from '@/data/sesong/03/games';
+import { gamesBySeason } from '@/data/sesong';
 import Layout from '@/layouts/Layout.astro';
 
 export function getStaticPaths() {
-  return games.map((game) => {
-    return { params: { game: game.slug } };
-  });
+  return Object.entries(gamesBySeason).flatMap(([season, games]) =>
+    games.map((game) => ({
+      params: { season, game: game.slug },
+    })),
+  );
 }
 
-const gameSlug = Astro.params.game;
+const { season, game: gameSlug } = Astro.params;
 
-const game = games.find((game) => game.slug === gameSlug)!;
+const game = gamesBySeason[season].find((g) => g.slug === gameSlug)!;
 ---
 
 <Layout title={game.title}>
   <section class="max-w-prose w-full gap-2 flex flex-col">
-    <a href="/sesong/03" class="block group"
+    <a href={`/sesong/${season}`} class="block group"
       ><span
         class="text-xl text-blueish pr-2 group-hover:text-reddish transition-colors duration-200"
         >←</span
@@ -35,9 +37,7 @@ const game = games.find((game) => game.slug === gameSlug)!;
             height="315"
             src={game.videoEmbedUrl}
             title="YouTube video player"
-            allow="accelerometer;
-        autoplay; clipboard-write; encrypted-media; gyroscope;
-        picture-in-picture; web-share"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowfullscreen
           />
         </div>
@@ -52,15 +52,11 @@ const game = games.find((game) => game.slug === gameSlug)!;
 
     <div class="flex items-center gap-2">
       <LightningIcon color="reddish" />
-      <p class="font-quantico text-xl">
-        Valgt av: {game.chosenBy}
-      </p>
+      <p class="font-quantico text-xl">Valgt av: {game.chosenBy}</p>
     </div>
     <div class="flex items-center gap-2">
       <LightningIcon color="blueish" />
-      <p class="font-quantico text-xl">
-        Varighet: {game.duration}
-      </p>
+      <p class="font-quantico text-xl">Varighet: {game.duration}</p>
     </div>
 
     <h2 class="text-2xl sm:text-4xl font-quantico self-start mt-8 mb-4">
