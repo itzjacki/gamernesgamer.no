@@ -1,7 +1,9 @@
 # Code Conventions
 
-Observed patterns in the codebase. These are descriptive — match them when adding
-or editing code so new work stays consistent with what's already here.
+## Principles
+
+- Always prefer readable duplication with reusable components to overly configurable generics.
+- Avoid clever code.
 
 ## Formatting: Prettier
 

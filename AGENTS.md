@@ -20,6 +20,7 @@ spectator audience, and is heading into a significant functionality upgrade.
 
 ## Working guidelines
 
+- Do not go ahead with solutions to problems that have structural consequences for the whole project without consulting first. Propose the approach and tradeoffs, then wait for approval before implementing.
 - Run `npm run build` after changes; it's the primary correctness check (there
   are no tests). Fix any build errors before finishing.
 - **Run Prettier on changed files before finishing.** There's no `format`
