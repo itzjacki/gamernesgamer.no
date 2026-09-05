@@ -15,22 +15,22 @@ const { name, description, imagePath, isCurse, revealed } = Astro.props;
   {
     revealed ? (
       <>
-        <img src={imagePath} alt='' class='rounded-2xl min-h-32' />
-        <div class='flex justify-center gap-4 items-center'>
-          <LightningIcon color='reddish' />
-          <h3 class='font-quantico text-xl text-center'>{name}</h3>
-          <LightningIcon color='reddish' />
+        <img src={imagePath} alt="" class="rounded-2xl min-h-32" />
+        <div class="flex justify-center gap-4 items-center">
+          <LightningIcon color="reddish" />
+          <h3 class="font-quantico text-xl text-center">{name}</h3>
+          <LightningIcon color="reddish" />
         </div>
         <p>{description}</p>
       </>
     ) : (
       <>
-        <p class='font-quantico text-9xl bg-[#1C2A2C] rounded-xl text-darkblueish text-center'>
+        <p class="font-quantico text-9xl bg-darkblueish-dark rounded-xl text-darkblueish text-center">
           ?
         </p>
-        <div class='flex justify-center gap-4 items-center'>
+        <div class="flex justify-center gap-4 items-center">
           <LightningIcon color={isCurse ? 'blueish' : 'reddish'} />
-          <h3 class='font-quantico text-xl text-center'>
+          <h3 class="font-quantico text-xl text-center">
             Mystisk {isCurse ? 'Curse' : 'Powerup'}
           </h3>
           <LightningIcon color={isCurse ? 'blueish' : 'reddish'} />

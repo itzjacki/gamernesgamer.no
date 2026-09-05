@@ -28,6 +28,7 @@ const statBars = stats
     viewBox="0 0 340 413"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
   >
     <rect
       width="201.894"
@@ -77,7 +78,10 @@ const statBars = stats
         <p class="font-quantico text-xl gridOverall justify-self-center self-start">
           Overall
         </p>
-        <p class="w-full gridImage text-9xl font-quantico place-self-end text-center">
+        <p
+          class="w-full gridImage text-9xl font-quantico place-self-end text-center"
+          aria-hidden="true"
+        >
           ?
         </p>
         <p class="gridName font-quantico text-sm self-center pl-1">
@@ -140,27 +144,36 @@ const statBars = stats
       let targetRotateY = 0;
       let currentRotateX = 0;
       let currentRotateY = 0;
+      let rafId: number | null = null;
 
-      const animate = () => {
+      function animate() {
         currentRotateX += (targetRotateX - currentRotateX) * 0.1;
         currentRotateY += (targetRotateY - currentRotateY) * 0.1;
 
         card.style.transformOrigin = 'center';
         card.style.transform = `perspective(1000px) rotateX(${currentRotateX}deg) rotateY(${currentRotateY}deg)`;
 
-        requestAnimationFrame(animate);
-      };
+        const isSettled =
+          Math.abs(targetRotateX - currentRotateX) < 0.01 &&
+          Math.abs(targetRotateY - currentRotateY) < 0.01;
 
-      animate();
+        if (isSettled) {
+          rafId = null;
+        } else {
+          rafId = requestAnimationFrame(animate);
+        }
+      }
 
-      const handleMouseMove = (e: MouseEvent) => {
+      function scheduleAnimate() {
+        if (!rafId) rafId = requestAnimationFrame(animate);
+      }
+
+      card.addEventListener('mousemove', (e: MouseEvent) => {
         const cardRect = card.getBoundingClientRect();
-        const { clientX, clientY } = e;
-
         const centerX = cardRect.left + cardRect.width / 2;
         const centerY = cardRect.top + cardRect.height / 2;
-        const mouseX = clientX - centerX;
-        const mouseY = clientY - centerY;
+        const mouseX = e.clientX - centerX;
+        const mouseY = e.clientY - centerY;
 
         targetRotateX = Math.max(
           Math.min(-(mouseY / (cardRect.height / 2)) * 20, 40),
@@ -170,15 +183,14 @@ const statBars = stats
           Math.min((mouseX / (cardRect.width / 2)) * 20, 40),
           -40,
         );
-      };
 
-      card.addEventListener('mouseover', () => {
-        card.addEventListener('mousemove', handleMouseMove);
+        scheduleAnimate();
       });
 
       card.addEventListener('mouseout', () => {
         targetRotateX = 0;
         targetRotateY = 0;
+        scheduleAnimate();
       });
     });
   });

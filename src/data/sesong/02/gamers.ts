@@ -61,19 +61,4 @@ export const gamers: Gamer[] = [
       tactics: 77,
     },
   },
-  // {
-  //   name: 'Kristin',
-  //   nickname: '"Sleeping Tiger"',
-  //   imagePath: 'images/image.png',
-  //   stats: {
-  //     overall: 88,
-  //     focus: 80,
-  //     strategy: 93,
-  //     mechanics: 79,
-  //     mental: 93,
-  //     versatility: 94,
-  //     consistency: 95,
-  //     tactics: 80,
-  //   },
-  // },
 ];
