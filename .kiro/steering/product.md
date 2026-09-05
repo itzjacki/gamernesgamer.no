@@ -4,45 +4,61 @@
 
 Gamernes Gamer is the companion website for a recurring gaming tournament held
 between a small group of friends. Each season, participants pick games, compete
-across them for points, and crown a winner. The site presents each season's
-lineup: the competing "gamers" (as football-card-style player cards with
-stats), the games being played (with rules and descriptions), and — in seasons
-that use them — power-ups and curses. Content is deliberately hidden behind
-"reveal" flags so games and participants can be unveiled as hype builds toward
-tournament day.
+across them for points, and crown a winner. The site is the permanent monument
+and celebration of the tournament — an archive of every season's lineup, results,
+and memorable moments, as well as a live companion during the 2-day event itself.
+
+The primary value is **post-tournament**: stats, career records, champion history,
+and "remember when" content that makes the tournament feel worth celebrating long
+after it ends. The secondary value is **during-tournament**: a live leaderboard
+and results tracker for the 2 days the event runs.
+
+The social hub for the group is the group chat, not the site. The site supports
+the chat by producing shareable artifacts (champion cards, podium graphics, player
+stat cards) that people drop into it.
 
 ## Target users
 
-- **The tournament group** (primary) — the participants themselves, using the
-  site to see the lineup, rules, and results for each season.
+- **The tournament participants** (primary) — the 4–5 competitors themselves,
+  using the site to relive seasons, track career stats, and follow the live event.
 - **Spectators** (secondary) — a modest audience following along. Not a large
   crowd, but a real one worth designing for.
 
-## Key features
+## Key features (current and planned)
 
+### Live
 - Per-season pages showing gamer cards, games, and (when used) power-ups/curses
 - Interactive, football-card-style gamer cards with stats and a tilt effect
 - Game detail pages with rules, descriptions, thumbnails, and YouTube embeds
-- "Reveal" flags to hide/show games, gamers, and power-ups until they're
-  officially unveiled
+- "Reveal" flags to hide/show games, gamers, and power-ups until unveiled
 - A countdown component for building anticipation before a tournament
 - Archive of past seasons (currently seasons 1–4)
 
+### Planned
+- **The Hall** — a proper landing page celebrating the champion lineage, not just
+  the most recent season
+- **Player career pages** — all-time stats, championships, win rate, head-to-head
+  records per player
+- **Results in Supabase** — all historical results in a database, driving live
+  stats and the admin panel
+- **Live leaderboard** — real-time standings during the 2-day tournament (polling)
+- **Admin panel** — custom results entry for a small group of trusted admins;
+  replaces the spreadsheet
+- **Shareable images** — champion card, podium, player stat cards via Vercel OG,
+  for dropping into the group chat
+- **Hall of Records** — all-time records and superlatives across all seasons
+- **Head-to-head pages** — per-pairing career records and side-by-side stats
+- **Content/media integration** — videos, funny images, and lore attached to
+  seasons, games, and players; floating non-season content in Skattkammeret (/lore)
+- **Collectible card variants** — champion cards, season cards, and moment cards
+  building on the FIFA card visual identity
+
 ## Business context
 
-- This is a hobby project, not a commercial product. It exists to make the
-  tournament more fun and give spectators something to follow.
-- **New seasons are recurring.** Adding a season is a core, repeated workflow —
-  the structure is built around it.
-- **The participant roster can change between seasons.** It has been stable so
-  far, but the code should not assume a fixed set of players. (Commented-out
-  entries for a planned-but-unjoined participant, "Kristin", exist in some data
-  files for this reason — harmless leftovers.)
-- **Power-ups and curses vary per season.** When present, they grant benefits
-  paired with mandatory downsides, affecting either in-game play or scoring.
-  Both their mechanics and their format can differ from season to season, so
-  they are modeled per-season rather than globally.
-- The site is Norwegian-language (`lang="no"`); all user-facing content is in
-  Norwegian.
-- The near-term direction is a significant upgrade to the site's functionality,
-  so upcoming work is expected to be more code-heavy than content-heavy.
+- Hobby project. Fun and polish matter as much as utility.
+- **New seasons are recurring.** Adding a season is a core, repeated workflow.
+- **The participant roster can change between seasons.** Never assume a fixed set of players.
+- **Power-ups and curses vary per season.** Modeled per-season, not globally.
+- Norwegian-language site (`lang="no"`). All user-facing content in Norwegian.
+- Tournaments run every 6–12 months, last 2 days. Monument for ~363 days, live companion for ~2.
+- The group chat is the social layer. The site produces artifacts for it — no comments, reactions, or notifications.

@@ -2,23 +2,54 @@
 
 # AGENTS.md
 
-Gamernes Gamer — Astro static site (Vercel) for a recurring friends gaming tournament. Shows seasons, players, games, power-ups.
+Gamernes Gamer — Next.js (App Router) site on Vercel for a recurring friends gaming tournament. Monument and archive of seasons, players, results, and memorable moments.
 
 ## Commands
 
 - Build: `npm run build` (primary correctness check — no tests)
 - Dev: `npm run dev`
-- Preview: `npm run preview`
-- Lint: `npm run lint:eslint`
-- Format: `npx prettier --write <files>` (single quotes, `prettier-plugin-astro`)
+- Preview: `npm run start`
+- Lint: `npm run lint` (`next lint`)
+- Format: `npx prettier --write <files>` (single quotes, `prettier-plugin-tailwindcss`)
+
+## Stack
+
+- **Next.js App Router** — Server Components by default, `'use client'` only when needed
+- **Tailwind CSS v4** — tokens in `src/styles/global.css` via `@theme`
+- **Supabase** — Postgres (results data) + Auth (admin allowlist). Use `@supabase/ssr`.
+  - Server client: `@/lib/supabase/server` (Server Components, Server Actions)
+  - Browser client: `@/lib/supabase/client` (`'use client'` components only)
+- **Vercel OG / Satori** — shareable image generation at `src/app/api/og/`
+- **TypeScript strict** throughout
 
 ## Guidelines
 
 - Structural changes: propose + get approval before implementing.
-- Run build and Prettier on changed files before finishing.
-- Data lives in `src/data/sesong/<NN>/` (`gamers.ts`, `games.ts`, optional `power-ups.ts`). Never put data in `src/pages/` (Astro routes all `.ts` files there).
-- See `.kiro/steering/structure.md` for the "add a season" workflow and `.kiro/steering/code-conventions.md` for conventions.
-- Use `@/*` import alias. Match existing Astro/Tailwind patterns and tokens in `src/styles/global.css`.
+- Run `npm run build` and Prettier on changed files before finishing.
+- Static content (gamers, games, power-ups) lives in `src/data/sesong/<NN>/`. Never put it in the database.
+- Results data (per-player points, finishing positions) lives in Supabase only.
+- Admin routes (`src/app/admin/`) must check Supabase session server-side. Never client-side auth gating.
+- Use `@/*` import alias. Match existing patterns and tokens in `src/styles/global.css`.
 - UI copy is Norwegian. Roster and power-ups vary per season — treat as per-season data.
 - Use subagents frequently for parallelizable or multi-step work. Prefer custom agents in `.kiro/agents/` when available.
 - Update steering docs in `.kiro/steering/` after any structural or behavioral changes to the project.
+
+## Site map
+
+- `/` — The Hall (champion monument, season lineage)
+- `/sesong/[n]` — Season detail (standings, games, power-ups)
+- `/sesong/[n]/[game]` — Game detail
+- `/spillere` — Player index
+- `/spillere/[spiller]` — Player career page
+- `/records` — Hall of Records (all-time stats)
+- `/vs/[a]/[b]` — Head-to-head
+- `/lore` — Skattkammeret (floating media/lore)
+- `/admin` — Results entry (protected, Supabase Auth)
+
+## See also
+
+- `.kiro/steering/structure.md` — full directory layout and "add a season" workflow
+- `.kiro/steering/tech.md` — stack details and constraints
+- `.kiro/steering/code-conventions.md` — component patterns, naming, formatting
+- `.kiro/steering/product.md` — product vision and feature roadmap context
+- `TODO.md` — active expansion plan with phases and open questions

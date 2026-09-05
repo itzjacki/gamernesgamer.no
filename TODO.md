@@ -58,8 +58,6 @@ Needs design exploration before implementation.
 
 - Design exploration session with UI/UX designer
 - New color palette, typography treatment, and design tokens
-- Redesigned layout and page structure (this is also where the new site map gets
-  scaffolded — landing page, player pages, etc.)
 - Evolved base gamer card design (the FIFA card concept is a core visual asset)
 - Apply new design system across all pages
 
