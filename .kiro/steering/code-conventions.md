@@ -40,6 +40,14 @@ const revealGames = true;
 
 Pages define `revealGamerCards` / `revealGames` / `revealPowerups` and pass them into cards.
 
+## React & Next.js patterns
+
+- Prefer modern React and Next.js features over older patterns.
+- **Server Actions** for all mutations (results entry, admin operations) — no separate API routes unless Vercel OG requires it.
+- **Fetch data in Server Components directly** — no API layer in between unless it meaningfully simplifies things. Decide at the point of need, not upfront.
+- **`<Suspense>`** boundaries around async Server Components. Use `loading.tsx` for route-level skeletons.
+- **Error boundaries** (`error.tsx`) at the route level for graceful failure handling.
+
 ## Imports
 
 - `@/*` alias for all cross-directory imports: `import { games } from '@/data/sesong/04/games'`
