@@ -1,4 +1,4 @@
-import type { Gamer } from '@/components/GamerCard.astro';
+import type { Gamer } from '@/types/gamer';
 
 export const gamers: Gamer[] = [
   {

@@ -12,7 +12,7 @@ Found during code review, 2026-09-05.
 ## Structural
 
 - [ ] `[game].astro` is duplicated across all four seasons with only the import path and back-link varying — consolidate into a shared component or layout
-- [ ] `Gamer`/`GamerStats` types are exported from `GamerCard.astro`; `PowerUp` from `PowerUpCard.astro` — move all types to `src/types/` so data files don't import from components
+- [x] `Gamer`/`GamerStats` types are exported from `GamerCard.astro`; `PowerUp` from `PowerUpCard.astro` — move all types to `src/types/` so data files don't import from components
 - [ ] `revealGamerCards`, `revealGames`, `revealPowerups` flags are copy-pasted in every season page — consider moving them into the season's data file
 
 ## Polish

@@ -1,4 +1,4 @@
-import type { PowerUp } from '@/components/PowerUpCard.astro';
+import type { PowerUp } from '@/types/power-up';
 
 export const powerUps: PowerUp[] = [
   {
