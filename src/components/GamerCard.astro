@@ -5,18 +5,20 @@ import type { Gamer, GamerStats } from '@/types/gamer';
 interface Props {
   name: string;
   nickname: string;
-  overallRating: number;
-  stats: GamerStats;
+  stats?: GamerStats;
   imagePath: string;
   revealed: boolean;
 }
 
-const { name, nickname, stats, imagePath, overallRating, revealed } =
-  Astro.props;
+const { name, nickname, stats, imagePath, revealed } = Astro.props;
 
 function capitalizeFirst(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
+
+const statBars = stats
+  ? Object.entries(stats).filter(([key]) => key !== 'overall')
+  : [];
 ---
 
 <div class="relative" data-type="card">
@@ -48,7 +50,7 @@ function capitalizeFirst(s: string) {
     revealed ? (
       <div class="z-10 w-full h-full absolute top-0 left-0 cardGrid pl-[16%] pr-[15%] pb-[15%]">
         <p class="font-quantico text-6xl gridRating self-end justify-self-center">
-          {overallRating}
+          {stats?.overall ?? '–'}
         </p>
         <p class="font-quantico text-xl gridOverall justify-self-center self-start">
           Overall
@@ -62,7 +64,7 @@ function capitalizeFirst(s: string) {
           {name} – {nickname}
         </p>
         <div class="gridStats grid grid-cols-2 gap-x-2 p-2">
-          {Object.entries(stats).map((stat) => (
+          {statBars.map((stat) => (
             <Statbar statName={capitalizeFirst(stat[0])} statValue={stat[1]} />
           ))}
         </div>
@@ -82,7 +84,7 @@ function capitalizeFirst(s: string) {
           Denne personen avsløres snart!
         </p>
         <div class="gridStats grid grid-cols-2 gap-x-2 p-2">
-          {Object.entries(stats).map((stat) => (
+          {statBars.map((stat) => (
             <Statbar statName={capitalizeFirst(stat[0])} statValue={'?'} />
           ))}
         </div>

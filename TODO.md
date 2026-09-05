@@ -8,8 +8,7 @@
 - [x] `[game].astro` is duplicated across all four seasons with only the data import and back-link varying
 - [x] Types (`Gamer`, `GamerStats`, `PowerUp`) were defined inside components and imported by data files — moved to `src/types/`
 - [ ] `revealGamerCards`, `revealGames`, `revealPowerups` flags are copy-pasted across every season page
-
-- [ ] `src/data/sesong/01/gamers.ts` — season 1 has no stats; the file is a copy of sesong 02's data as a workaround
+- [x] `src/data/sesong/01/gamers.ts` — season 1 has no stats; the file is a copy of sesong 02's data as a workaround
 
 ## Polish
 

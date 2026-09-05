@@ -1,4 +1,5 @@
 export interface GamerStats {
+  overall: number;
   focus: number;
   strategy: number;
   mechanics: number;
@@ -11,7 +12,6 @@ export interface GamerStats {
 export interface Gamer {
   name: string;
   nickname: string;
-  imagePath: string; // should be 1000px tall
-  overallRating: number;
-  stats: GamerStats;
+  imagePath: string;
+  stats?: GamerStats;
 }

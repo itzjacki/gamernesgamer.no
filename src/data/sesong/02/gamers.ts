@@ -6,6 +6,7 @@ export const gamers: Gamer[] = [
     nickname: '"The Maestro"',
     imagePath: '/images/gamers/02/tobias.png',
     stats: {
+      overall: 91,
       focus: 99,
       strategy: 89,
       mechanics: 86,
@@ -14,13 +15,13 @@ export const gamers: Gamer[] = [
       consistency: 91,
       tactics: 95,
     },
-    overallRating: 91,
   },
   {
     name: 'Jørgen',
     nickname: '"All in"',
     imagePath: '/images/gamers/02/jorgen.png',
     stats: {
+      overall: 87,
       focus: 96,
       strategy: 87,
       mechanics: 98,
@@ -29,14 +30,13 @@ export const gamers: Gamer[] = [
       consistency: 81,
       tactics: 91,
     },
-    overallRating: 87,
   },
-
   {
     name: 'Jakob',
     nickname: '"The Professor"',
     imagePath: '/images/gamers/02/jakob.png',
     stats: {
+      overall: 87,
       focus: 74,
       strategy: 99,
       mechanics: 77,
@@ -45,13 +45,13 @@ export const gamers: Gamer[] = [
       consistency: 86,
       tactics: 95,
     },
-    overallRating: 87,
   },
   {
     name: 'William',
     nickname: '"Iron Will"',
     imagePath: '/images/gamers/02/william.png',
     stats: {
+      overall: 84,
       focus: 93,
       strategy: 73,
       mechanics: 95,
@@ -60,13 +60,13 @@ export const gamers: Gamer[] = [
       consistency: 79,
       tactics: 77,
     },
-    overallRating: 84,
   },
   // {
   //   name: 'Kristin',
   //   nickname: '"Sleeping Tiger"',
   //   imagePath: 'images/image.png',
   //   stats: {
+  //     overall: 88,
   //     focus: 80,
   //     strategy: 93,
   //     mechanics: 79,
@@ -75,6 +75,5 @@ export const gamers: Gamer[] = [
   //     consistency: 95,
   //     tactics: 80,
   //   },
-  //   overallRating: 88,
   // },
 ];
