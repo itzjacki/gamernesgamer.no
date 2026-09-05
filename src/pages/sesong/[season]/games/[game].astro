@@ -1,6 +1,6 @@
 ---
 import LightningIcon from '@/components/LightningIcon.astro';
-import { seasonData } from '@/data/sesong';
+import { seasonData, isSeason } from '@/data/sesong';
 import Layout from '@/layouts/Layout.astro';
 
 export function getStaticPaths() {
@@ -12,6 +12,10 @@ export function getStaticPaths() {
 }
 
 const { season, game: gameSlug } = Astro.params;
+
+if (!isSeason(season)) {
+  return Astro.redirect('/404');
+}
 
 const game = seasonData[season].games.find((g) => g.slug === gameSlug)!;
 ---

@@ -38,4 +38,8 @@ export const seasonData = {
 
 export type Season = keyof typeof seasonData;
 
+export function isSeason(value: string | undefined): value is Season {
+  return value !== undefined && value in seasonData;
+}
+
 export const currentSeason: Season = '04';
