@@ -70,7 +70,7 @@ function capitalizeFirst(s: string) {
           Overall
         </p>
         <img
-          class='w-full gridImage self-end mb-[-1px] ml-[-3px]'
+          class='w-full gridImage self-end -mb-px -ml-0.75'
           src={imagePath}
           alt={`Bilde av ${name}`}
         />
@@ -178,11 +178,11 @@ function capitalizeFirst(s: string) {
 
         targetRotateX = Math.max(
           Math.min(-(mouseY / (cardRect.height / 2)) * 20, 40),
-          -40
+          -40,
         );
         targetRotateY = Math.max(
           Math.min((mouseX / (cardRect.width / 2)) * 20, 40),
-          -40
+          -40,
         );
       };
 

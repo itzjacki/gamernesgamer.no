@@ -1,1 +1,11 @@
 @import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "sans-serif";
+  --font-quantico: "Quantico", "sans-serif";
+
+  --color-reddish: #db5461;
+  --color-blueish: #73c9bb;
+  --color-grayish: #1d1a1f;
+  --color-darkblueish: #334d51;
+}
