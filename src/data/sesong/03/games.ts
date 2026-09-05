@@ -136,8 +136,7 @@ export const games: Game[] = [
       Dersom dere blir ferdig før tiden kan dere spille gjennom boss rushet så mange ganger dere rekker for å forbedre tiden. Beste tid står.
       Dersom dere ikke kommer gjennom hele runnet er det bare om å gjøre og komme lengst mulig.
       <br><br>
-      Det ligger en save file pinned i discord. Den skal gi tilgang til alle charms, spells og være fully upgradet. Bare paste filen inn i Hollow Knight folderen. 
-      Min ligger i denne pathen: C:\Users\Kristin\AppData\LocalLow\Team Cherry\Hollow Knight
+      Det ligger en save file pinned i discord. Den skal gi tilgang til alle charms, spells og være fully upgradet. Bare paste filen inn i Hollow Knight folderen.
       <br><br>
       Hvordan dere velger å builde charms er helt fritt. De er kinda som runes eller upgrades. Sitt på benken for å endre charms. Det er ikke mulig andre steder. Hver charm tar x antall points, og du har et maks antall points å bruke. Choose wisely :))
       <br><br>
