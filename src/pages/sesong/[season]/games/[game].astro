@@ -1,11 +1,11 @@
 ---
 import LightningIcon from '@/components/LightningIcon.astro';
-import { gamesBySeason } from '@/data/sesong';
+import { seasonData } from '@/data/sesong';
 import Layout from '@/layouts/Layout.astro';
 
 export function getStaticPaths() {
-  return Object.entries(gamesBySeason).flatMap(([season, games]) =>
-    games.map((game) => ({
+  return Object.entries(seasonData).flatMap(([season, data]) =>
+    data.games.map((game) => ({
       params: { season, game: game.slug },
     })),
   );
@@ -13,7 +13,7 @@ export function getStaticPaths() {
 
 const { season, game: gameSlug } = Astro.params;
 
-const game = gamesBySeason[season].find((g) => g.slug === gameSlug)!;
+const game = seasonData[season].games.find((g) => g.slug === gameSlug)!;
 ---
 
 <Layout title={game.title}>

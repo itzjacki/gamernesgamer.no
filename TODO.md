@@ -13,6 +13,6 @@
 ## Polish
 
 - [x] `LightningIcon.astro` — two near-identical SVG paths that only differ in fill colour
-- [ ] `SeasonHeader.astro` — season links are a hardcoded static array
+- [x] `SeasonHeader.astro` — season links are a hardcoded static array
 - [ ] Hover colour `#2a252c` is hardcoded in both `GameCard.astro` and `PreviousSeasonLink.astro`
 - [ ] `ScuffedCountdown.astro` — uses `var`, is commented out in all pages
