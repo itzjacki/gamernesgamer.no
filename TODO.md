@@ -6,18 +6,17 @@ Found during code review, 2026-09-05.
 
 - [ ] `sesong/01/games/[game].astro` — "Gå tilbake" link points to `/sesong/03` instead of `/sesong/01`
 - [ ] `sesong/04/games/[game].astro` — "Gå tilbake" link points to `/sesong/03` instead of `/sesong/04`
-- [ ] `src/data/sesong/01/gamers.ts` — copy-paste of sesong 02 data (wrong image paths, possibly wrong stats too)
-- [ ] `src/data/sesong/02/gamers.ts` and `sesong/03/gamers.ts` are bit-for-bit identical — sesong 03 data was never filled in
+- [ ] `src/data/sesong/01/gamers.ts` — season 1 has no stats; the file is a copy of sesong 02's data as a workaround
 
 ## Structural
 
-- [ ] `[game].astro` is duplicated across all four seasons with only the import path and back-link varying — consolidate into a shared component or layout
-- [x] `Gamer`/`GamerStats` types are exported from `GamerCard.astro`; `PowerUp` from `PowerUpCard.astro` — move all types to `src/types/` so data files don't import from components
-- [ ] `revealGamerCards`, `revealGames`, `revealPowerups` flags are copy-pasted in every season page — consider moving them into the season's data file
+- [ ] `[game].astro` is duplicated across all four seasons with only the data import and back-link varying
+- [x] Types (`Gamer`, `GamerStats`, `PowerUp`) were defined inside components and imported by data files — moved to `src/types/`
+- [ ] `revealGamerCards`, `revealGames`, `revealPowerups` flags are copy-pasted across every season page
 
 ## Polish
 
-- [ ] `LightningIcon.astro` — two near-identical SVG paths differing only in fill colour; collapse to one SVG with a dynamic `fill`
-- [ ] `SeasonHeader.astro` — season links are a hardcoded static array; derive from a `CURRENT_SEASON` constant so adding a new season is one change, not many
-- [ ] Hover colour `#2a252c` is hardcoded in both `GameCard.astro` and `PreviousSeasonLink.astro` — add as a design token in `global.css`
-- [ ] `ScuffedCountdown.astro` — uses `var`, is commented out everywhere; either delete it or add a note that it's reactivated each pre-season
+- [ ] `LightningIcon.astro` — two near-identical SVG paths that only differ in fill colour
+- [ ] `SeasonHeader.astro` — season links are a hardcoded static array
+- [ ] Hover colour `#2a252c` is hardcoded in both `GameCard.astro` and `PreviousSeasonLink.astro`
+- [ ] `ScuffedCountdown.astro` — uses `var`, is commented out in all pages
