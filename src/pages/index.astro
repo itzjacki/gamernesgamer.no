@@ -4,9 +4,9 @@ import GamerCard from '@/components/GamerCard.astro';
 import LightningIcon from '@/components/LightningIcon.astro';
 import PowerUpCard from '@/components/PowerUpCard.astro';
 import GameCard from '@/components/GameCard.astro';
-import { gamers } from '@/data/sesong/4/gamers';
-import { games } from '@/data/sesong/4/games';
-import { curses, powerUps } from '@/data/sesong/4/power-ups';
+import { gamers } from '@/data/season/4/gamers';
+import { games } from '@/data/season/4/games';
+import { curses, powerUps } from '@/data/season/4/power-ups';
 
 const revealGamerCards = true;
 const revealGames = true;
@@ -57,7 +57,7 @@ const revealPowerups = true;
           <li>
             <GameCard
               title={game.title}
-              slug={`/sesong/4/games/${game.slug}`}
+              slug={`/sesong/4/spill/${game.slug}`}
               thumbnailPath={game.thumbnailPath}
               chosenBy={game.chosenBy}
               duration={game.duration}
