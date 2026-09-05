@@ -1,13 +1,17 @@
 {
   "name": "gamernesgamer.no",
   "type": "module",
-  "version": "3.9",
+  "version": "4.0.0",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "format": "prettier --write .",
+    "lint:types": "tsc --noEmit",
+    "lint:astro": "astro check",
+    "lint": "npm run lint:types && npm run lint:astro"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
@@ -16,6 +20,7 @@
   },
   "devDependencies": {
     "prettier": "^3.0.3",
-    "prettier-plugin-astro": "^0.14.1"
+    "prettier-plugin-astro": "^0.14.1",
+    "typescript": "^7.0.2"
   }
 }
