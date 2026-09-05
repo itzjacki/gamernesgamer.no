@@ -4,12 +4,10 @@ interface Props {
 }
 
 const { season } = Astro.props;
-
-const slug = String(season).padStart(2, '0');
 ---
 
 <a
-  href={`/sesong/${slug}`}
+  href={`/sesong/${season}`}
   class="border-2 hover:bg-grayish-light border-darkblueish h-full p-4 rounded-2xl transition-all block w-32 text-center"
 >
   Sesong {season}

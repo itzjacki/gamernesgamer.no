@@ -2,20 +2,20 @@ import type { Game } from '@/types/game';
 import type { Gamer } from '@/types/gamer';
 import type { PowerUp } from '@/types/power-up';
 
-import { games as games01 } from './01/games';
-import { gamers as gamers01 } from './01/gamers';
+import { games as games1 } from './1/games';
+import { gamers as gamers1 } from './1/gamers';
 
-import { games as games02 } from './02/games';
-import { gamers as gamers02 } from './02/gamers';
-import { powerUps as powerUps02 } from './02/power-ups';
+import { games as games2 } from './2/games';
+import { gamers as gamers2 } from './2/gamers';
+import { powerUps as powerUps2 } from './2/power-ups';
 
-import { games as games03 } from './03/games';
-import { gamers as gamers03 } from './03/gamers';
-import { powerUps as powerUps03 } from './03/power-ups';
+import { games as games3 } from './3/games';
+import { gamers as gamers3 } from './3/gamers';
+import { powerUps as powerUps3 } from './3/power-ups';
 
-import { games as games04 } from './04/games';
-import { gamers as gamers04 } from './04/gamers';
-import { powerUps as powerUps04, curses as curses04 } from './04/power-ups';
+import { games as games4 } from './4/games';
+import { gamers as gamers4 } from './4/gamers';
+import { powerUps as powerUps4, curses as curses4 } from './4/power-ups';
 
 export type SeasonData = {
   games: Game[];
@@ -25,14 +25,14 @@ export type SeasonData = {
 };
 
 export const seasonData = {
-  '01': { games: games01, gamers: gamers01 },
-  '02': { games: games02, gamers: gamers02, powerUps: powerUps02 },
-  '03': { games: games03, gamers: gamers03, powerUps: powerUps03 },
-  '04': {
-    games: games04,
-    gamers: gamers04,
-    powerUps: powerUps04,
-    curses: curses04,
+  '1': { games: games1, gamers: gamers1 },
+  '2': { games: games2, gamers: gamers2, powerUps: powerUps2 },
+  '3': { games: games3, gamers: gamers3, powerUps: powerUps3 },
+  '4': {
+    games: games4,
+    gamers: gamers4,
+    powerUps: powerUps4,
+    curses: curses4,
   },
 } as const satisfies Record<string, SeasonData>;
 
@@ -42,4 +42,4 @@ export function isSeason(value: string | undefined): value is Season {
   return value !== undefined && value in seasonData;
 }
 
-export const currentSeason: Season = '04';
+export const currentSeason: Season = '4';

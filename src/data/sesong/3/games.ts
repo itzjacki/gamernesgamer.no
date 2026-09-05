@@ -4,7 +4,7 @@ export const games: Game[] = [
   {
     title: 'World of Warcraft',
     slug: 'world-of-warcraft',
-    thumbnailPath: '/images/game-thumbnails/03/world-of-warcraft.jpg',
+    thumbnailPath: '/images/game-thumbnails/3/world-of-warcraft.jpg',
     chosenBy: 'William',
     duration: '60 min',
     shortDescription:
@@ -21,7 +21,7 @@ export const games: Game[] = [
   {
     title: 'BattleBlock Theater',
     slug: 'battleblock-theater',
-    thumbnailPath: '/images/game-thumbnails/03/battleblock-theater.jpg',
+    thumbnailPath: '/images/game-thumbnails/3/battleblock-theater.jpg',
     chosenBy: 'Kristin',
     duration: '60 min',
     shortDescription:
@@ -46,7 +46,7 @@ export const games: Game[] = [
   {
     title: 'Kerbal Space Program',
     slug: 'kerbal-space-program',
-    thumbnailPath: '/images/game-thumbnails/03/kerbal-space-program.jpg',
+    thumbnailPath: '/images/game-thumbnails/3/kerbal-space-program.jpg',
     chosenBy: 'Jakob',
     duration: '60 min',
     shortDescription:
@@ -61,7 +61,7 @@ export const games: Game[] = [
   {
     title: 'GeoGuessr',
     slug: 'geoguessr',
-    thumbnailPath: '/images/game-thumbnails/03/geoguessr.jpg',
+    thumbnailPath: '/images/game-thumbnails/3/geoguessr.jpg',
     chosenBy: 'Jørgen',
     duration: '60 min',
     shortDescription:
@@ -82,7 +82,7 @@ export const games: Game[] = [
   {
     title: 'Jump King',
     slug: 'jump-king',
-    thumbnailPath: '/images/game-thumbnails/03/jump-king.jpg',
+    thumbnailPath: '/images/game-thumbnails/3/jump-king.jpg',
     chosenBy: 'Tobias',
     duration: '60 min',
     shortDescription:
@@ -94,7 +94,7 @@ export const games: Game[] = [
   {
     title: 'Planet Coaster',
     slug: 'planet-coaster',
-    thumbnailPath: '/images/game-thumbnails/03/planet-coaster.jpg',
+    thumbnailPath: '/images/game-thumbnails/3/planet-coaster.jpg',
     chosenBy: 'Jørgen',
     duration: '60 min',
     shortDescription:
@@ -106,7 +106,7 @@ export const games: Game[] = [
   {
     title: 'War Thunder',
     slug: 'war-thunder',
-    thumbnailPath: '/images/game-thumbnails/03/war-thunder.jpg',
+    thumbnailPath: '/images/game-thumbnails/3/war-thunder.jpg',
     chosenBy: 'Jakob',
     duration: '60 min',
     shortDescription:
@@ -125,7 +125,7 @@ export const games: Game[] = [
   {
     title: 'Hollow Knight',
     slug: 'hollow-knight',
-    thumbnailPath: '/images/game-thumbnails/03/hollow-knight.jpg',
+    thumbnailPath: '/images/game-thumbnails/3/hollow-knight.jpg',
     chosenBy: 'Kristin',
     duration: '60 min',
     shortDescription:
@@ -149,7 +149,7 @@ export const games: Game[] = [
   {
     title: 'Pummel Party',
     slug: 'pummel-party',
-    thumbnailPath: '/images/game-thumbnails/03/pummel-party.jpg',
+    thumbnailPath: '/images/game-thumbnails/3/pummel-party.jpg',
     chosenBy: 'Tobias',
     duration: '60 min',
     shortDescription:
@@ -161,7 +161,7 @@ export const games: Game[] = [
   {
     title: "PlayerUnknown's Battlegrounds",
     slug: 'pubg',
-    thumbnailPath: '/images/game-thumbnails/03/pubg.jpg',
+    thumbnailPath: '/images/game-thumbnails/3/pubg.jpg',
     chosenBy: 'William',
     duration: '60 min',
     shortDescription:

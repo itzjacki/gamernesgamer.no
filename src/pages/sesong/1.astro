@@ -1,0 +1,64 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import LightningIcon from '@/components/LightningIcon.astro';
+import GameCard from '@/components/GameCard.astro';
+import { gamers } from '@/data/sesong/1/gamers';
+import { games } from '@/data/sesong/1/games';
+
+const revealGames = true;
+---
+
+<Layout title="Sesong 1 - Gamernes Gamer">
+  <section class="flex flex-col gap-4 items-center max-w-prose w-full">
+    <h1 class="text-4xl sm:text-6xl font-quantico">Sesong 1</h1>
+    <div class="flex gap-4">
+      <LightningIcon color="reddish" />
+      <LightningIcon color="blueish" />
+      <LightningIcon color="reddish" />
+    </div>
+    <p class="font-quantico">18/03/2023</p>
+    <div class="border-t-blueish border-t-2 w-1/6"></div>
+  </section>
+  <section id="participants" class="flex flex-col items-center gap-8 max-w-4xl">
+    <h2 class="text-3xl sm:text-4xl font-quantico">Utøvere</h2>
+    <ul class="grid-cols-1 md:grid-cols-2 grid gap-16 justify-center">
+      {
+        gamers.map((gamer) => (
+          <li>
+            <div class="flex flex-col items-center bg-darkblueish rounded-lg py-4 w-64">
+              <img
+                src={gamer.imagePath}
+                alt={'Bilde av ' + gamer.name}
+                class="h-48 mb-2"
+              />
+              <p class="text-center text-lg font-semibold border-t-2 border-reddish w-full rounded-b-lg">
+                {gamer.name} - {gamer.nickname}
+              </p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section id="games" class="flex flex-col items-center gap-8 max-w-5xl">
+    <h2 class="text-3xl sm:text-4xl font-quantico">Spill</h2>
+    <ul class="flex flex-wrap gap-x-20 gap-y-16 justify-center">
+      {
+        games.map((game) => (
+          <li>
+            <GameCard
+              title={game.title}
+              slug={`/sesong/1/games/${game.slug}`}
+              thumbnailPath={game.thumbnailPath}
+              chosenBy={game.chosenBy}
+              duration={game.duration}
+              shortDescription={game.shortDescription}
+              revealed={revealGames}
+            />
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</Layout>

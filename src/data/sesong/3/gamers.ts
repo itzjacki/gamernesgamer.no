@@ -4,7 +4,7 @@ export const gamers: Gamer[] = [
   {
     name: 'Tobias',
     nickname: '"The Maestro"',
-    imagePath: '/images/gamers/03/tobias.png',
+    imagePath: '/images/gamers/3/tobias.png',
     stats: {
       overall: 93,
       focus: 99,
@@ -19,7 +19,7 @@ export const gamers: Gamer[] = [
   {
     name: 'Jørgen',
     nickname: '"All in"',
-    imagePath: '/images/gamers/03/jorgen.png',
+    imagePath: '/images/gamers/3/jorgen.png',
     stats: {
       overall: 88,
       focus: 95,
@@ -34,7 +34,7 @@ export const gamers: Gamer[] = [
   {
     name: 'Jakob',
     nickname: '"The Professor"',
-    imagePath: '/images/gamers/03/jakob.png',
+    imagePath: '/images/gamers/3/jakob.png',
     stats: {
       overall: 88,
       focus: 79,
@@ -49,7 +49,7 @@ export const gamers: Gamer[] = [
   {
     name: 'William',
     nickname: '"Iron Will"',
-    imagePath: '/images/gamers/03/william.png',
+    imagePath: '/images/gamers/3/william.png',
     stats: {
       overall: 86,
       focus: 97,

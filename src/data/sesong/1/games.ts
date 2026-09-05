@@ -4,7 +4,7 @@ export const games: Game[] = [
   {
     title: 'Sjakk',
     slug: 'sjakk',
-    thumbnailPath: '/images/game-thumbnails/01/sjakk.jpg',
+    thumbnailPath: '/images/game-thumbnails/1/sjakk.jpg',
     chosenBy: 'Tobias',
     duration: '30 min',
     shortDescription:
@@ -13,7 +13,7 @@ export const games: Game[] = [
   {
     title: 'Old School RuneScape',
     slug: 'old-school-runescape',
-    thumbnailPath: '/images/game-thumbnails/01/old-school-runescape.jpg',
+    thumbnailPath: '/images/game-thumbnails/1/old-school-runescape.jpg',
     chosenBy: 'Jakob',
     duration: '30 min',
     shortDescription:
@@ -23,7 +23,7 @@ export const games: Game[] = [
     title: 'Counter-Strike: Global Offensive',
     slug: 'counter-strike-global-offensive',
     thumbnailPath:
-      '/images/game-thumbnails/01/counter-strike-global-offensive.jpg',
+      '/images/game-thumbnails/1/counter-strike-global-offensive.jpg',
     chosenBy: 'William',
     duration: '45 min',
     shortDescription:
@@ -32,7 +32,7 @@ export const games: Game[] = [
   {
     title: 'The Elder Scrolls V: Skyrim',
     slug: 'the-elder-scrolls-v-skyrim',
-    thumbnailPath: '/images/game-thumbnails/01/the-elder-scrolls-v-skyrim.jpg',
+    thumbnailPath: '/images/game-thumbnails/1/the-elder-scrolls-v-skyrim.jpg',
     chosenBy: 'Jakob',
     duration: '60 min',
     shortDescription:
@@ -41,7 +41,7 @@ export const games: Game[] = [
   {
     title: 'Tetris',
     slug: 'tetris',
-    thumbnailPath: '/images/game-thumbnails/01/tetris.jpg',
+    thumbnailPath: '/images/game-thumbnails/1/tetris.jpg',
     chosenBy: 'Jørgen',
     duration: '30 min',
     shortDescription:
@@ -50,7 +50,7 @@ export const games: Game[] = [
   {
     title: 'Pokemon Showdown!',
     slug: 'pokemon-showdown',
-    thumbnailPath: '/images/game-thumbnails/01/pokemon-showdown.jpg',
+    thumbnailPath: '/images/game-thumbnails/1/pokemon-showdown.jpg',
     chosenBy: 'Jørgen',
     duration: '60 min',
     shortDescription:
@@ -59,7 +59,7 @@ export const games: Game[] = [
   {
     title: 'Trackmania',
     slug: 'trackmania',
-    thumbnailPath: '/images/game-thumbnails/01/trackmania.jpg',
+    thumbnailPath: '/images/game-thumbnails/1/trackmania.jpg',
     chosenBy: 'Tobias',
     duration: '60 min',
     shortDescription:
@@ -68,7 +68,7 @@ export const games: Game[] = [
   {
     title: 'Flat Out 2',
     slug: 'flat-out-2',
-    thumbnailPath: '/images/game-thumbnails/01/flat-out-2.jpg',
+    thumbnailPath: '/images/game-thumbnails/1/flat-out-2.jpg',
     chosenBy: 'William',
     duration: '45 min',
     shortDescription: 'Alle stunt maps, score kombineres til slutt.',
