@@ -15,7 +15,7 @@ spectator audience, and is heading into a significant functionality upgrade.
 - Dev server: `npm run dev`
 - Preview build: `npm run preview`
 - Format: Prettier (single quotes; `prettier-plugin-astro`)
-- Lint: none configured — rely on TypeScript strict + `astro build`
+- Lint: `npm run lint:eslint` (ESLint with `eslint-plugin-astro` + `@typescript-eslint`)
 - Tests: none configured
 
 ## Working guidelines
