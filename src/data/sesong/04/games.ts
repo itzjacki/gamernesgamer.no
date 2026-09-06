@@ -22,7 +22,7 @@ export const games: Game[] = [
     shortDescription:
       'Om å gjøre å være høyest oppe etter 60 minutter. Ingen revives.',
     longDescription:
-      'Om å gjøre å være høyest oppe etter 1 time eller når alle har dødd. Spiller med mod som gjør at vi kan progresse til neste areas uten å vente på alle. Ingen prep (unntatt en kort felles-sesjon). Spilles med proximity voice chat på. Ikke lov å revive andre. Easy difficulty. Vi samler sammen alle tinga som ligger på stranda og “snake drafter” blant de. Velger man ryggsekken får man ikke velge flere items. Klatring til toppen av tårnet på flyplassen bestemmer draft order. Tiebreaker: Race fra start, om å gjøre å komme lengst på 5 min',
+      'Om å gjøre å være høyest oppe etter 1 time eller når alle har dødd. Spiller med mod som gjør at vi kan progresse til neste areas uten å vente på alle. Ingen prep (unntatt en kort felles-sesjon). Spilles med proximity voice chat på. Ikke lov å revive andre. Easy difficulty. Vi samler sammen alle tinga som ligger på stranda og "snake drafter" blant de. Velger man ryggsekken får man ikke velge flere items. Klatring til toppen av tårnet på flyplassen bestemmer draft order. Tiebreaker: Race fra start, om å gjøre å komme lengst på 5 min',
     videoEmbedUrl: undefined,
   },
   {
@@ -58,7 +58,7 @@ export const games: Game[] = [
     shortDescription:
       'Vi spiller en parkour map som fokuserer på CS movement. Om å gjøre å komme lengst på 75 minutter.',
     longDescription:
-      'Det spilles et KZ map. Her handler det ikke om skyting, men om å komme lengst mulig på banen i løpet av 75 minutter. Vi skal spille på et map som er etterlignet "only up”. Her er det stor sjanse for å falle ned og det er ingen checkpoints. Den som AVSLUTTER høyest vinner. Tiebreaker: Om to spillere er på samme hindring/plattform når tiden går ut får begge spillerne en sjanse til å forsøke neste hindring hvor det er sudden death. Om en spiller klarer hindringen og den andre ikke vinner den umiddelbart. Om begge spillere klarer hindringen gjelder samme regler for neste hinder helt til en feiler. Om begge spillerne feiler så handler det om å lande høyest. Om begge lander på samme plattform (eller bunnen) gjelder “sudden death” fortsatt.',
+      'Det spilles et KZ map. Her handler det ikke om skyting, men om å komme lengst mulig på banen i løpet av 75 minutter. Vi skal spille på et map som er etterlignet "only up". Her er det stor sjanse for å falle ned og det er ingen checkpoints. Den som AVSLUTTER høyest vinner. Tiebreaker: Om to spillere er på samme hindring/plattform når tiden går ut får begge spillerne en sjanse til å forsøke neste hindring hvor det er sudden death. Om en spiller klarer hindringen og den andre ikke vinner den umiddelbart. Om begge spillere klarer hindringen gjelder samme regler for neste hinder helt til en feiler. Om begge spillerne feiler så handler det om å lande høyest. Om begge lander på samme plattform (eller bunnen) gjelder "sudden death" fortsatt.',
     videoEmbedUrl: undefined,
   },
   {
