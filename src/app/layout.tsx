@@ -7,9 +7,10 @@ export const metadata: Metadata = {
     template: '%s - Gamernes Gamer',
     default: 'Gamernes Gamer',
   },
-  description: 'Gamernes Gamer: Sannsynligvis Norges mest prestisjetunge gamingkonkurranse.',
+  description:
+    'Gamernes Gamer: Sannsynligvis Norges mest prestisjetunge gamingkonkurranse.',
   icons: {
-    icon: '/favicon.svg',
+    icon: '/favicon.ico',
   },
 };
 
