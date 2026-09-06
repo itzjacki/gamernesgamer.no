@@ -29,16 +29,30 @@ export default function RootLayout({ children }: Props) {
           crossOrigin='anonymous'
         />
         <link
-          href='https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Quantico:wght@400;700&display=swap'
+          href='https://fonts.googleapis.com/css2?family=Martian+Mono:wght@400;500&display=swap'
           rel='stylesheet'
         />
       </head>
-      <body className='bg-grayish text-white'>
-        <div className='mx-auto mt-4 mb-20 flex flex-col items-center p-4 sm:mt-16'>
-          <SeasonHeader />
-          <main className='flex flex-col items-center gap-20 sm:gap-28'>
-            {children}
-          </main>
+      <body className='bg-bg text-text font-sans'>
+        {/* Blueprint grid — scrolls with page, centered on viewport.
+            Container: 880px = 22 × 40px. Content: 800px = 20 × 40px. */}
+        <div className='relative min-h-screen'>
+          <div
+            aria-hidden='true'
+            className='pointer-events-none absolute inset-0'
+            style={{
+              backgroundImage:
+                'linear-gradient(rgba(232,216,216,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(232,216,216,0.04) 1px, transparent 1px)',
+              backgroundSize: '40px 40px',
+              backgroundPosition: 'calc(50% + 20px) calc(50% + 20px)',
+            }}
+          />
+          <div className='relative mx-auto w-full max-w-220 px-10'>
+            <SeasonHeader />
+            <main className='flex flex-col gap-20 pb-20 sm:gap-28'>
+              {children}
+            </main>
+          </div>
         </div>
       </body>
     </html>

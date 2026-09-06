@@ -1,0 +1,30 @@
+.cardGrid {
+  display: grid;
+  grid-template:
+    'image rating' 35%
+    'image overall' 10%
+    'image .' 12%
+    'name name' 8%
+    'stats stats'
+    / 55% 45%;
+}
+
+.gridRating {
+  grid-area: rating;
+}
+
+.gridOverall {
+  grid-area: overall;
+}
+
+.gridImage {
+  grid-area: image;
+}
+
+.gridName {
+  grid-area: name;
+}
+
+.gridStats {
+  grid-area: stats;
+}

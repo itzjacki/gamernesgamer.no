@@ -13,16 +13,22 @@ export default function Statbar({
 }: Props) {
   function getBarWidth() {
     if (statValue === '?') return 0;
-    return Math.round(((statValue - statMin) / (statMax - statMin)) * 100);
+    return Math.min(
+      100,
+      Math.max(
+        0,
+        Math.round(((statValue - statMin) / (statMax - statMin)) * 100),
+      ),
+    );
   }
 
   return (
     <div className='grid h-fit grid-cols-2 text-xs'>
       <p>{statName}</p>
       <p className='text-right'>{statValue}</p>
-      <div className='relative col-span-2 h-1 w-full bg-white'>
+      <div className='bg-border relative col-span-2 h-1 w-full'>
         <div
-          className='bg-reddish absolute top-0 left-0 h-full'
+          className='bg-accent absolute top-0 left-0 h-full'
           style={{ width: `${getBarWidth()}%` }}
         />
       </div>

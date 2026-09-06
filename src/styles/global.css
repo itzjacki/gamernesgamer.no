@@ -1,9 +1,18 @@
 @import 'tailwindcss';
 
 @theme {
-  --font-sans: 'Inter', 'sans-serif';
-  --font-quantico: 'Quantico', 'sans-serif';
+  --font-sans: 'Neue Montreal', sans-serif;
+  --font-mono: 'Martian Mono', monospace;
 
+  --color-bg: #17181a;
+  --color-surface: #1c1d1f;
+  --color-accent: #e8334a;
+  --color-text: #e6e1db;
+  --color-text-muted: #706b66;
+  --color-border: #222120;
+  --color-border-accent: #4a2028;
+
+  /* Legacy tokens — kept for any components not yet migrated */
   --color-reddish: #db5461;
   --color-blueish: #73c9bb;
   --color-grayish: #1d1a1f;
@@ -21,4 +30,30 @@
 body,
 html {
   margin: 0;
+}
+
+@font-face {
+  font-family: 'Neue Montreal';
+  src: url('/fonts/neue-montreal/PPNeueMontreal-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Neue Montreal';
+  src: url('/fonts/neue-montreal/PPNeueMontreal-Semibold.otf')
+    format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Neue Montreal';
+  src: url('/fonts/neue-montreal/PPNeueMontreal-Extrabold.otf')
+    format('opentype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
 }

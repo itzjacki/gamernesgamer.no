@@ -1,23 +1,21 @@
+import Link from 'next/link';
 import { seasonData, currentSeason, type Season } from '@/data/sesong';
 
 export default function SeasonHeader() {
   const seasons = Object.keys(seasonData) as Season[];
 
   return (
-    <header>
-      <nav>
-        <ul className='bg-darkblueish mb-8 flex flex-wrap justify-center rounded-2xl px-2'>
+    <header className='py-8'>
+      <nav aria-label='Sesonger'>
+        <ul className='flex flex-wrap justify-center'>
           {seasons.map((season) => (
-            <li
-              key={season}
-              className='border-grayish hover:border-y-reddish border-y-2 border-r-2 text-sm transition-all duration-200 last:border-r-0'
-            >
-              <a
+            <li key={season} className='-mr-px'>
+              <Link
                 href={season === currentSeason ? '/' : `/sesong/${season}`}
-                className='block p-2'
+                className='border-border-accent bg-bg text-text-muted hover:border-accent hover:text-accent focus-visible:outline-accent block w-[121px] border px-4 py-2 text-center font-mono text-xs tracking-widest uppercase transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2'
               >
                 Sesong {Number(season)}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>

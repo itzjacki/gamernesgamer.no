@@ -53,19 +53,28 @@ a stack that's more comfortable and better suited to the dynamic features ahead.
 
 ## Phase 2 — Visual rebrand
 
-Redesign the visual identity of the site. Direction: dark mode, playing with light
-(refractions, rays, glow) — not retro gaming, not generic SaaS, not vibecoded slop.
-Needs design exploration before implementation.
+Redesign the visual identity of the site. Dark mode only. Needs design exploration
+before any implementation — see design.md for the full process and constraints.
+
+**Process:**
+
+1. Visual identity session — designer presents 3 genuinely divergent directions as
+   mood boards / vocabularies. Jakob picks one.
+2. Prototype phase — selected direction prototyped as toggleable UI variations on a
+   single route. Jakob approves before full implementation.
+3. Full implementation — new identity applied across the entire site with current
+   structure and content intact.
 
 **Scope:**
 
-- [ ] Design exploration session with visual identity designer
-- [ ] New color palette, typography treatment, and design tokens
-- [ ] Evolved base gamer card design (the FIFA card concept is a core visual asset)
-- [ ] Apply new design system across all pages
+- [ ] Design exploration session with visual identity designer (3 divergent directions)
+- [ ] Prototype phase: core components (typography, palette, links, player cards, game cards)
+- [ ] New color palette, typography treatment, and design tokens (locked after prototype)
+- [ ] Full implementation: new identity applied across all existing pages and content
 
-**Note:** New page shells can be scaffolded here even if they're empty/placeholder —
-the site map is roughly known, the content comes in Phase 4+.
+**Note:** Page structure work (The Hall, season pages, etc.) is separate and comes
+after the identity is locked. New page shells can be scaffolded here if convenient,
+but layout/structure decisions are not part of Phase 2.
 
 ---
 
