@@ -5,9 +5,9 @@ export default function SeasonHeader() {
   const seasons = Object.keys(seasonData) as Season[];
 
   return (
-    <header className='py-8'>
+    <header className='py-8 flex justify-center'>
       <nav aria-label='Sesonger'>
-        <ul className='flex flex-wrap justify-center'>
+        <ul className='grid grid-cols-2 sm:grid-cols-4'>
           {seasons.map((season) => (
             <li key={season} className='-mr-px'>
               <Link

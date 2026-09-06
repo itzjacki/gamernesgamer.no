@@ -47,7 +47,7 @@ export default function RootLayout({ children }: Props) {
               backgroundPosition: 'calc(50% + 20px) calc(50% + 20px)',
             }}
           />
-          <div className='relative mx-auto w-full max-w-220 px-10'>
+          <div className='relative mx-auto w-full max-w-220 px-4 sm:px-6 lg:px-10'>
             <SeasonHeader />
             <main className='flex flex-col gap-20 pb-20 sm:gap-28'>
               {children}
