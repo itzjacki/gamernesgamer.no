@@ -1,23 +1,15 @@
 import type { Game } from '@/types/game';
 import type { Gamer } from '@/types/gamer';
 import type { PowerUp } from '@/types/power-up';
+import type { SeasonMeta } from '@/types/season-meta';
 
-import { games as games01 } from './01/games';
-import { gamers as gamers01 } from './01/gamers';
-
-import { games as games02 } from './02/games';
-import { gamers as gamers02 } from './02/gamers';
-import { powerUps as powerUps02 } from './02/power-ups';
-
-import { games as games03 } from './03/games';
-import { gamers as gamers03 } from './03/gamers';
-import { powerUps as powerUps03 } from './03/power-ups';
-
-import { games as games04 } from './04/games';
-import { gamers as gamers04 } from './04/gamers';
-import { powerUps as powerUps04, curses as curses04 } from './04/power-ups';
+import * as s01 from './01';
+import * as s02 from './02';
+import * as s03 from './03';
+import * as s04 from './04';
 
 export type SeasonData = {
+  meta: SeasonMeta;
   games: Game[];
   gamers: Gamer[];
   powerUps?: PowerUp[];
@@ -25,14 +17,25 @@ export type SeasonData = {
 };
 
 export const seasonData = {
-  '01': { games: games01, gamers: gamers01 },
-  '02': { games: games02, gamers: gamers02, powerUps: powerUps02 },
-  '03': { games: games03, gamers: gamers03, powerUps: powerUps03 },
+  '01': { meta: s01.meta, games: s01.games, gamers: s01.gamers },
+  '02': {
+    meta: s02.meta,
+    games: s02.games,
+    gamers: s02.gamers,
+    powerUps: s02.powerUps,
+  },
+  '03': {
+    meta: s03.meta,
+    games: s03.games,
+    gamers: s03.gamers,
+    powerUps: s03.powerUps,
+  },
   '04': {
-    games: games04,
-    gamers: gamers04,
-    powerUps: powerUps04,
-    curses: curses04,
+    meta: s04.meta,
+    games: s04.games,
+    gamers: s04.gamers,
+    powerUps: s04.powerUps,
+    curses: s04.curses,
   },
 } as const satisfies Record<string, SeasonData>;
 

@@ -45,15 +45,15 @@ Gamernes Gamer — Next.js (App Router) site on Vercel for a recurring friends g
 
 ## Site map
 
-- `/` — The Hall (champion monument, season lineage)
+- `/` — Redirects to current season (The Hall — planned)
 - `/sesong/[n]` — Season detail (standings, games, power-ups)
 - `/sesong/[n]/[game]` — Game detail
-- `/spillere` — Player index
-- `/spillere/[spiller]` — Player career page
-- `/records` — Hall of Records (all-time stats)
-- `/vs/[a]/[b]` — Head-to-head
-- `/lore` — Skattkammeret (floating media/lore)
-- `/admin` — Results entry (protected, Supabase Auth)
+- `/spillere` — Player index (planned)
+- `/spillere/[spiller]` — Player career page (planned)
+- `/records` — Hall of Records (planned)
+- `/vs/[a]/[b]` — Head-to-head (planned)
+- `/lore` — Skattkammeret (planned)
+- `/admin` — Results entry (protected, planned)
 
 ## See also
 
