@@ -11,7 +11,7 @@
 
 - `npm run build` — primary correctness check (no test framework)
 - `npm run dev` / `npm run start`
-- `npm run lint` (`next lint`)
+- `npm run lint` (`eslint .`)
 - `npx prettier --write <files>` — single quotes, `prettier-plugin-tailwindcss`
 
 ## Constraints
