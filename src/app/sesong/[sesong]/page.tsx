@@ -1,24 +1,9 @@
 import { notFound } from 'next/navigation';
-import { seasonData, isSeason, type Season } from '@/data/sesong';
+import { seasonData, isSeason } from '@/data/sesong';
 import GamerCard from '@/components/GamerCard';
 import GameCard from '@/components/GameCard';
 import PowerUpCard from '@/components/PowerUpCard';
 import Heading from '@/components/Heading';
-
-const revealGamerCards = true;
-const revealGames = true;
-const revealPowerups = true;
-
-const seasonMeta: Record<Season, { date: string; videoEmbedUrl?: string }> = {
-  '01': { date: '18/03/2023' },
-  '02': {
-    date: '07/10/2023',
-    videoEmbedUrl:
-      'https://www.youtube.com/embed/3BN1IVT0164?si=g4KGFm-B_WSJ2Yoy',
-  },
-  '03': { date: '16/03/2024–17/03/2024' },
-  '04': { date: '13/12/2025–14/12/2025' },
-};
 
 interface Props {
   params: Promise<{ sesong: string }>;
@@ -36,10 +21,9 @@ export default async function SeasonPage({ params }: Props) {
   }
 
   const season = seasonData[sesong];
-  const { gamers, games } = season;
+  const { meta, gamers, games } = season;
   const powerUps = 'powerUps' in season ? season.powerUps : undefined;
   const curses = 'curses' in season ? season.curses : undefined;
-  const meta = seasonMeta[sesong];
   const seasonNumber = Number(sesong);
 
   return (
@@ -47,7 +31,7 @@ export default async function SeasonPage({ params }: Props) {
       <section className='flex flex-col gap-4 pt-8'>
         <Heading
           as='h1'
-          aboveLine={`GG V${seasonNumber}.0.0`}
+          aboveLine={`GG — Sesong ${seasonNumber}`}
           belowLine={meta.date}
         >
           Sesong {seasonNumber}
@@ -68,9 +52,7 @@ export default async function SeasonPage({ params }: Props) {
       </section>
 
       <section id='participants' className='flex flex-col gap-8'>
-        <Heading as='h2' aboveLine={`Sesong ${seasonNumber}`}>
-          Utøvere
-        </Heading>
+        <Heading as='h2'>Utøvere</Heading>
         {gamers.some((g) => g.stats) ? (
           <ul className='grid grid-cols-1 justify-items-center gap-10 sm:grid-cols-2'>
             {gamers.map((gamer) => (
@@ -80,13 +62,13 @@ export default async function SeasonPage({ params }: Props) {
                   nickname={gamer.nickname}
                   imagePath={gamer.imagePath}
                   stats={gamer.stats}
-                  revealed={revealGamerCards}
+                  revealed={meta.revealGamerCards}
                 />
               </li>
             ))}
           </ul>
         ) : (
-          <ul className='grid grid-cols-1 gap-[40px] sm:grid-cols-2'>
+          <ul className='grid grid-cols-1 gap-10 sm:grid-cols-2'>
             {gamers.map((gamer) => (
               <li key={gamer.name}>
                 <div className='border-border-accent bg-bg flex w-full flex-col items-center border py-4'>
@@ -106,9 +88,7 @@ export default async function SeasonPage({ params }: Props) {
       </section>
 
       <section id='games' className='flex flex-col gap-8'>
-        <Heading as='h2' aboveLine={`Sesong ${seasonNumber}`}>
-          Spill
-        </Heading>
+        <Heading as='h2'>Spill</Heading>
         <ul className='grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3'>
           {games.map((game) => (
             <li key={game.slug}>
@@ -119,7 +99,7 @@ export default async function SeasonPage({ params }: Props) {
                 chosenBy={game.chosenBy}
                 duration={game.duration}
                 shortDescription={game.shortDescription}
-                revealed={revealGames}
+                revealed={meta.revealGames}
               />
             </li>
           ))}
@@ -128,13 +108,11 @@ export default async function SeasonPage({ params }: Props) {
 
       {powerUps && powerUps.length > 0 && (
         <section id='power-ups' className='flex flex-col gap-8'>
-          <Heading as='h2' aboveLine={`Sesong ${seasonNumber}`}>
-            Power-ups
-          </Heading>
+          <Heading as='h2'>Power-ups</Heading>
           <ul className='grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3'>
             {powerUps.map((powerUp) => (
               <li key={powerUp.name}>
-                <PowerUpCard {...powerUp} revealed={revealPowerups} />
+                <PowerUpCard {...powerUp} revealed={meta.revealPowerups} />
               </li>
             ))}
           </ul>
@@ -142,7 +120,7 @@ export default async function SeasonPage({ params }: Props) {
             <ul className='grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3'>
               {curses.map((curse) => (
                 <li key={curse.name}>
-                  <PowerUpCard {...curse} revealed={revealPowerups} />
+                  <PowerUpCard {...curse} revealed={meta.revealPowerups} />
                 </li>
               ))}
             </ul>

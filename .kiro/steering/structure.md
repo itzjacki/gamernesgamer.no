@@ -5,39 +5,41 @@
 ```
 src/
   app/                  Next.js App Router — pages and layouts
-    page.tsx            The Hall (landing page / champion monument)
-    layout.tsx          Root layout (head, nav, fonts)
+    page.tsx            Redirects to current season (The Hall — planned, not yet built)
+    layout.tsx          Root layout (head, fonts, grid background, container, nav)
     sesong/
-      page.tsx          Season index
       [sesong]/
         page.tsx        Season detail page
         [game]/
           page.tsx      Game detail page
     spillere/
-      page.tsx          Player index
+      page.tsx          Player index (planned)
       [spiller]/
-        page.tsx        Player career page
+        page.tsx        Player career page (planned)
     records/
-      page.tsx          All-time Hall of Records
+      page.tsx          All-time Hall of Records (planned)
     vs/[a]/[b]/
-      page.tsx          Head-to-head page
+      page.tsx          Head-to-head page (planned)
     lore/
-      page.tsx          Skattkammeret (floating media/lore)
+      page.tsx          Skattkammeret (planned)
     admin/
-      page.tsx          Admin dashboard (protected)
+      page.tsx          Admin dashboard (protected, planned)
       login/page.tsx
-      results/page.tsx  Results entry form
-    api/og/             Vercel OG image generation
+      results/page.tsx  Results entry form (planned)
+    api/og/             Vercel OG image generation (planned)
   components/           Reusable React components (PascalCase .tsx)
   data/sesong/
     01/ .. 04/
       gamers.ts         Gamer[] for the season
       games.ts          Game[] for the season
       power-ups.ts      PowerUp[] + curses — only when used
-  lib/supabase/         Server + browser Supabase clients
+  lib/supabase/         Server + browser Supabase clients (planned)
   types/                Shared TypeScript types
   styles/global.css     Tailwind import + @theme design tokens
-public/images/          Static assets (gamers/<NN>/, game-thumbnails/<NN>/, power-ups/)
+public/
+  fonts/
+    neue-montreal/      Self-hosted Neue Montreal (Pangram Pangram, OFL)
+  images/               Static assets (gamers/<NN>/, game-thumbnails/<NN>/, power-ups/)
 ```
 
 ## Key rules
@@ -62,8 +64,8 @@ public/images/          Static assets (gamers/<NN>/, game-thumbnails/<NN>/, powe
 1. Create `src/data/sesong/<NN>/` with `gamers.ts`, `games.ts` (+ `power-ups.ts` if needed).
 2. Add images under `public/images/gamers/<NN>/` and `public/images/game-thumbnails/<NN>/`.
 3. Seed results into Supabase.
-4. Add season to nav in `src/components/SeasonHeader.tsx`.
-5. Landing page pulls latest champion from DB automatically.
+4. Update `currentSeason` in `src/data/sesong/index.ts` (or equivalent) to the new season.
+5. Landing page redirect and nav update automatically from `currentSeason`.
 
 ## Data split
 
