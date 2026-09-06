@@ -39,6 +39,7 @@ Gamernes Gamer — Next.js (App Router) site on Vercel for a recurring friends g
 - Admin routes (`src/app/admin/`) must check Supabase session server-side. Never client-side auth gating.
 - Use `@/*` import alias. Match existing patterns and tokens in `src/styles/global.css`.
 - UI copy is Norwegian. Roster and power-ups vary per season — treat as per-season data.
+- You will never write real copy for the site. If you write copy, make it clearly placeholder, it's crucial for the site that all copy is written by humans, no matter how small. Exceptions can be made for invisible text like a11y snippets.
 - Use subagents frequently for parallelizable or multi-step work. Prefer custom agents in `.kiro/agents/` when available.
 - Update steering docs in `.kiro/steering/` after any structural or behavioral changes to the project.
 

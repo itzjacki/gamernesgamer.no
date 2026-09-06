@@ -1,5 +1,5 @@
+import Image from 'next/image';
 import type { PowerUp } from '@/types/power-up';
-import LightningIcon from './LightningIcon';
 
 interface Props extends PowerUp {
   revealed: boolean;
@@ -14,31 +14,44 @@ export default function PowerUpCard({
 }: Props) {
   return (
     <div
-      className={`flex h-full min-h-96 w-64 flex-col gap-4 rounded-2xl p-4 pb-6 ${isCurse ? 'bg-reddish' : 'bg-darkblueish'}`}
+      className={`flex h-full flex-col gap-4 border p-4 pb-6 ${
+        isCurse ? 'border-accent bg-bg' : 'border-border-accent bg-bg'
+      }`}
     >
+      <p className='text-text-muted font-mono text-xs tracking-widest uppercase'>
+        {isCurse ? 'Curse' : 'Power-up'}
+      </p>
+
       {revealed ? (
         <>
-          <img src={imagePath} alt='' className='min-h-32 rounded-2xl' />
-          <div className='flex items-center justify-center gap-4'>
-            <LightningIcon color='reddish' />
-            <h3 className='font-quantico text-center text-xl'>{name}</h3>
-            <LightningIcon color='reddish' />
-          </div>
-          <p>{description}</p>
+          <Image
+            src={imagePath}
+            alt=''
+            width={240}
+            height={240}
+            className='w-full'
+          />
+          <h3 className='text-text text-center text-lg font-semibold'>
+            {name}
+          </h3>
+          <p className='text-text-muted text-sm leading-relaxed'>
+            {description}
+          </p>
         </>
       ) : (
         <>
-          <p className='bg-darkblueish-dark font-quantico text-darkblueish rounded-xl text-center text-9xl'>
+          <div
+            aria-hidden='true'
+            className='bg-surface text-text-muted grid h-40 w-full place-items-center font-mono text-6xl'
+          >
             ?
-          </p>
-          <div className='flex items-center justify-center gap-4'>
-            <LightningIcon color={isCurse ? 'blueish' : 'reddish'} />
-            <h3 className='font-quantico text-center text-xl'>
-              Mystisk {isCurse ? 'Curse' : 'Powerup'}
-            </h3>
-            <LightningIcon color={isCurse ? 'blueish' : 'reddish'} />
           </div>
-          <p>Denne {isCurse ? 'cursen' : 'powerupen'} avsløres snart!</p>
+          <h3 className='text-text text-center text-lg font-semibold'>
+            Mystisk {isCurse ? 'curse' : 'power-up'}
+          </h3>
+          <p className='text-text-muted text-sm leading-relaxed'>
+            Denne {isCurse ? 'cursen' : 'power-upen'} avsløres snart!
+          </p>
         </>
       )}
     </div>

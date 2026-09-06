@@ -8,8 +8,7 @@ reminiscing, rivalry, and celebration. The tone is **competitive and unique**,
 person made for real people, not a product landing page or a gaming content
 platform.
 
-The direction Jakob has named: **dark mode, playing with light** — refractions,
-rays, glow. Not retro gaming nostalgia, not generic SaaS, not vibecoded slop.
+The site is dark mode — non-negotiable. No multiple themes.
 The FIFA card concept is an existing core visual asset and should evolve, not
 be replaced.
 
@@ -40,12 +39,40 @@ is not locked in — see typography guidelines below.
 
 ## Phase 2 rebrand direction
 
-**Stated direction:** dark mode, light as a design material (refractions, rays, glows).
-Not retro gaming, not generic SaaS, not the vibecoded look.
+**Process:** Two-stage exploration before any implementation.
 
-This needs a design exploration session before implementation. The designer should
-present 2–3 radically different directions for Jakob to react to, not a single
-pre-baked answer. Use the prototype skill for this.
+1. **Visual identity session** — the UI/UX designer presents three genuinely divergent
+   directions as mood boards / design vocabularies. No tokens, no code. Jakob reacts
+   and selects one direction.
+2. **Prototype phase** — the selected direction is prototyped using the `prototype` skill
+   (toggleable UI variations on a single route) so Jakob can see it running before
+   committing to full implementation.
+
+**Non-negotiables (hard constraints, not up for exploration):**
+
+- Dark mode only. No multiple themes.
+- No retro gaming aesthetic.
+- No "newspaper sports page" aesthetic.
+- None of the overused styles named in the anti-slop rules below.
+
+**On the anti-slop color rules:** Purple/indigo, violet accents, and similar defaults are not hard-banned — they are high-risk. If a direction genuinely commits to them with intention and avoids the tell-signs (stock gradient, default accent, no dominant color), they can work. But the bar is high and the burden of proof is on the designer. When in doubt, avoid.
+
+**"Playing with light" (refractions, rays, glow) is one candidate direction, not a
+constraint.** The designer should treat it as one option among genuinely different
+alternatives. All three directions must be dark-mode native.
+
+**Scope of the identity exploration:**
+
+The exploration focuses on visual identity expressed through core components —
+not page structure (The Hall, season pages, etc.). Specifically:
+
+- Typography (display + body pairing)
+- Base color palette (dominant color + accent)
+- Links and interactive states
+- Player cards (FIFA-style gamer cards — useful test surface, not primary deliverable)
+- Content cards (game cards)
+
+Page layout and structure work is separate and comes after direction is chosen.
 
 **What to preserve:**
 
@@ -53,12 +80,16 @@ pre-baked answer. Use the prototype skill for this.
 - Dark background (the site has always lived in the dark)
 - The competitive-but-friendly tone
 
-**What to decide in exploration:**
+**What the exploration must decide:**
 
 - New color palette (dominant color + accent — see palette rules below)
 - Typography evolution (see typography rules below)
 - Surface language (borders vs shadows, radius, depth)
-- How "light" enters the design (subtle? dramatic? restrained?)
+
+**Process note:** The three directions must be genuinely divergent from each other —
+not three variations on the same aesthetic. If directions feel adjacent, push back
+and demand more divergence. The value of three options is real choice, not confidence
+inflation.
 
 ---
 

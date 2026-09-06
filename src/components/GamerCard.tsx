@@ -1,8 +1,10 @@
 'use client';
 
-import { useRef } from 'react';
-import type { Gamer, GamerStats } from '@/types/gamer';
+import { useRef, useEffect } from 'react';
+import Image from 'next/image';
+import type { GamerStats } from '@/types/gamer';
 import Statbar from './Statbar';
+import styles from './GamerCard.module.css';
 
 export interface Props {
   name: string;
@@ -32,6 +34,13 @@ export default function GamerCard({
     ? Object.entries(stats).filter(([key]) => key !== 'overall')
     : [];
 
+  // Cancel any pending animation frame on unmount
+  useEffect(() => {
+    return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
   function animate() {
     const card = cardRef.current;
     if (!card) return;
@@ -54,6 +63,9 @@ export default function GamerCard({
   }
 
   function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    // Respect reduced motion preference
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
     const card = cardRef.current;
     if (!card) return;
     const rect = card.getBoundingClientRect();
@@ -66,7 +78,7 @@ export default function GamerCard({
     scheduleAnimate();
   }
 
-  function handleMouseOut() {
+  function handleMouseLeave() {
     targetRef.current = { x: 0, y: 0 };
     scheduleAnimate();
   }
@@ -75,7 +87,7 @@ export default function GamerCard({
     <div
       ref={cardRef}
       onMouseMove={handleMouseMove}
-      onMouseOut={handleMouseOut}
+      onMouseLeave={handleMouseLeave}
       className='relative'
     >
       <svg
@@ -91,7 +103,7 @@ export default function GamerCard({
           height='580.067'
           rx='5'
           transform='matrix(0.877421 0.479722 -0.535829 0.844327 224.626 -62.0838)'
-          fill='#DB5461'
+          fill='var(--color-accent)'
         />
         <rect
           x='51.7496'
@@ -99,31 +111,41 @@ export default function GamerCard({
           width='241.888'
           height='331.231'
           rx='23'
-          fill='#334D51'
+          fill='#221a1c'
         />
         <path
           d='M51.7496 206.5H263.862C271.041 206.5 276.862 212.32 276.862 219.5V223.413C276.862 230.593 271.041 236.413 263.862 236.413H51.7496V206.5Z'
-          fill='#1D1A1F'
+          fill='var(--color-bg)'
         />
       </svg>
 
       {revealed ? (
-        <div className='cardGrid absolute top-0 left-0 z-10 h-full w-full pr-[15%] pb-[15%] pl-[16%]'>
-          <p className='gridRating font-quantico self-end justify-self-center text-6xl'>
+        <div
+          className={`${styles.cardGrid} text-text absolute top-0 left-0 z-10 h-full w-full pr-[15%] pb-[15%] pl-[16%]`}
+        >
+          <p
+            className={`${styles.gridRating} self-end justify-self-center text-6xl font-extrabold`}
+          >
             {stats?.overall ?? '–'}
           </p>
-          <p className='gridOverall font-quantico self-start justify-self-center text-xl'>
+          <p
+            className={`${styles.gridOverall} text-text-muted self-start justify-self-center font-mono text-xs tracking-wider uppercase`}
+          >
             Overall
           </p>
-          <img
-            className='gridImage -mb-px -ml-0.75 w-full self-end'
+          <Image
+            className={`${styles.gridImage} -mb-px -ml-0.75 w-full self-end`}
             src={imagePath}
             alt={`Bilde av ${name}`}
+            width={340}
+            height={280}
           />
-          <p className='gridName font-quantico self-center pl-1 text-sm'>
+          <p
+            className={`${styles.gridName} self-center pl-1 font-mono text-xs tracking-wide`}
+          >
             {name} – {nickname}
           </p>
-          <div className='gridStats grid grid-cols-2 gap-x-2 p-2'>
+          <div className={`${styles.gridStats} grid grid-cols-2 gap-x-2 p-2`}>
             {statBars.map((stat) => (
               <Statbar
                 key={stat[0]}
@@ -134,23 +156,31 @@ export default function GamerCard({
           </div>
         </div>
       ) : (
-        <div className='cardGrid absolute top-0 left-0 z-10 h-full w-full pr-[15%] pb-[15%] pl-[16%]'>
-          <p className='gridRating font-quantico self-end justify-self-center text-6xl'>
+        <div
+          className={`${styles.cardGrid} text-text absolute top-0 left-0 z-10 h-full w-full pr-[15%] pb-[15%] pl-[16%]`}
+        >
+          <p
+            className={`${styles.gridRating} self-end justify-self-center text-6xl font-extrabold`}
+          >
             ?
           </p>
-          <p className='gridOverall font-quantico self-start justify-self-center text-xl'>
+          <p
+            className={`${styles.gridOverall} text-text-muted self-start justify-self-center font-mono text-xs tracking-wider uppercase`}
+          >
             Overall
           </p>
           <p
-            className='gridImage font-quantico w-full place-self-end text-center text-9xl'
+            className={`${styles.gridImage} w-full place-self-end text-center text-9xl font-extrabold`}
             aria-hidden='true'
           >
             ?
           </p>
-          <p className='gridName font-quantico self-center pl-1 text-sm'>
+          <p
+            className={`${styles.gridName} self-center pl-1 font-mono text-xs tracking-wide`}
+          >
             Denne personen avsløres snart!
           </p>
-          <div className='gridStats grid grid-cols-2 gap-x-2 p-2'>
+          <div className={`${styles.gridStats} grid grid-cols-2 gap-x-2 p-2`}>
             {statBars.map((stat) => (
               <Statbar
                 key={stat[0]}
@@ -161,24 +191,6 @@ export default function GamerCard({
           </div>
         </div>
       )}
-
-      <style>{`
-        .cardGrid {
-          display: grid;
-          grid-template:
-            'image rating' 35%
-            'image overall' 10%
-            'image .' 12%
-            'name name' 8%
-            'stats stats'
-            / 55% 45%;
-        }
-        .gridRating { grid-area: rating; }
-        .gridOverall { grid-area: overall; }
-        .gridImage { grid-area: image; }
-        .gridName { grid-area: name; }
-        .gridStats { grid-area: stats; }
-      `}</style>
     </div>
   );
 }

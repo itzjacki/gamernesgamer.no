@@ -3,7 +3,7 @@ import { seasonData, isSeason, type Season } from '@/data/sesong';
 import GamerCard from '@/components/GamerCard';
 import GameCard from '@/components/GameCard';
 import PowerUpCard from '@/components/PowerUpCard';
-import LightningIcon from '@/components/LightningIcon';
+import Heading from '@/components/Heading';
 
 const revealGamerCards = true;
 const revealGames = true;
@@ -14,10 +14,10 @@ const seasonMeta: Record<Season, { date: string; videoEmbedUrl?: string }> = {
   '02': {
     date: '07/10/2023',
     videoEmbedUrl:
-      'https://www.youtube.com/embed/3BN1IVT0164?si=g4KGFm-B_WSL2Yoy',
+      'https://www.youtube.com/embed/3BN1IVT0164?si=g4KGFm-B_WSJ2Yoy',
   },
-  '03': { date: '16/03/2024 - 17/03/2024' },
-  '04': { date: '13/12/2025 - 14/12/2025' },
+  '03': { date: '16/03/2024–17/03/2024' },
+  '04': { date: '13/12/2025–14/12/2025' },
 };
 
 interface Props {
@@ -44,22 +44,19 @@ export default async function SeasonPage({ params }: Props) {
 
   return (
     <>
-      <section className='flex w-full max-w-prose flex-col items-center gap-4'>
-        <h1 className='font-quantico text-4xl sm:text-6xl'>
+      <section className='flex flex-col gap-4 pt-8'>
+        <Heading
+          as='h1'
+          aboveLine={`GG V${seasonNumber}.0.0`}
+          belowLine={meta.date}
+        >
           Sesong {seasonNumber}
-        </h1>
-        <div className='flex gap-4'>
-          <LightningIcon color='reddish' />
-          <LightningIcon color='blueish' />
-          <LightningIcon color='reddish' />
-        </div>
-        <p className='font-quantico'>{meta.date}</p>
-        <div className='border-t-blueish w-1/6 border-t-2' />
+        </Heading>
 
         {meta.videoEmbedUrl && (
-          <div className='mt-8 w-5/6'>
+          <div className='mt-8 w-full max-w-2xl'>
             <iframe
-              className='aspect-video w-full rounded-2xl'
+              className='aspect-video w-full rounded-sm'
               src={meta.videoEmbedUrl}
               title={`Gamernes Gamer sesong ${seasonNumber}`}
               allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen'
@@ -70,13 +67,12 @@ export default async function SeasonPage({ params }: Props) {
         )}
       </section>
 
-      <section
-        id='participants'
-        className='flex max-w-4xl flex-col items-center gap-8'
-      >
-        <h2 className='font-quantico text-3xl sm:text-4xl'>Utøvere</h2>
+      <section id='participants' className='flex flex-col gap-8'>
+        <Heading as='h2' aboveLine={`Sesong ${seasonNumber}`}>
+          Utøvere
+        </Heading>
         {gamers.some((g) => g.stats) ? (
-          <ul className='flex flex-wrap justify-center gap-16'>
+          <ul className='grid grid-cols-1 justify-items-center gap-10 sm:grid-cols-2'>
             {gamers.map((gamer) => (
               <li key={gamer.name}>
                 <GamerCard
@@ -90,17 +86,17 @@ export default async function SeasonPage({ params }: Props) {
             ))}
           </ul>
         ) : (
-          <ul className='grid grid-cols-1 justify-center gap-16 md:grid-cols-2'>
+          <ul className='grid grid-cols-1 gap-[40px] sm:grid-cols-2'>
             {gamers.map((gamer) => (
               <li key={gamer.name}>
-                <div className='bg-darkblueish flex w-64 flex-col items-center rounded-lg py-4'>
+                <div className='border-border-accent bg-bg flex w-full flex-col items-center border py-4'>
                   <img
                     src={gamer.imagePath}
                     alt={`Bilde av ${gamer.name}`}
                     className='mb-2 h-48'
                   />
-                  <p className='border-reddish w-full rounded-b-lg border-t-2 text-center text-lg font-semibold'>
-                    {gamer.name} - {gamer.nickname}
+                  <p className='border-border text-text w-full border-t px-3 pt-3 text-center text-sm font-semibold'>
+                    {gamer.name} – {gamer.nickname}
                   </p>
                 </div>
               </li>
@@ -109,12 +105,11 @@ export default async function SeasonPage({ params }: Props) {
         )}
       </section>
 
-      <section
-        id='games'
-        className='flex max-w-5xl flex-col items-center gap-8'
-      >
-        <h2 className='font-quantico text-3xl sm:text-4xl'>Spill</h2>
-        <ul className='flex flex-wrap justify-center gap-x-20 gap-y-16'>
+      <section id='games' className='flex flex-col gap-8'>
+        <Heading as='h2' aboveLine={`Sesong ${seasonNumber}`}>
+          Spill
+        </Heading>
+        <ul className='grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3'>
           {games.map((game) => (
             <li key={game.slug}>
               <GameCard
@@ -132,12 +127,11 @@ export default async function SeasonPage({ params }: Props) {
       </section>
 
       {powerUps && powerUps.length > 0 && (
-        <section
-          id='power-ups'
-          className='flex max-w-5xl flex-col items-center gap-8'
-        >
-          <h2 className='font-quantico text-3xl sm:text-4xl'>Power-ups</h2>
-          <ul className='flex flex-wrap justify-center gap-8'>
+        <section id='power-ups' className='flex flex-col gap-8'>
+          <Heading as='h2' aboveLine={`Sesong ${seasonNumber}`}>
+            Power-ups
+          </Heading>
+          <ul className='grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3'>
             {powerUps.map((powerUp) => (
               <li key={powerUp.name}>
                 <PowerUpCard {...powerUp} revealed={revealPowerups} />
@@ -145,7 +139,7 @@ export default async function SeasonPage({ params }: Props) {
             ))}
           </ul>
           {curses && curses.length > 0 && (
-            <ul className='flex flex-wrap justify-center gap-8'>
+            <ul className='grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3'>
               {curses.map((curse) => (
                 <li key={curse.name}>
                   <PowerUpCard {...curse} revealed={revealPowerups} />
