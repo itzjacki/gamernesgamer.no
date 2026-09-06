@@ -37,8 +37,9 @@ Neue Montreal self-hosted in `public/fonts/neue-montreal/`. Martian Mono from Go
 
 - 40px cells, `rgba(232,216,216,0.04)`
 - Centered: `background-position: calc(50% + 20px) calc(50% + 20px)`
-- Container: `max-w-220 px-10` (880px container, 800px content)
-- Scrolls with page. Mobile: step max-width in 40px increments.
+- Container: `max-w-220` (880px = 22 × 40px), `lg:px-10` (40px per side at desktop)
+- Content width: 800px = 20 × 40px
+- Grid scrolls with page. Mobile: grid is texture only, normal responsive padding (`px-4 sm:px-6`). Grid alignment is a desktop feature.
 
 ## Surface language
 
