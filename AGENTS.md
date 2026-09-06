@@ -1,5 +1,13 @@
 <!-- kickstart-version: 1 -->
 
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
+
+<!-- END:nextjs-agent-rules -->
+
 # AGENTS.md
 
 Gamernes Gamer — Next.js (App Router) site on Vercel for a recurring friends gaming tournament. Monument and archive of seasons, players, results, and memorable moments.
@@ -9,7 +17,7 @@ Gamernes Gamer — Next.js (App Router) site on Vercel for a recurring friends g
 - Build: `npm run build` (primary correctness check — no tests)
 - Dev: `npm run dev`
 - Preview: `npm run start`
-- Lint: `npm run lint` (`next lint`)
+- Lint: `npm run lint` (`eslint .`)
 - Format: `npx prettier --write <files>` (single quotes, `prettier-plugin-tailwindcss`)
 
 ## Stack
