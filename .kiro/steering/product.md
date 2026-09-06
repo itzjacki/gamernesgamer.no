@@ -27,6 +27,7 @@ stat cards) that people drop into it.
 ## Key features (current and planned)
 
 ### Live
+
 - Per-season pages showing gamer cards, games, and (when used) power-ups/curses
 - Interactive, football-card-style gamer cards with stats and a tilt effect
 - Game detail pages with rules, descriptions, thumbnails, and YouTube embeds
@@ -35,6 +36,7 @@ stat cards) that people drop into it.
 - Archive of past seasons (currently seasons 1–4)
 
 ### Planned
+
 - **The Hall** — a proper landing page celebrating the champion lineage, not just
   the most recent season
 - **Player career pages** — all-time stats, championships, win rate, head-to-head

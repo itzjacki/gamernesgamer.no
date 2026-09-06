@@ -35,7 +35,9 @@ Hide unrevealed content with a boolean ternary, never by commenting out:
 
 ```tsx
 const revealGames = true;
-{revealed ? <RealContent /> : <Placeholder />}  // placeholder: "?", "Mystisk spill", etc.
+{
+  revealed ? <RealContent /> : <Placeholder />;
+} // placeholder: "?", "Mystisk spill", etc.
 ```
 
 Pages define `revealGamerCards` / `revealGames` / `revealPowerups` and pass them into cards.
