@@ -22,59 +22,21 @@ social hub — the site produces artifacts that feed into it.
   features depends on how much curation is realistic.
 - **Media volume:** Is the existing content (videos, images, memes) in the dozens or
   hundreds? Affects whether /lore is a simple data file or needs an asset pipeline.
-- **Rebrand direction:** Dark mode, light/refraction aesthetic. Needs design exploration
-  with the UI/UX designer before implementation.
 
 ---
 
-## Phase 1 — Next.js rewrite
-
-**Status: done.**
+## Phase 1 — Next.js rewrite ✅
 
 Migrate the existing Astro site to Next.js. No new features — parity with the current
-site. This is the foundation for everything that follows, and lets the codebase move into
-a stack that's more comfortable and better suited to the dynamic features ahead.
-
-**Scope:**
-
-- [x] Set up Next.js project with App Router, Tailwind CSS v4, TypeScript strict
-- [x] Migrate all existing pages: home, season pages (/sesong/[n]), game detail pages
-  (/sesong/[n]/[game])
-- [x] Migrate all existing components (GamerCard with tilt effect, GameCard, PowerUpCard,
-  SeasonHeader, LightningIcon, Statbar)
-- [x] Preserve all existing data files in src/data/sesong/[n]/ as-is (seasons 01–04)
-- [x] Preserve all existing design tokens, colors, and fonts
-- [ ] Countdown component (season 4 is over — add back when needed for Season 5)
-- [x] Vercel deployment — merged to main, successfully deployed
-
-**Not in scope:** No new features, no rebrand, no DB.
+site.
 
 ---
 
-## Phase 2 — Visual rebrand
+## Phase 2 — Visual rebrand ✅
 
-Redesign the visual identity of the site. Dark mode only. Needs design exploration
-before any implementation — see design.md for the full process and constraints.
-
-**Process:**
-
-1. Visual identity session — designer presents 3 genuinely divergent directions as
-   mood boards / vocabularies. Jakob picks one.
-2. Prototype phase — selected direction prototyped as toggleable UI variations on a
-   single route. Jakob approves before full implementation.
-3. Full implementation — new identity applied across the entire site with current
-   structure and content intact.
-
-**Scope:**
-
-- [ ] Design exploration session with visual identity designer (3 divergent directions)
-- [ ] Prototype phase: core components (typography, palette, links, player cards, game cards)
-- [ ] New color palette, typography treatment, and design tokens (locked after prototype)
-- [ ] Full implementation: new identity applied across all existing pages and content
-
-**Note:** Page structure work (The Hall, season pages, etc.) is separate and comes
-after the identity is locked. New page shells can be scaffolded here if convenient,
-but layout/structure decisions are not part of Phase 2.
+VERKSTED direction implemented. Neue Montreal + Martian Mono, `#17181a` graphite
+background, `#E8334A` accent. Blueprint grid, surface language, full component set.
+See `design.md` for the full system.
 
 ---
 
@@ -87,84 +49,59 @@ question before starting.
 **Scope:**
 
 - [ ] Supabase project setup (Postgres + Auth)
-- [ ] Auth for a small admin group (not public — allowlist/invite model)
+- [ ] Auth for a small admin group (allowlist/invite model, not public)
 - [ ] Data schema design (resolve open question: points-only vs. full game format modeling)
 - [ ] Seed all historical season data (all 4 seasons backfilled)
-- [ ] Custom /admin panel in Next.js:
+- [ ] Custom /admin panel:
   - [ ] Sign in via Supabase Auth
-  - [ ] Results entry form (enter scores for a game, per player)
+  - [ ] Results entry form (enter scores per player per game)
   - [ ] Review/edit submitted results
   - [ ] Protected server-side via Supabase session
-- [ ] API routes / server actions for reading results data (used by public pages)
-
-**Decisions needed first:**
-
-- Data modeling depth (see open questions)
-- Who gets admin access and how accounts are managed
+- [ ] Server actions for reading results data (used by public pages)
 
 ---
 
 ## Phase 4 — Historical content & stats features
 
-Build out the post-tournament value features. These all depend on Phase 3 data being
-in place. Build order within this phase is flexible.
+All depend on Phase 3 data being in place.
 
 ### Must-have
 
-- [ ] **Season pages (enhanced):** Final standings, points-over-games progression chart,
-  game strip, power-ups display. Replace current static season pages with DB-backed versions.
-- [ ] **Player career pages (/players/[slug]):** Career stats (seasons entered, total points,
-  championships, win rate, best/worst finish). Evolved FIFA card. Links to all seasons played.
-- [ ] **Player index (/players):** Overview of all players across all seasons.
-- [ ] **The Hall (landing page / /):** Reigning champion hero, championship lineage across all
-  seasons, entry points to seasons and players. The "monument" feel.
+- [ ] **Season pages (enhanced):** Final standings, points-over-games chart, power-ups display
+- [ ] **Player career pages (/spillere/[spiller]):** Career stats, championships, win rate. Evolved gamer card.
+- [ ] **Player index (/spillere):** All players across all seasons
+- [ ] **The Hall (/):** Reigning champion hero, championship lineage, entry points to seasons and players
 
 ### Strong ideas
 
-- [ ] **Season recaps:** Editorial title + short recap text per season. Gated on editorial appetite.
-- [ ] **Season superlatives:** Highest single-game score, most dominant win, etc. per season.
-- [ ] **Season card variants:** Per-season version of each player's card showing that season's stats.
-- [ ] **Champion card treatment:** Special visual variant for the season winner.
-- [ ] **H2H widget on player pages:** Compact head-to-head record vs. each other player,
-  linking out to /vs. Only counts seasons where both played.
-- [ ] **Attached media on game/season pages:** Clips, screenshots, memes in context rather
-  than a central gallery.
+- [ ] **Season recaps:** Editorial title + short recap per season. Gated on editorial appetite.
+- [ ] **Season superlatives:** Highest score, most dominant win, etc. per season
+- [ ] **Champion card treatment:** Special visual variant for the season winner
+- [ ] **H2H widget on player pages:** Compact head-to-head record vs. each other player
+- [ ] **Attached media on game/season pages:** Clips, screenshots, memes in context
 
-### Explore later (post Phase 4)
+### Explore later
 
-- [ ] **/records (Hall of Records):** All-time records, silly awards (Wooden Spoon, longest
-  drought, biggest collapse), rivalry matrix. Blocked on cross-season normalization decision.
-- [ ] **/vs/[a]/[b] (Head-to-head pages):** Lifetime record, side-by-side stats, provocative
-  verdict. Same blocker. Most shareable artifact type — worth building eventually.
-- [ ] **Collectible card system expansion:** Moment cards beyond champion (MVP, record-breaker,
-  "the collapse"). Treat as an opportunistic pattern, not a committed matrix. Ship base
-  card + champion first.
-- [ ] **OG/shareable images:** Champion card, podium graphic, player stat cards generated via
-  Vercel OG / Satori. Doubles as social link previews for group chat sharing.
-- [ ] **Skattkammeret (/lore):** Floating wall of non-season-specific content (videos, memes,
-  lore). Scope depends on media volume. Comes after the stats core.
+- [ ] **/records (Hall of Records):** All-time records and superlatives. Blocked on cross-season normalization.
+- [ ] **/vs/[a]/[b] (Head-to-head pages):** Lifetime record, side-by-side stats. Same blocker.
+- [ ] **Collectible card expansion:** Moment cards (MVP, record-breaker, "the collapse")
+- [ ] **OG/shareable images:** Champion card, podium, player stat cards via Vercel OG
+- [ ] **Skattkammeret (/lore):** Floating wall of videos, memes, lore. Scope depends on media volume.
 
 ---
 
 ## Phase 5 — Live tournament mode
 
-Build the during-tournament features. Only 2 days per tournament, every 6-12 months —
-but high value on those days.
-
-**Scope:**
-
-- [ ] Live leaderboard on season page (polls /api every 5–15s — no WebSockets needed)
+- [ ] Countdown component (pre-tournament anticipation)
+- [ ] Live leaderboard on season page (polling, no WebSockets needed)
 - [ ] Admin panel supports real-time score entry during the tournament
-- [ ] Results entered during the tournament become the permanent archive record
-  (no separate spreadsheet needed)
 
 ---
 
 ## Cut / far future
 
-- **Predictions/picks:** Far future. LoL-pickems style.
-- **Comments, reactions, notifications:** Cut completely. The group chat is the social
-  layer.
-- **WebSockets:** Polling is sufficient for this audience size.
+- **Predictions/picks:** Far future
+- **Comments, reactions, notifications:** Cut — group chat is the social layer
+- **WebSockets:** Polling is sufficient
 - **Public user accounts:** No public auth. Admin access only.
-- **CMS or multi-editor tooling:** The /admin panel is the ceiling. Content lives in code.
+- **CMS or multi-editor tooling:** The /admin panel is the ceiling
