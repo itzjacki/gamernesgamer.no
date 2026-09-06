@@ -11,3 +11,14 @@
   --color-darkblueish: #334d51;
   --color-darkblueish-dark: #1c2a2c;
 }
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body,
+html {
+  margin: 0;
+}

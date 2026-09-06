@@ -67,7 +67,7 @@ export const games: Game[] = [
     shortDescription:
       'Vi spiller Community World, i 3 forskjellige moduser (alt lov, NM, NMPZ). Flest wins på 60 min vinner.',
     longDescription: `
-      Spiller party geoguessr som vanlig, med formatet “Live Challenge”. Skal bare spille banen “A Community World”. De første 10 minuttene av spillet har man 60s per runde, og man har muligheten til å bevege seg fritt rundt. De neste 25 minuttene har man 20s per runde, og man har ikke mulighet til å gå rundt, men kan fremdeles scrolle og zoome. De siste 10 minuttene har man 10s per runde, og ikke mulighet til å bevege seg på noen måte. 
+      Spiller party geoguessr som vanlig, med formatet "Live Challenge". Skal bare spille banen "A Community World". De første 10 minuttene av spillet har man 60s per runde, og man har muligheten til å bevege seg fritt rundt. De neste 25 minuttene har man 20s per runde, og man har ikke mulighet til å gå rundt, men kan fremdeles scrolle og zoome. De siste 10 minuttene har man 10s per runde, og ikke mulighet til å bevege seg på noen måte. 
       <br><br>
       Vinneren er den som har flest førsteplasser. 
       <br><br>
@@ -118,7 +118,7 @@ export const games: Game[] = [
       <br><br>
       Man har bare lov til å bruke én flytype gjennom hele turneringa. Flyene man kan bruke må man unlocke, og består av nesten alle fighters og noen interceptors som er max BR 1.7 i Arcade Air Battles (Battle Rank er mål på hvor bra et fly er). Det er lov å unlocke upgrades til flyet sitt (dette går relativt fort), men ikke lov å oppgradere crewet sitt. Det er heldigvis lett å bytte til et u-oppgradert crew dersom man blir tvunget til å oppgradere crewet som del av opplæring eller glemmer seg, så ikke stress om dette skjer.
       <br><br>
-      Matchene spilles i Custom battles, der man kan velge fritt blant “1v1 duel”-banene. Taper av forrige runde velger bane, mens i første runde bør den som har valgt først færrest ganger velge. Har man valgt først like mange ganger kan man slå mynt om det. Dere er voksne, figure it out. Det er viktig at man husker å endre weather til clear - siden det virker som at skyer kan være forskjellige hos forskjellige folk,vi skrur de derfor av så det garantert er likt.
+      Matchene spilles i Custom battles, der man kan velge fritt blant "1v1 duel"-banene. Taper av forrige runde velger bane, mens i første runde bør den som har valgt først færrest ganger velge. Har man valgt først like mange ganger kan man slå mynt om det. Dere er voksne, figure it out. Det er viktig at man husker å endre weather til clear - siden det virker som at skyer kan være forskjellige hos forskjellige folk,vi skrur de derfor av så det garantert er likt.
     `,
     videoEmbedUrl: undefined,
   },
