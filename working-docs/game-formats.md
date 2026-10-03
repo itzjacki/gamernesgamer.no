@@ -13,7 +13,10 @@ Status key: [ok] data present [!] quirk/confirm [--] missing
 ## TAXONOMY
 
 Top-level type:
-score one number per player. direction: high | low
+score one number per player. direction high|low is DISPLAY-ONLY (noted in the
+static TS game data), NOT stored in the DB — round_result.raw_score is always
+higher = better. A score-low game is modeled as a rounds (sum) game instead,
+with placements as raw_score (see Hollow Knight).
 rounds N sub-events. axes: raw_score x aggregation
 h2h matches. structure + series + match_result
 placement final positions only, no sub-data
@@ -132,7 +135,10 @@ Used when raw scores are not directly comparable across rounds
 
 SCORE / PLACEMENT top-level games (no rounds, no matches): a single stage holding
 one round_result per player (one round, order=1). score games store raw_score
-(direction high/low noted on the game); placement games store the final 4..1.
+with higher = better always (direction high/low is display-only, noted on the
+game in static TS — never stored; a score-low game is modeled as a rounds (sum)
+game with placements as raw_score);
+placement games store the final 4..1.
 
 RENDERING (driven by stage.kind, not by any free-text label)
 SEEDING between stages is NOT stored. Which group finishers advance to which
@@ -149,8 +155,9 @@ matches naming the players, obvious when stages are viewed in `order`.
   slot_id is enough - no feeds_into / seeding columns.
 
 SEPARATE LAYER (not part of this model): a game's final result -> SEASON POINTS
-(per-season ladder + power-up adjustments). Stored per game result, not derived
-from a shared table. Decoded values live in game-placements.md.
+(per-season ladder + power-up adjustments). Points are DERIVED at read time:
+season_ladder[game_result.placement] + SUM(power_up_use.points_delta). The ladder
+is season-wide (identical across all games). Decoded values live in game-placements.md.
 
 SCOPE: 4-player seasons only (Kristin nearly joined S3 but did not play), so one
 bracket template per kind, no player-count variants. If a future season changes
@@ -253,8 +260,9 @@ Planet Coaster score high
 War Thunder h2h single-round-robin -> double-elim-reset, bo1 group / bo3/bo5 late, win-loss
 [ok]
 
-Hollow Knight score low
-[--]
+Hollow Knight rounds sum (1 round)
+[--] fastest completion (originally score low; modeled as a 1-round sum game
+     storing placements as raw_score — DB has no score direction, see TAXONOMY)
 
 Pummel Party score high
 [--] cumulative minigame
