@@ -11,12 +11,25 @@ social hub — the site produces artifacts that feed into it.
 
 ## Open questions (must resolve before relevant phases)
 
-- **Data modeling depth:** Store only final per-player points per game, or model internal
-  game formats (brackets, round-robins, race rounds) in the DB too? The former doesn't
-  fully replace the spreadsheet, and may limit what sort of statistics we can show. Needs a dedicated discussion before Phase 3.
+- **Data modeling depth:** DECIDED — model internal game formats in the DB
+  (not points-only). Depth is now RESOLVED too: a stage → match → game pipeline.
+  Standings/table stages (round-robin, swiss, score-group) derive standings from
+  matches; elim stages place matches into fixed 4-player bracket templates by
+  slot_id. Every result is a `game` row (two ints); win-loss stored as 1-0;
+  match results and standings derived, never stored. 6 stage kinds incl. two
+  double-elim variants (reset / no-reset). 4-player scope only.
+  Full model + per-game classification: `working-docs/game-formats.md` (RESOLVED MODEL
+  section). Verified historical points/placements: `working-docs/game-placements.md`.
+  Codified in steering: `.kiro/steering/structure.md` "Data split".
 - **Cross-season point normalization:** Points are not comparable across seasons (different
   point scales per game/season). All-time stats and /records require a normalization
   strategy. Exact method TBD — resolve before building /records and /vs.
+  Ground truth now documented: base ladders are S2 7/4/2/1 and S3/S4 8/5/3/1
+  (S1 is 4/3/2/1), and off-ladder values are power-up adjustments (e.g. Double Up
+  doubles the ladder value; some cells carry +bonus, 0, or −1 penalties). Power-up
+  mechanics live in `src/data/sesong/<NN>/power-ups.ts`; decoded per-game
+  points/placements in `working-docs/game-placements.md`. Normalization likely works off
+  placement (comparable across seasons) rather than raw points.
 - **Editorial appetite:** Several "monument" features (season recaps, "how it went down"
   blocks, Skattkammeret lore content) require written content from Jakob. Scope of these
   features depends on how much curation is realistic.
@@ -43,14 +56,14 @@ See `design.md` for the full system.
 ## Phase 3 — Backend + admin panel
 
 Set up Supabase (Postgres + auth) and build the custom admin panel. This is the
-prerequisite for all results-based features. Must resolve the data modeling open
-question before starting.
+prerequisite for all results-based features. Format modeling is decided (see Open
+questions); settle the modeling *depth* before finalizing the schema.
 
 **Scope:**
 
 - [ ] Supabase project setup (Postgres + Auth)
 - [ ] Auth for a small admin group (allowlist/invite model, not public)
-- [ ] Data schema design (resolve open question: points-only vs. full game format modeling)
+- [x] Data schema design — model + depth RESOLVED (stage → match → game pipeline, see structure.md "Data split" / TODO open question). SQL schema written: supabase/schema.sql.
 - [ ] Seed all historical season data (all 4 seasons backfilled)
 - [ ] Custom /admin panel:
   - [ ] Sign in via Supabase Auth
