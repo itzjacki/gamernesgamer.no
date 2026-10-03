@@ -4,7 +4,7 @@
 - **React 19** — `.tsx` for all pages and components.
 - **TypeScript strict** — extends `next` tsconfig.
 - **Tailwind CSS v4** — tokens in `src/styles/global.css` via `@theme`.
-- **Supabase** (`@supabase/ssr`) — Postgres (results only) + Auth (admin allowlist, invite-only, no public accounts).
+- **Supabase** (`@supabase/ssr`) — Postgres (all results data, modeled as full game formats — see structure.md "Data split") + Auth (admin allowlist, invite-only, no public accounts).
 - **Vercel OG / Satori** — shareable image generation as edge functions.
 
 ## Commands

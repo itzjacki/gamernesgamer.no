@@ -70,4 +70,20 @@ public/
 ## Data split
 
 - **Code:** Gamers, games, power-ups, curses — stable, typed, git-reviewable.
-- **Supabase:** Results only — points and finishing positions per player per game per season.
+- **Supabase:** All results. We model internal game formats, not points-only
+  (decided — see TODO.md "Data modeling depth"). The results schema is a
+  stage → match → game pipeline:
+  - `stage` (game_id, order, kind) — kind ∈ round-robin | swiss | single-elim |
+    final-bronze | double-elim-reset | double-elim-no-reset.
+  - `match` (stage_id, slot_id, player_a, player_b, series_len) — no result
+    stored; derived from its game rows. slot_id places elim matches into a
+    fixed 4-player template per kind (no feeds_into; template edges are static).
+  - `game` (match_id, game_number, score_a, score_b) — the single source of
+    every result; always two ints. Win-loss games store 1-0 and render as 1-0
+    (no win-loss/score flag). Match results and standings are DERIVED.
+  - Group/swiss/score stages render as standings tables; elim stages render as
+    4-player bracket templates. Scope is 4-player seasons only.
+  - Season points per game (ladder + power-up adjustments) are a SEPARATE layer,
+    stored per game result — not derived from a shared table.
+  Full worksheet + rationale: `working-docs/game-formats.md`; verified historical
+  points/placements: `working-docs/game-placements.md`.
