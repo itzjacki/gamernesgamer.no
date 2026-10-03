@@ -27,7 +27,7 @@ export const games: Game[] = [
   },
   {
     title: 'Ratz Instagib',
-    slug: 'ratz-Instagib',
+    slug: 'ratz-instagib',
     thumbnailPath: '/images/game-thumbnails/4/ratz-instagib.jpg',
     chosenBy: 'William',
     duration: '75 min',
