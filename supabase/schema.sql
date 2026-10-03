@@ -92,7 +92,6 @@ ALTER TYPE "public"."stage_aggregation" OWNER TO "postgres";
 
 CREATE TYPE "public"."stage_kind" AS ENUM (
     'round-robin',
-    'swiss',
     'single-elim',
     'final-bronze',
     'double-elim-reset',
@@ -210,6 +209,8 @@ CREATE TABLE IF NOT EXISTS "public"."match" (
     "player_a" "uuid" NOT NULL,
     "player_b" "uuid" NOT NULL,
     "series_len" "public"."series_length" NOT NULL,
+    "leg" smallint DEFAULT 1 NOT NULL,
+    CONSTRAINT "match_leg_check" CHECK (("leg" >= 1)),
     CONSTRAINT "player_order" CHECK (("player_a" < "player_b")),
     CONSTRAINT "players_differ" CHECK (("player_a" <> "player_b"))
 );
@@ -235,6 +236,10 @@ COMMENT ON COLUMN "public"."match"."player_b" IS 'season_player.id of the greate
 
 
 COMMENT ON COLUMN "public"."match"."series_len" IS 'Best-of format for this match.';
+
+
+
+COMMENT ON COLUMN "public"."match"."leg" IS 'Which meeting of this pairing within the stage (1-indexed). 1 = first/only meeting; 2+ = rematch in a dual round-robin or a round-robin''s extra-leg (swiss-style) finish. Single round-robin stages are all leg 1.';
 
 
 
@@ -586,7 +591,7 @@ ALTER TABLE ONLY "public"."match"
 
 
 ALTER TABLE ONLY "public"."match"
-    ADD CONSTRAINT "match_stage_id_player_a_player_b_key" UNIQUE ("stage_id", "player_a", "player_b");
+    ADD CONSTRAINT "match_stage_id_player_a_player_b_leg_key" UNIQUE ("stage_id", "player_a", "player_b", "leg");
 
 
 

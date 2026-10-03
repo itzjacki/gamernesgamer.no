@@ -1,9 +1,12 @@
 # GAME FORMATS
 
-STATUS: as of 2026-10-02. RESOLVED MODEL section below is the decided DB data
+STATUS: as of 2026-10-04. RESOLVED MODEL section below is the decided DB data
 model (also codified in .kiro/steering/structure.md "Data split" and TODO.md).
 Per-game CSV-status lines verified against the raw CSVs. Companion: game-placements.md.
 SQL implementation: supabase/schema.sql.
+UPDATE 2026-10-04: dual round-robin (S2 LoL) + 2XKO's swiss-finish are modeled as
+one round-robin stage using match.leg for repeated pairings; the standalone
+'swiss' stage kind was removed (migration 20261003231523).
 
 How each game's results are structured, for DB schema design.
 Season points & placements (who won each game) live in game-placements.md.
@@ -33,10 +36,14 @@ sum the points (Trombone group stage).
 
 h2h axes:
 structure a stage pipeline; each stage's kind is one of the 6 in RESOLVED MODEL
-(round-robin, swiss, single-elim, final-bronze, double-elim-reset,
+(round-robin, single-elim, final-bronze, double-elim-reset,
 double-elim-no-reset). Multi-stage games chain them, e.g. round-robin
--> single-elim, or round-robin -> swiss -> final-bronze (2XKO).
-series bo1 | bo3 | bo5 (per stage)
+-> single-elim (CS:GO), or round-robin -> final-bronze (2XKO).
+A DUAL round-robin (every pair meets twice, e.g. S2 LoL) and a round-robin
+with an extra "swiss finish" (a few rematches to settle standings, e.g.
+S4 2XKO) are BOTH a single round-robin stage whose repeated pairings carry
+match.leg = 2. No separate "swiss" or "dual" kind — see match.leg below.
+series bo1 | bo3 | bo5 (per match)
 match_result win-loss | score (W/L derivable)
 
 NOTE: We ARE modeling internal formats in the DB (decided). game result ->
@@ -51,7 +58,7 @@ reconstruction, no overloaded fields. Field-by-field below so nothing relies on
 remembering the discussion.
 
 A GAME (e.g. "CS:GO", "2XKO") is played as an ordered PIPELINE OF STAGES. Each
-stage is one phase of that game (a group phase, a swiss phase, a finals bracket).
+stage is one phase of that game (a group/round-robin phase, a finals bracket).
 A stage contains MATCHES (one meeting of two players). A match contains GAMES
 (the individual contests inside a best-of series). So: game -> stages ->
 matches -> games(rows).
@@ -61,11 +68,14 @@ id PK.
 game_id FK -> the game this stage belongs to.
 order Position of this stage WITHIN its game's pipeline, 1-indexed.
 order=1 is played first. This is what sequences the pipeline:
-e.g. 2XKO has order=1 round-robin, order=2 swiss, order=3 finals.
+e.g. 2XKO has order=1 round-robin, order=2 finals.
 NOT a display-sort or season-wide field - it is per-game stage order.
 kind What this phase is, and therefore how it renders:
-round-robin everyone plays everyone -> standings table
-swiss swiss-paired phase -> standings table
+round-robin everyone plays everyone -> standings table. Includes
+DUAL round-robin (each pair twice) and a round-robin
+with a "swiss finish" (a few extra rematches to settle
+standings) - both expressed via match.leg, NOT a
+separate kind.
 single-elim 4-player knockout -> bracket template
 final-bronze just a final + a bronze -> bracket template
 double-elim-reset double-elim, grand final CAN be replayed
@@ -73,18 +83,26 @@ double-elim-reset double-elim, grand final CAN be replayed
 double-elim-no-reset double-elim, single grand final
 (A "score-group" phase - a group ranked by a raw score rather than
 by matches - also renders as a standings table; see note below.)
+(There is NO "swiss" kind. 2XKO was misread as having a swiss phase; it is
+a round-robin plus a few extra-leg rematches - see match.leg. A standalone
+swiss kind can be re-added if a true swiss event ever happens.)
 
 Entity: match (one meeting of two players, within a stage)
 id PK.
 stage_id FK -> parent stage.
 slot_id Position of this match inside a bracket template. NULL for table
-stages (round-robin/swiss/score-group have no bracket). For elim
+stages (round-robin/score-group have no bracket). For elim
 stages it is a fixed label from that kind's template, e.g.
 single-elim: SF1, SF2, F, BR ; double-elim: WB-SF1, WB-F, LB-F,
 GF (+ GF2 for -reset). The template defines which slot feeds which,
 so no feeds_into column is needed.
 player_a FK -> player.
 player_b FK -> player.
+leg Which meeting of this pairing within the stage, 1-indexed.
+1 = first/only meeting; 2+ = a rematch. Single round-robin is all
+leg 1. A dual round-robin plays every pair at leg 1 and leg 2; a
+"swiss finish" plays only SOME pairs a second leg. unique is
+(stage_id, player_a, player_b, leg), so partial extra legs are fine.
 series_len bo1 | bo3 | bo5. How many games this match is at most.
 (NO result column. The match's outcome is DERIVED from its game rows.)
 
@@ -145,10 +163,10 @@ SEEDING between stages is NOT stored. Which group finishers advance to which
 finals slot is derived at read time from the group standings + the finals
 matches naming the players, obvious when stages are viewed in `order`.
 (Trombone: group standings -> top 2 to the final, bottom 2 to bronze.)
-
-- round-robin / swiss / score-group -> STANDINGS TABLE (derive W/L or points,
-  sort). 2XKO's round-robin (order=1) and swiss (order=2) share one carried
-  W/L record; render them as one combined table or two, reader's choice.
+- round-robin / score-group -> STANDINGS TABLE (derive W/L or points, sort).
+  A dual round-robin or a round-robin with a swiss-finish is still ONE
+  round-robin stage (the repeated pairings carry match.leg=2); the standings
+  tally every match row regardless of leg.
 - single-elim / final-bronze / double-elim-\* -> BRACKET drawn from a FIXED
   4-PLAYER TEMPLATE per kind. Each match's slot_id places it into the template;
   the template's wiring (who advances to where) is static, so the match list +
@@ -165,23 +183,26 @@ size, add a size-specific template or a feeds_into column then - a non-destructi
 addition, because the stored matches/slots are unaffected.
 
 WORKED EXAMPLE - 2XKO (a game, read top to bottom):
-stage(order=1, kind=round-robin) -> matches with slot_id=NULL; standings table
-stage(order=2, kind=swiss) -> matches slot_id=NULL; continues same record
-stage(order=3, kind=final-bronze) -> match slot_id=F (final), match slot_id=BR
-(bronze); drawn from the final-bronze template
-Each match holds its game rows (bo3 group/swiss, bo5 late); win-loss stored 1-0;
+stage(order=1, kind=round-robin) -> the full round-robin as matches with
+slot_id=NULL, leg=1; PLUS the swiss-finish rematches as matches with slot_id=NULL,
+leg=2 (only the pairs that were replayed). One combined standings table.
+stage(order=2, kind=final-bronze) -> match slot_id=F (final), match slot_id=BR
+(bronze); drawn from the final-bronze template.
+Each match holds its game rows (bo3 group, bo5 late); win-loss stored 1-0;
 who won each match and the standings are computed from those rows.
 
 ## INVENTORY (per game)
 
 How the shorthand below maps to the model's stage.kind:
-"single-round-robin" -> kind=round-robin
+"single-round-robin" -> kind=round-robin (all matches leg 1)
+"dual-round-robin" -> kind=round-robin (every pair at leg 1 AND leg 2)
 "single-elim" -> kind=single-elim
 "bronze-final-and-final" -> kind=final-bronze
 "double-elim-reset" / "double-elim-no-reset" -> that exact kind (named on the
 game line). -no-reset is unused so far, kept for
 expected future seasons.
-"swiss" -> kind=swiss
+"swiss finish" -> NOT a kind; the round-robin stage gets a few extra-leg
+rematches (match.leg=2 for some pairs). See 2XKO.
 "rounds"/"score"/"placement" top-level types are the per-game-row shapes, not
 bracket stages; see TAXONOMY.
 
@@ -234,7 +255,7 @@ Wreckfest rounds sum (10 tracks)
 Total War: Empire h2h double-elim-reset, bo1, win-loss
 [ok]
 
-League of Legends h2h single-round-robin -> single-elim, bo3, win-loss
+League of Legends h2h dual-round-robin -> bronze-final-and-final, bo3, win-loss
 [ok]
 
 ## SESONG 3
@@ -262,7 +283,7 @@ War Thunder h2h single-round-robin -> double-elim-reset, bo1 group / bo3/bo5 lat
 
 Hollow Knight rounds sum (1 round)
 [--] fastest completion (originally score low; modeled as a 1-round sum game
-     storing placements as raw_score — DB has no score direction, see TAXONOMY)
+storing placements as raw_score — DB has no score direction, see TAXONOMY)
 
 Pummel Party score high
 [--] cumulative minigame
@@ -293,5 +314,7 @@ Garry's Mod rounds sum (6 races)
 FC25 h2h single-round-robin -> single-elim, bo1, score (goals)
 [ok]
 
-2XKO h2h single-round-robin -> swiss (continues same W/L record to 3W or 3L) -> bronze-final-and-final, bo3 group/swiss / bo5 late, win-loss
-[ok] full round-robin first, THEN swiss-paired on carried record until each player has 3W or 3L
+2XKO h2h round-robin (with swiss-finish rematches via match.leg) -> bronze-final-and-final, bo3 group / bo5 late, win-loss
+[ok] full round-robin first, THEN a few swiss-paired rematches on carried record
+     until each player has 3W or 3L — stored as the SAME round-robin stage with
+     match.leg=2 on the replayed pairings (one extra match in our case). No swiss kind.

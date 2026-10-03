@@ -105,12 +105,17 @@ working-docs/
   The results schema is a stage → match → match_game pipeline for H2H games, and a
   stage → round → round_result pipeline for non-H2H games. A single game can chain
   both (e.g. Trombone Champ: rounds group stage → H2H finals).
-  - `stage` (game_id, ordinal, kind, aggregation) — kind ∈ round-robin | swiss |
+  - `stage` (game_id, ordinal, kind, aggregation) — kind ∈ round-robin |
     single-elim | final-bronze | double-elim-reset | double-elim-no-reset | rounds.
-    aggregation ∈ sum | rank-then-sum (rounds stages only).
-  - `match` (stage_id, slot_id, player_a, player_b, series_len) — player_a/b are
+    aggregation ∈ sum | rank-then-sum (rounds stages only). A dual round-robin and
+    a round-robin with a "swiss finish" are both kind=round-robin (no swiss kind);
+    repeated pairings are distinguished by match.leg.
+  - `match` (stage_id, slot_id, player_a, player_b, leg, series_len) — player_a/b are
     season_player.id, not player.id. slot_id places elim matches into a fixed template
     per kind (no feeds_into; template edges are static). NULL for standings stages.
+    leg (1-indexed) is the meeting number of a pairing in the stage: 1 for single
+    round-robin; 2+ for a rematch (dual round-robin or swiss-finish). unique is
+    (stage_id, player_a, player_b, leg).
   - `match_game` (match_id, game_number, score_a, score_b, tiebreak_winner) — the
     single source of every H2H result; always two ints. Win-loss games store 1-0.
     tiebreak_winner ('a'|'b') set only when scores are equal.
