@@ -40,6 +40,16 @@ public/
   fonts/
     neue-montreal/      Self-hosted Neue Montreal (Pangram Pangram, OFL)
   images/               Static assets (gamers/<NN>/, game-thumbnails/<NN>/, power-ups/)
+supabase/
+  config.toml           Supabase CLI config (local stack, project link).
+  migrations/           SOURCE OF TRUTH for the DB schema. Ordered SQL migrations
+    <ts>_initial_schema.sql  First migration: full schema + updated_at triggers +
+                        RLS enabled (locked; policies land with the admin panel).
+  schema.sql            GENERATED reference snapshot (via `supabase db dump`).
+                        Do NOT edit by hand — regenerate after each migration.
+working-docs/
+  game-formats.md       Resolved data model + per-game format inventory
+  game-placements.md    Verified historical points & placements (all 4 seasons)
 ```
 
 ## Key rules
@@ -71,19 +81,35 @@ public/
 
 - **Code:** Gamers, games, power-ups, curses — stable, typed, git-reviewable.
 - **Supabase:** All results. We model internal game formats, not points-only
-  (decided — see TODO.md "Data modeling depth"). The results schema is a
-  stage → match → game pipeline:
-  - `stage` (game_id, order, kind) — kind ∈ round-robin | swiss | single-elim |
-    final-bronze | double-elim-reset | double-elim-no-reset.
-  - `match` (stage_id, slot_id, player_a, player_b, series_len) — no result
-    stored; derived from its game rows. slot_id places elim matches into a
-    fixed 4-player template per kind (no feeds_into; template edges are static).
-  - `game` (match_id, game_number, score_a, score_b) — the single source of
-    every result; always two ints. Win-loss games store 1-0 and render as 1-0
-    (no win-loss/score flag). Match results and standings are DERIVED.
-  - Group/swiss/score stages render as standings tables; elim stages render as
-    4-player bracket templates. Scope is 4-player seasons only.
-  - Season points per game (ladder + power-up adjustments) are a SEPARATE layer,
-    stored per game result — not derived from a shared table.
-  Full worksheet + rationale: `working-docs/game-formats.md`; verified historical
+  (decided — see TODO.md "Data modeling depth"). Schema source of truth:
+  `supabase/migrations/` (generated reference snapshot in `supabase/schema.sql`).
+  The results schema is a stage → match → match_game pipeline for H2H games, and a
+  stage → round → round_result pipeline for non-H2H games. A single game can chain
+  both (e.g. Trombone Champ: rounds group stage → H2H finals).
+  - `stage` (game_id, ordinal, kind, aggregation) — kind ∈ round-robin | swiss |
+    single-elim | final-bronze | double-elim-reset | double-elim-no-reset | rounds.
+    aggregation ∈ sum | rank-then-sum (rounds stages only).
+  - `match` (stage_id, slot_id, player_a, player_b, series_len) — player_a/b are
+    season_player.id, not player.id. slot_id places elim matches into a fixed template
+    per kind (no feeds_into; template edges are static). NULL for standings stages.
+  - `match_game` (match_id, game_number, score_a, score_b, tiebreak_winner) — the
+    single source of every H2H result; always two ints. Win-loss games store 1-0.
+    tiebreak_winner ('a'|'b') set only when scores are equal.
+  - `round` (stage_id, ordinal) — one sub-event in a rounds stage.
+  - `round_result` (round_id, season_player_id, raw_score) — the single source of
+    every non-H2H result. raw_score always higher = better; negatives allowed.
+  - `game_result` (game_id, season_player_id, placement) — final 1..N placement per
+    player per game. Stored explicitly (not derived) — tiebreakers can override
+    point totals. Only written after game is complete with all ties broken.
+  - `season_result` (season_id, season_player_id, placement, note) — final season
+    placement. Stored explicitly for same reason.
+  - Season points per game are DERIVED: season_ladder[game_result.placement] +
+    SUM(power_up_use.points_delta where affected_season_player_id = player).
+    The base ladder is season-wide (identical across all games in a season),
+    stored in `season_ladder` (season_id, placement, points).
+    Power-up deltas stored in `power_up_use` (game_id, power_up_id,
+    used_by_season_player_id, affected_season_player_id, points_delta).
+  - All `*_season_player_id` columns store `season_player.id`, NOT `player.id`.
+    Joining to `player` always goes through `season_player` first.
+  Full model + rationale: `working-docs/game-formats.md`; verified historical
   points/placements: `working-docs/game-placements.md`.
