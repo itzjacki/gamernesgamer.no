@@ -120,6 +120,7 @@ export type Database = {
       match: {
         Row: {
           id: string;
+          leg: number;
           player_a: string;
           player_b: string;
           series_len: Database['public']['Enums']['series_length'];
@@ -128,6 +129,7 @@ export type Database = {
         };
         Insert: {
           id?: string;
+          leg?: number;
           player_a: string;
           player_b: string;
           series_len: Database['public']['Enums']['series_length'];
@@ -136,6 +138,7 @@ export type Database = {
         };
         Update: {
           id?: string;
+          leg?: number;
           player_a?: string;
           player_b?: string;
           series_len?: Database['public']['Enums']['series_length'];
@@ -564,7 +567,6 @@ export type Database = {
       stage_aggregation: 'sum' | 'rank-then-sum';
       stage_kind:
         | 'round-robin'
-        | 'swiss'
         | 'single-elim'
         | 'final-bronze'
         | 'double-elim-reset'
@@ -710,7 +712,6 @@ export const Constants = {
       stage_aggregation: ['sum', 'rank-then-sum'],
       stage_kind: [
         'round-robin',
-        'swiss',
         'single-elim',
         'final-bronze',
         'double-elim-reset',

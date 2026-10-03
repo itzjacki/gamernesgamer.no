@@ -14,8 +14,10 @@ social hub — the site produces artifacts that feed into it.
 - **Data modeling depth:** DECIDED AND SCHEMA WRITTEN. Full stage → match → match_game
   pipeline for H2H games; stage → round → round_result for non-H2H (rounds/score/placement)
   games. A single game can chain both (e.g. Trombone Champ: rounds group stage → H2H finals).
-  6 stage kinds: round-robin | swiss | single-elim | final-bronze | double-elim-reset |
-  double-elim-no-reset | rounds. Points = season_ladder[game_result.placement] +
+  6 stage kinds: round-robin | single-elim | final-bronze | double-elim-reset |
+  double-elim-no-reset | rounds. (Dual round-robin and 2XKO's "swiss finish" are
+  round-robin stages using match.leg for repeated pairings — no swiss kind.)
+  Points = season_ladder[game_result.placement] +
   SUM(power_up_use.points_delta) — ladder is season-wide (identical across all games),
   power-up deltas stored in power_up_use. Placements always unique, stored explicitly
   (not derived) because tiebreakers can override point totals. Scope is variable roster
