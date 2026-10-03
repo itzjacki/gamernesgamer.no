@@ -33,7 +33,26 @@ src/
       gamers.ts         Gamer[] for the season
       games.ts          Game[] for the season
       power-ups.ts      PowerUp[] + curses — only when used
-  lib/supabase/         Server + browser Supabase clients (planned)
+  lib/
+    supabase/           Supabase clients + generated DB types
+      read.ts           Server-only, secret-key, no-cookie client. Used NOW for
+                        result reads (RLS locked, no policies yet).
+      server.ts         Cookie-bound Auth client (admin panel, Phase 5).
+      client.ts         Browser client (admin panel, Phase 5).
+      database.types.ts GENERATED (supabase gen types --local). Do NOT hand-edit.
+    results/            Read + derivation layer for tournament results
+      queries.ts        Public API: getSeasonView(n) / getGameView(n, slug).
+                        Server Components only. null → notFound(); throw → error.
+      fetch.ts          IO boundary — one raw per-season bundle. confirmed=true
+                        filtered here. Imports no derivation.
+      compose.ts        (added at need) joins src/data static content by slug.
+      raw.ts            Raw row aliases over generated types (module-internal).
+      view-models.ts    Hand-authored camelCase shapes components consume.
+      derive/           PURE, sync, no IO — unit-tested against S1.
+        points.ts       ladder[placement] + Σ power-up deltas.
+        players.ts      season_player.id → PlayerRef resolution.
+        index.ts        assembleSeasonView / assembleGameView.
+      __tests__/        Vitest: S1 fixtures + derivation tests.
   types/                Shared TypeScript types
   styles/global.css     Tailwind import + @theme design tokens
 public/
@@ -111,5 +130,5 @@ working-docs/
     used_by_season_player_id, affected_season_player_id, points_delta).
   - All `*_season_player_id` columns store `season_player.id`, NOT `player.id`.
     Joining to `player` always goes through `season_player` first.
-  Full model + rationale: `working-docs/game-formats.md`; verified historical
-  points/placements: `working-docs/game-placements.md`.
+    Full model + rationale: `working-docs/game-formats.md`; verified historical
+    points/placements: `working-docs/game-placements.md`.

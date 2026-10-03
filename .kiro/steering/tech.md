@@ -9,10 +9,40 @@
 
 ## Commands
 
-- `npm run build` — primary correctness check (no test framework)
+- `npm run build` — primary correctness check (TypeScript strict + Next compile)
+- `npm run test` — Vitest, scoped to the pure results-derivation layer only
 - `npm run dev` / `npm run start`
 - `npm run lint` (`eslint .`)
 - `npx prettier --write <files>` — single quotes, `prettier-plugin-tailwindcss`
+
+## Reading results data
+
+- The read layer lives in `src/lib/` (see structure.md). Public pages call
+  `getSeasonView(n)` / `getGameView(n, slug)` from `src/lib/results/queries` —
+  Server Components only; never a client component.
+- **Clients** (`src/lib/supabase/`): `read.ts` is used NOW for result reads —
+  server-only, no cookies, uses the **secret** key because RLS is enabled with
+  no policies yet (anon/publishable reads return nothing until public read
+  policies land). `server.ts` (cookie-bound Auth) and `client.ts` (browser) are
+  for the admin panel (Phase 5) and use the publishable key.
+- **The eventual public-read flip is isolated to `read.ts`**: once RLS grants
+  public reads of `confirmed = true` rows, swap its key to the publishable key —
+  no other read-layer change. Queries already filter `confirmed = true`.
+- **Env vars** (server-only, NEVER `NEXT_PUBLIC_`): `SUPABASE_URL`,
+  `SUPABASE_SECRET_KEY`. Local `.env.local` points at the local stack. **Before
+  any deploy, confirm these are set in the Vercel project settings** — the
+  Vercel+Supabase integration may sync the URL and publishable key but not
+  necessarily the secret key. `database.types.ts` is generated
+  (`supabase gen types typescript --local`); regenerate after each migration.
+
+## Testing
+
+- **Vitest covers the pure derivation only** (`src/lib/results/derive/**` via
+  `src/lib/results/__tests__/`). That code is silent arithmetic `next build`
+  can't catch (points, standings, aggregation), and Season 1 provides verified
+  oracle numbers. The IO layer (`fetch.ts`, `queries.ts`) and Supabase clients
+  are NOT unit-tested — `next build` stays their gate. Config: `vitest.config.mts`,
+  include glob scoped so tests can't drift into needing a DB or browser.
 
 ## Constraints
 
@@ -41,7 +71,7 @@
 
 A migration's version number must be assigned by exactly one authority. The CLI
 stamps a filename timestamp; the MCP `apply_migration` tool stamps its own
-timestamp at apply time. Applying the same change through *both* (hand-authored
+timestamp at apply time. Applying the same change through _both_ (hand-authored
 file locally + MCP remotely) produces two different versions for one migration —
 history drift that confuses later `db push`. We hit this on the initial schema
 and had to rename local files to match the remote-recorded versions.
