@@ -3,8 +3,7 @@ import { signIn } from '@/app/admin/actions';
 import GoogleSignInButton from '@/components/GoogleSignInButton';
 
 export const metadata: Metadata = {
-  // PLACEHOLDER: page title — written by a human.
-  title: '[PLACEHOLDER: Logg inn]',
+  title: 'Logg inn — Adminpanel',
 };
 
 interface Props {
@@ -18,27 +17,22 @@ export default async function AdminLoginPage({ searchParams }: Props) {
   return (
     <section className='flex min-h-[70svh] items-center justify-center'>
       <div className='border-border bg-bg w-80 border p-6 sm:w-100 sm:p-10'>
-        {/* PLACEHOLDER eyebrow — e.g. "ADMIN". Written by a human. */}
         <p className='text-text-muted font-mono text-xs tracking-wider uppercase'>
-          [PLACEHOLDER: eyebrow]
+          Adminpanel
         </p>
 
-        {/* PLACEHOLDER heading — e.g. "Logg inn". Written by a human. */}
-        <h1 className='text-text mt-2 text-2xl font-extrabold'>
-          [PLACEHOLDER: overskrift]
-        </h1>
+        <h1 className='text-text mt-2 text-2xl font-extrabold'>Logg inn</h1>
 
-        {/* PLACEHOLDER sub — e.g. a short explanation. Written by a human. */}
         <p className='text-text-muted mt-3 text-sm leading-relaxed'>
-          [PLACEHOLDER: kort forklaring på hva dette er]
+          Administrasjonspanelet for Gamernes Gamer. Logg inn med Google for å
+          fortsette.
         </p>
 
         {error ? (
-          // PLACEHOLDER error line — written by a human. Shown when the OAuth
-          // init or callback exchange fails (not the non-admin case, which the
-          // admin layout handles).
+          // Shown when the OAuth init or callback exchange fails (not the
+          // non-admin case, which the admin layout handles).
           <p className='text-accent mt-4 font-mono text-xs'>
-            [PLACEHOLDER: feilmelding ved innlogging]
+            Innloggingen gikk ikke gjennom. Prøv igjen.
           </p>
         ) : null}
 
@@ -48,16 +42,13 @@ export default async function AdminLoginPage({ searchParams }: Props) {
 
         <form action={signIn} className='mt-8'>
           <GoogleSignInButton
-            // PLACEHOLDER: Google-approved label string, chosen by a human.
-            label='[PLACEHOLDER: Logg på med Google]'
-            // PLACEHOLDER: shown while redirecting. Written by a human.
-            pendingLabel='[PLACEHOLDER: Sender deg til Google …]'
+            label='Logg inn med Google'
+            pendingLabel='Sender deg til Google …'
           />
         </form>
 
-        {/* PLACEHOLDER footnote — e.g. "Kun for inviterte". Written by a human. */}
         <p className='text-text-muted mt-4 font-mono text-xs'>
-          [PLACEHOLDER: fotnote]
+          Kun for inviterte administratorer.
         </p>
       </div>
     </section>

@@ -30,8 +30,19 @@ src/
         layout.tsx       Allowlist gate: getClaims() + is_admin() RPC; non-admins
                          get a rejection screen. One choke point for all nested
                          admin routes.
-        page.tsx         Admin dashboard landing (protected).
-        results/page.tsx Results entry form (planned — lives under the group).
+        page.tsx         Admin dashboard: renders the DB overview + admin
+                         membership management in-place (one page, no sub-route).
+        DbOverview.tsx   Read-only sanity readout (season/game/user counts +
+                         current season) — a <dl>, not a dashboard.
+        AdminManagement.tsx  Admin membership panel (presentational): lists
+                         admins, add from existing signed-in users, remove.
+                         Own mono eyebrow heading (page owns the single <h1>).
+        actions.ts       'use server' — addAdmin / removeAdmin (call the RPCs);
+                         revalidate /admin.
+        AddAdminForm.tsx    'use client' — select a user + submit.
+        RemoveAdminButton.tsx  'use client' — confirm + remove; last-admin
+                         guard surfaced inline.
+        results/page.tsx Results entry form (planned — moved to Phase 5).
     auth/
       callback/route.ts  OAuth code-exchange (exchangeCodeForSession). NOT under
                          /admin, so the proxy lets it through to finish sign-in.
@@ -81,6 +92,10 @@ supabase/
     <ts>_initial_schema.sql  Full schema + updated_at triggers + RLS enabled.
     <ts>_auth_admin_and_rls_policies.sql  admin_user allowlist + is_admin() +
                         public-read / admin-write policies on every table.
+    <ts>_admin_membership_management.sql  SECURITY DEFINER RPCs letting admins
+                        manage the allowlist from the UI: admin_list_users (reads
+                        auth.users, admin-gated), admin_add, admin_remove
+                        (last-admin lockout guard).
   schema.sql            GENERATED reference snapshot (via `supabase db dump`).
                         Do NOT edit by hand — regenerate after each migration.
   seed.sql              Historical results data (S1–S4). Data, not schema — kept
@@ -102,7 +117,13 @@ working-docs/           Secondary reference (the DB is the source of truth).
   the `admin/(protected)/layout.tsx` gate then enforces the invite-only allowlist
   (`is_admin()` RPC) and shows a rejection screen to authenticated non-admins.
 - Admin accounts are invite-only: a Google sign-in creates the `auth.users` row,
-  but access requires an `admin_user` row added via the service role.
+  but access requires an `admin_user` row. Existing admins manage the allowlist
+  in-place on the `/admin` dashboard (the `admin_add` / `admin_remove` SECURITY
+  DEFINER RPCs, which re-check `is_admin()` and block removing the last admin).
+  The service role (dashboard) remains the bootstrap path for the first admin
+  and the
+  recovery escape hatch. You can only add users who have already signed in with
+  Google — there is no email pre-authorization.
 - Use `@/*` alias for all cross-directory imports.
 - Data files export named consts: `export const games`, `export const gamers`, `export const powerUps`, `export const curses`.
 

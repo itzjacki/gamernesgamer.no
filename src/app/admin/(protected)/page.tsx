@@ -1,37 +1,104 @@
 import type { Metadata } from 'next';
 import { signOut } from '@/app/admin/actions';
+import { createReadClient } from '@/lib/supabase/read';
+import { createAuthClient } from '@/lib/supabase/server';
+import { currentSeason } from '@/data/sesong';
+import DbOverview from './DbOverview';
+import AdminManagement, { type AdminRow } from './AdminManagement';
+import { type AddableUser } from './AddAdminForm';
 
 export const metadata: Metadata = {
-  // PLACEHOLDER: page title — written by a human.
-  title: '[PLACEHOLDER: Admin]',
+  title: 'Adminpanel',
 };
 
 /**
  * Admin dashboard landing. The (protected) layout has already verified the
- * visitor is an allowlisted admin, so this page can assume access. Minimal for
- * now — it exists to verify the full Google auth loop end to end; the results
- * entry + review UI (next steps) will live under this route group.
+ * visitor is an allowlisted admin. Renders two in-place panels under the single
+ * page heading: a read-only DB overview (a sanity glance that the seeded data
+ * is intact) and admin membership management (add/remove admins). Results
+ * entry/review will join this panel in a later phase.
+ *
+ * Data: seasons/games counts come from the public-read tables via the
+ * publishable read client (head-only exact counts). The user list comes from
+ * the admin-only admin_list_users() RPC — reading auth.users requires that
+ * privileged path — and is split into current admins + addable (non-admin)
+ * users for the management panel. All reads are per-request Server Component
+ * reads.
  */
-export default function AdminDashboardPage() {
-  return (
-    <section className='flex flex-col gap-6'>
-      {/* PLACEHOLDER heading — written by a human. */}
-      <h1 className='text-text text-3xl font-extrabold'>
-        [PLACEHOLDER: Admin — oversikt]
-      </h1>
+export default async function AdminDashboardPage() {
+  const read = createReadClient();
+  const auth = await createAuthClient();
 
-      {/* PLACEHOLDER body — written by a human. */}
-      <p className='text-text-muted text-sm leading-relaxed'>
-        [PLACEHOLDER: kort intro / hva som kommer her]
-      </p>
+  const [seasonsRes, gamesRes, usersRes, claimsRes] = await Promise.all([
+    read.from('season').select('*', { count: 'exact', head: true }),
+    read.from('game').select('*', { count: 'exact', head: true }),
+    auth.rpc('admin_list_users'),
+    auth.auth.getClaims(),
+  ]);
+
+  const seasons = seasonsRes.count ?? 0;
+  const games = gamesRes.count ?? 0;
+
+  const users = usersRes.data ?? [];
+  const signedInUsers = users.length;
+
+  const currentUserId =
+    typeof claimsRes.data?.claims?.sub === 'string'
+      ? claimsRes.data.claims.sub
+      : null;
+
+  const admins: AdminRow[] = users
+    .filter((u) => u.is_admin)
+    .map((u) => ({
+      id: u.id,
+      email: u.email,
+      display_name: u.display_name,
+      admin_since: u.admin_since,
+    }));
+  const addable: AddableUser[] = users
+    .filter((u) => !u.is_admin)
+    .map((u) => ({ id: u.id, label: u.email }));
+  const isLastAdmin = admins.length <= 1;
+
+  const usersError = Boolean(usersRes.error);
+
+  return (
+    <section className='flex flex-col gap-8'>
+      <div className='flex flex-col gap-2'>
+        <h1 className='text-text text-3xl font-extrabold'>Adminpanel</h1>
+      </div>
+
+      <DbOverview
+        seasons={seasons}
+        games={games}
+        signedInUsers={signedInUsers}
+        currentSeason={currentSeason}
+      />
+
+      {usersError ? (
+        <div className='border-border bg-bg border p-6 sm:p-10'>
+          <p className='text-text-muted font-mono text-xs tracking-wider uppercase'>
+            Administratorer
+          </p>
+          <p className='text-accent mt-4 font-mono text-sm' role='alert'>
+            Kunne ikke hente brukerlisten.
+          </p>
+        </div>
+      ) : (
+        <AdminManagement
+          admins={admins}
+          addable={addable}
+          currentUserId={currentUserId}
+          isLastAdmin={isLastAdmin}
+        />
+      )}
 
       <form action={signOut}>
         <button
           type='submit'
           className='border-border bg-surface text-text hover:border-accent focus-visible:outline-accent active:bg-bg flex h-11 items-center justify-center border px-6 text-sm transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2'
         >
-          {/* PLACEHOLDER: e.g. "Logg ut". Written by a human. */}
-          [PLACEHOLDER: Logg ut]
+          Logg ut
         </button>
       </form>
     </section>
