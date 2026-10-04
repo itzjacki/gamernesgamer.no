@@ -6,33 +6,33 @@ import type { Database } from './database.types';
 /**
  * Server-only Supabase client for reading tournament results.
  *
- * Uses the SECRET key (RLS-bypassing), because RLS is enabled on every table
- * with NO policies yet — anon/publishable reads return nothing until the public
- * read policies land with the admin panel. This client is the single place that
- * choice lives: when confirmed-result read policies exist, swap the key here for
- * the publishable key and nothing else in the read layer changes.
+ * Uses the PUBLISHABLE key and relies on RLS. Public read policies now exist:
+ * structural tables (seasons, games, stages, matches, rounds, etc.) are world
+ * readable, and the leaf result tables (game_result, season_result) expose only
+ * `confirmed = true` rows to anon. So anonymous reads return exactly the public
+ * data — no RLS-bypassing secret key needed. Unconfirmed, staged results stay
+ * invisible to the public without any filtering in app code (the queries still
+ * filter `confirmed = true` as defense-in-depth).
  *
- * `import 'server-only'` makes the build fail loudly if this module is ever
- * pulled into a client bundle, keeping the secret key off the browser.
- *
- * No cookies: result reads are anonymous (not tied to a user session). The
- * cookie-bound client for Auth lives in ./server (admin panel, later).
+ * `import 'server-only'` keeps this module out of client bundles. We still read
+ * on the server (not the browser) because result reads happen in Server
+ * Components; this is deliberately a no-cookie, no-session client — the
+ * cookie-bound Auth client for the admin panel lives in ./server.
  *
  * createClient here is lightweight and safe to call per request; it configures
- * a fetch, holding no user state. Do not share the returned client across
- * requests that carry user identity — these reads carry none.
+ * a fetch and holds no user state.
  */
 export function createReadClient() {
-  const url = process.env.SUPABASE_URL;
-  const secretKey = process.env.SUPABASE_SECRET_KEY;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-  if (!url || !secretKey) {
+  if (!url || !publishableKey) {
     throw new Error(
-      'Missing SUPABASE_URL or SUPABASE_SECRET_KEY. Set them in .env.local for local dev (point at the local stack) and in the Vercel project settings before deploying. These are server-only — never prefix with NEXT_PUBLIC_.',
+      'Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY. Set them in .env.local for local dev (point at the local stack) and in the Vercel project settings before deploying.',
     );
   }
 
-  return createClient<Database>(url, secretKey, {
+  return createClient<Database>(url, publishableKey, {
     auth: {
       persistSession: false,
       autoRefreshToken: false,

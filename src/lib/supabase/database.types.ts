@@ -1,9 +1,3 @@
-// =============================================================================
-// GENERATED FILE — DO NOT EDIT BY HAND.
-// Produced by: supabase gen types typescript --local > src/lib/supabase/database.types.ts
-// Regenerate after every migration. Source of truth is supabase/migrations/.
-// =============================================================================
-
 export type Json =
   | string
   | number
@@ -40,6 +34,24 @@ export type Database = {
   };
   public: {
     Tables: {
+      admin_user: {
+        Row: {
+          created_at: string;
+          note: string | null;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          note?: string | null;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          note?: string | null;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       game: {
         Row: {
           id: string;
@@ -558,7 +570,7 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
     };
     Enums: {
       game_status: 'not-started' | 'in-progress' | 'complete';

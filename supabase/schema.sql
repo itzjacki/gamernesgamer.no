@@ -112,6 +112,24 @@ CREATE TYPE "public"."tiebreak_winner" AS ENUM (
 ALTER TYPE "public"."tiebreak_winner" OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "public"."is_admin"() RETURNS boolean
+    LANGUAGE "sql" STABLE
+    SET "search_path" TO ''
+    AS $$
+  select exists (
+    select 1 from public.admin_user au
+    where au.user_id = (select auth.uid())
+  );
+$$;
+
+
+ALTER FUNCTION "public"."is_admin"() OWNER TO "postgres";
+
+
+COMMENT ON FUNCTION "public"."is_admin"() IS 'True if the current authenticated user is in the admin_user allowlist. Used by write policies across the schema.';
+
+
+
 CREATE OR REPLACE FUNCTION "public"."set_updated_at"() RETURNS "trigger"
     LANGUAGE "plpgsql"
     SET "search_path" TO ''
@@ -132,6 +150,20 @@ COMMENT ON FUNCTION "public"."set_updated_at"() IS 'Sets updated_at to now() on 
 SET default_tablespace = '';
 
 SET default_table_access_method = "heap";
+
+
+CREATE TABLE IF NOT EXISTS "public"."admin_user" (
+    "user_id" "uuid" NOT NULL,
+    "note" "text",
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL
+);
+
+
+ALTER TABLE "public"."admin_user" OWNER TO "postgres";
+
+
+COMMENT ON TABLE "public"."admin_user" IS 'Allowlist of admin auth users. Membership grants write access to all tournament tables via RLS. Invite-only: managed by existing admins or the service role (dashboard). No public signup.';
+
 
 
 CREATE TABLE IF NOT EXISTS "public"."game" (
@@ -555,6 +587,11 @@ COMMENT ON COLUMN "public"."stage"."aggregation" IS 'Required for rounds stages 
 
 
 
+ALTER TABLE ONLY "public"."admin_user"
+    ADD CONSTRAINT "admin_user_pkey" PRIMARY KEY ("user_id");
+
+
+
 ALTER TABLE ONLY "public"."game"
     ADD CONSTRAINT "game_pkey" PRIMARY KEY ("id");
 
@@ -771,6 +808,11 @@ CREATE OR REPLACE TRIGGER "set_updated_at" BEFORE UPDATE ON "public"."season_res
 
 
 
+ALTER TABLE ONLY "public"."admin_user"
+    ADD CONSTRAINT "admin_user_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+
+
+
 ALTER TABLE ONLY "public"."game_result"
     ADD CONSTRAINT "game_result_game_id_fkey" FOREIGN KEY ("game_id") REFERENCES "public"."game"("id") ON DELETE CASCADE;
 
@@ -876,10 +918,41 @@ ALTER TABLE ONLY "public"."stage"
 
 
 
+ALTER TABLE "public"."admin_user" ENABLE ROW LEVEL SECURITY;
+
+
+CREATE POLICY "admin_user_select_admin" ON "public"."admin_user" FOR SELECT TO "authenticated" USING (( SELECT "public"."is_admin"() AS "is_admin"));
+
+
+
+CREATE POLICY "admin_user_select_self" ON "public"."admin_user" FOR SELECT TO "authenticated" USING ((( SELECT "auth"."uid"() AS "uid") = "user_id"));
+
+
+
 ALTER TABLE "public"."game" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."game_result" ENABLE ROW LEVEL SECURITY;
+
+
+CREATE POLICY "game_result_select_admin" ON "public"."game_result" FOR SELECT TO "authenticated" USING (( SELECT "public"."is_admin"() AS "is_admin"));
+
+
+
+CREATE POLICY "game_result_select_public" ON "public"."game_result" FOR SELECT TO "authenticated", "anon" USING (("confirmed" = true));
+
+
+
+CREATE POLICY "game_result_write_admin" ON "public"."game_result" TO "authenticated" USING (( SELECT "public"."is_admin"() AS "is_admin")) WITH CHECK (( SELECT "public"."is_admin"() AS "is_admin"));
+
+
+
+CREATE POLICY "game_select_public" ON "public"."game" FOR SELECT TO "authenticated", "anon" USING (true);
+
+
+
+CREATE POLICY "game_write_admin" ON "public"."game" TO "authenticated" USING (( SELECT "public"."is_admin"() AS "is_admin")) WITH CHECK (( SELECT "public"."is_admin"() AS "is_admin"));
+
 
 
 ALTER TABLE "public"."match" ENABLE ROW LEVEL SECURITY;
@@ -888,13 +961,53 @@ ALTER TABLE "public"."match" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."match_game" ENABLE ROW LEVEL SECURITY;
 
 
+CREATE POLICY "match_game_select_public" ON "public"."match_game" FOR SELECT TO "authenticated", "anon" USING (true);
+
+
+
+CREATE POLICY "match_game_write_admin" ON "public"."match_game" TO "authenticated" USING (( SELECT "public"."is_admin"() AS "is_admin")) WITH CHECK (( SELECT "public"."is_admin"() AS "is_admin"));
+
+
+
+CREATE POLICY "match_select_public" ON "public"."match" FOR SELECT TO "authenticated", "anon" USING (true);
+
+
+
+CREATE POLICY "match_write_admin" ON "public"."match" TO "authenticated" USING (( SELECT "public"."is_admin"() AS "is_admin")) WITH CHECK (( SELECT "public"."is_admin"() AS "is_admin"));
+
+
+
 ALTER TABLE "public"."player" ENABLE ROW LEVEL SECURITY;
+
+
+CREATE POLICY "player_select_public" ON "public"."player" FOR SELECT TO "authenticated", "anon" USING (true);
+
+
+
+CREATE POLICY "player_write_admin" ON "public"."player" TO "authenticated" USING (( SELECT "public"."is_admin"() AS "is_admin")) WITH CHECK (( SELECT "public"."is_admin"() AS "is_admin"));
+
 
 
 ALTER TABLE "public"."power_up" ENABLE ROW LEVEL SECURITY;
 
 
+CREATE POLICY "power_up_select_public" ON "public"."power_up" FOR SELECT TO "authenticated", "anon" USING (true);
+
+
+
 ALTER TABLE "public"."power_up_use" ENABLE ROW LEVEL SECURITY;
+
+
+CREATE POLICY "power_up_use_select_public" ON "public"."power_up_use" FOR SELECT TO "authenticated", "anon" USING (true);
+
+
+
+CREATE POLICY "power_up_use_write_admin" ON "public"."power_up_use" TO "authenticated" USING (( SELECT "public"."is_admin"() AS "is_admin")) WITH CHECK (( SELECT "public"."is_admin"() AS "is_admin"));
+
+
+
+CREATE POLICY "power_up_write_admin" ON "public"."power_up" TO "authenticated" USING (( SELECT "public"."is_admin"() AS "is_admin")) WITH CHECK (( SELECT "public"."is_admin"() AS "is_admin"));
+
 
 
 ALTER TABLE "public"."round" ENABLE ROW LEVEL SECURITY;
@@ -903,19 +1016,79 @@ ALTER TABLE "public"."round" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."round_result" ENABLE ROW LEVEL SECURITY;
 
 
+CREATE POLICY "round_result_select_public" ON "public"."round_result" FOR SELECT TO "authenticated", "anon" USING (true);
+
+
+
+CREATE POLICY "round_result_write_admin" ON "public"."round_result" TO "authenticated" USING (( SELECT "public"."is_admin"() AS "is_admin")) WITH CHECK (( SELECT "public"."is_admin"() AS "is_admin"));
+
+
+
+CREATE POLICY "round_select_public" ON "public"."round" FOR SELECT TO "authenticated", "anon" USING (true);
+
+
+
+CREATE POLICY "round_write_admin" ON "public"."round" TO "authenticated" USING (( SELECT "public"."is_admin"() AS "is_admin")) WITH CHECK (( SELECT "public"."is_admin"() AS "is_admin"));
+
+
+
 ALTER TABLE "public"."season" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER TABLE "public"."season_ladder" ENABLE ROW LEVEL SECURITY;
 
 
+CREATE POLICY "season_ladder_select_public" ON "public"."season_ladder" FOR SELECT TO "authenticated", "anon" USING (true);
+
+
+
+CREATE POLICY "season_ladder_write_admin" ON "public"."season_ladder" TO "authenticated" USING (( SELECT "public"."is_admin"() AS "is_admin")) WITH CHECK (( SELECT "public"."is_admin"() AS "is_admin"));
+
+
+
 ALTER TABLE "public"."season_player" ENABLE ROW LEVEL SECURITY;
+
+
+CREATE POLICY "season_player_select_public" ON "public"."season_player" FOR SELECT TO "authenticated", "anon" USING (true);
+
+
+
+CREATE POLICY "season_player_write_admin" ON "public"."season_player" TO "authenticated" USING (( SELECT "public"."is_admin"() AS "is_admin")) WITH CHECK (( SELECT "public"."is_admin"() AS "is_admin"));
+
 
 
 ALTER TABLE "public"."season_result" ENABLE ROW LEVEL SECURITY;
 
 
+CREATE POLICY "season_result_select_admin" ON "public"."season_result" FOR SELECT TO "authenticated" USING (( SELECT "public"."is_admin"() AS "is_admin"));
+
+
+
+CREATE POLICY "season_result_select_public" ON "public"."season_result" FOR SELECT TO "authenticated", "anon" USING (("confirmed" = true));
+
+
+
+CREATE POLICY "season_result_write_admin" ON "public"."season_result" TO "authenticated" USING (( SELECT "public"."is_admin"() AS "is_admin")) WITH CHECK (( SELECT "public"."is_admin"() AS "is_admin"));
+
+
+
+CREATE POLICY "season_select_public" ON "public"."season" FOR SELECT TO "authenticated", "anon" USING (true);
+
+
+
+CREATE POLICY "season_write_admin" ON "public"."season" TO "authenticated" USING (( SELECT "public"."is_admin"() AS "is_admin")) WITH CHECK (( SELECT "public"."is_admin"() AS "is_admin"));
+
+
+
 ALTER TABLE "public"."stage" ENABLE ROW LEVEL SECURITY;
+
+
+CREATE POLICY "stage_select_public" ON "public"."stage" FOR SELECT TO "authenticated", "anon" USING (true);
+
+
+
+CREATE POLICY "stage_write_admin" ON "public"."stage" TO "authenticated" USING (( SELECT "public"."is_admin"() AS "is_admin")) WITH CHECK (( SELECT "public"."is_admin"() AS "is_admin"));
+
 
 
 
@@ -1077,6 +1250,12 @@ GRANT USAGE ON SCHEMA "public" TO "service_role";
 
 
 
+REVOKE ALL ON FUNCTION "public"."is_admin"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."is_admin"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."is_admin"() TO "service_role";
+
+
+
 GRANT ALL ON FUNCTION "public"."set_updated_at"() TO "anon";
 GRANT ALL ON FUNCTION "public"."set_updated_at"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."set_updated_at"() TO "service_role";
@@ -1095,6 +1274,12 @@ GRANT ALL ON FUNCTION "public"."set_updated_at"() TO "service_role";
 
 
 
+
+
+
+GRANT ALL ON TABLE "public"."admin_user" TO "anon";
+GRANT ALL ON TABLE "public"."admin_user" TO "authenticated";
+GRANT ALL ON TABLE "public"."admin_user" TO "service_role";
 
 
 
