@@ -70,5 +70,7 @@ Neue Montreal self-hosted in `public/fonts/neue-montreal/`. Martian Mono from Go
 - No fade-up-on-scroll on every section
 - No emoji as icons, no Sparkles icon next to anything
 - No arrow glyphs on links (→) — AI tell
-- No placeholder copy shipped as real. All copy Norwegian, written by a human.
+- No placeholder copy shipped as real. All **public-facing** copy Norwegian,
+  written by a human. Admin-only UI (`src/app/admin/**`) is exempt — generated
+  Norwegian copy is fine there.
 - Body text WCAG AA. Touch targets ≥ 44px. Visible focus states always.

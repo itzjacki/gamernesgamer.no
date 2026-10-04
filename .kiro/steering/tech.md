@@ -4,7 +4,7 @@
 - **React 19** — `.tsx` for all pages and components.
 - **TypeScript strict** — extends `next` tsconfig.
 - **Tailwind CSS v4** — tokens in `src/styles/global.css` via `@theme`.
-- **Supabase** (`@supabase/ssr`) — Postgres (all results data, modeled as full game formats — see structure.md "Data split") + Auth (admin allowlist, invite-only, no public accounts).
+- **Supabase** (`@supabase/ssr`) — Postgres (all results data, modeled as full game formats — see structure.md "Data split") + Auth (admin allowlist via Google OAuth, invite-only, no public accounts).
 - **Vercel OG / Satori** — shareable image generation as edge functions.
 
 ## Commands
@@ -52,7 +52,8 @@
 - Results data (points, finishing positions) lives in Supabase only.
 - Admin routes protected server-side via Supabase session. Never client-side auth gating.
 - Dynamic routes use `generateStaticParams()` for pre-rendering.
-- All user-facing copy is Norwegian.
+- All user-facing (public) copy is Norwegian, human-written. Admin-only UI
+  (`src/app/admin/**`) copy may be agent-generated Norwegian.
 - Hosting: Vercel (Git push to deploy, no CI).
 
 ## Database workflow
@@ -93,6 +94,11 @@ can't drift.
   `*_auth_admin_and_rls_policies`): public reads of structural data +
   `confirmed = true` results; writes restricted to admins. "Admin" = a row in
   `admin_user` (allowlist keyed by auth user id), checked by `public.is_admin()`
-  (SECURITY INVOKER, `search_path = ''`). Admin accounts are invite-only
-  (dashboard / service role) — no public signup. `/admin/*` is gated server-side
-  by `src/proxy.ts` (session refresh + redirect to `/admin/login`).
+  (SECURITY INVOKER, `search_path = ''`). Sign-in is **Google-only OAuth** (no
+  passwords); any Google user can authenticate, but access is invite-only — an
+  `admin_user` row is added via the service role (no public signup). `/admin/*`
+  is gated in two layers: `src/proxy.ts` refreshes the session and redirects
+  signed-out visitors to `/admin/login` (coarse, no DB), and
+  `admin/(protected)/layout.tsx` runs the `is_admin()` RPC to enforce the
+  allowlist, showing authenticated non-admins a rejection screen. OAuth
+  code-exchange lands at `/auth/callback`.

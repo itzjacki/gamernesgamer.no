@@ -2,7 +2,7 @@ import { createBrowserClient } from '@supabase/ssr';
 import type { Database } from './database.types';
 
 /**
- * Browser client for `'use client'` components (admin panel — Phase 5).
+ * Browser client for `'use client'` components (admin panel — Phase 3).
  *
  * Not used by any current code — public pages are Server Components reading via
  * ./read. createBrowserClient is a singleton internally, so calling this

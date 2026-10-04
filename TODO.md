@@ -65,11 +65,55 @@ results entry) and the server actions for public reads are what's left.
       advisors clean.
 - [x] Flipped `read.ts` to the publishable key (RLS-enforced) now that public-read
       policies exist. No app code uses the secret key anymore.
+**Workflow for each step below:** consult the relevant subagents *at the start of
+that step* (not upfront) before building — e.g. `architect` for data/form
+structure, `ui-ux-designer` for the interface, `frontend-developer` for
+implementation, `code-reviewer` before finishing. Pick the agents that fit the
+step; don't pre-consult steps that aren't being worked yet.
+
+**Prerequisite (Jakob, dashboard) — Google OAuth bootstrap:** sign-in is
+Google-only (no passwords). With OAuth the admin's `auth.users` row is created
+automatically on first sign-in — do NOT create it by hand. Bootstrap: (1) set up
+the Google provider (see "Google OAuth setup" below), (2) sign in once through
+`/admin/login` (you'll hit the "not an admin" rejection — expected), (3) insert
+your `admin_user` row via the service role, (4) reload `/admin`.
+
 - [ ] Custom /admin panel:
-  - [ ] Sign in via Supabase Auth (login page + server action)
-  - [ ] Results entry form (enter scores per player per game)
-  - [ ] Review/edit submitted results; flip `confirmed` to publish
+  - [x] Sign in via Google OAuth — login page + `signIn`/`signOut` server
+        actions + `/auth/callback` code-exchange route. Allowlist gate in
+        `admin/(protected)/layout.tsx` (`is_admin` RPC); authenticated
+        non-admins get a graceful rejection screen with sign-out. Google-only
+        by decision (no password handling; everyone has a Google account).
+        Admin UI copy is agent-generated Norwegian (admin pages are exempt from
+        the human-written-copy rule).
+  - [x] Admin dashboard shell (protected landing at `/admin`, sign-out) —
+        minimal; verifies the full auth loop. Expands into results UI next.
+  - [ ] Admin management: add/remove other admins (manage the `admin_user`
+        allowlist from the UI instead of by hand via the service role)
+  - [ ] DB overview: a small read-only sanity panel confirming the data is
+        intact (season/game/admin counts, current season) — not a result browser
 - [ ] Server actions for reading results data (used by public pages)
+
+> Results entry (the scores-per-player-per-game form + review/edit/confirm) moved
+> to Phase 5 — it's a live-season tool, not a prerequisite for the Phase 4
+> historical pages (which read already-seeded S1–S4 data).
+
+### Google OAuth setup (Jakob, one-time)
+
+1. **Google Cloud** — create an OAuth **Web application** client:
+   - Authorized JavaScript origins: `http://localhost:3000` (dev) +
+     `https://<prod-domain>`.
+   - Authorized redirect URIs point at **Supabase's** callback, not the app:
+     `http://127.0.0.1:54321/auth/v1/callback` (local) and
+     `https://<project-ref>.supabase.co/auth/v1/callback` (prod).
+   - Copy the Client ID + Client Secret.
+2. **Supabase dashboard** → Auth → Providers → Google: enable, paste ID/secret.
+   Auth → URL Configuration: set the Site URL and add the app's own callback
+   (`https://<prod-domain>/auth/callback`, plus
+   `http://localhost:3000/auth/callback` for dev) to the redirect allow-list.
+3. **Local stack** — `supabase/config.toml` `[auth.external.google]` with
+   `enabled = true` and the client id/secret via `env(...)` (secret in a
+   gitignored `supabase/.env`); `supabase stop && supabase start` to apply.
 
 ---
 
@@ -106,6 +150,11 @@ All depend on Phase 3 data being in place.
 
 - [ ] Countdown component (pre-tournament anticipation)
 - [ ] Live leaderboard on season page (polling, no WebSockets needed)
+- [ ] **Results entry form** (enter scores per player per game) — schema-heavy;
+      needs an architect + UX pass (H2H match games vs. round scores differ).
+      Moved here from Phase 3: it's a live-season tool, best designed against the
+      actual live-entry workflow.
+- [ ] Review/edit submitted results; flip `confirmed` to publish
 - [ ] Admin panel supports real-time score entry during the tournament
 
 ---
