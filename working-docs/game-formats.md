@@ -101,8 +101,13 @@ player_b FK -> player.
 leg Which meeting of this pairing within the stage, 1-indexed.
 1 = first/only meeting; 2+ = a rematch. Single round-robin is all
 leg 1. A dual round-robin plays every pair at leg 1 and leg 2; a
-"swiss finish" plays only SOME pairs a second leg. unique is
-(stage_id, player_a, player_b, leg), so partial extra legs are fine.
+"swiss finish" plays only SOME pairs a second leg. ALSO used for
+bracket rematches: in a double-elim stage the same pair can meet
+twice (e.g. winners-final then grand-final, or a WB semi then the
+losers-final) - the second meeting carries leg=2 while slot_id keeps
+the bracket role. unique is (stage_id, player_a, player_b, leg), which
+is what lets the same pair appear twice in one stage; it is NOT
+specific to round-robin.
 series_len bo1 | bo3 | bo5. How many games this match is at most.
 (NO result column. The match's outcome is DERIVED from its game rows.)
 
@@ -163,6 +168,7 @@ SEEDING between stages is NOT stored. Which group finishers advance to which
 finals slot is derived at read time from the group standings + the finals
 matches naming the players, obvious when stages are viewed in `order`.
 (Trombone: group standings -> top 2 to the final, bottom 2 to bronze.)
+
 - round-robin / score-group -> STANDINGS TABLE (derive W/L or points, sort).
   A dual round-robin or a round-robin with a swiss-finish is still ONE
   round-robin stage (the repeated pairings carry match.leg=2); the standings
@@ -253,7 +259,10 @@ Wreckfest rounds sum (10 tracks)
 [--] placement + point for fastest lap - resolved: store as raw_score, sum
 
 Total War: Empire h2h double-elim-reset, bo1, win-loss
-[ok]
+[ok] seeds from an AI-battle speedrun; WB-F and GF are both Jakob-Tobias and
+WB-SF2 and LB-F are both Tobias-Jørgen, so the second meeting of each pair
+carries match.leg=2. The GF was won by the WB survivor (Jakob), so the
+reset game (GF2) was never played — only 6 matches stored.
 
 League of Legends h2h dual-round-robin -> bronze-final-and-final, bo3, win-loss
 [ok]
@@ -316,5 +325,5 @@ FC25 h2h single-round-robin -> single-elim, bo1, score (goals)
 
 2XKO h2h round-robin (with swiss-finish rematches via match.leg) -> bronze-final-and-final, bo3 group / bo5 late, win-loss
 [ok] full round-robin first, THEN a few swiss-paired rematches on carried record
-     until each player has 3W or 3L — stored as the SAME round-robin stage with
-     match.leg=2 on the replayed pairings (one extra match in our case). No swiss kind.
+until each player has 3W or 3L — stored as the SAME round-robin stage with
+match.leg=2 on the replayed pairings (one extra match in our case). No swiss kind.
