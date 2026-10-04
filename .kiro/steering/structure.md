@@ -22,12 +22,22 @@ src/
       page.tsx          Head-to-head page (planned)
     lore/
       page.tsx          Skattkammeret (planned)
-    admin/
-      page.tsx          Admin dashboard (protected, planned)
-      login/page.tsx
-      results/page.tsx  Results entry form (planned)
+    admin/               Admin panel (Google OAuth, invite-only). Live: login
+                         + dashboard. Results UI planned.
+      login/page.tsx     Sign-in page (ungated) — Google button, VERKSTED style.
+      actions.ts         'use server' — signIn (Google OAuth) + signOut.
+      (protected)/       Route group gated by the allowlist layout below.
+        layout.tsx       Allowlist gate: getClaims() + is_admin() RPC; non-admins
+                         get a rejection screen. One choke point for all nested
+                         admin routes.
+        page.tsx         Admin dashboard landing (protected).
+        results/page.tsx Results entry form (planned — lives under the group).
+    auth/
+      callback/route.ts  OAuth code-exchange (exchangeCodeForSession). NOT under
+                         /admin, so the proxy lets it through to finish sign-in.
     api/og/             Vercel OG image generation (planned)
   components/           Reusable React components (PascalCase .tsx)
+                       (incl. GoogleSignInButton.tsx — 'use client' submit button)
   data/sesong/
     01/ .. 04/
       gamers.ts         Gamer[] for the season
@@ -87,8 +97,12 @@ working-docs/           Secondary reference (the DB is the source of truth).
 
 - `src/data/sesong/<NN>/` — static season content (gamers, games, power-ups). Never in the DB.
 - `src/lib/supabase/server` — server client for Server Components/Actions. `src/lib/supabase/client` — browser client for `'use client'` only.
-- `src/app/admin/` — all routes check Supabase session server-side. `src/proxy.ts` redirects unauthenticated users to `/admin/login`.
-- Admin accounts are invite-only, created in Supabase dashboard.
+- `src/app/admin/` — Google-only OAuth sign-in. `src/proxy.ts` redirects
+  signed-out visitors from `/admin/*` (except `/admin/login`) to the login page;
+  the `admin/(protected)/layout.tsx` gate then enforces the invite-only allowlist
+  (`is_admin()` RPC) and shows a rejection screen to authenticated non-admins.
+- Admin accounts are invite-only: a Google sign-in creates the `auth.users` row,
+  but access requires an `admin_user` row added via the service role.
 - Use `@/*` alias for all cross-directory imports.
 - Data files export named consts: `export const games`, `export const gamers`, `export const powerUps`, `export const curses`.
 
