@@ -7,6 +7,11 @@ SQL implementation: supabase/schema.sql.
 UPDATE 2026-10-04: dual round-robin (S2 LoL) + 2XKO's swiss-finish are modeled as
 one round-robin stage using match.leg for repeated pairings; the standalone
 'swiss' stage kind was removed (migration 20261003231523).
+SEED PROGRESS 2026-10-04: Seasons 1, 2 and 3 are seeded into supabase/seed.sql
+and reconciled on the local stack (every [ok] below is now not just resolved but
+actually seeded + verified). Season 4 is the only one left. match.leg is also
+used for bracket rematches in double-elim stages (S2 Total War, S3 War Thunder),
+not just round-robin — see the `leg` field in RESOLVED MODEL.
 
 How each game's results are structured, for DB schema design.
 Season points & placements (who won each game) live in game-placements.md.
@@ -250,13 +255,13 @@ The Sims 4 score high
 [ok]
 
 Warcraft 3 placement
-[--]
+[ok] 4-way FFA last-man-standing; single rounds stage, placement as raw_score
 
 Poker placement
-[--]
+[ok] Texas Hold'em cash game, bust-out order; single rounds stage, placement
 
 Wreckfest rounds sum (10 tracks)
-[--] placement + point for fastest lap - resolved: store as raw_score, sum
+[ok] placement + fastest-lap bonus, combined per track into one raw_score, sum
 
 Total War: Empire h2h double-elim-reset, bo1, win-loss
 [ok] seeds from an AI-battle speedrun; WB-F and GF are both Jakob-Tobias and
@@ -270,35 +275,39 @@ League of Legends h2h dual-round-robin -> bronze-final-and-final, bo3, win-loss
 ## SESONG 3
 
 World of Warcraft score high
-[--]
+[ok] gold held @ 60 min; single rounds stage, real score as raw_score
 
 BattleBlock Theater rounds sum
-[--] per-player CSVs J/Jø/T/W (W=recount)
+[ok] 11 levels (9 + Boss 1/2); per-level COMBINED points stored as raw_score
+(the deaths/clear/gems/yarn sub-tables are not stored — lossy flatten)
 
 Kerbal Space Program score high
-[--] tiebreak: science remaining
+[ok] techs unlocked @ 60 min; single rounds stage, real score (tiebreak:
+science remaining — not needed, no tie)
 
 GeoGuessr score high
-[--] # of 1st-place finishes
+[ok] # of 1st-place round finishes; single rounds stage, that count as raw_score
 
 Jump King placement
-[--] highest point after 60 min
+[ok] highest point @ 60 min; single rounds stage, placement as raw_score
 
 Planet Coaster score high
-[--] visitor count @ 60 min
+[ok] visitor count @ 60 min; single rounds stage, real score as raw_score
 
 War Thunder h2h single-round-robin -> double-elim-reset, bo1 group / bo3/bo5 late, win-loss
-[ok]
+[ok] Jakob fell to the losers' bracket (lost WB-F to Tobias 2-1) then ran it
+back: beat Tobias in GF AND GF2 (reset). Jakob-Tobias meet 3× in the stage —
+WB-F leg 1, GF leg 2, GF2 leg 3. bo3 early, bo5 for LB-F/GF/GF2.
 
 Hollow Knight rounds sum (1 round)
-[--] fastest completion (originally score low; modeled as a 1-round sum game
+[ok] fastest completion (originally score low; modeled as a 1-round sum game
 storing placements as raw_score — DB has no score direction, see TAXONOMY)
 
 Pummel Party score high
-[--] cumulative minigame
+[ok] cumulative minigame score; single rounds stage, real score as raw_score
 
 PUBG placement
-[--]
+[ok] FFA last-man-standing; single rounds stage, placement as raw_score
 
 ## SESONG 4
 

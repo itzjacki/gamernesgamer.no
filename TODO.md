@@ -76,8 +76,13 @@ questions); settle the modeling _depth_ before finalizing the schema.
       all, triggers fire, FK constraints enforce); security advisors clean apart
       from the intentional "RLS enabled, no policy" INFO. `set_updated_at()`
       hardened with pinned `search_path`.
-- [ ] Seed all historical season data (all 4 seasons backfilled) — `supabase/seed.sql`,
-      blocked on gathering internal format details for the `[--]` games.
+- [~] Seed all historical season data (all 4 seasons backfilled) — `supabase/seed.sql`.
+  **S1, S2, S3 DONE** (seeded + reconciled against the working docs on the
+  local stack; totals, per-game points matrices, round sums, H2H standings
+  and invariants all verified). **S4 is the last one remaining** (has 2XKO's
+  swiss-finish via match.leg and Trombone's rank-then-sum → H2H chain to work
+  through). All seed data is LOCAL-ONLY — nothing pushed to the remote DB
+  until the full S1–S4 run is complete, per the agreed workflow.
 - [ ] Custom /admin panel:
   - [ ] Sign in via Supabase Auth
   - [ ] Results entry form (enter scores per player per game)
@@ -89,7 +94,7 @@ questions); settle the modeling _depth_ before finalizing the schema.
 **Follow-ups before the next migration:**
 
 - [ ] Link the CLI to the remote project (`supabase login` + `supabase link
-    --project-ref <ref>`) so `supabase db push` becomes the apply path and we
+  --project-ref <ref>`) so `supabase db push` becomes the apply path and we
       stop using MCP `apply_migration` (which caused migration-version drift on
       the initial schema — see tech.md "One apply path per migration").
 
