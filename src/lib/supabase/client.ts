@@ -9,12 +9,12 @@ import type { Database } from './database.types';
  * repeatedly is safe. Uses the PUBLISHABLE key (safe in the browser, RLS-gated).
  */
 export function createBrowserSupabaseClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  const url = process.env.NEXT_PUBLIC_DB_SUPABASE_URL;
+  const publishableKey = process.env.NEXT_PUBLIC_DB_SUPABASE_PUBLISHABLE_KEY;
 
   if (!url || !publishableKey) {
     throw new Error(
-      'Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY for the browser client.',
+      'Missing NEXT_PUBLIC_DB_SUPABASE_URL or NEXT_PUBLIC_DB_SUPABASE_PUBLISHABLE_KEY for the browser client.',
     );
   }
 
