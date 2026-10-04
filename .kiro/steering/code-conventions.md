@@ -9,11 +9,16 @@
 
 - Prettier (`prettier ^3`), single quotes (`singleQuote: true`), `prettier-plugin-tailwindcss`.
 - **Always run `npx prettier --write <files>` before finishing.** Part of done.
-- Quality gates: Prettier + TypeScript strict + `next build`. No test framework.
+- Quality gates: Prettier + TypeScript strict + `next build` + `npm run test`
+  (Vitest, results layer only).
 
 ## Components
 
 - Server Components by default. `'use client'` only for browser APIs / state / effects.
+- Reuse the shared primitives (`Panel`, `Button`, `StatList`/`StatRow`,
+  `SectionLabel`, `Heading`) instead of re-inlining surface/button/eyebrow
+  markup. Add a new primitive only when a real second use appears — not
+  speculatively.
 - Props typed with a local `interface Props` above the component:
 
   ```tsx

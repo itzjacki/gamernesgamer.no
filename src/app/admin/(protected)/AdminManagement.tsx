@@ -1,3 +1,4 @@
+import Panel from '@/components/Panel';
 import AddAdminForm, { type AddableUser } from './AddAdminForm';
 import RemoveAdminButton from './RemoveAdminButton';
 
@@ -39,11 +40,7 @@ export default function AdminManagement({
   isLastAdmin,
 }: Props) {
   return (
-    <div className='border-border bg-bg border p-6 sm:p-10'>
-      <p className='text-text-muted font-mono text-xs tracking-wider uppercase'>
-        Administratorer
-      </p>
-
+    <Panel label='Administratorer'>
       {/* Region 1: current admins */}
       <ul className='mt-4 flex flex-col'>
         {admins.map((admin) => {
@@ -104,6 +101,6 @@ export default function AdminManagement({
       <div className='mt-8'>
         <AddAdminForm users={addable} />
       </div>
-    </div>
+    </Panel>
   );
 }

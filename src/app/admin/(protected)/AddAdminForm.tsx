@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { addAdmin } from './actions';
+import Button from '@/components/Button';
 
 export interface AddableUser {
   id: string;
@@ -75,13 +76,9 @@ export default function AddAdminForm({ users }: Props) {
           ))}
         </select>
 
-        <button
-          type='submit'
-          disabled={isPending || !selected}
-          className='border-border bg-surface text-text hover:border-accent focus-visible:outline-accent active:bg-bg flex h-11 items-center justify-center border px-6 text-sm transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50'
-        >
+        <Button type='submit' disabled={isPending || !selected}>
           {isPending ? 'Legger til …' : 'Legg til'}
-        </button>
+        </Button>
       </div>
 
       {error ? (

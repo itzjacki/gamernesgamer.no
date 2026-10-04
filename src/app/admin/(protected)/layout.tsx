@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation';
 import { signOut } from '@/app/admin/actions';
 import { createAuthClient } from '@/lib/supabase/server';
+import Panel from '@/components/Panel';
+import Button from '@/components/Button';
 
 interface Props {
   children: React.ReactNode;
@@ -40,9 +42,10 @@ export default async function AdminLayout({ children }: Props) {
 
     return (
       <section className='flex min-h-[70svh] items-center justify-center'>
-        <div className='border-border bg-bg w-80 border p-6 sm:w-100 sm:p-10'>
+        <Panel className='w-80 sm:w-100'>
           {/* Accent eyebrow is the single "stop" signal — accent earns its
-              place on a real status. */}
+              place on a real status. Kept as explicit markup (not Panel's
+              muted label prop) to preserve the accent color. */}
           <p className='text-accent font-mono text-xs tracking-wider uppercase'>
             Ingen tilgang
           </p>
@@ -65,18 +68,15 @@ export default async function AdminLayout({ children }: Props) {
           <div className='border-border -mx-6 mt-8 border-t sm:-mx-10' />
 
           <form action={signOut} className='mt-8'>
-            <button
-              type='submit'
-              className='border-border bg-surface text-text hover:border-accent focus-visible:outline-accent active:bg-bg flex h-11 w-full items-center justify-center border text-sm transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2'
-            >
+            <Button type='submit' width='full'>
               Logg ut
-            </button>
+            </Button>
           </form>
 
           <p className='text-text-muted mt-4 font-mono text-xs'>
             Be en eksisterende administrator om tilgang.
           </p>
-        </div>
+        </Panel>
       </section>
     );
   }

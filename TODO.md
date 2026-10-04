@@ -127,9 +127,12 @@ your `admin_user` row via the service role, (4) reload `/admin`.
 
 ---
 
-## Phase 4 — Historical content & stats features
+## Phase 4 — Historical content & stats features 🚧
 
-All depend on Phase 3 data being in place.
+Started. Phase 3 data is live and the shared UI primitives (`Panel`, `Button`,
+`StatList`/`StatRow`) are in place to build on. First target: enhanced season
+pages (wire `getSeasonView(n)` into `/sesong/[n]`). `/records` + `/vs` stay
+blocked on cross-season normalization.
 
 ### Must-have
 

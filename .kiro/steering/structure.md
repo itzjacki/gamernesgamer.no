@@ -47,8 +47,12 @@ src/
       callback/route.ts  OAuth code-exchange (exchangeCodeForSession). NOT under
                          /admin, so the proxy lets it through to finish sign-in.
     api/og/             Vercel OG image generation (planned)
-  components/           Reusable React components (PascalCase .tsx)
-                       (incl. GoogleSignInButton.tsx — 'use client' submit button)
+  components/           Reusable React components (PascalCase .tsx). Primitives:
+                       Panel (bordered surface + optional eyebrow), Button
+                       (polymorphic button/a/link), StatList + StatRow (dl
+                       readout), SectionLabel, Heading. GoogleSignInButton is
+                       the one 'use client' (useFormStatus). Build primitives
+                       only when a real use exists.
   data/sesong/
     01/ .. 04/
       gamers.ts         Gamer[] for the season
