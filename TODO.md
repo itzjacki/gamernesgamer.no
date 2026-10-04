@@ -76,13 +76,20 @@ questions); settle the modeling _depth_ before finalizing the schema.
       all, triggers fire, FK constraints enforce); security advisors clean apart
       from the intentional "RLS enabled, no policy" INFO. `set_updated_at()`
       hardened with pinned `search_path`.
-- [~] Seed all historical season data (all 4 seasons backfilled) — `supabase/seed.sql`.
-  **S1, S2, S3 DONE** (seeded + reconciled against the working docs on the
-  local stack; totals, per-game points matrices, round sums, H2H standings
-  and invariants all verified). **S4 is the last one remaining** (has 2XKO's
-  swiss-finish via match.leg and Trombone's rank-then-sum → H2H chain to work
-  through). All seed data is LOCAL-ONLY — nothing pushed to the remote DB
-  until the full S1–S4 run is complete, per the agreed workflow.
+- [x] Seed all historical season data (all 4 seasons backfilled) — `supabase/seed.sql`.
+  **S1, S2, S3, S4 ALL DONE** (seeded + reconciled against the working docs on
+  the local stack; totals, per-game points matrices, round sums, H2H standings
+  and invariants all verified). S4 exercised the two formats new to this run —
+  2XKO's swiss-finish (one leg-2 rematch in the round-robin stage) and
+  Trombone's rank-then-sum group → final-bronze H2H chain — plus the first
+  rank-then-sum stages (Ratz Instagib kills, Trombone song scores). No schema
+  change was needed. **PUSHED TO PROD 2026-10-04** — the two outstanding schema
+  migrations (`add_round_label_and_game_result_note`, `add_match_leg_and_drop_swiss`)
+  were applied to the remote via `supabase db push`, then all 4 seasons loaded
+  with `supabase db push --linked --include-seed`. Verified on prod: 4 seasons,
+  34 games, 136 game_results, all four seasons' derived totals match the working
+  docs (S4 49/47/29/22), security advisors clean apart from the intentional
+  "RLS enabled, no policy" INFO.
 - [ ] Custom /admin panel:
   - [ ] Sign in via Supabase Auth
   - [ ] Results entry form (enter scores per player per game)
@@ -93,10 +100,11 @@ questions); settle the modeling _depth_ before finalizing the schema.
 
 **Follow-ups before the next migration:**
 
-- [ ] Link the CLI to the remote project (`supabase login` + `supabase link
-  --project-ref <ref>`) so `supabase db push` becomes the apply path and we
-      stop using MCP `apply_migration` (which caused migration-version drift on
-      the initial schema — see tech.md "One apply path per migration").
+- [x] Link the CLI to the remote project — DONE (project ref
+  `vozercwmzysctmpwlwhn`, already linked). `supabase db push` is now the apply
+      path for both schema and seed; verified by the 2026-10-04 prod push, which
+      cleanly added the two drifted-apart migrations with matching versions on
+      both sides. No more MCP `apply_migration` for file-backed schema.
 
 ---
 
