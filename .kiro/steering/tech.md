@@ -37,10 +37,12 @@
 
 ## Testing
 
-- **Vitest covers the pure derivation only** (`src/lib/results/derive/**` via
-  `src/lib/results/__tests__/`). That code is silent arithmetic `next build`
-  can't catch (points, standings, aggregation), and Season 1 provides verified
-  oracle numbers. The IO layer (`fetch.ts`, `queries.ts`) and Supabase clients
+- **Vitest covers the pure results layer** — the derivation (`src/lib/results/derive/**`)
+  and the compose seam (`compose.ts`), via `src/lib/results/__tests__/`. That
+  code is silent arithmetic `next build` can't catch (points, standings,
+  aggregation, power-up deltas) plus the DB↔static-content join; Seasons 1 and 2
+  provide verified oracle numbers (S2 adds power-ups and a point-tie resolved by
+  season_result). The IO layer (`fetch.ts`, `queries.ts`) and Supabase clients
   are NOT unit-tested — `next build` stays their gate. Config: `vitest.config.mts`,
   include glob scoped so tests can't drift into needing a DB or browser.
 
