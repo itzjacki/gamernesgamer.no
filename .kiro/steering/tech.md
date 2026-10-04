@@ -20,18 +20,19 @@
 - The read layer lives in `src/lib/` (see structure.md). Public pages call
   `getSeasonView(n)` / `getGameView(n, slug)` from `src/lib/results/queries` —
   Server Components only; never a client component.
-- **Clients** (`src/lib/supabase/`): `read.ts` is used NOW for result reads —
-  server-only, no cookies, uses the **secret** key because RLS is enabled with
-  no policies yet (anon/publishable reads return nothing until public read
-  policies land). `server.ts` (cookie-bound Auth) and `client.ts` (browser) are
-  for the admin panel (Phase 5) and use the publishable key.
-- **The eventual public-read flip is isolated to `read.ts`**: once RLS grants
-  public reads of `confirmed = true` rows, swap its key to the publishable key —
-  no other read-layer change. Queries already filter `confirmed = true`.
-- **Env vars** (server-only, NEVER `NEXT_PUBLIC_`): `SUPABASE_URL`,
-  `SUPABASE_SECRET_KEY`. Local `.env.local` points at the local stack. Before a
-  deploy, confirm both are set in Vercel (the Supabase integration may sync the
-  URL + publishable key but not the secret key). Regenerate `database.types.ts`
+- **Clients** (`src/lib/supabase/`): `read.ts` is the public result-read client —
+  server-only, no cookies, **publishable key** under RLS. Public-read policies
+  are live (structural tables world-readable; `game_result`/`season_result`
+  expose only `confirmed = true` to anon), so the publishable key returns exactly
+  the public data. `server.ts` (cookie-bound Auth) and `client.ts` (browser) are
+  the admin-panel clients and also use the publishable key.
+- Queries still filter `confirmed = true` as defense-in-depth on top of RLS.
+- **Env vars**: all three clients use `NEXT_PUBLIC_SUPABASE_URL` +
+  `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (publishable key is safe client-side and
+  RLS-gated). No app code uses the secret key anymore — results are read under
+  RLS. Local `.env.local` points at the local stack; before a deploy, confirm
+  both `NEXT_PUBLIC_` vars are set in Vercel (the Supabase integration usually
+  syncs them). Regenerate `database.types.ts`
   (`supabase gen types typescript --local`) after each migration.
 
 ## Testing
@@ -88,5 +89,10 @@ can't drift.
 
 - Result data is seeded via `supabase/seed.sql` (data, not schema — kept out of
   migrations so prod never re-runs it on a plain `db push`).
-- RLS is enabled on every table from the first migration (locked, no policies yet);
-  read/write policies land with the admin panel + Supabase Auth.
+- RLS is enabled on every table, with policies live (migration
+  `*_auth_admin_and_rls_policies`): public reads of structural data +
+  `confirmed = true` results; writes restricted to admins. "Admin" = a row in
+  `admin_user` (allowlist keyed by auth user id), checked by `public.is_admin()`
+  (SECURITY INVOKER, `search_path = ''`). Admin accounts are invite-only
+  (dashboard / service role) — no public signup. `/admin/*` is gated server-side
+  by `src/proxy.ts` (session refresh + redirect to `/admin/login`).

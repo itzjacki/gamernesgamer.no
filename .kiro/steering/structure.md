@@ -35,10 +35,11 @@ src/
       power-ups.ts      PowerUp[] + curses — only when used
   lib/
     supabase/           Supabase clients + generated DB types
-      read.ts           Server-only, secret-key, no-cookie client. Used NOW for
-                        result reads (RLS locked, no policies yet).
-      server.ts         Cookie-bound Auth client (admin panel, Phase 5).
-      client.ts         Browser client (admin panel, Phase 5).
+      read.ts           Server-only, no-cookie, publishable-key client for
+                        public result reads (RLS-enforced; confirmed=true only).
+      server.ts         Cookie-bound Auth client (Server Components/Actions).
+      client.ts         Browser client ('use client' admin components).
+      proxy.ts          updateSession(): refreshes the session + gates /admin.
       database.types.ts GENERATED (supabase gen types --local). Do NOT hand-edit.
     results/            Read + derivation layer for tournament results
       queries.ts        Public API: getSeasonView(n) / getGameView(n, slug).
@@ -58,6 +59,8 @@ src/
       __tests__/        Vitest: S1 + S2 fixtures, derivation + compose tests.
   types/                Shared TypeScript types
   styles/global.css     Tailwind import + @theme design tokens
+  proxy.ts              Next.js Proxy (formerly middleware): refreshes the
+                        Supabase session + gates /admin via lib/supabase/proxy.
 public/
   fonts/
     neue-montreal/      Self-hosted Neue Montreal (Pangram Pangram, OFL)
@@ -65,8 +68,9 @@ public/
 supabase/
   config.toml           Supabase CLI config (local stack, project link).
   migrations/           SOURCE OF TRUTH for the DB schema. Ordered SQL migrations
-    <ts>_initial_schema.sql  First migration: full schema + updated_at triggers +
-                        RLS enabled (locked; policies land with the admin panel).
+    <ts>_initial_schema.sql  Full schema + updated_at triggers + RLS enabled.
+    <ts>_auth_admin_and_rls_policies.sql  admin_user allowlist + is_admin() +
+                        public-read / admin-write policies on every table.
   schema.sql            GENERATED reference snapshot (via `supabase db dump`).
                         Do NOT edit by hand — regenerate after each migration.
   seed.sql              Historical results data (S1–S4). Data, not schema — kept
@@ -83,7 +87,7 @@ working-docs/           Secondary reference (the DB is the source of truth).
 
 - `src/data/sesong/<NN>/` — static season content (gamers, games, power-ups). Never in the DB.
 - `src/lib/supabase/server` — server client for Server Components/Actions. `src/lib/supabase/client` — browser client for `'use client'` only.
-- `src/app/admin/` — all routes check Supabase session server-side. Middleware redirects to `/admin/login`.
+- `src/app/admin/` — all routes check Supabase session server-side. `src/proxy.ts` redirects unauthenticated users to `/admin/login`.
 - Admin accounts are invite-only, created in Supabase dashboard.
 - Use `@/*` alias for all cross-directory imports.
 - Data files export named consts: `export const games`, `export const gamers`, `export const powerUps`, `export const curses`.
