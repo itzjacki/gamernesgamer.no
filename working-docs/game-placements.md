@@ -9,8 +9,8 @@ undone. Companion file: game-formats.md (how each game is structured + DB model)
 Points = cell from the season overall/poeng sheet.
 Placement = finishing order, decoded against the base ladder (power-ups undone).
 
-SEED STATUS 2026-10-04: Seasons 1–3 below are seeded into supabase/seed.sql and
-reconcile to these numbers on the local stack. Season 4 is not yet seeded.
+SEED STATUS 2026-10-04: All four seasons (S1–S4) are seeded into
+supabase/seed.sql and reconcile to these numbers on the local stack.
 
 Base ladder S2: 1st=7 2nd=4 3rd=2 4th=1
 S3/S4: 1st=8 2nd=5 3rd=3 4th=1

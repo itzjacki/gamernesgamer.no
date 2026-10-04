@@ -27,7 +27,7 @@ begin;
 -- and to season_ladder / season_result. player rows are shared cross-season,
 -- so we reset them too and re-insert.
 -- ---------------------------------------------------------------------------
-delete from season where number in (1, 2, 3);
+delete from season where number in (1, 2, 3, 4);
 delete from player where slug in ('jakob', 'jorgen', 'tobias', 'william');
 
 
@@ -1159,6 +1159,448 @@ begin
   ---------------------------------------------------------------------------
   -- SEASON RESULT
   -- Totals (ladder + power-ups) 75/33/58/20. Jakob champion outright; no tie.
+  ---------------------------------------------------------------------------
+  insert into season_result (season_id, season_player_id, placement, confirmed, note) values
+    (v_season, sp_jakob,   1, true, null),
+    (v_season, sp_tobias,  2, true, null),
+    (v_season, sp_jorgen,  3, true, null),
+    (v_season, sp_william, 4, true, null);
+end $$;
+
+
+-- =============================================================================
+-- SEASON 4  (2025-12-13 — 2025-12-14, two days)
+-- Base ladder 8/5/3/1. Eight power-ups + four curses available; every one only
+-- ever adjusts the USER's own points (affected = used_by, can_target_others =
+-- false). Final totals 49/29/47/22 (Jakob/Jørgen/Tobias/William). Jakob
+-- champion outright; no season-level tie.
+--
+-- Two formats appear here for the first time:
+--  • rank-then-sum rounds stages (Ratz Instagib kills, Trombone song scores):
+--    raw_score stores the REAL per-round number; standings rank each round
+--    N..1 and sum the rank points. The stored raw scores are lossless; the
+--    4/3/2/1 points are derived, never stored.
+--  • a round-robin with a "swiss finish" (2XKO): the full round-robin plus one
+--    extra rematch (Jakob–William) carried on match.leg=2 in the SAME stage.
+--
+-- Points reconcile as season_ladder[placement] + Σ power_up_use.points_delta:
+--   LoL           J5 Jø8 T3 W0      (William Sucks to Suck -1)
+--   PEAK          J8 Jø5 T3 W1
+--   Ratz Instagib J5 Jø1 T8 W3      (STE ×2 + Power-up Cloner, all 0)
+--   Trombone      J5 Jø3 T8 W1      (Sucks to Suck 0; Unsuccessful Tax 0)
+--   Counter-Strike J5 Jø4 T8 W1     (Jørgen Safety Net +1; others 0)
+--   Garry's Mod   J12 Jø3 T6 W3     (Jakob DES +4; Tobias Wide Net +1; William Safety Net +2)
+--   FC25          J8 Jø1 T3 W7      (William Back to Back +2; Power-up Cloner 0)
+--   2XKO          J1 Jø4 T8 W6      (Jørgen Wide Net +1; William DES +1)
+-- =============================================================================
+do $$
+declare
+  v_season uuid;
+  -- season_player ids
+  sp_jakob   uuid;
+  sp_jorgen  uuid;
+  sp_tobias  uuid;
+  sp_william uuid;
+  -- power_up ids (all eight power-ups + four curses available this season)
+  pu_safety   uuid;
+  pu_gamba    uuid;
+  pu_sword    uuid;
+  pu_ball     uuid;
+  pu_tax      uuid;
+  pu_cloner   uuid;
+  pu_widenet  uuid;
+  pu_b2b      uuid;
+  cu_untax    uuid;
+  cu_sucks    uuid;
+  cu_alleg    uuid;
+  cu_gambler  uuid;
+  -- reusable ids
+  v_game   uuid;
+  v_stage  uuid;
+  v_round  uuid;
+begin
+  ---------------------------------------------------------------------------
+  -- Season + roster + ladder + power-up anchors
+  ---------------------------------------------------------------------------
+  insert into season (number, status, started_at, ended_at)
+  values (4, 'complete', timestamptz '2025-12-13 10:00:00+01', timestamptz '2025-12-14 23:00:00+01')
+  returning id into v_season;
+
+  insert into season_player (season_id, player_id)
+  select v_season, id from player where slug = 'jakob'   returning id into sp_jakob;
+  insert into season_player (season_id, player_id)
+  select v_season, id from player where slug = 'jorgen'  returning id into sp_jorgen;
+  insert into season_player (season_id, player_id)
+  select v_season, id from player where slug = 'tobias'  returning id into sp_tobias;
+  insert into season_player (season_id, player_id)
+  select v_season, id from player where slug = 'william' returning id into sp_william;
+
+  insert into season_ladder (season_id, placement, points) values
+    (v_season, 1, 8),
+    (v_season, 2, 5),
+    (v_season, 3, 3),
+    (v_season, 4, 1);
+
+  -- Power-up anchors. All twelve are seeded (the full S4 roster of eight
+  -- power-ups + four curses), can_target_others=false for every one: this
+  -- season every power-up/curse only ever adjusts the USER's own points.
+  insert into power_up (season_id, slug, is_curse, can_target_others)
+  values (v_season, 'safety-net', false, false) returning id into pu_safety;
+  insert into power_up (season_id, slug, is_curse, can_target_others)
+  values (v_season, 'gamba-time', false, false) returning id into pu_gamba;
+  insert into power_up (season_id, slug, is_curse, can_target_others)
+  values (v_season, 'double-edged-sword', false, false) returning id into pu_sword;
+  insert into power_up (season_id, slug, is_curse, can_target_others)
+  values (v_season, 'crystal-ballin', false, false) returning id into pu_ball;
+  insert into power_up (season_id, slug, is_curse, can_target_others)
+  values (v_season, 'successful-tax-evasion', false, false) returning id into pu_tax;
+  insert into power_up (season_id, slug, is_curse, can_target_others)
+  values (v_season, 'power-up-cloner', false, false) returning id into pu_cloner;
+  insert into power_up (season_id, slug, is_curse, can_target_others)
+  values (v_season, 'wide-net', false, false) returning id into pu_widenet;
+  insert into power_up (season_id, slug, is_curse, can_target_others)
+  values (v_season, 'back-to-back', false, false) returning id into pu_b2b;
+  insert into power_up (season_id, slug, is_curse, can_target_others)
+  values (v_season, 'unsuccessful-tax-evasion', true, false) returning id into cu_untax;
+  insert into power_up (season_id, slug, is_curse, can_target_others)
+  values (v_season, 'sucks-to-suck', true, false) returning id into cu_sucks;
+  insert into power_up (season_id, slug, is_curse, can_target_others)
+  values (v_season, 'not-beating-the-allegations', true, false) returning id into cu_alleg;
+  insert into power_up (season_id, slug, is_curse, can_target_others)
+  values (v_season, 'curse-of-the-gambler', true, false) returning id into cu_gambler;
+
+  -------------------------------------------------------------------------
+  -- GAME 1 — League of Legends (rounds, sum, 3 matches)
+  -- Arena, rotating 2v2 teams; raw per-match score summed directly.
+  -- Sums: Jakob 12, Jørgen 19, Tobias 12, William 11.
+  -- Jakob & Tobias tie on 12 — Jakob takes 2nd on best-placements tiebreak.
+  -- Final: 1 Jørgen, 2 Jakob, 3 Tobias, 4 William.
+  -------------------------------------------------------------------------
+  insert into game (season_id, slug, ordinal, status)
+  values (v_season, 'league-of-legends-04', 1, 'complete') returning id into v_game;
+
+  insert into stage (game_id, ordinal, kind, aggregation)
+  values (v_game, 1, 'rounds', 'sum') returning id into v_stage;
+  insert into round (stage_id, ordinal, label) values (v_stage, 1, 'Match 1') returning id into v_round;
+  insert into round_result (round_id, season_player_id, raw_score) values
+    (v_round, sp_jakob, 6), (v_round, sp_jorgen, 6), (v_round, sp_tobias, 2), (v_round, sp_william, 2);
+  insert into round (stage_id, ordinal, label) values (v_stage, 2, 'Match 2') returning id into v_round;
+  insert into round_result (round_id, season_player_id, raw_score) values
+    (v_round, sp_jakob, 1), (v_round, sp_jorgen, 5), (v_round, sp_tobias, 5), (v_round, sp_william, 1);
+  insert into round (stage_id, ordinal, label) values (v_stage, 3, 'Match 3') returning id into v_round;
+  insert into round_result (round_id, season_player_id, raw_score) values
+    (v_round, sp_jakob, 5), (v_round, sp_jorgen, 8), (v_round, sp_tobias, 5), (v_round, sp_william, 8);
+  -- Sums: Jakob 12, Jørgen 19, Tobias 12, William 11.
+
+  insert into game_result (game_id, season_player_id, placement, confirmed, note) values
+    (v_game, sp_jorgen,  1, true, null),
+    (v_game, sp_jakob,   2, true, 'Jakob og Tobias endte begge på 12 poeng. Jakob tok 2. plass på tiebreakeren om flest best-plasseringer gjennom de tre kampene.'),
+    (v_game, sp_tobias,  3, true, null),
+    (v_game, sp_william, 4, true, null);
+
+  -- Curse: William Sucks to Suck (-1 — 4th place, curse took effect).
+  insert into power_up_use (game_id, power_up_id, used_by_season_player_id, affected_season_player_id, points_delta) values
+    (v_game, cu_sucks, sp_william, sp_william, -1);
+
+  -------------------------------------------------------------------------
+  -- GAME 2 — PEAK (score, high — altitude) single rounds stage, one round.
+  -- Altitude: Jakob 569, Jørgen 448, Tobias 387, William 315.
+  -- Final: 1 Jakob, 2 Jørgen, 3 Tobias, 4 William.
+  -------------------------------------------------------------------------
+  insert into game (season_id, slug, ordinal, status)
+  values (v_season, 'peak', 2, 'complete') returning id into v_game;
+
+  insert into stage (game_id, ordinal, kind, aggregation)
+  values (v_game, 1, 'rounds', 'sum') returning id into v_stage;
+  insert into round (stage_id, ordinal, label) values (v_stage, 1, 'Høyde') returning id into v_round;
+  insert into round_result (round_id, season_player_id, raw_score) values
+    (v_round, sp_jakob, 569), (v_round, sp_jorgen, 448), (v_round, sp_tobias, 387), (v_round, sp_william, 315);
+
+  insert into game_result (game_id, season_player_id, placement, confirmed) values
+    (v_game, sp_jakob,   1, true),
+    (v_game, sp_jorgen,  2, true),
+    (v_game, sp_tobias,  3, true),
+    (v_game, sp_william, 4, true);
+
+  -- Power-up: Jakob Power-up Cloner (0 — cloned Tobias's Successful Tax Evasion).
+  -- Curse: Jørgen Unsuccessful Tax Evasion (0).
+  insert into power_up_use (game_id, power_up_id, used_by_season_player_id, affected_season_player_id, points_delta) values
+    (v_game, pu_cloner, sp_jakob,  sp_jakob,  0),
+    (v_game, cu_untax,  sp_jorgen, sp_jorgen, 0);
+
+  -------------------------------------------------------------------------
+  -- GAME 3 — Ratz Instagib (rounds, rank-then-sum, 6 matches)
+  -- raw_score = kills per match. Rank-then-sum (4..1 per match) gives:
+  -- Jakob 19, Jørgen 7, Tobias 19, William 17 — Jakob & Tobias tie on 19,
+  -- Tobias 1st on the sheet. Final: 1 Tobias, 2 Jakob, 3 William, 4 Jørgen.
+  -------------------------------------------------------------------------
+  insert into game (season_id, slug, ordinal, status)
+  values (v_season, 'ratz-instagib', 3, 'complete') returning id into v_game;
+
+  insert into stage (game_id, ordinal, kind, aggregation)
+  values (v_game, 1, 'rounds', 'rank-then-sum') returning id into v_stage;
+  insert into round (stage_id, ordinal, label) values (v_stage, 1, 'Match 1') returning id into v_round;
+  insert into round_result (round_id, season_player_id, raw_score) values
+    (v_round, sp_jakob, 50), (v_round, sp_jorgen, 34), (v_round, sp_tobias, 43), (v_round, sp_william, 35);
+  insert into round (stage_id, ordinal, label) values (v_stage, 2, 'Match 2') returning id into v_round;
+  insert into round_result (round_id, season_player_id, raw_score) values
+    (v_round, sp_jakob, 45), (v_round, sp_jorgen, 31), (v_round, sp_tobias, 45), (v_round, sp_william, 51);
+  insert into round (stage_id, ordinal, label) values (v_stage, 3, 'Match 3') returning id into v_round;
+  insert into round_result (round_id, season_player_id, raw_score) values
+    (v_round, sp_jakob, 48), (v_round, sp_jorgen, 24), (v_round, sp_tobias, 39), (v_round, sp_william, 34);
+  insert into round (stage_id, ordinal, label) values (v_stage, 4, 'Match 4') returning id into v_round;
+  insert into round_result (round_id, season_player_id, raw_score) values
+    (v_round, sp_jakob, 41), (v_round, sp_jorgen, 32), (v_round, sp_tobias, 58), (v_round, sp_william, 50);
+  insert into round (stage_id, ordinal, label) values (v_stage, 5, 'Match 5') returning id into v_round;
+  insert into round_result (round_id, season_player_id, raw_score) values
+    (v_round, sp_jakob, 48), (v_round, sp_jorgen, 23), (v_round, sp_tobias, 38), (v_round, sp_william, 23);
+  insert into round (stage_id, ordinal, label) values (v_stage, 6, 'Match 6') returning id into v_round;
+  insert into round_result (round_id, season_player_id, raw_score) values
+    (v_round, sp_jakob, 44), (v_round, sp_jorgen, 29), (v_round, sp_tobias, 49), (v_round, sp_william, 63);
+  -- Rank-then-sum points: Jakob 19, Jørgen 7, Tobias 19, William 17.
+
+  insert into game_result (game_id, season_player_id, placement, confirmed, note) values
+    (v_game, sp_tobias,  1, true, 'Jakob og Tobias endte begge på 19 poeng. Tobias tok 1. plass på tiebreakeren.'),
+    (v_game, sp_jakob,   2, true, null),
+    (v_game, sp_william, 3, true, null),
+    (v_game, sp_jorgen,  4, true, null);
+
+  -- Power-ups: Jakob Successful Tax Evasion (0), Jørgen Successful Tax Evasion
+  -- (0), Tobias Power-up Cloner (0 — cloned Jørgen's Successful Tax Evasion).
+  insert into power_up_use (game_id, power_up_id, used_by_season_player_id, affected_season_player_id, points_delta) values
+    (v_game, pu_tax,    sp_jakob,  sp_jakob,  0),
+    (v_game, pu_tax,    sp_jorgen, sp_jorgen, 0),
+    (v_game, pu_cloner, sp_tobias, sp_tobias, 0);
+
+  -------------------------------------------------------------------------
+  -- GAME 4 — Trombone Champ (rounds rank-then-sum → final-bronze, bo3, score)
+  -- Group: 8 songs, raw_score = real song score, rank-then-sum (4..1 per song).
+  -- Group points: Jakob 24, Jørgen 14, Tobias 32, William 10.
+  -- Top two (Tobias, Jakob) to the final; bottom two (Jørgen, William) to bronze.
+  -- Final: Tobias beat Jakob 2-0. Bronze: Jørgen beat William 2-1.
+  -- Final placements: 1 Tobias, 2 Jakob, 3 Jørgen, 4 William.
+  -------------------------------------------------------------------------
+  insert into game (season_id, slug, ordinal, status)
+  values (v_season, 'trombone-champ', 4, 'complete') returning id into v_game;
+
+  -- Stage 1: group (rounds, rank-then-sum). Real song scores stored as raw_score.
+  insert into stage (game_id, ordinal, kind, aggregation)
+  values (v_game, 1, 'rounds', 'rank-then-sum') returning id into v_stage;
+  insert into round (stage_id, ordinal, label) values (v_stage, 1, 'Jasmine Flower') returning id into v_round;
+  insert into round_result (round_id, season_player_id, raw_score) values
+    (v_round, sp_jakob, 3821420), (v_round, sp_jorgen, 3739710), (v_round, sp_tobias, 4135640), (v_round, sp_william, 3567590);
+  insert into round (stage_id, ordinal, label) values (v_stage, 2, 'Rising Sun Blues') returning id into v_round;
+  insert into round_result (round_id, season_player_id, raw_score) values
+    (v_round, sp_jakob, 4798370), (v_round, sp_jorgen, 4284440), (v_round, sp_tobias, 4810560), (v_round, sp_william, 4399590);
+  insert into round (stage_id, ordinal, label) values (v_stage, 3, 'Ballgame') returning id into v_round;
+  insert into round_result (round_id, season_player_id, raw_score) values
+    (v_round, sp_jakob, 3490110), (v_round, sp_jorgen, 3272200), (v_round, sp_tobias, 3739660), (v_round, sp_william, 3078920);
+  insert into round (stage_id, ordinal, label) values (v_stage, 4, 'O Christmas Tree') returning id into v_round;
+  insert into round_result (round_id, season_player_id, raw_score) values
+    (v_round, sp_jakob, 4927060), (v_round, sp_jorgen, 4153740), (v_round, sp_tobias, 6463080), (v_round, sp_william, 4171150);
+  insert into round (stage_id, ordinal, label) values (v_stage, 5, 'Hello My Baby') returning id into v_round;
+  insert into round_result (round_id, season_player_id, raw_score) values
+    (v_round, sp_jakob, 7498740), (v_round, sp_jorgen, 6715170), (v_round, sp_tobias, 8438470), (v_round, sp_william, 6378150);
+  insert into round (stage_id, ordinal, label) values (v_stage, 6, 'Gymnopedie') returning id into v_round;
+  insert into round_result (round_id, season_player_id, raw_score) values
+    (v_round, sp_jakob, 4708460), (v_round, sp_jorgen, 3961600), (v_round, sp_tobias, 5016510), (v_round, sp_william, 3953500);
+  insert into round (stage_id, ordinal, label) values (v_stage, 7, 'Marseillaise') returning id into v_round;
+  insert into round_result (round_id, season_player_id, raw_score) values
+    (v_round, sp_jakob, 3025190), (v_round, sp_jorgen, 2652750), (v_round, sp_tobias, 3321340), (v_round, sp_william, 2571540);
+  insert into round (stage_id, ordinal, label) values (v_stage, 8, 'Korobeiniki') returning id into v_round;
+  insert into round_result (round_id, season_player_id, raw_score) values
+    (v_round, sp_jakob, 9057240), (v_round, sp_jorgen, 7859100), (v_round, sp_tobias, 10091970), (v_round, sp_william, 7252360);
+  -- Rank-then-sum points: Jakob 24, Jørgen 14, Tobias 32, William 10.
+
+  -- Stage 2: final-bronze (bo3, real song scores).
+  -- Final: Tobias beat Jakob 2-0 (Hungarian Rhapsody 11647874-9874820;
+  --   Hall of the Mountain King 7223040-5641210).
+  -- Bronze: Jørgen beat William 2-1 (William Tell 4476780-3894250 Jørgen;
+  --   Rhapsody in Blue 8247330-8216200 William; Sailor's Hornpipe 4743920-3596130 Jørgen).
+  insert into stage (game_id, ordinal, kind) values (v_game, 2, 'final-bronze')
+    returning id into v_stage;
+  perform pg_temp.seed_h2h_match(v_stage, 'BR', 'bo3', sp_jorgen, sp_william,
+    array[4476780, 8216200, 4743920], array[3894250, 8247330, 3596130]);
+  perform pg_temp.seed_h2h_match(v_stage, 'F',  'bo3', sp_tobias, sp_jakob,
+    array[11647874, 7223040], array[9874820, 5641210]);
+
+  insert into game_result (game_id, season_player_id, placement, confirmed) values
+    (v_game, sp_tobias,  1, true),
+    (v_game, sp_jakob,   2, true),
+    (v_game, sp_jorgen,  3, true),
+    (v_game, sp_william, 4, true);
+
+  -- Curses: Jakob Sucks to Suck (0 — finished 2nd, no effect),
+  -- Tobias Unsuccessful Tax Evasion (0).
+  insert into power_up_use (game_id, power_up_id, used_by_season_player_id, affected_season_player_id, points_delta) values
+    (v_game, cu_sucks, sp_jakob,  sp_jakob,  0),
+    (v_game, cu_untax, sp_tobias, sp_tobias, 0);
+
+  -------------------------------------------------------------------------
+  -- GAME 5 — Counter-Strike 2 (placement — furthest on KZ parkour map)
+  -- Single rounds stage, one round, raw_score = 4..1 placement.
+  -- Final: 1 Tobias, 2 Jakob, 3 Jørgen, 4 William.
+  -------------------------------------------------------------------------
+  insert into game (season_id, slug, ordinal, status)
+  values (v_season, 'counter-strike-2', 5, 'complete') returning id into v_game;
+
+  insert into stage (game_id, ordinal, kind, aggregation)
+  values (v_game, 1, 'rounds', 'sum') returning id into v_stage;
+  insert into round (stage_id, ordinal, label) values (v_stage, 1, 'Plassering') returning id into v_round;
+  insert into round_result (round_id, season_player_id, raw_score) values
+    (v_round, sp_tobias, 4), (v_round, sp_jakob, 3), (v_round, sp_jorgen, 2), (v_round, sp_william, 1);
+
+  insert into game_result (game_id, season_player_id, placement, confirmed) values
+    (v_game, sp_tobias,  1, true),
+    (v_game, sp_jakob,   2, true),
+    (v_game, sp_jorgen,  3, true),
+    (v_game, sp_william, 4, true);
+
+  -- Power-ups: Tobias Successful Tax Evasion (0); Jakob Power-up Cloner (0 —
+  -- cloned Tobias's Wide Net); Jørgen Safety Net (+1 — 3rd place bonus).
+  insert into power_up_use (game_id, power_up_id, used_by_season_player_id, affected_season_player_id, points_delta) values
+    (v_game, pu_tax,    sp_tobias, sp_tobias, 0),
+    (v_game, pu_cloner, sp_jakob,  sp_jakob,  0),
+    (v_game, pu_safety, sp_jorgen, sp_jorgen, 1);
+
+  -------------------------------------------------------------------------
+  -- GAME 6 — Garry's Mod (rounds, sum, 6 races)
+  -- Sled build. raw_score = placement points per race (4=best).
+  -- Sums: Jakob 20, Jørgen 14, Tobias 16, William 10.
+  -- Final: 1 Jakob, 2 Tobias, 3 Jørgen, 4 William.
+  -------------------------------------------------------------------------
+  insert into game (season_id, slug, ordinal, status)
+  values (v_season, 'garrys-mod', 6, 'complete') returning id into v_game;
+
+  insert into stage (game_id, ordinal, kind, aggregation)
+  values (v_game, 1, 'rounds', 'sum') returning id into v_stage;
+  insert into round (stage_id, ordinal, label) values (v_stage, 1, 'Race 1') returning id into v_round;
+  insert into round_result (round_id, season_player_id, raw_score) values
+    (v_round, sp_jakob, 3), (v_round, sp_jorgen, 4), (v_round, sp_tobias, 2), (v_round, sp_william, 1);
+  insert into round (stage_id, ordinal, label) values (v_stage, 2, 'Race 2') returning id into v_round;
+  insert into round_result (round_id, season_player_id, raw_score) values
+    (v_round, sp_jakob, 4), (v_round, sp_jorgen, 1), (v_round, sp_tobias, 2), (v_round, sp_william, 3);
+  insert into round (stage_id, ordinal, label) values (v_stage, 3, 'Race 3') returning id into v_round;
+  insert into round_result (round_id, season_player_id, raw_score) values
+    (v_round, sp_jakob, 4), (v_round, sp_jorgen, 2), (v_round, sp_tobias, 3), (v_round, sp_william, 1);
+  insert into round (stage_id, ordinal, label) values (v_stage, 4, 'Race 4') returning id into v_round;
+  insert into round_result (round_id, season_player_id, raw_score) values
+    (v_round, sp_jakob, 4), (v_round, sp_jorgen, 3), (v_round, sp_tobias, 2), (v_round, sp_william, 1);
+  insert into round (stage_id, ordinal, label) values (v_stage, 5, 'Race 5') returning id into v_round;
+  insert into round_result (round_id, season_player_id, raw_score) values
+    (v_round, sp_jakob, 4), (v_round, sp_jorgen, 2), (v_round, sp_tobias, 3), (v_round, sp_william, 1);
+  insert into round (stage_id, ordinal, label) values (v_stage, 6, 'Race 6') returning id into v_round;
+  insert into round_result (round_id, season_player_id, raw_score) values
+    (v_round, sp_jakob, 1), (v_round, sp_jorgen, 2), (v_round, sp_tobias, 4), (v_round, sp_william, 3);
+  -- Sums: Jakob 20, Jørgen 14, Tobias 16, William 10.
+
+  insert into game_result (game_id, season_player_id, placement, confirmed) values
+    (v_game, sp_jakob,   1, true),
+    (v_game, sp_tobias,  2, true),
+    (v_game, sp_jorgen,  3, true),
+    (v_game, sp_william, 4, true);
+
+  -- Power-ups: Jakob Double-Edged Sword (+4), Tobias Wide Net (+1),
+  -- William Safety Net (+2 — last-place bonus).
+  insert into power_up_use (game_id, power_up_id, used_by_season_player_id, affected_season_player_id, points_delta) values
+    (v_game, pu_sword,   sp_jakob,   sp_jakob,   4),
+    (v_game, pu_widenet, sp_tobias,  sp_tobias,  1),
+    (v_game, pu_safety,  sp_william, sp_william, 2);
+
+  -------------------------------------------------------------------------
+  -- GAME 7 — FC25 (round-robin → single-elim, score — goals)
+  -- Ultimate Team. Group bo1 for seeding (goals):
+  --   Jakob 12-0 Jørgen, Tobias 3-1 William, Jakob 5-0 Tobias,
+  --   William 7-0 Jørgen, Jakob 6-3 William, Tobias 6-2 Jørgen.
+  -- Group wins: Jakob 3, Tobias 2, William 1, Jørgen 0.
+  -- Seeds: 1 Jakob, 2 Tobias, 3 William, 4 Jørgen.
+  -- SF1 Jakob 16-0 Jørgen, SF2 William 3-2 Tobias,
+  -- BR Tobias 6-2 Jørgen, F Jakob 6-1 William.
+  -- Final: 1 Jakob, 2 William, 3 Tobias, 4 Jørgen.
+  -------------------------------------------------------------------------
+  insert into game (season_id, slug, ordinal, status)
+  values (v_season, 'fc-25', 7, 'complete') returning id into v_game;
+
+  -- Stage 1: round-robin seeding (bo1, real goals).
+  insert into stage (game_id, ordinal, kind) values (v_game, 1, 'round-robin')
+    returning id into v_stage;
+  perform pg_temp.seed_h2h_match(v_stage, null, 'bo1', sp_jakob,  sp_jorgen,  array[12], array[0]);
+  perform pg_temp.seed_h2h_match(v_stage, null, 'bo1', sp_tobias, sp_william, array[3],  array[1]);
+  perform pg_temp.seed_h2h_match(v_stage, null, 'bo1', sp_jakob,  sp_tobias,  array[5],  array[0]);
+  perform pg_temp.seed_h2h_match(v_stage, null, 'bo1', sp_william, sp_jorgen, array[7],  array[0]);
+  perform pg_temp.seed_h2h_match(v_stage, null, 'bo1', sp_jakob,  sp_william, array[6],  array[3]);
+  perform pg_temp.seed_h2h_match(v_stage, null, 'bo1', sp_tobias, sp_jorgen,  array[6],  array[2]);
+
+  -- Stage 2: single-elim (bo1, real goals). SF1/SF2/BR/F template.
+  insert into stage (game_id, ordinal, kind) values (v_game, 2, 'single-elim')
+    returning id into v_stage;
+  perform pg_temp.seed_h2h_match(v_stage, 'SF1', 'bo1', sp_jakob,   sp_jorgen,  array[16], array[0]);
+  perform pg_temp.seed_h2h_match(v_stage, 'SF2', 'bo1', sp_william, sp_tobias,  array[3],  array[2]);
+  perform pg_temp.seed_h2h_match(v_stage, 'BR',  'bo1', sp_tobias,  sp_jorgen,  array[6],  array[2]);
+  perform pg_temp.seed_h2h_match(v_stage, 'F',   'bo1', sp_jakob,   sp_william, array[6],  array[1]);
+
+  insert into game_result (game_id, season_player_id, placement, confirmed) values
+    (v_game, sp_jakob,   1, true),
+    (v_game, sp_william, 2, true),
+    (v_game, sp_tobias,  3, true),
+    (v_game, sp_jorgen,  4, true);
+
+  -- Power-ups: Tobias Power-up Cloner (0 — cloned Jørgen's Wide Net);
+  -- William Back to Back (+2).
+  insert into power_up_use (game_id, power_up_id, used_by_season_player_id, affected_season_player_id, points_delta) values
+    (v_game, pu_cloner, sp_tobias,  sp_tobias,  0),
+    (v_game, pu_b2b,    sp_william, sp_william, 2);
+
+  -------------------------------------------------------------------------
+  -- GAME 8 — 2XKO (round-robin + swiss finish → final-bronze, win-loss)
+  -- Group bo3. Full round-robin (6 matches, leg 1) PLUS one swiss-finish
+  -- rematch (Jakob–William, leg 2) to settle who reached 3W / 3L:
+  --   R1 Tobias 2-0 Jørgen, William 2-0 Jakob
+  --   R2 Tobias 2-1 William, Jakob 2-0 Jørgen
+  --   R3 Tobias 2-0 Jakob, William 2-0 Jørgen
+  --   R4 William 2-0 Jakob  (leg 2 — Jakob–William's second meeting)
+  -- Group records: Tobias 3-0, William 3-1, Jakob 1-3, Jørgen 0-3.
+  -- Finals bo5. Bronze: Jørgen 3-0 Jakob. Final: Tobias 3-1 William.
+  -- Final placements: 1 Tobias, 2 William, 3 Jørgen, 4 Jakob.
+  -------------------------------------------------------------------------
+  insert into game (season_id, slug, ordinal, status)
+  values (v_season, '2xko', 8, 'complete') returning id into v_game;
+
+  -- Stage 1: round-robin with a swiss-finish rematch. All leg 1 except the
+  -- Jakob–William rematch (leg 2). Win-loss stored as per-game 1-0 rows.
+  insert into stage (game_id, ordinal, kind) values (v_game, 1, 'round-robin')
+    returning id into v_stage;
+  -- Round-robin (leg 1):
+  perform pg_temp.seed_h2h_match(v_stage, null, 'bo3', sp_tobias,  sp_jorgen,  array[1,1],   array[0,0],   1::smallint);
+  perform pg_temp.seed_h2h_match(v_stage, null, 'bo3', sp_william, sp_jakob,   array[1,1],   array[0,0],   1::smallint);
+  perform pg_temp.seed_h2h_match(v_stage, null, 'bo3', sp_tobias,  sp_william, array[1,0,1], array[0,1,0], 1::smallint);
+  perform pg_temp.seed_h2h_match(v_stage, null, 'bo3', sp_jakob,   sp_jorgen,  array[1,1],   array[0,0],   1::smallint);
+  perform pg_temp.seed_h2h_match(v_stage, null, 'bo3', sp_tobias,  sp_jakob,   array[1,1],   array[0,0],   1::smallint);
+  perform pg_temp.seed_h2h_match(v_stage, null, 'bo3', sp_william, sp_jorgen,  array[1,1],   array[0,0],   1::smallint);
+  -- Swiss-finish rematch (leg 2): William beat Jakob again.
+  perform pg_temp.seed_h2h_match(v_stage, null, 'bo3', sp_william, sp_jakob,   array[1,1],   array[0,0],   2::smallint);
+
+  -- Stage 2: final-bronze (bo5, win-loss).
+  insert into stage (game_id, ordinal, kind) values (v_game, 2, 'final-bronze')
+    returning id into v_stage;
+  perform pg_temp.seed_h2h_match(v_stage, 'BR', 'bo5', sp_jorgen, sp_jakob,   array[1,1,1],   array[0,0,0]);
+  perform pg_temp.seed_h2h_match(v_stage, 'F',  'bo5', sp_tobias, sp_william, array[1,1,0,1], array[0,0,1,0]);
+
+  insert into game_result (game_id, season_player_id, placement, confirmed) values
+    (v_game, sp_tobias,  1, true),
+    (v_game, sp_william, 2, true),
+    (v_game, sp_jorgen,  3, true),
+    (v_game, sp_jakob,   4, true);
+
+  -- Power-ups: William Double-Edged Sword (+1), Jørgen Wide Net (+1).
+  insert into power_up_use (game_id, power_up_id, used_by_season_player_id, affected_season_player_id, points_delta) values
+    (v_game, pu_sword,   sp_william, sp_william, 1),
+    (v_game, pu_widenet, sp_jorgen,  sp_jorgen,  1);
+
+  ---------------------------------------------------------------------------
+  -- SEASON RESULT
+  -- Totals (ladder + power-ups) 49/29/47/22. Jakob champion outright; no tie.
+  -- Final order: 1 Jakob (49), 2 Tobias (47), 3 Jørgen (29), 4 William (22).
   ---------------------------------------------------------------------------
   insert into season_result (season_id, season_player_id, placement, confirmed, note) values
     (v_season, sp_jakob,   1, true, null),

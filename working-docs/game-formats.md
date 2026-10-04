@@ -7,11 +7,13 @@ SQL implementation: supabase/schema.sql.
 UPDATE 2026-10-04: dual round-robin (S2 LoL) + 2XKO's swiss-finish are modeled as
 one round-robin stage using match.leg for repeated pairings; the standalone
 'swiss' stage kind was removed (migration 20261003231523).
-SEED PROGRESS 2026-10-04: Seasons 1, 2 and 3 are seeded into supabase/seed.sql
-and reconciled on the local stack (every [ok] below is now not just resolved but
-actually seeded + verified). Season 4 is the only one left. match.leg is also
-used for bracket rematches in double-elim stages (S2 Total War, S3 War Thunder),
-not just round-robin — see the `leg` field in RESOLVED MODEL.
+SEED PROGRESS 2026-10-04: All four seasons (S1–S4) are seeded into
+supabase/seed.sql and reconciled on the local stack (every [ok] below is now not
+just resolved but actually seeded + verified). S4 added the first rank-then-sum
+stages (Ratz Instagib, Trombone group) and the first round-robin swiss-finish
+(2XKO, one leg-2 rematch). match.leg is also used for bracket rematches in
+double-elim stages (S2 Total War, S3 War Thunder), not just round-robin — see
+the `leg` field in RESOLVED MODEL.
 
 How each game's results are structured, for DB schema design.
 Season points & placements (who won each game) live in game-placements.md.
