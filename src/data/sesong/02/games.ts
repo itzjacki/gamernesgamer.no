@@ -240,8 +240,7 @@ export const games: Game[] = [
     </ul>
     <br>
     <p>
-      H2H-turneringa spilles på turneringsdagen og er double elimination. Man
-      spiller Bo1 i alt unntatt finalen, som er Bo3.
+      H2H-turneringa spilles på turneringsdagen og er double elimination, Bo1.
     </p>
     `,
   },
