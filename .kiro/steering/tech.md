@@ -27,12 +27,15 @@
   the public data. `server.ts` (cookie-bound Auth) and `client.ts` (browser) are
   the admin-panel clients and also use the publishable key.
 - Queries still filter `confirmed = true` as defense-in-depth on top of RLS.
-- **Env vars**: all three clients use `NEXT_PUBLIC_SUPABASE_URL` +
-  `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (publishable key is safe client-side and
-  RLS-gated). No app code uses the secret key anymore — results are read under
-  RLS. Local `.env.local` points at the local stack; before a deploy, confirm
-  both `NEXT_PUBLIC_` vars are set in Vercel (the Supabase integration usually
-  syncs them). Regenerate `database.types.ts`
+- **Env vars**: all three clients use `NEXT_PUBLIC_DB_SUPABASE_URL` +
+  `NEXT_PUBLIC_DB_SUPABASE_PUBLISHABLE_KEY` (publishable key is safe client-side
+  and RLS-gated). The `DB_` infix is the Vercel Supabase integration's prefix —
+  it namespaces every var it syncs as `DB_*` (and `NEXT_PUBLIC_DB_*` for the
+  public ones), so the app reads those names in both prod and local to stay
+  consistent. No app code uses the secret key anymore — results are read under
+  RLS. Local `.env.local` points at the local stack with the same
+  `NEXT_PUBLIC_DB_*` names; before a deploy, confirm both are set in Vercel (the
+  Supabase integration syncs them automatically). Regenerate `database.types.ts`
   (`supabase gen types typescript --local`) after each migration.
 
 ## Testing
