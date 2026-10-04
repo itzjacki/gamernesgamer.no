@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { signIn } from '@/app/admin/actions';
 import GoogleSignInButton from '@/components/GoogleSignInButton';
+import Panel from '@/components/Panel';
 
 export const metadata: Metadata = {
   title: 'Logg inn — Adminpanel',
@@ -16,7 +17,7 @@ export default async function AdminLoginPage({ searchParams }: Props) {
 
   return (
     <section className='flex min-h-[70svh] items-center justify-center'>
-      <div className='border-border bg-bg w-80 border p-6 sm:w-100 sm:p-10'>
+      <Panel className='w-80 sm:w-100'>
         <p className='text-text-muted font-mono text-xs tracking-wider uppercase'>
           Adminpanel
         </p>
@@ -50,7 +51,7 @@ export default async function AdminLoginPage({ searchParams }: Props) {
         <p className='text-text-muted mt-4 font-mono text-xs'>
           Kun for inviterte administratorer.
         </p>
-      </div>
+      </Panel>
     </section>
   );
 }

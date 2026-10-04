@@ -3,6 +3,8 @@ import { signOut } from '@/app/admin/actions';
 import { createReadClient } from '@/lib/supabase/read';
 import { createAuthClient } from '@/lib/supabase/server';
 import { currentSeason } from '@/data/sesong';
+import Panel from '@/components/Panel';
+import Button from '@/components/Button';
 import DbOverview from './DbOverview';
 import AdminManagement, { type AdminRow } from './AdminManagement';
 import { type AddableUser } from './AddAdminForm';
@@ -76,14 +78,11 @@ export default async function AdminDashboardPage() {
       />
 
       {usersError ? (
-        <div className='border-border bg-bg border p-6 sm:p-10'>
-          <p className='text-text-muted font-mono text-xs tracking-wider uppercase'>
-            Administratorer
-          </p>
+        <Panel label='Administratorer'>
           <p className='text-accent mt-4 font-mono text-sm' role='alert'>
             Kunne ikke hente brukerlisten.
           </p>
-        </div>
+        </Panel>
       ) : (
         <AdminManagement
           admins={admins}
@@ -94,12 +93,7 @@ export default async function AdminDashboardPage() {
       )}
 
       <form action={signOut}>
-        <button
-          type='submit'
-          className='border-border bg-surface text-text hover:border-accent focus-visible:outline-accent active:bg-bg flex h-11 items-center justify-center border px-6 text-sm transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2'
-        >
-          Logg ut
-        </button>
+        <Button type='submit'>Logg ut</Button>
       </form>
     </section>
   );

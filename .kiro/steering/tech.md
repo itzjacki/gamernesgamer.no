@@ -133,3 +133,13 @@ running app simply doesn't call the new objects until it ships.
   `admin/(protected)/layout.tsx` runs the `is_admin()` RPC to enforce the
   allowlist, showing authenticated non-admins a rejection screen. OAuth
   code-exchange lands at `/auth/callback`.
+- **Redirect URLs (hosted project, Auth → URL Configuration):** `signIn` passes
+  `redirectTo: ${origin}/auth/callback`, which Supabase validates against the
+  Redirect URLs allow-list; an unmatched URL silently falls back to **Site URL**.
+  So Site URL must be the **production domain** (not localhost — that was the bug
+  that routed preview logins through localhost), and preview deploys need a
+  wildcard entry: `https://*-<vercel-team-slug>.vercel.app/**`. Google itself
+  only ever sees Supabase's stable `/auth/v1/callback`, so no Google config
+  changes per environment. Local dev points at the local stack, whose redirect
+  allow-list lives in `supabase/config.toml`, not the dashboard — so the hosted
+  allow-list needs no localhost entry.

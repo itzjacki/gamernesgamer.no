@@ -1,3 +1,6 @@
+import Panel from '@/components/Panel';
+import { StatList, StatRow } from '@/components/StatList';
+
 interface Row {
   label: string;
   value: string;
@@ -30,24 +33,12 @@ export default function DbOverview({
   ];
 
   return (
-    <div className='border-border bg-bg border p-6 sm:p-10'>
-      <p className='text-text-muted font-mono text-xs tracking-wider uppercase'>
-        Database
-      </p>
-
-      <dl className='mt-4 flex flex-col'>
+    <Panel label='Database'>
+      <StatList className='mt-4'>
         {rows.map((row) => (
-          <div
-            key={row.label}
-            className='border-border flex items-baseline justify-between gap-4 border-t py-3 first:border-t-0 first:pt-0'
-          >
-            <dt className='text-text-muted text-sm'>{row.label}</dt>
-            <dd className='text-text font-mono text-sm tabular-nums'>
-              {row.value}
-            </dd>
-          </div>
+          <StatRow key={row.label} label={row.label} value={row.value} />
         ))}
-      </dl>
-    </div>
+      </StatList>
+    </Panel>
   );
 }
