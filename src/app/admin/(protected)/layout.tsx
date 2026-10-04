@@ -42,19 +42,18 @@ export default async function AdminLayout({ children }: Props) {
       <section className='flex min-h-[70svh] items-center justify-center'>
         <div className='border-border bg-bg w-80 border p-6 sm:w-100 sm:p-10'>
           {/* Accent eyebrow is the single "stop" signal — accent earns its
-              place on a real status. PLACEHOLDER copy, written by a human. */}
+              place on a real status. */}
           <p className='text-accent font-mono text-xs tracking-wider uppercase'>
-            [PLACEHOLDER: eyebrow — ingen tilgang]
+            Ingen tilgang
           </p>
 
-          {/* PLACEHOLDER heading — written by a human. */}
           <h1 className='text-text mt-2 text-2xl font-extrabold'>
-            [PLACEHOLDER: overskrift — logget inn, men ikke admin]
+            Du er logget inn, men ikke administrator
           </h1>
 
-          {/* PLACEHOLDER explanation — written by a human. */}
           <p className='text-text-muted mt-3 text-sm leading-relaxed'>
-            [PLACEHOLDER: forklaring — tilgang er invitasjonsbasert]
+            Tilgang til adminpanelet er invitasjonsbasert. Kontoen din er logget
+            inn, men står ikke på administratorlisten.
           </p>
 
           {email ? (
@@ -70,14 +69,12 @@ export default async function AdminLayout({ children }: Props) {
               type='submit'
               className='border-border bg-surface text-text hover:border-accent focus-visible:outline-accent active:bg-bg flex h-11 w-full items-center justify-center border text-sm transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2'
             >
-              {/* PLACEHOLDER: e.g. "Logg ut". Written by a human. */}
-              [PLACEHOLDER: Logg ut]
+              Logg ut
             </button>
           </form>
 
-          {/* PLACEHOLDER footnote — written by a human. */}
           <p className='text-text-muted mt-4 font-mono text-xs'>
-            [PLACEHOLDER: fotnote — be en admin om tilgang]
+            Be en eksisterende administrator om tilgang.
           </p>
         </div>
       </section>

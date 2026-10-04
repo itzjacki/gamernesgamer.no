@@ -85,6 +85,34 @@ can't drift.
   assigns one canonical version.
 - After any schema change: run advisors (`get_advisors`) and fix findings. Pin
   `search_path = ''` on all functions.
+- **Accepted advisor exception:** lint 0029
+  (`authenticated_security_definer_function_executable`) fires for the three
+  admin-membership RPCs (`admin_add`, `admin_list_users`, `admin_remove`). This
+  is intentional and reviewed (see the header comment in the
+  `*_admin_membership_management` migration): they must be SECURITY DEFINER and
+  callable by `authenticated`, and each guards with `is_admin()` first, so it is
+  the documented false-positive case. The findings are dismissed in Studio →
+  Advisors → Security. If they reappear after a re-run, re-dismiss — don't
+  "fix" by switching to INVOKER or revoking EXECUTE (either would break them).
+
+### Prod apply autonomy
+
+The agent may apply **additive, reversible** migrations to prod (`supabase db
+push`) and run advisors **without asking first** — then report what it did.
+"Additive/reversible" = new tables, columns, functions, policies, indexes,
+grants; nothing that can lose data or break the live app. Immediately after
+applying, the agent runs `get_advisors` and fixes or flags findings (an additive
+change's main failure mode is an advisor hit, e.g. a new SECURITY DEFINER
+function tripping advisor 0029).
+
+**Destructive or risky operations still require explicit approval**: dropping or
+renaming columns/tables, data deletes or backfills, loosening RLS in a way that
+could expose or hide rows, or anything that can break the running app. When in
+doubt, treat it as destructive and ask.
+
+Ordering note: there is no "deploy app before DB" rule. Additive schema is
+normally applied *first*, then the app code that uses it is deployed — the
+running app simply doesn't call the new objects until it ships.
 
 ### Other
 

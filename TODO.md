@@ -78,7 +78,7 @@ the Google provider (see "Google OAuth setup" below), (2) sign in once through
 `/admin/login` (you'll hit the "not an admin" rejection — expected), (3) insert
 your `admin_user` row via the service role, (4) reload `/admin`.
 
-- [ ] Custom /admin panel:
+- [x] Custom /admin panel:
   - [x] Sign in via Google OAuth — login page + `signIn`/`signOut` server
         actions + `/auth/callback` code-exchange route. Allowlist gate in
         `admin/(protected)/layout.tsx` (`is_admin` RPC); authenticated
@@ -88,11 +88,21 @@ your `admin_user` row via the service role, (4) reload `/admin`.
         the human-written-copy rule).
   - [x] Admin dashboard shell (protected landing at `/admin`, sign-out) —
         minimal; verifies the full auth loop. Expands into results UI next.
-  - [ ] Admin management: add/remove other admins (manage the `admin_user`
-        allowlist from the UI instead of by hand via the service role)
-  - [ ] DB overview: a small read-only sanity panel confirming the data is
-        intact (season/game/admin counts, current season) — not a result browser
-- [ ] Server actions for reading results data (used by public pages)
+  - [x] Admin management: add/remove other admins (manage the `admin_user`
+        allowlist from the UI instead of by hand via the service role) — built:
+        `/admin/admins` + `admin_add`/`admin_remove`/`admin_list_users` RPCs,
+        last-admin lockout guard, add-from-signed-in-users only.
+  - [x] DB overview: a small read-only sanity panel confirming the data is
+        intact (season/game/user counts, current season) — built:
+        `DbOverview.tsx` on the dashboard (a `<dl>`, not a result browser).
+- [x] Server actions for reading results data (used by public pages) — the
+      read layer is built + unit-tested: `getSeasonView(n)` / `getGameView(n,
+      slug)` in `src/lib/results/queries.ts`, backed by `read.ts` (publishable
+      key, RLS-enforced). Note: these are read functions for Server Components
+      to call directly (reads aren't Server Actions — those are for mutations),
+      per code-conventions. The layer exists but is **not yet consumed by any
+      page** — wiring it into the season/game pages IS Phase 4's "Season pages
+      (enhanced)".
 
 > Results entry (the scores-per-player-per-game form + review/edit/confirm) moved
 > to Phase 5 — it's a live-season tool, not a prerequisite for the Phase 4
