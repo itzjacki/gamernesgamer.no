@@ -114,8 +114,9 @@ working-docs/
     season_player.id, not player.id. slot_id places elim matches into a fixed template
     per kind (no feeds_into; template edges are static). NULL for standings stages.
     leg (1-indexed) is the meeting number of a pairing in the stage: 1 for single
-    round-robin; 2+ for a rematch (dual round-robin or swiss-finish). unique is
-    (stage_id, player_a, player_b, leg).
+    round-robin; 2+ for a rematch (dual round-robin, swiss-finish, OR a bracket
+    rematch like a double-elim winners-final → grand-final between the same two).
+    unique is (stage_id, player_a, player_b, leg).
   - `match_game` (match_id, game_number, score_a, score_b, tiebreak_winner) — the
     single source of every H2H result; always two ints. Win-loss games store 1-0.
     tiebreak_winner ('a'|'b') set only when scores are equal.
