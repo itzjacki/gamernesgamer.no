@@ -35,7 +35,9 @@ Gamernes Gamer — Next.js (App Router) site on Vercel for a recurring friends g
 - Structural changes: propose + get approval before implementing.
 - Run `npm run build` and Prettier on changed files before finishing.
 - Static content (gamers, games, power-ups) lives in `src/data/sesong/<NN>/`. Never put it in the database.
-- Results data (per-player points, finishing positions) lives in Supabase only.
+- Results data (per-player points, finishing positions) lives in Supabase only —
+  the DB is the source of truth (S1–S4 seeded via `supabase/seed.sql`, on prod).
+  `working-docs/` (markdown + `result-spreadsheets/` CSVs) is secondary reference.
 - Admin routes (`src/app/admin/`) must check Supabase session server-side. Never client-side auth gating.
 - Use `@/*` import alias. Match existing patterns and tokens in `src/styles/global.css`.
 - UI copy is Norwegian. Roster and power-ups vary per season — treat as per-season data.

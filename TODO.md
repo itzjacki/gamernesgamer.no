@@ -11,31 +11,13 @@ social hub — the site produces artifacts that feed into it.
 
 ## Open questions (must resolve before relevant phases)
 
-- **Data modeling depth:** DECIDED AND SCHEMA WRITTEN. Full stage → match → match_game
-  pipeline for H2H games; stage → round → round_result for non-H2H (rounds/score/placement)
-  games. A single game can chain both (e.g. Trombone Champ: rounds group stage → H2H finals).
-  6 stage kinds: round-robin | single-elim | final-bronze | double-elim-reset |
-  double-elim-no-reset | rounds. (Dual round-robin and 2XKO's "swiss finish" are
-  round-robin stages using match.leg for repeated pairings — no swiss kind.)
-  Points = season_ladder[game_result.placement] +
-  SUM(power_up_use.points_delta) — ladder is season-wide (identical across all games),
-  power-up deltas stored in power_up_use. Placements always unique, stored explicitly
-  (not derived) because tiebreakers can override point totals. Scope is variable roster
-  size (no 4-player hardcoding). Schema source of truth: `supabase/migrations/`
-  (generated reference snapshot: `supabase/schema.sql`).
-  Full model: `working-docs/game-formats.md`. Points/placements: `working-docs/game-placements.md`.
-- **Cross-season point normalization:** Points are not comparable across seasons (different
-  point scales per game/season). All-time stats and /records require a normalization
-  strategy. Exact method TBD — resolve before building /records and /vs.
-  Ground truth now documented: base ladders are S2 7/4/2/1 and S3/S4 8/5/3/1
-  (S1 is 4/3/2/1), and off-ladder values are power-up adjustments (e.g. Double Up
-  doubles the ladder value; some cells carry +bonus, 0, or −1 penalties). Power-up
-  mechanics live in `src/data/sesong/<NN>/power-ups.ts`; decoded per-game
-  points/placements in `working-docs/game-placements.md`. Normalization likely works off
-  placement (comparable across seasons) rather than raw points.
-  Options analysis + recommendation (A: fixed placement scale, C: avg finish)
-  with worked S1/S2 examples: `working-docs/cross-season-normalization.md` —
-  awaiting Jakob's call on the sub-decisions there.
+- **Data modeling depth:** RESOLVED, built, and seeded (S1–S4 live on prod). Full
+  stage → match → match_game / stage → round → round_result model. Details:
+  `working-docs/game-formats.md`; schema: `supabase/migrations/`.
+- **Cross-season point normalization:** Raw points aren't comparable across seasons
+  (different ladders + power-ups), so all-time stats (/records, /vs) need a
+  placement-based normalization. Options + recommendation await Jakob's call:
+  `working-docs/cross-season-normalization.md`. Resolve before building /records and /vs.
 - **Editorial appetite:** Several "monument" features (season recaps, "how it went down"
   blocks, Skattkammeret lore content) require written content from Jakob. Scope of these
   features depends on how much curation is realistic.
@@ -61,35 +43,19 @@ See `design.md` for the full system.
 
 ## Phase 3 — Backend + admin panel
 
-Set up Supabase (Postgres + auth) and build the custom admin panel. This is the
-prerequisite for all results-based features. Format modeling is decided (see Open
-questions); settle the modeling _depth_ before finalizing the schema.
+Supabase (Postgres + Auth) + the custom admin panel. Prerequisite for all
+results-based features. Data is in; the admin panel is what's left.
 
 **Scope:**
 
-- [x] Supabase project setup (Postgres + Auth) — remote project created and linked
-      via MCP; local Supabase stack (Docker) running as dev/test/staging.
+- [x] Supabase project set up and linked; local stack (Docker) as dev/test/staging.
+- [x] Schema designed + applied (local + prod) — stage → match / stage → round
+      model, 14 tables, updated_at triggers, RLS locked (no policies yet),
+      `set_updated_at()` search_path pinned. Model: `working-docs/game-formats.md`.
+- [x] All historical data (S1–S4) seeded in `supabase/seed.sql`, reconciled on
+      local, and **pushed to prod** (`db push --linked --include-seed`). Verified
+      on prod: 4 seasons, 34 games, all derived totals match the working docs.
 - [ ] Auth for a small admin group (allowlist/invite model, not public)
-- [x] Data schema design — model + depth RESOLVED (stage → match → game pipeline, see structure.md "Data split" / TODO open question). Source of truth: `supabase/migrations/` (snapshot: `supabase/schema.sql`).
-- [x] Schema applied — initial schema + updated_at triggers + RLS (locked, no
-      policies yet) applied to BOTH local and remote; verified (14 tables, RLS on
-      all, triggers fire, FK constraints enforce); security advisors clean apart
-      from the intentional "RLS enabled, no policy" INFO. `set_updated_at()`
-      hardened with pinned `search_path`.
-- [x] Seed all historical season data (all 4 seasons backfilled) — `supabase/seed.sql`.
-  **S1, S2, S3, S4 ALL DONE** (seeded + reconciled against the working docs on
-  the local stack; totals, per-game points matrices, round sums, H2H standings
-  and invariants all verified). S4 exercised the two formats new to this run —
-  2XKO's swiss-finish (one leg-2 rematch in the round-robin stage) and
-  Trombone's rank-then-sum group → final-bronze H2H chain — plus the first
-  rank-then-sum stages (Ratz Instagib kills, Trombone song scores). No schema
-  change was needed. **PUSHED TO PROD 2026-10-04** — the two outstanding schema
-  migrations (`add_round_label_and_game_result_note`, `add_match_leg_and_drop_swiss`)
-  were applied to the remote via `supabase db push`, then all 4 seasons loaded
-  with `supabase db push --linked --include-seed`. Verified on prod: 4 seasons,
-  34 games, 136 game_results, all four seasons' derived totals match the working
-  docs (S4 49/47/29/22), security advisors clean apart from the intentional
-  "RLS enabled, no policy" INFO.
 - [ ] Custom /admin panel:
   - [ ] Sign in via Supabase Auth
   - [ ] Results entry form (enter scores per player per game)
@@ -97,14 +63,8 @@ questions); settle the modeling _depth_ before finalizing the schema.
   - [ ] Protected server-side via Supabase session
   - [ ] RLS policies (public read of confirmed results; admin-only writes) land here
 - [ ] Server actions for reading results data (used by public pages)
-
-**Follow-ups before the next migration:**
-
-- [x] Link the CLI to the remote project — DONE (project ref
-  `vozercwmzysctmpwlwhn`, already linked). `supabase db push` is now the apply
-      path for both schema and seed; verified by the 2026-10-04 prod push, which
-      cleanly added the two drifted-apart migrations with matching versions on
-      both sides. No more MCP `apply_migration` for file-backed schema.
+- [ ] Flip `read.ts` to the publishable key once public-read RLS policies exist
+      (currently uses the secret key because RLS is locked).
 
 ---
 

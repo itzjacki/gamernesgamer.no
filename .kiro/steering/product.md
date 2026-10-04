@@ -41,8 +41,6 @@ stat cards) that people drop into it.
   the most recent season
 - **Player career pages** — all-time stats, championships, win rate, head-to-head
   records per player
-- **Results in Supabase** — all historical results in a database, driving live
-  stats and the admin panel
 - **Live leaderboard** — real-time standings during the 2-day tournament (polling)
 - **Admin panel** — custom results entry for a small group of trusted admins;
   replaces the spreadsheet
