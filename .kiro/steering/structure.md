@@ -45,14 +45,17 @@ src/
                         Server Components only. null → notFound(); throw → error.
       fetch.ts          IO boundary — one raw per-season bundle. confirmed=true
                         filtered here. Imports no derivation.
-      compose.ts        (added at need) joins src/data static content by slug.
+      compose.ts        Joins DB view-models to static src/data/sesong content:
+                        game by slug, player by name, season by padded slug.
+                        PURE; the one seam that imports both halves. Pages call
+                        it when they need results + static content together.
       raw.ts            Raw row aliases over generated types (module-internal).
       view-models.ts    Hand-authored camelCase shapes components consume.
       derive/           PURE, sync, no IO — unit-tested against S1.
         points.ts       ladder[placement] + Σ power-up deltas.
         players.ts      season_player.id → PlayerRef resolution.
         index.ts        assembleSeasonView / assembleGameView.
-      __tests__/        Vitest: S1 fixtures + derivation tests.
+      __tests__/        Vitest: S1 + S2 fixtures, derivation + compose tests.
   types/                Shared TypeScript types
   styles/global.css     Tailwind import + @theme design tokens
 public/

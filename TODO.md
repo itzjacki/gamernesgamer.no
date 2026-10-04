@@ -33,6 +33,9 @@ social hub — the site produces artifacts that feed into it.
   mechanics live in `src/data/sesong/<NN>/power-ups.ts`; decoded per-game
   points/placements in `working-docs/game-placements.md`. Normalization likely works off
   placement (comparable across seasons) rather than raw points.
+  Options analysis + recommendation (A: fixed placement scale, C: avg finish)
+  with worked S1/S2 examples: `working-docs/cross-season-normalization.md` —
+  awaiting Jakob's call on the sub-decisions there.
 - **Editorial appetite:** Several "monument" features (season recaps, "how it went down"
   blocks, Skattkammeret lore content) require written content from Jakob. Scope of these
   features depends on how much curation is realistic.
@@ -60,7 +63,7 @@ See `design.md` for the full system.
 
 Set up Supabase (Postgres + auth) and build the custom admin panel. This is the
 prerequisite for all results-based features. Format modeling is decided (see Open
-questions); settle the modeling *depth* before finalizing the schema.
+questions); settle the modeling _depth_ before finalizing the schema.
 
 **Scope:**
 
@@ -86,7 +89,7 @@ questions); settle the modeling *depth* before finalizing the schema.
 **Follow-ups before the next migration:**
 
 - [ ] Link the CLI to the remote project (`supabase login` + `supabase link
-      --project-ref <ref>`) so `supabase db push` becomes the apply path and we
+    --project-ref <ref>`) so `supabase db push` becomes the apply path and we
       stop using MCP `apply_migration` (which caused migration-version drift on
       the initial schema — see tech.md "One apply path per migration").
 
