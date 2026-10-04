@@ -1,19 +1,15 @@
 # PER-GAME POINTS & PLACEMENTS
 
-STATUS: verified source of truth as of 2026-10-02. Totals reconcile to the
-season overall sheets; every game has unique placements 1st-4th (ties resolved).
-Jakob fact-checked and manually corrected. Points sourced from the season
-overall/poeng sheets; placements decoded against the base ladder with power-ups
-undone. Companion file: game-formats.md (how each game is structured + DB model).
+**Secondary reference — the Supabase DB is the source of truth.** These numbers
+are seeded into `supabase/seed.sql` (S1–S4) and live in the database; this file
+is kept for provenance and quick human reading. If they disagree, the DB wins.
+Companion: `game-formats.md` (how each game is structured + DB model). Raw CSVs:
+`working-docs/result-spreadsheets/`.
 
-Points = cell from the season overall/poeng sheet.
-Placement = finishing order, decoded against the base ladder (power-ups undone).
+Points = cell from the season overall/poeng sheet. Placement = finishing order,
+decoded against the base ladder with power-ups undone.
 
-SEED STATUS 2026-10-04: All four seasons (S1–S4) are seeded into
-supabase/seed.sql and reconcile to these numbers on the local stack.
-
-Base ladder S2: 1st=7 2nd=4 3rd=2 4th=1
-S3/S4: 1st=8 2nd=5 3rd=3 4th=1
+Base ladder: S1 4/3/2/1 · S2 7/4/2/1 · S3 & S4 8/5/3/1 (1st/2nd/3rd/4th).
 
 Columns: Jakob / Jørgen / Tobias / William (points, then placement)
 

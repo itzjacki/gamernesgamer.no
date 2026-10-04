@@ -13,7 +13,7 @@ The job has three phases: **verify**, **write**, **reconcile**. Do not write SQL
 
 Three sources must agree before anything is seeded. When they disagree, stop and ask the user — do not guess:
 
-1. **The CSVs** — `.temp/spreadsheets/season <N>/*.csv`. The raw per-game sheets plus an "Overall poeng" sheet. This is the ground truth for the numbers.
+1. **The CSVs** — `working-docs/result-spreadsheets/season <N>/*.csv`. The raw per-game sheets plus an "Overall poeng" sheet. This is the ground truth for the numbers.
 2. **`working-docs/game-formats.md`** — how each game is structured (stage pipeline, rounds vs H2H, aggregation). Per-game status keys: `[ok]` present, `[!]` quirk, `[--]` internal detail missing.
 3. **`working-docs/game-placements.md`** — verified final points and placements per player per game, already fact-checked. Column order is **Jakob / Jørgen / Tobias / William** — the per-game CSV matrices use the same order, but confirm it each time rather than assuming.
 
@@ -61,9 +61,10 @@ Never hardcode UUIDs. Resolve ids via `returning ... into` locals (season, seaso
 
 The approved copy exception: tiebreak `note` fields are factual archive data, and the user has agreed the agent may write them (normally all site copy is human-written). Keep them factual and in Norwegian. They may never surface on the site; the point is to have them in the data.
 
-## Phase 3 — Reconcile (verify locally)
+## Phase 3 — Reconcile (verify locally), then push to prod
 
-Apply and check against the **local** stack. The MCP Supabase tools talk to the **remote** project, which is intentionally left empty until the whole multi-season run is done — so verify locally, not via MCP, and never push to prod mid-run.
+Apply and check against the **local** stack first — always verify locally (not via
+MCP, which reads the remote) before touching prod.
 
 ```
 supabase db reset        # replays all migrations + seed.sql from scratch
@@ -85,8 +86,22 @@ Run reconciliation queries and confirm every one matches the working docs before
 
 After the schema is touched (only if a verify-phase surprise forced an additive migration): regenerate the snapshot with `supabase db dump --local -f supabase/schema.sql` and re-add its `DO NOT EDIT` header. Then run `npm run build` to confirm nothing broke.
 
+### Push to prod
+
+Once local reconciles, push to the linked remote (prod already holds S1–S4; the
+seed is idempotent so re-running is safe):
+
+```
+supabase db push                               # any new/additive migrations first
+supabase db push --linked --include-seed       # re-run seed.sql against prod
+```
+
+Then verify on prod via MCP `execute_sql` (read-only): season present, derived
+totals match the Overall sheet, and `get_advisors` is clean apart from the known
+"RLS enabled, no policy" INFO.
+
 ## Scope discipline
 
 - One season per run. Do not seed ahead of the user's "it's ready."
-- Schema changes are a last resort and must be **additive** nullable columns (so no backfill, no risk to existing seeded data), authored as a hand-edited migration file created via `supabase migration new <name>` and applied with `db reset` then — only during the eventual prod push — `supabase db push`. Never apply schema via MCP `apply_migration` (it caused version drift before).
-- Do not build UI, read-layer code, or derivation logic as part of seeding. Seeding ends when the data reconciles locally.
+- Schema changes are a last resort and must be **additive** nullable columns (so no backfill, no risk to existing seeded data), authored as a hand-edited migration file created via `supabase migration new <name>` and applied with `db reset`, then `supabase db push`. Never apply schema via MCP `apply_migration` (it caused version drift before).
+- Do not build UI, read-layer code, or derivation logic as part of seeding. Seeding ends when the season reconciles locally and is pushed to prod.
