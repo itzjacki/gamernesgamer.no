@@ -5,6 +5,7 @@ import {
   s2ExpectedGamePoints,
   s2ExpectedPowerUpDeltas,
   s2ExpectedTotals,
+  s2ExpectedUses,
 } from './s2.fixtures';
 
 /**
@@ -110,6 +111,43 @@ describe('assembleSeasonView — Season 2', () => {
     expect(bySlug.jakob.points).toBe(bySlug.jakob.ladderPoints);
     expect(bySlug.tobias.powerUpDelta).toBe(0);
     expect(bySlug.tobias.points).toBe(bySlug.tobias.ladderPoints);
+  });
+
+  it('carries the per-use power-up list, with net delta === Σ of the list', () => {
+    for (const game of view.games) {
+      const expectedUses = s2ExpectedUses[game.slug] ?? {};
+      for (const row of game.results) {
+        const expected = expectedUses[row.player.slug] ?? [];
+        // The resolved per-use entries match the oracle (slug/isCurse/delta).
+        expect(row.powerUpUses, `${game.slug}/${row.player.slug} uses`).toEqual(
+          expected,
+        );
+        // Invariant: the net delta is exactly the sum of the per-use list.
+        const sum = row.powerUpUses.reduce((a, u) => a + u.pointsDelta, 0);
+        expect(sum, `${game.slug}/${row.player.slug} Σlist`).toBe(
+          row.powerUpDelta,
+        );
+      }
+    }
+  });
+
+  it('includes zero-delta power-up uses in the per-use list (Gamba Time misses)', () => {
+    const lol = view.games.find((g) => g.slug === 'league-of-legends-02')!;
+    const jakob = lol.results.find((r) => r.player.slug === 'jakob')!;
+    // The use IS listed even though it moved no points.
+    expect(jakob.powerUpUses).toHaveLength(1);
+    expect(jakob.powerUpUses[0]).toMatchObject({
+      slug: 'gamba-time',
+      pointsDelta: 0,
+    });
+    expect(jakob.powerUpDelta).toBe(0);
+  });
+
+  it('leaves the per-use list empty for cells with no power-up', () => {
+    const cf = view.games.find((g) => g.slug === 'curve-fever')!; // no uses
+    for (const row of cf.results) {
+      expect(row.powerUpUses, row.player.slug).toEqual([]);
+    }
   });
 
   it('orders games by ordinal and each game result by placement', () => {

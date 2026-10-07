@@ -100,9 +100,9 @@ your `admin_user` row via the service role, (4) reload `/admin`.
       slug)` in `src/lib/results/queries.ts`, backed by `read.ts` (publishable
       key, RLS-enforced). Note: these are read functions for Server Components
       to call directly (reads aren't Server Actions — those are for mutations),
-      per code-conventions. The layer exists but is **not yet consumed by any
-      page** — wiring it into the season/game pages IS Phase 4's "Season pages
-      (enhanced)".
+      per code-conventions. **Now consumed:** `/sesong/[sesong]/page.tsx` wires
+      `getSeasonView(n)` + `composeSeasonView` into its finished/live branch
+      (Phase 4's "Season pages (enhanced)", in progress).
 
 > Results entry (the scores-per-player-per-game form + review/edit/confirm) moved
 > to Phase 5 — it's a live-season tool, not a prerequisite for the Phase 4
@@ -136,7 +136,51 @@ blocked on cross-season normalization.
 
 ### Must-have
 
-- [ ] **Season pages (enhanced):** Final standings, points-over-games chart, power-ups display
+- [~] **Season pages (enhanced):** Largely built — `/sesong/[sesong]/page.tsx`
+      has a `finished`/`live` branch wired to `getSeasonView(n)` +
+      `composeSeasonView` (so the read layer IS now consumed by a page — the
+      "not yet consumed" note in Phase 3 is stale), with final standings
+      (`StandingsTable`), the points-over-games chart (`SeasonPointsChart`),
+      champion hero, participants, and the games grid. `upcoming` seasons keep
+      the hype poster. Remaining:
+  - [x] **Per-game points matrix (`GamePointsMatrix`).** Box-score table on the
+        finished view, placed after the chart ("the numbers behind the race").
+        Axes flipped (games as rows, players as columns) to stay narrow on
+        mobile; player columns follow standings order, cells re-keyed by
+        seasonPlayerId so columns align. Each cell shows the plain TOTAL; cells
+        with a power-up/curse are a **native-popover trigger** (HTML Popover API
+        — no JS, stays a Server Component) marked with a dotted underline, whose
+        panel breaks the total into a "Grunnpoeng" line + one line per power-up
+        with its signed delta (real U+2212 minus, no colour-coding — accent
+        stays reserved for rank-1). This replaced an earlier superscript idea
+        that made totals look inflated. Reusable later on player/records pages.
+        **Public copy is placeholder** (heading "Poeng per spill", the help
+        line, totals label "Totalt", the Grunnpoeng line, the trigger
+        aria-label) — flagged in-file, needs human Norwegian review. Positioning
+        uses CSS Anchor Positioning with the browser's centered-popover default
+        as a graceful fallback for older browsers.
+  - [x] **Power-ups surfaced on the finished view (results-integrated).** Chose
+        option (b): the results layer now carries per-cell power-up usage end to
+        end. `PowerUp` static type gained a `slug` (populated S2–S4, matching the
+        DB `power_up.slug`, unique per season); `fetch` pulls the `power_up`
+        anchors; `derive` builds a per-use list and derives the net as its sum
+        (single summation — list and net can't drift); `compose` joins the
+        static name/description by slug (fail-loud `requirePowerUp`); view-model
+        gained `PowerUpUseEntry` / composed `ComposedPowerUpUse`. Zero-delta uses
+        are included. Vitest grew to 42 tests (S2 oracle: net-unchanged, Σlist,
+        zero-delta inclusion, name-join, fail-loud). The finished view surfaces
+        power-ups two ways: per-cell effect breakdowns in the matrix popovers,
+        AND a static CATALOG section (power-ups + curses as `PowerUpCard`s,
+        everything revealed) after the games grid, matching the poster layout.
+        S1 (no power-ups) renders no catalog.
+  - [ ] **Champion hero needs manual work (not automatic).** `ChampionHero`
+        resolves a dedicated background-removed cutout at
+        `public/images/champions/<NN>.png` at build time, falling back to the
+        regular gamer portrait when absent. The cutout has to be produced by
+        hand per season (background removal); without it the hero renders the
+        plain portrait rather than the intended treatment. Track per-season
+        cutout creation as a manual step (and fold it into the "Adding a new
+        season" workflow).
 - [ ] **Player career pages (/spillere/[spiller]):** Career stats, championships, win rate. Evolved gamer card.
 - [ ] **Player index (/spillere):** All players across all seasons
 - [ ] **The Hall (/):** Reigning champion hero, championship lineage, entry points to seasons and players
@@ -144,7 +188,14 @@ blocked on cross-season normalization.
 ### Strong ideas
 
 - [ ] **Season recaps:** Editorial title + short recap per season. Gated on editorial appetite.
-- [ ] **Season superlatives:** Highest score, most dominant win, etc. per season
+- [ ] **Season superlatives:** Highest score, most dominant win, etc. per season.
+      Candidate: a "power-up impact" superlative (net power-up points gained per
+      player across the season) — the composed data already carries every
+      `powerUpUse`, so it's a pure aggregation. This is the right home for the
+      season-level power-up story (considered and rejected as a clickable matrix
+      totals-row popover — it'd just re-roll the per-game rows above and make the
+      sheet's bottom line interactive; the standings/player pages are where a
+      season rollup is new information).
 - [ ] **Champion card treatment:** Special visual variant for the season winner
 - [ ] **H2H widget on player pages:** Compact head-to-head record vs. each other player
 - [ ] **Attached media on game/season pages:** Clips, screenshots, memes in context

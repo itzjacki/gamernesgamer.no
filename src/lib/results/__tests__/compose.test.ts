@@ -70,6 +70,40 @@ describe('composeSeasonView — Season 2', () => {
       view.standings.filter((s) => s.isChampion).map((s) => s.player.slug),
     ).toEqual(['tobias']);
   });
+
+  it('joins each power-up use to its static name/description by slug', () => {
+    // Hearthstone: Jørgen used Double Up (+4), Jakob used Safety Net (+2).
+    const hs = view.games.find((g) => g.game.slug === 'hearthstone')!;
+    const jorgen = hs.results.find((r) => r.player.slug === 'jorgen')!;
+    expect(jorgen.powerUpUses).toHaveLength(1);
+    expect(jorgen.powerUpUses[0]).toMatchObject({
+      slug: 'double-up',
+      name: 'Double Up', // from src/data/sesong/02/power-ups.ts
+      pointsDelta: 4,
+    });
+    expect(jorgen.powerUpUses[0].description).toContain('Dobbelt poeng');
+
+    const jakob = hs.results.find((r) => r.player.slug === 'jakob')!;
+    expect(jakob.powerUpUses[0]).toMatchObject({
+      slug: 'safety-net',
+      name: 'Safety Net',
+      pointsDelta: 2,
+    });
+  });
+
+  it('keeps zero-delta uses in the composed list too', () => {
+    const lol = view.games.find((g) => g.game.slug === 'league-of-legends-02')!;
+    const jakob = lol.results.find((r) => r.player.slug === 'jakob')!;
+    expect(jakob.powerUpUses).toEqual([
+      {
+        slug: 'gamba-time',
+        isCurse: false,
+        pointsDelta: 0,
+        name: 'Gamba Time',
+        description: expect.stringContaining('Gjett'),
+      },
+    ]);
+  });
 });
 
 describe('composeGameView — Season 2', () => {
@@ -102,6 +136,38 @@ describe('compose — fail-loud on missing static content', () => {
     const broken = { ...assembleSeasonView(s2Bundle), seasonSlug: '99' };
     expect(() => composeSeasonView(broken)).toThrow(
       /no static season content/i,
+    );
+  });
+
+  it('throws when a power-up use slug has no static entry', () => {
+    const view = assembleSeasonView(s2Bundle);
+    // Inject a use with a slug that exists in no S2 power-ups.ts entry.
+    const broken = {
+      ...view,
+      games: view.games.map((g, i) =>
+        i === 0
+          ? {
+              ...g,
+              results: g.results.map((r, j) =>
+                j === 0
+                  ? {
+                      ...r,
+                      powerUpUses: [
+                        {
+                          slug: 'ghost-power-up',
+                          isCurse: false,
+                          pointsDelta: 1,
+                        },
+                      ],
+                    }
+                  : r,
+              ),
+            }
+          : g,
+      ),
+    };
+    expect(() => composeSeasonView(broken)).toThrow(
+      /no static power-up content/i,
     );
   });
 });

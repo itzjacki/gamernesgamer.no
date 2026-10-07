@@ -6,8 +6,9 @@ import type {
   GameSummary,
   GamePlacementRow,
 } from '../view-models';
-import { ladderByPlacement, gamePoints } from './points';
+import { ladderByPlacement, gamePoints, powerUpById } from './points';
 import { resolvePlayers, requireRef } from './players';
+import { cumulativeSeries } from './series';
 
 /**
  * PURE. Assembles view-models from a raw SeasonBundle. No IO, no async — this
@@ -26,6 +27,7 @@ function seasonSlug(seasonNumber: number): string {
 function buildGameSummaries(bundle: SeasonBundle): GameSummary[] {
   const refs = resolvePlayers(bundle.roster, bundle.players);
   const ladder = ladderByPlacement(bundle.ladder);
+  const powerUps = powerUpById(bundle.powerUps);
 
   const resultsByGame = new Map<string, typeof bundle.gameResults>();
   for (const gr of bundle.gameResults) {
@@ -45,7 +47,12 @@ function buildGameSummaries(bundle: SeasonBundle): GameSummary[] {
     .sort((a, b) => a.ordinal - b.ordinal)
     .map((game) => {
       const grs = resultsByGame.get(game.id) ?? [];
-      const points = gamePoints(grs, ladder, usesByGame.get(game.id) ?? []);
+      const points = gamePoints(
+        grs,
+        ladder,
+        usesByGame.get(game.id) ?? [],
+        powerUps,
+      );
       const pointsBySp = new Map(points.map((p) => [p.seasonPlayerId, p]));
 
       const results: GamePlacementRow[] = grs
@@ -57,6 +64,7 @@ function buildGameSummaries(bundle: SeasonBundle): GameSummary[] {
             ladderPoints: p.ladderPoints,
             powerUpDelta: p.powerUpDelta,
             points: p.points,
+            powerUpUses: p.powerUpUses,
             note: gr.note,
           };
         })
@@ -90,12 +98,15 @@ export function assembleSeasonView(bundle: SeasonBundle): SeasonView {
       note: sr.note,
     }));
 
+  const players = [...refs.values()];
+
   return {
     seasonNumber: bundle.season.number,
     seasonSlug: seasonSlug(bundle.season.number),
-    players: [...refs.values()],
+    players,
     standings,
     games,
+    series: cumulativeSeries(games, players),
   };
 }
 

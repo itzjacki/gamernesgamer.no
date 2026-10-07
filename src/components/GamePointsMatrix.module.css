@@ -1,0 +1,120 @@
+/*
+ * Native-popover power-up breakdown for GamePointsMatrix.
+ *
+ * Behaviour is 100% platform: `[popover]` + `popovertarget` give toggle,
+ * light-dismiss, and Escape with no JS, so the component stays a Server
+ * Component. Positioning uses CSS Anchor Positioning where supported and
+ * degrades to the browser's default centered top-layer popover otherwise —
+ * both are fully usable. Popovers render in the top layer, so the table's
+ * horizontal overflow cannot clip them.
+ *
+ * Tokens come from src/styles/global.css @theme (referenced as CSS custom
+ * properties). No raw hex. No shadow, no radius — VERKSTED surface language.
+ */
+
+.trigger {
+  /* The number itself is the hit target; keep it inline + mono via the cell. */
+  position: relative;
+  display: inline-block;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+/* Expand the touch/click target to >=44px without growing the dense cell. */
+.trigger::after {
+  content: '';
+  position: absolute;
+  inset: 50% 50% 50% 50%;
+  min-width: 44px;
+  min-height: 44px;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* The "there's a breakdown here" affordance: a hairline dotted underline. */
+.affordance {
+  text-decoration: underline dotted var(--color-text-muted);
+  text-underline-offset: 3px;
+}
+
+/* ---- Popover panel ---------------------------------------------------- */
+
+.popover {
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  /* Fallback (no anchor-positioning support): centered in the viewport. */
+  position: fixed;
+  inset: 0;
+  width: max-content;
+  max-width: min(16rem, calc(100vw - 2rem));
+  height: max-content;
+  margin: auto;
+}
+
+.lines {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.line:last-child {
+  border-bottom: 0;
+}
+
+.lineName {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+}
+
+.lineDelta {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+}
+
+/*
+ * Anchored placement where supported. Each cell passes a unique anchor name via
+ * the inline `--anchor` custom property on the trigger; the popover reads the
+ * matching name via `--anchor` too (bridged inline). We feature-detect with
+ * `anchor-name` so unsupported browsers keep the centered fallback above.
+ */
+@supports (anchor-name: --x) {
+  .trigger {
+    anchor-name: var(--anchor);
+  }
+
+  .popover {
+    position: absolute;
+    inset: auto;
+    margin: 0;
+    position-anchor: var(--anchor);
+    position-area: block-end span-inline-end;
+    position-try-fallbacks:
+      block-start span-inline-end,
+      block-end span-inline-start,
+      block-start span-inline-start;
+  }
+}

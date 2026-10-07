@@ -1,4 +1,10 @@
-import type { SeasonLadderRow, GameResultRow, PowerUpUseRow } from '../raw';
+import type {
+  SeasonLadderRow,
+  GameResultRow,
+  PowerUpRow,
+  PowerUpUseRow,
+} from '../raw';
+import type { PowerUpUseEntry } from '../view-models';
 
 /**
  * PURE. No IO, no Supabase, no async. Season-points derivation.
@@ -21,19 +27,67 @@ export function ladderByPlacement(
   return map;
 }
 
-/**
- * Net power-up delta per affected season_player, for a single game.
- * Returns a Map keyed by affected_season_player_id. Players with no power-up
- * effect are absent (callers default to 0).
- */
-export function powerUpDeltaByPlayer(
-  powerUpUsesForGame: PowerUpUseRow[],
-): Map<string, number> {
-  const map = new Map<string, number>();
-  for (const use of powerUpUsesForGame) {
-    const prev = map.get(use.affected_season_player_id) ?? 0;
-    map.set(use.affected_season_player_id, prev + use.points_delta);
+/** Map power_up.id → its slug + is_curse, for resolving uses to entries. */
+export function powerUpById(
+  powerUps: PowerUpRow[],
+): Map<string, { slug: string; isCurse: boolean }> {
+  const map = new Map<string, { slug: string; isCurse: boolean }>();
+  for (const pu of powerUps) {
+    map.set(pu.id, { slug: pu.slug, isCurse: pu.is_curse });
   }
+  return map;
+}
+
+/**
+ * Per-affected-player list of power-up use ENTRIES, for a single game. Each DB
+ * use row becomes one entry (incl. zero-delta uses). Entries are sorted
+ * deterministically — slug asc, then pointsDelta asc, then original order — so
+ * React keys and snapshot tests are stable. The net delta is derived from this
+ * same list by the caller, so list and net can never drift.
+ *
+ * Throws if a use references a power_up id with no anchor row (a dangling FK
+ * would silently drop archive detail — fail loud, matching gamePoints).
+ */
+export function powerUpUsesByPlayer(
+  powerUpUsesForGame: PowerUpUseRow[],
+  powerUps: Map<string, { slug: string; isCurse: boolean }>,
+): Map<string, PowerUpUseEntry[]> {
+  // Keep each entry's original DB order alongside it for a stable final sort.
+  const indexed = new Map<string, { entry: PowerUpUseEntry; i: number }[]>();
+
+  powerUpUsesForGame.forEach((use, i) => {
+    const anchor = powerUps.get(use.power_up_id);
+    if (!anchor) {
+      throw new Error(
+        `No power_up row for power_up_id ${use.power_up_id}; cannot resolve a power-up use.`,
+      );
+    }
+    const list = indexed.get(use.affected_season_player_id) ?? [];
+    list.push({
+      entry: {
+        slug: anchor.slug,
+        isCurse: anchor.isCurse,
+        pointsDelta: use.points_delta,
+      },
+      i,
+    });
+    indexed.set(use.affected_season_player_id, list);
+  });
+
+  // Deterministic order: slug asc, then pointsDelta asc, then original DB order.
+  const map = new Map<string, PowerUpUseEntry[]>();
+  for (const [player, list] of indexed) {
+    const sorted = list
+      .sort(
+        (a, b) =>
+          a.entry.slug.localeCompare(b.entry.slug) ||
+          a.entry.pointsDelta - b.entry.pointsDelta ||
+          a.i - b.i,
+      )
+      .map((x) => x.entry);
+    map.set(player, sorted);
+  }
+
   return map;
 }
 
@@ -42,20 +96,26 @@ export interface GamePoints {
   placement: number;
   ladderPoints: number;
   powerUpDelta: number;
+  powerUpUses: PowerUpUseEntry[];
   points: number;
 }
 
 /**
  * Compute each player's points for one game from its game_result rows + the
- * ladder + that game's power-up uses. Throws if a placement has no ladder row
- * (a silent null here would corrupt totals — fail loud instead).
+ * ladder + that game's power-up uses (resolved against the season's power_up
+ * anchors). Throws if a placement has no ladder row (a silent null here would
+ * corrupt totals — fail loud instead).
+ *
+ * The net `powerUpDelta` is the SUM of the player's resolved use entries — the
+ * single source of the summation, so the per-use list and the net cannot drift.
  */
 export function gamePoints(
   gameResults: GameResultRow[],
   ladder: Map<number, number>,
   powerUpUsesForGame: PowerUpUseRow[],
+  powerUps: Map<string, { slug: string; isCurse: boolean }>,
 ): GamePoints[] {
-  const deltas = powerUpDeltaByPlayer(powerUpUsesForGame);
+  const usesByPlayer = powerUpUsesByPlayer(powerUpUsesForGame, powerUps);
 
   return gameResults.map((gr) => {
     const ladderPoints = ladder.get(gr.placement);
@@ -64,12 +124,14 @@ export function gamePoints(
         `No season_ladder row for placement ${gr.placement}; cannot derive points.`,
       );
     }
-    const powerUpDelta = deltas.get(gr.season_player_id) ?? 0;
+    const powerUpUses = usesByPlayer.get(gr.season_player_id) ?? [];
+    const powerUpDelta = powerUpUses.reduce((sum, u) => sum + u.pointsDelta, 0);
     return {
       seasonPlayerId: gr.season_player_id,
       placement: gr.placement,
       ladderPoints,
       powerUpDelta,
+      powerUpUses,
       points: ladderPoints + powerUpDelta,
     };
   });

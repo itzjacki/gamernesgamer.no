@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { seasonData, currentSeason, type Season } from '@/data/sesong';
+import { seasonData, type Season } from '@/data/sesong';
 
 export default function SeasonHeader() {
   const seasons = Object.keys(seasonData) as Season[];
@@ -11,7 +11,7 @@ export default function SeasonHeader() {
           {seasons.map((season) => (
             <li key={season} className='-mr-px'>
               <Link
-                href={season === currentSeason ? '/' : `/sesong/${season}`}
+                href={`/sesong/${season}`}
                 className='border-border-accent bg-bg text-text-muted hover:border-accent hover:text-accent focus-visible:outline-accent relative block w-[121px] border px-4 py-2 text-center font-mono text-xs tracking-widest uppercase focus-visible:outline-2 focus-visible:outline-offset-2 hover:z-10'
               >
                 Sesong {Number(season)}
