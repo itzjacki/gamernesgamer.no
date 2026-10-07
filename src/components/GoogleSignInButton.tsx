@@ -36,9 +36,7 @@ function GoogleG() {
 }
 
 interface Props {
-  /** PLACEHOLDER label slot — Google-approved string, chosen by a human. */
   label: string;
-  /** PLACEHOLDER label shown while redirecting to Google. */
   pendingLabel: string;
 }
 

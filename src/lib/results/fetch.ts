@@ -35,33 +35,42 @@ export async function fetchSeasonBundle(
 
   const seasonId = season.id;
 
-  const [roster, ladder, games, gameResults, powerUpUses, seasonResults] =
-    await Promise.all([
-      supabase.from('season_player').select('*').eq('season_id', seasonId),
-      supabase.from('season_ladder').select('*').eq('season_id', seasonId),
-      supabase.from('game').select('*').eq('season_id', seasonId),
-      // game_result has no season_id; filter by confirmed and join via game below.
-      supabase
-        .from('game_result')
-        .select('*, game!inner(season_id)')
-        .eq('game.season_id', seasonId)
-        .eq('confirmed', true),
-      supabase
-        .from('power_up_use')
-        .select('*, game!inner(season_id)')
-        .eq('game.season_id', seasonId),
-      supabase
-        .from('season_result')
-        .select('*')
-        .eq('season_id', seasonId)
-        .eq('confirmed', true),
-    ]);
+  const [
+    roster,
+    ladder,
+    games,
+    gameResults,
+    powerUps,
+    powerUpUses,
+    seasonResults,
+  ] = await Promise.all([
+    supabase.from('season_player').select('*').eq('season_id', seasonId),
+    supabase.from('season_ladder').select('*').eq('season_id', seasonId),
+    supabase.from('game').select('*').eq('season_id', seasonId),
+    // game_result has no season_id; filter by confirmed and join via game below.
+    supabase
+      .from('game_result')
+      .select('*, game!inner(season_id)')
+      .eq('game.season_id', seasonId)
+      .eq('confirmed', true),
+    supabase.from('power_up').select('*').eq('season_id', seasonId),
+    supabase
+      .from('power_up_use')
+      .select('*, game!inner(season_id)')
+      .eq('game.season_id', seasonId),
+    supabase
+      .from('season_result')
+      .select('*')
+      .eq('season_id', seasonId)
+      .eq('confirmed', true),
+  ]);
 
   for (const res of [
     roster,
     ladder,
     games,
     gameResults,
+    powerUps,
     powerUpUses,
     seasonResults,
   ]) {
@@ -89,6 +98,7 @@ export async function fetchSeasonBundle(
     gameResults: stripJoin(
       gameResults.data ?? [],
     ) as SeasonBundle['gameResults'],
+    powerUps: powerUps.data ?? [],
     powerUpUses: stripJoin(
       powerUpUses.data ?? [],
     ) as SeasonBundle['powerUpUses'],

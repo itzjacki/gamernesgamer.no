@@ -25,8 +25,7 @@ export default async function AdminLoginPage({ searchParams }: Props) {
         <h1 className='text-text mt-2 text-2xl font-extrabold'>Logg inn</h1>
 
         <p className='text-text-muted mt-3 text-sm leading-relaxed'>
-          Administrasjonspanelet for Gamernes Gamer. Logg inn med Google for å
-          fortsette.
+          Administrasjonspanelet for Gamernes Gamer. Logg inn for å fortsette.
         </p>
 
         {error ? (
@@ -47,10 +46,6 @@ export default async function AdminLoginPage({ searchParams }: Props) {
             pendingLabel='Sender deg til Google …'
           />
         </form>
-
-        <p className='text-text-muted mt-4 font-mono text-xs'>
-          Kun for inviterte administratorer.
-        </p>
       </Panel>
     </section>
   );

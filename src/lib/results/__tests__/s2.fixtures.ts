@@ -118,6 +118,29 @@ export const s2Bundle: SeasonBundle = {
     { season_id: SEASON_ID, placement: 3, points: 2 },
     { season_id: SEASON_ID, placement: 4, points: 1 },
   ],
+  powerUps: [
+    {
+      id: PU.doubleUp,
+      season_id: SEASON_ID,
+      slug: 'double-up',
+      is_curse: false,
+      can_target_others: false,
+    },
+    {
+      id: PU.safetyNet,
+      season_id: SEASON_ID,
+      slug: 'safety-net',
+      is_curse: false,
+      can_target_others: false,
+    },
+    {
+      id: PU.gambaTime,
+      season_id: SEASON_ID,
+      slug: 'gamba-time',
+      is_curse: false,
+      can_target_others: false,
+    },
+  ],
   games: [
     {
       id: G.hearthstone,
@@ -337,3 +360,40 @@ export const s2ExpectedTotals = {
   tobias: 39,
   william: 30,
 } as const;
+
+/**
+ * Expected per-cell power-up USE lists (slug + delta), for the new per-use
+ * breakdown. Only cells with at least one use are listed; every other cell has
+ * an empty list. Slugs match the static power-up content (double-up etc.).
+ * Deterministic order: slug asc, then delta asc, then DB order — the one cell
+ * with two uses (none in S2; all S2 cells have a single use) would follow it.
+ */
+export const s2ExpectedUses: Record<
+  string,
+  Record<string, { slug: string; isCurse: boolean; pointsDelta: number }[]>
+> = {
+  hearthstone: {
+    jorgen: [{ slug: 'double-up', isCurse: false, pointsDelta: 4 }],
+    jakob: [{ slug: 'safety-net', isCurse: false, pointsDelta: 2 }],
+  },
+  'warcraft-3': {
+    tobias: [{ slug: 'safety-net', isCurse: false, pointsDelta: 1 }],
+  },
+  poker: {
+    william: [{ slug: 'gamba-time', isCurse: false, pointsDelta: 0 }],
+  },
+  wreckfest: {
+    jakob: [{ slug: 'double-up', isCurse: false, pointsDelta: 4 }],
+    william: [{ slug: 'double-up', isCurse: false, pointsDelta: 2 }],
+    jorgen: [{ slug: 'safety-net', isCurse: false, pointsDelta: 2 }],
+  },
+  'total-war-empire': {
+    tobias: [{ slug: 'double-up', isCurse: false, pointsDelta: 4 }],
+    william: [{ slug: 'safety-net', isCurse: false, pointsDelta: 2 }],
+    jorgen: [{ slug: 'gamba-time', isCurse: false, pointsDelta: 0 }],
+  },
+  'league-of-legends-02': {
+    jakob: [{ slug: 'gamba-time', isCurse: false, pointsDelta: 0 }],
+    tobias: [{ slug: 'gamba-time', isCurse: false, pointsDelta: 0 }],
+  },
+};

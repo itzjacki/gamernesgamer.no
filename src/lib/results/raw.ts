@@ -10,6 +10,7 @@ export type PlayerRow = Tables<'player'>;
 export type SeasonLadderRow = Tables<'season_ladder'>;
 export type GameRow = Tables<'game'>;
 export type GameResultRow = Tables<'game_result'>;
+export type PowerUpRow = Tables<'power_up'>;
 export type PowerUpUseRow = Tables<'power_up_use'>;
 
 /**
@@ -28,6 +29,8 @@ export interface SeasonBundle {
   ladder: SeasonLadderRow[];
   games: GameRow[];
   gameResults: GameResultRow[];
+  /** Power-up anchors for the season — slug + is_curse live here, not on uses. */
+  powerUps: PowerUpRow[];
   powerUpUses: PowerUpUseRow[];
   seasonResults: Tables<'season_result'>[];
 }

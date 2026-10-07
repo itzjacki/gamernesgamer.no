@@ -208,6 +208,7 @@ export const s1Bundle: SeasonBundle = {
       { sp: SP.jorgen, placement: 4 },
     ]),
   ],
+  powerUps: [],
   powerUpUses: [],
   seasonResults: [
     {
