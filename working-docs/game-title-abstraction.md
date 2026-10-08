@@ -20,7 +20,7 @@ single season's appearance — so it has nowhere clean to live today.
 
 Three levels. Naming chosen deliberately (`title`, not `franchise`/`series`):
 `series` collides with the H2H `series_len`/bo3 concept; `franchise` overclaims
-(LoL S2 vs S4 is the *same* game, not a franchise).
+(LoL S2 vs S4 is the _same_ game, not a franchise).
 
 - **`title`** (NEW, stable identity) — the canonical game. One row per real game:
   `league-of-legends`, `counter-strike` (both CS:GO and CS2 point here),

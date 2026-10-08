@@ -12,7 +12,7 @@ export default function SeasonHeader() {
             <li key={season} className='-mr-px'>
               <Link
                 href={`/sesong/${season}`}
-                className='border-border-accent bg-bg text-text-muted hover:border-accent hover:text-accent focus-visible:outline-accent relative block w-[121px] border px-4 py-2 text-center font-mono text-xs tracking-widest uppercase focus-visible:outline-2 focus-visible:outline-offset-2 hover:z-10'
+                className='border-border-accent bg-bg text-text-muted hover:border-accent hover:text-accent focus-visible:outline-accent relative block w-[121px] border px-4 py-2 text-center font-mono text-xs tracking-widest uppercase hover:z-10 focus-visible:outline-2 focus-visible:outline-offset-2'
               >
                 Sesong {Number(season)}
               </Link>
