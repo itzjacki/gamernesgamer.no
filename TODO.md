@@ -107,7 +107,7 @@ your `admin_user` row via the service role, (4) reload `/admin`.
         `DbOverview.tsx` on the dashboard (a `<dl>`, not a result browser).
 - [x] Server actions for reading results data (used by public pages) — the
       read layer is built + unit-tested: `getSeasonView(n)` / `getGameView(n,
-  slug)` in `src/lib/results/queries.ts`, backed by `read.ts` (publishable
+slug)` in `src/lib/results/queries.ts`, backed by `read.ts` (publishable
       key, RLS-enforced). Note: these are read functions for Server Components
       to call directly (reads aren't Server Actions — those are for mutations),
       per code-conventions. **Now consumed:** `/sesong/[sesong]/page.tsx` wires
@@ -240,7 +240,6 @@ build it once, pure + tested.
       else falls back to the latest card art. All public copy is `TODO(copy)`
       placeholder for human Norwegian (incl. the "Alle spillere" back-link label).
       Remaining (all deferred/blocked, do NOT block /records):
-  - [ ] **Human copy pass** (Jakob) — all public strings are placeholder.
   - [ ] **Dedicated hero portraits** (Jakob) — `public/images/heroes/<slug>.png`;
         falls back to card art until then. Deferred by decision.
   - [ ] **Career-stat OG card** — DEFERRED until hero portraits exist, since the

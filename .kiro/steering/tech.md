@@ -18,8 +18,8 @@
 ## Reading results data
 
 - The read layer lives in `src/lib/` (see structure.md). Public pages call
-  `getSeasonView(n)` / `getGameView(n, slug)` from `src/lib/results/queries` —
-  Server Components only; never a client component.
+  `getSeasonView(n)` / `getGameView(n, slug)` / `getCareerView(slug)` from
+  `src/lib/results/queries` — Server Components only; never a client component.
 - **Clients** (`src/lib/supabase/`): `read.ts` is the public result-read client —
   server-only, no cookies, **publishable key** under RLS. Public-read policies
   are live (structural tables world-readable; `game_result`/`season_result`
@@ -40,14 +40,17 @@
 
 ## Testing
 
-- **Vitest covers the pure results layer** — the derivation (`src/lib/results/derive/**`)
-  and the compose seam (`compose.ts`), via `src/lib/results/__tests__/`. That
-  code is silent arithmetic `next build` can't catch (points, standings,
-  aggregation, power-up deltas) plus the DB↔static-content join; Seasons 1 and 2
-  provide verified oracle numbers (S2 adds power-ups and a point-tie resolved by
-  season_result). The IO layer (`fetch.ts`, `queries.ts`) and Supabase clients
-  are NOT unit-tested — `next build` stays their gate. Config: `vitest.config.mts`,
-  include glob scoped so tests can't drift into needing a DB or browser.
+- **Vitest covers the pure results layer** — the derivation (`src/lib/results/derive/**`,
+  including the cross-season `derive/career/**`) and the compose seam
+  (`compose.ts`), via `src/lib/results/__tests__/`. That code is silent arithmetic
+  `next build` can't catch (points, standings, aggregation, power-up deltas,
+  career avg-placement / closeness tiebreak / trophy ordering) plus the
+  DB↔static-content join; Seasons 1 and 2 provide verified oracle numbers (S2 adds
+  power-ups and a point-tie resolved by season_result). The career tests assemble
+  over the S1+S2 bundles and read the per-season assembler's authoritative output.
+  The IO layer (`fetch.ts`, `queries.ts`) and Supabase clients are NOT unit-tested
+  — `next build` stays their gate. Config: `vitest.config.mts`, include glob scoped
+  so tests can't drift into needing a DB or browser.
 
 ## Constraints
 
@@ -114,7 +117,7 @@ could expose or hide rows, or anything that can break the running app. When in
 doubt, treat it as destructive and ask.
 
 Ordering note: there is no "deploy app before DB" rule. Additive schema is
-normally applied *first*, then the app code that uses it is deployed — the
+normally applied _first_, then the app code that uses it is deployed — the
 running app simply doesn't call the new objects until it ships.
 
 ### Other

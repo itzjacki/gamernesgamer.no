@@ -44,7 +44,7 @@ Gamernes Gamer — Next.js (App Router) site on Vercel for a recurring friends g
 - You will never write real **public-facing** copy for the site. If you write
   public copy, make it clearly placeholder — it's crucial that all public-facing
   copy is written by humans, no matter how small. This rule applies ONLY to
-  public-facing surfaces. **Admin-only UI (`src/app/admin/**`) is exempt**: you
+  public-facing surfaces. **Admin-only UI (`src/app/admin/**`) is exempt\*\*: you
   may write real Norwegian copy there directly. Invisible text (a11y snippets)
   is also exempt everywhere.
 - Use subagents frequently for parallelizable or multi-step work. Prefer custom agents in `.kiro/agents/` when available.
@@ -52,15 +52,16 @@ Gamernes Gamer — Next.js (App Router) site on Vercel for a recurring friends g
 
 ## Site map
 
-- `/` — Redirects to current season (The Hall — planned)
+- `/` — Redirects to current season (The Hall — dropped; front-page rework planned)
 - `/sesong/[n]` — Season detail (standings, games, power-ups)
 - `/sesong/[n]/[game]` — Game detail
-- `/spillere` — Player index (planned)
-- `/spillere/[spiller]` — Player career page (planned)
+- `/spillere` — Player index (built)
+- `/spillere/[spiller]` — Player career page (built)
 - `/records` — Hall of Records (planned)
 - `/vs/[a]/[b]` — Head-to-head (planned)
 - `/lore` — Skattkammeret (planned)
-- `/admin` — Results entry (protected, planned)
+- `/admin` — Admin panel: login + dashboard + admin management (built); results
+  entry (planned, Phase 5). Protected server-side.
 
 ## See also
 
