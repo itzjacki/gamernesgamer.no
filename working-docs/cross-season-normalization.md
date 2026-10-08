@@ -26,13 +26,13 @@ constant every season (always 1–4).
      games," "most game 1st-places," genre comparisons.
 
 4. **Career metric: SUM of season placement-points.** Additive, so the career total
-   grows each season (fits the monument framing). Valid *because* every player has
+   grows each season (fits the monument framing). Valid _because_ every player has
    currently played every season (equal participation).
    - **Guardrail (YAGNI, do not build now):** if participation ever becomes unequal
      (someone joins late / skips a season), a pure sum penalizes latecomers. The
      pre-agreed fallback is to add a per-season **average** placement-points metric
-     alongside (or ahead of) the sum. Add it to the places that use totals *at that
-     point*, not before.
+     alongside (or ahead of) the sum. Add it to the places that use totals _at that
+     point_, not before.
 
 5. **Per-game scale anchors to the TOP (1st = 4) regardless of field size.** Not
    every game had 4 players (field sizes vary; games change every season). Anchoring
