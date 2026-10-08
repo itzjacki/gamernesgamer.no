@@ -10,7 +10,7 @@ export const games: Game[] = [
     shortDescription: 'Head-to-Head-turnering med decks på helt nye brukere.',
     longDescription: `
     <p>
-      Hver utøver har mulighet til å lage opptil 2 standard-deck på helt nye 
+      Hver spiller har mulighet til å lage opptil 2 standard-deck på helt nye 
       hearthstonebrukere i forberedelsene til GG. Eneste begrensning i prep-time 
       er at man ikke kan bruke deck templates fra nettet eller bruke ekte penger 
       på den brukeren sin. Deckene skal ikke reveales i forkant av turneringen. 

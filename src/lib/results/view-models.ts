@@ -7,10 +7,12 @@
  * boundary: a component never resolves a season_player.id, never sums points,
  * never re-sorts standings.
  *
- * Scope note (first slice): season standings + per-game points matrix only.
- * H2H group tables, rounds detail, brackets, and player-career shapes are
- * deliberately absent until their data/need lands.
+ * Scope: season standings + per-game points matrix (season/game views) and the
+ * cross-season player career (career views, further down). H2H group tables,
+ * rounds detail, and brackets are deliberately absent until their data/need lands.
  */
+
+import type { GamerStats } from '@/types/gamer';
 
 /**
  * A player resolved for display. Collapses season_player + player identity and
@@ -131,4 +133,131 @@ export interface GameView {
   ordinal: number;
   /** Final placement + points per player, ordered by placement. */
   results: GamePlacementRow[];
+}
+
+/* -------------------------------------------------------------------------- */
+/* Player career (cross-season)                                               */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Career view-models. Unlike the season/game views (one season), these span
+ * ALL seasons a player competed in. The pure derivation (derive/career) emits
+ * the DB-only `Career*` shapes below; compose joins static src/data/sesong
+ * (nicknames, card art, game titles) to produce the composed `*View` shapes a
+ * page consumes. Same split as the season model.
+ *
+ * Scope: ONE player's career. The all-time board (/records) will reuse the
+ * ledger + trophy COUNTS derivation across all players, but those composed,
+ * page-shaped types stay career-only until /records is a real second caller
+ * (extract-on-second-use).
+ */
+
+/** Which kind of trophy — drives both the icon and the hover label template. */
+export type TrophyKind =
+  | 'season-gold' // GG season winner (placement 1)
+  | 'season-silver' // GG season 2nd
+  | 'season-bronze' // GG season 3rd
+  | 'game-gold'; // won an individual game within a season
+
+/**
+ * One trophy on the shelf — a DB-derived fact. Carries the keys needed to
+ * render a hover label and link out; the human-facing game TITLE is joined in
+ * compose (game-gold only). Season trophies need no title join (the label is
+ * just the season number).
+ */
+export interface CareerTrophy {
+  kind: TrophyKind;
+  /** Season this was won in (1-indexed) — for the label and the season link. */
+  seasonNumber: number;
+  /** Zero-padded season slug for the season-page link (e.g. "02"). */
+  seasonSlug: string;
+  /** For game-gold only: the game slug (title joined in compose, links out). */
+  gameSlug?: string;
+}
+
+/** One season in the player's record — their final placement that season. */
+export interface CareerSeasonRow {
+  seasonNumber: number;
+  seasonSlug: string;
+  /** Authoritative final placement that season (from season_result). */
+  placement: number;
+  /** Derived total season points that season. */
+  totalPoints: number;
+  /** True when placement === 1. */
+  isChampion: boolean;
+}
+
+/** Flat career totals — the ledger readout. */
+export interface CareerLedger {
+  /** Seasons the player competed in. */
+  seasonsPlayed: number;
+  /** Mean of final season placements, raw (unrounded). Display with toFixed(1). */
+  averagePlacement: number;
+  /** Sum of every season's total points. */
+  careerPoints: number;
+  /** Best (lowest-placement; tiebreak = closeness) season's number. */
+  bestSeasonNumber: number;
+  /** Worst season's number. Equals bestSeasonNumber for a single-season player. */
+  worstSeasonNumber: number;
+}
+
+/**
+ * The DB-only career aggregate. Pure derivation output — stable keys and
+ * numbers, NO names/images/titles (those are composed). `slug`/`name` come from
+ * the cross-season player identity (player.slug/name), which the derivation
+ * resolves from the roster rows, so they're DB facts, not static content.
+ */
+export interface CareerStats {
+  slug: string;
+  name: string;
+  ledger: CareerLedger;
+  /** One row per season played, ascending by season number. */
+  seasons: CareerSeasonRow[];
+  /**
+   * Trophies, pre-sorted for display: season trophies first (by season, then
+   * gold→silver→bronze), then game-gold (by season, then game ordinal).
+   */
+  trophies: CareerTrophy[];
+}
+
+/* -------- composed (static content joined) -------- */
+
+/** A trophy with its human-facing label parts resolved (game title joined). */
+export interface CareerTrophyView extends CareerTrophy {
+  /** For game-gold: the static game title (e.g. "Trackmania"). Undefined for season trophies. */
+  gameTitle?: string;
+}
+
+/** One per-season FIFA card for the gallery, with a season plaque. */
+export interface CareerCard {
+  seasonNumber: number;
+  seasonSlug: string;
+  /** Per-season gamer content (nickname/image/stats vary per season). */
+  nickname: string;
+  imagePath: string;
+  stats?: GamerStats;
+}
+
+/** The nameplate hero. Isolated so the OG card can export this exact shape. */
+export interface CareerHero {
+  name: string;
+  /** Latest season's nickname. */
+  nickname: string;
+  /**
+   * Hero portrait. A dedicated hero image when present, else the latest card
+   * art as a fallback. `heroImageIsFallback` tells the UI/OG which it got.
+   */
+  imagePath: string;
+  heroImageIsFallback: boolean;
+}
+
+/** Everything the career page renders from. One multi-season pass produces this. */
+export interface CareerView {
+  slug: string;
+  hero: CareerHero;
+  ledger: CareerLedger;
+  seasons: CareerSeasonRow[];
+  trophies: CareerTrophyView[];
+  /** All per-season cards, ascending by season (the FUTBIN-style gallery). */
+  cards: CareerCard[];
 }

@@ -8,6 +8,10 @@ import type {
   GameView,
   GamePlacementRow,
   PlayerRef,
+  CareerStats,
+  CareerView,
+  CareerCard,
+  CareerTrophyView,
 } from './view-models';
 
 /**
@@ -225,5 +229,59 @@ export function composeGameView(view: GameView): ComposedGameView {
     game,
     ordinal: view.ordinal,
     results: composeResults(view.results, powerUps),
+  };
+}
+
+/* -------------------------------------------------------------------------- */
+/* Player career (cross-season)                                               */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Join a CareerStats (pure, DB-derived) to static src/data/sesong content:
+ *  - the FIFA-card gallery: each season's gamer nickname/image/stats (per-season),
+ *  - the hero nameplate: the LATEST season's nickname + card art (the dedicated
+ *    hero portrait, if any, is resolved separately in queries.ts via the
+ *    filesystem — compose stays pure/IO-free and sets the card-art fallback),
+ *  - game-gold trophy labels: the static game title per game slug.
+ *
+ * Fail-loud on any missing static match, same stance as the season composer:
+ * every seeded season/game must have static content.
+ */
+export function composeCareerView(stats: CareerStats): CareerView {
+  // One card per season played, ascending — resolve each season's gamer by name.
+  const cards: CareerCard[] = stats.seasons.map((row) => {
+    const content = seasonContent(row.seasonSlug);
+    const gamer = requireGamer(gamerByName(content.gamers), stats.name);
+    return {
+      seasonNumber: row.seasonNumber,
+      seasonSlug: row.seasonSlug,
+      nickname: gamer.nickname,
+      imagePath: gamer.imagePath,
+      stats: gamer.stats,
+    };
+  });
+
+  // Hero = latest season (cards are season-ascending, so the last one).
+  const latest = cards[cards.length - 1];
+
+  const trophies: CareerTrophyView[] = stats.trophies.map((t) => {
+    if (t.kind !== 'game-gold') return t;
+    const content = seasonContent(t.seasonSlug);
+    const game = requireGame(gameBySlug(content.games), t.gameSlug!);
+    return { ...t, gameTitle: game.title };
+  });
+
+  return {
+    slug: stats.slug,
+    hero: {
+      name: stats.name,
+      nickname: latest.nickname,
+      imagePath: latest.imagePath,
+      heroImageIsFallback: true, // queries.ts flips this if a hero portrait exists
+    },
+    ledger: stats.ledger,
+    seasons: stats.seasons,
+    trophies,
+    cards,
   };
 }

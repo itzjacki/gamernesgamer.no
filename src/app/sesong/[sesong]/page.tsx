@@ -234,7 +234,7 @@ function FinishedSeason({
       )}
 
       <section id='participants' className='flex flex-col gap-8'>
-        <Heading as='h2'>Utøvere</Heading>
+        <Heading as='h2'>Spillere</Heading>
         {composed.standings.some((s) => s.gamer.stats) ? (
           <ul className='grid grid-cols-1 justify-items-center gap-10 sm:grid-cols-2'>
             {composed.standings.map((s) => (
@@ -370,7 +370,7 @@ function UpcomingSeason({
       </section>
 
       <section id='participants' className='flex flex-col gap-8'>
-        <Heading as='h2'>Utøvere</Heading>
+        <Heading as='h2'>Spillere</Heading>
         {gamers.some((g) => g.stats) ? (
           <ul className='grid grid-cols-1 justify-items-center gap-10 sm:grid-cols-2'>
             {gamers.map((gamer) => (

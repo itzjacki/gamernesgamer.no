@@ -1,0 +1,111 @@
+/*
+ * Native-popover trophy shelf. Same platform mechanism as
+ * GamePointsMatrix.module.css: `[popover]` + `popovertarget` give toggle,
+ * light-dismiss, and Escape with no JS, so TrophyShelf stays a Server
+ * Component. Positioning uses CSS Anchor Positioning where supported and
+ * degrades to the browser's default centered top-layer popover otherwise.
+ *
+ * Tokens come from src/styles/global.css @theme. No raw hex, no shadow, no
+ * radius — VERKSTED surface language.
+ */
+
+.trigger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* >=44px touch target without JS. */
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.25rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: border-color 150ms;
+}
+
+.trigger:hover {
+  border-color: var(--color-accent);
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ---- Popover panel ---------------------------------------------------- */
+
+.popover {
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  /* Fallback (no anchor-positioning support): centered in the viewport. */
+  position: fixed;
+  inset: 0;
+  width: max-content;
+  max-width: min(16rem, calc(100vw - 2rem));
+  height: max-content;
+  margin: auto;
+}
+
+.label {
+  display: block;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-text);
+}
+
+/* Secondary line (game-gold season): smaller + muted, on its own line. */
+.sub {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+}
+
+.link {
+  display: block;
+  padding: 0.5rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.link:hover {
+  color: var(--color-accent);
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
+@supports (anchor-name: --x) {
+  .trigger {
+    anchor-name: var(--anchor);
+  }
+
+  .popover {
+    position: absolute;
+    inset: auto;
+    margin: 0;
+    position-anchor: var(--anchor);
+    position-area: block-end span-inline-end;
+    position-try-fallbacks:
+      block-start span-inline-end,
+      block-end span-inline-start,
+      block-start span-inline-start;
+  }
+}

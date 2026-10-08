@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { createReadClient } from '../supabase/read';
+import { seasonData } from '@/data/sesong';
 import type { SeasonBundle } from './raw';
 
 /**
@@ -104,4 +105,23 @@ export async function fetchSeasonBundle(
     ) as SeasonBundle['powerUpUses'],
     seasonResults: seasonResults.data ?? [],
   };
+}
+
+/**
+ * Fan-out: every season's bundle, fetched in parallel. The cross-season read
+ * boundary for the player career page (and later /records). Deliberately a thin
+ * loop over fetchSeasonBundle rather than a bespoke cross-season query — the
+ * dataset is a handful of seasons, pages are prerendered, and this reuses the
+ * single confirmed-filtered IO path (no second place to keep the public-read
+ * gate correct).
+ *
+ * Season numbers come from the static season catalog (seasonData keys), the one
+ * source of truth for "how many seasons exist". A null bundle (season present
+ * in static data but not yet in the DB) is dropped, so the result holds only
+ * seasons with real rows.
+ */
+export async function fetchAllSeasonBundles(): Promise<SeasonBundle[]> {
+  const seasonNumbers = Object.keys(seasonData).map(Number);
+  const bundles = await Promise.all(seasonNumbers.map(fetchSeasonBundle));
+  return bundles.filter((b): b is SeasonBundle => b !== null);
 }

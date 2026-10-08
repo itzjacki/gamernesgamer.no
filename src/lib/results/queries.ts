@@ -1,8 +1,13 @@
 import 'server-only';
 
-import { fetchSeasonBundle } from './fetch';
+import { existsSync } from 'node:fs';
+import path from 'node:path';
+import { fetchSeasonBundle, fetchAllSeasonBundles } from './fetch';
 import { assembleSeasonView, assembleGameView } from './derive';
-import type { SeasonView, GameView } from './view-models';
+import { assembleCareer } from './derive/career';
+import { composeCareerView } from './compose';
+import type { SeasonView, GameView, CareerView } from './view-models';
+import { allPlayers } from '../players/roster';
 
 /**
  * Public read API. Pages call these and nothing else in the module.
@@ -36,4 +41,47 @@ export async function getGameView(
   const bundle = await fetchSeasonBundle(seasonNumber);
   if (!bundle) return null;
   return assembleGameView(bundle, gameSlug);
+}
+
+/**
+ * All player slugs for generateStaticParams on /spillere/[spiller]. Pure static
+ * data (the cross-season roster) — no DB, so prerender param generation needs
+ * no IO. A player with a roster entry but no confirmed results yet still gets a
+ * param; getCareerView then returns null → notFound() for that page.
+ */
+export function getAllPlayerSlugs(): string[] {
+  return allPlayers().map((p) => p.slug);
+}
+
+/**
+ * The player career page's read API. Fetches every season bundle, derives the
+ * cross-season career for `slug`, and joins static content.
+ *
+ * Contract (same as getSeasonView): returns null when the slug matches no
+ * roster in any season (→ notFound()); throws on a real fetch error (→ error.tsx).
+ *
+ * The dedicated hero portrait is resolved HERE (not in compose) so compose
+ * stays pure/IO-free and unit-testable: a background-removed portrait at
+ * public/images/heroes/<slug>.png is used when present, otherwise the composer's
+ * latest-card-art fallback stands (and heroImageIsFallback stays true).
+ */
+export async function getCareerView(slug: string): Promise<CareerView | null> {
+  const bundles = await fetchAllSeasonBundles();
+  const stats = assembleCareer(bundles, slug);
+  if (!stats) return null;
+
+  const view = composeCareerView(stats);
+  return { ...view, hero: resolveHeroImage(slug, view.hero) };
+}
+
+/** Prefer a dedicated hero portrait on disk; else keep the card-art fallback. */
+function resolveHeroImage(
+  slug: string,
+  hero: CareerView['hero'],
+): CareerView['hero'] {
+  const rel = `/images/heroes/${slug}.png`;
+  const abs = path.join(process.cwd(), 'public', rel);
+  return existsSync(abs)
+    ? { ...hero, imagePath: rel, heroImageIsFallback: false }
+    : hero;
 }
