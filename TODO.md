@@ -21,7 +21,7 @@ social hub — the site produces artifacts that feed into it.
   decision: `working-docs/cross-season-normalization.md` (delete when /records + /vs
   ship). Unblocks /records and /vs.
 - **Game title abstraction + genre tags:** PLANNED. Today's `Game` is already a
-  per-season *instance*; introduce a stable **`title`** layer above it (identity +
+  per-season _instance_; introduce a stable **`title`** layer above it (identity +
   multi-valued genre tags; CS:GO ≈ CS2; LoL instances share a title) and an
   additive `titleId` on each instance. No DB schema change — static-data refactor in
   `src/data`. Genre tags are human-entered (part of data entry; Jakob seeds S1–S4
@@ -75,11 +75,11 @@ results entry) and the server actions for public reads are what's left.
       advisors clean.
 - [x] Flipped `read.ts` to the publishable key (RLS-enforced) now that public-read
       policies exist. No app code uses the secret key anymore.
-**Workflow for each step below:** consult the relevant subagents *at the start of
-that step* (not upfront) before building — e.g. `architect` for data/form
-structure, `ui-ux-designer` for the interface, `frontend-developer` for
-implementation, `code-reviewer` before finishing. Pick the agents that fit the
-step; don't pre-consult steps that aren't being worked yet.
+      **Workflow for each step below:** consult the relevant subagents _at the start of
+      that step_ (not upfront) before building — e.g. `architect` for data/form
+      structure, `ui-ux-designer` for the interface, `frontend-developer` for
+      implementation, `code-reviewer` before finishing. Pick the agents that fit the
+      step; don't pre-consult steps that aren't being worked yet.
 
 **Prerequisite (Jakob, dashboard) — Google OAuth bootstrap:** sign-in is
 Google-only (no passwords). With OAuth the admin's `auth.users` row is created
@@ -107,7 +107,7 @@ your `admin_user` row via the service role, (4) reload `/admin`.
         `DbOverview.tsx` on the dashboard (a `<dl>`, not a result browser).
 - [x] Server actions for reading results data (used by public pages) — the
       read layer is built + unit-tested: `getSeasonView(n)` / `getGameView(n,
-      slug)` in `src/lib/results/queries.ts`, backed by `read.ts` (publishable
+  slug)` in `src/lib/results/queries.ts`, backed by `read.ts` (publishable
       key, RLS-enforced). Note: these are read functions for Server Components
       to call directly (reads aren't Server Actions — those are for mutations),
       per code-conventions. **Now consumed:** `/sesong/[sesong]/page.tsx` wires
@@ -148,22 +148,24 @@ blocked on cross-season normalization.
 
 Dependency-driven, not top-to-bottom. The three sharp dependencies: a **multi-season
 fetch** (`fetch.ts` is single-season) blocks only /records + /vs; the **title/genre
-layer** blocks only the *genre* stats (not the rest of any page); the **career
+layer** blocks only the _genre_ stats (not the rest of any page); the **career
 placement-points derivation** (4/3/2/1 sum) is shared by player pages + /records —
 build it once, pure + tested.
 
 1. **Season pages** — functionally done; remaining work is Jakob's manual visual
    polish (champion-hero cutouts), which does NOT block anything below. Feature
    expansion deferred to end of Phase 4 (see item below).
-2. **Player career pages + index** — next must-have, lowest dependency (per-player
-   reads need no multi-season fetch), and where the shared career-points derivation
-   gets built. Defer the best/worst-genre stat (waits on the title layer).
+2. **Player career pages + index** — index BUILT; career pages BUILT (see
+   must-have below). The shared career derivation (`derive/career`: placement-points
+   / avg-placement / trophies, pure + unit-tested against the S1+S2 oracle) now
+   exists. Best/worst-genre stat still deferred (waits on the title layer).
 3. **Title/genre abstraction + seed S1–S4 genres** — self-contained static-data
    refactor Jakob does manually; pin the genre taxonomy first. Lights up genre stats
    for /records, /vs, and retroactively the player pages. See
    `working-docs/game-title-abstraction.md`.
-4. **Multi-season fetch** — small pure prerequisite for the two blocked pages; build
-   + unit-test standalone.
+4. **Multi-season fetch** — DONE early. Built as `fetchAllSeasonBundles()` (a thin
+   parallel fan-out over `fetchSeasonBundle`) for the career pages; /records reuses
+   it, so this is no longer a blocker there.
 5. **/records** — career leaderboard (reuses step 2's derivation) + superlative wall;
    now unblocked by steps 3 + 4.
 6. **/vs/[a]/[b]** — last; needs a product-owner refinement pass on the relational
@@ -175,14 +177,14 @@ build it once, pure + tested.
 ### Must-have
 
 - [~] **Season pages (enhanced):** Largely built — `/sesong/[sesong]/page.tsx`
-      has a `finished`/`live` branch wired to `getSeasonView(n)` +
-      `composeSeasonView` (so the read layer IS now consumed by a page — the
-      "not yet consumed" note in Phase 3 is stale), with final standings
-      (`StandingsTable`), the points-over-games chart (`SeasonPointsChart`),
-      champion hero, participants, and the games grid. `upcoming` seasons keep
-      the hype poster. **Remaining work is manual visual polish (blocked by
-      Jakob) — it does NOT block progressing to the other stats/content pages.**
-      Remaining:
+  has a `finished`/`live` branch wired to `getSeasonView(n)` +
+  `composeSeasonView` (so the read layer IS now consumed by a page — the
+  "not yet consumed" note in Phase 3 is stale), with final standings
+  (`StandingsTable`), the points-over-games chart (`SeasonPointsChart`),
+  champion hero, participants, and the games grid. `upcoming` seasons keep
+  the hype poster. **Remaining work is manual visual polish (blocked by
+  Jakob) — it does NOT block progressing to the other stats/content pages.**
+  Remaining:
   - [x] **Per-game points matrix (`GamePointsMatrix`).** Box-score table on the
         finished view, placed after the chart ("the numbers behind the race").
         Axes flipped (games as rows, players as columns) to stay narrow on
@@ -221,8 +223,61 @@ build it once, pure + tested.
         plain portrait rather than the intended treatment. Track per-season
         cutout creation as a manual step (and fold it into the "Adding a new
         season" workflow).
-- [ ] **Player career pages (/spillere/[spiller]):** Career stats, championships, win rate. Evolved gamer card. Later: best/worst genre (needs the title/genre layer).
-- [ ] **Player index (/spillere):** All players across all seasons
+- [x] **Player career pages (/spillere/[spiller]):** BUILT. Nameplate hero
+      (`PlayerHero` — accent used for every player by design, not champion-gated),
+      a Transfermarkt-style `TrophyShelf` (season gold/silver/bronze + per-game
+      golds, native-popover hover/focus labels linking out; the real GG trophy art
+      is now wired in — season tiers render the actual trophy SVG metal-tinted
+      gold/silver/bronze, game-golds keep the small on-token cup; see
+      `TrophyIcon.tsx`), a `CareerLedger` instrument-panel (avg placement as the
+      headline skill stat, career points, seasons played, best/worst season), a
+      `SeasonRecord` mono stepped readout (not a chart, by decision), a FUTBIN-style
+      `CardGallery` of all per-season FIFA cards, and a "&larr; Alle spillere" back
+      link up to the index. Trophies sort by significance (gold→silver→bronze) then
+      age. Data layer: `derive/career` (pure, 15 oracle-backed tests inc. trophy
+      ordering), `composeCareerView`, `getCareerView`/`getAllPlayerSlugs`; hero
+      portrait resolves a dedicated `public/images/heroes/<slug>.png` when present,
+      else falls back to the latest card art. All public copy is `TODO(copy)`
+      placeholder for human Norwegian (incl. the "Alle spillere" back-link label).
+      Remaining (all deferred/blocked, do NOT block /records):
+  - [ ] **Human copy pass** (Jakob) — all public strings are placeholder.
+  - [ ] **Dedicated hero portraits** (Jakob) — `public/images/heroes/<slug>.png`;
+        falls back to card art until then. Deferred by decision.
+  - [ ] **Career-stat OG card** — DEFERRED until hero portraits exist, since the
+        final hero art may change the component shape the OG card mirrors. Hero
+        shape is already OG-export-ready when we pick it up.
+  - [ ] **Best/worst genre stat** — BLOCKED on the title/genre layer.
+  - [x] **Rivaler section — CUT until /vs lands.** Was a raw `Placeholder` panel;
+        removed entirely rather than shipping a stub. Revisit as a compact H2H
+        teaser once `/vs/[a]/[b]` exists (see the H2H-widget strong idea).
+- [~] **Player index (/spillere):** BUILT (first pass). All players across all
+  seasons as a VERKSTED "entrant sheet" — one row per player (portrait plate +
+  name + latest-season nickname), whole row links to the career page, accent
+  earned on hover/focus, plus a mono `#` run-order rail and a header strip.
+  Static sheet — an on-load "arming" animation was prototyped and removed (see
+  the ambient-polish section after Phase 5). Pure static data
+  (`src/lib/players/roster.ts`: `allPlayers()` + `playerSlug()`, slug verified
+  against `seed.sql`) — no results layer, so no career stats yet. Follow-up
+  (ALL gated on the career placement-points derivation — build-order step 2,
+  shared with /records):
+  - [ ] **Career-stats columns.** The seasons-appeared column was removed (it said
+        nothing while everyone has played every season). When career stats land,
+        add the first real right-hand mono column(s) — championships / total career
+        points / win rate — back into `PlayerRoster`. `allPlayers()` already carries
+        each player's `seasons` list for reuse. This is also when accent-at-rest
+        finally earns its place (champion callouts).
+  - [ ] **Visual rework (AFTER the career-stats columns land).** The first pass is
+        deliberately basic — a plain hairline sheet. Once the rows actually carry
+        content, give it a proper visual pass: taller rows (~2–3× current height) to
+        make room for a larger player image and less trivial geometry, and a small,
+        intentional touch of accent. Deferred on purpose — hard to judge the right
+        treatment before the rows are filled out, so don't design it against today's
+        near-empty row.
+  - [ ] **Sort by average placement.** The row index number next to each name
+        currently implies a ranking it doesn't have (players are sorted
+        most-tenured, then alphabetically). Once career placements are derivable,
+        sort the sheet by **average placement** (best first) so the `#` rail
+        becomes a real all-time ranking rather than a cosmetic counter.
 - [ ] **Front page (/):** Latest-champion hero + entry points into seasons,
       players, and /records. The live-companion surface (recency); it is NOT the
       all-time career board.
@@ -248,7 +303,9 @@ build it once, pure + tested.
       sheet's bottom line interactive; the standings/player pages are where a
       season rollup is new information).
 - [ ] **Champion card treatment:** Special visual variant for the season winner
-- [ ] **H2H widget on player pages:** Compact head-to-head record vs. each other player
+- [ ] **H2H widget on player pages:** Compact head-to-head record vs. each other
+      player. This is the intended replacement for the career page's cut "Rivaler"
+      section — build it when `/vs/[a]/[b]` lands.
 - [ ] **Attached media on game/season pages:** Clips, screenshots, memes in context
 
 ### Explore later
@@ -277,6 +334,27 @@ build it once, pure + tested.
       actual live-entry workflow.
 - [ ] Review/edit submitted results; flip `confirmed` to publish
 - [ ] Admin panel supports real-time score entry during the tournament
+
+---
+
+## Ambient polish (post-Phase 5, exploratory)
+
+Low-priority visual flourishes — only worth doing once the core monument is
+complete, and only if they can be made to feel intentional rather than decorative.
+
+- [ ] **"Signal lights" tracing the angular lines.** A prototyped on-load "arming"
+      animation for the `/spillere` entrant sheet (rows resolving as a hairline
+      swept across each) was tried and **removed** — it didn't carry its weight in
+      isolation. The idea worth keeping from it: small bright "lights" that shoot
+      along the site's existing angular lines (the gamer-card diagonal, grid rules,
+      panel hairlines) as a deliberate, sparing motion motif — a timing-board /
+      instrument-panel pulse, not per-element decoration. Needs real design work to
+      fit VERKSTED: must stay monochrome-or-single-accent, honor reduced-motion, and
+      read as purposeful (e.g. one accent light on a champion row) rather than
+      ambient sparkle. Scope it as a site-wide motion language, not a one-off.
+- [ ] Do a review of spacing on the page. Currently, we have large amounts of spacing
+      between almost all sections, this should probably be changed, so spacing is used
+      more intentionally. This will also help reinforce VERKSTED.
 
 ---
 

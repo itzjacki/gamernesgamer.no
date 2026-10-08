@@ -40,7 +40,7 @@ export default function StandingsTable({ rows, pointsLabel = 'POENG' }: Props) {
       <thead>
         <tr className='border-border text-text-muted border-b font-mono text-xs tracking-widest uppercase'>
           <th className='w-16 px-4 py-3 text-center font-normal'>POS</th>
-          <th className='px-4 py-3 font-normal'>UTØVER</th>
+          <th className='px-4 py-3 font-normal'>Spiller</th>
           <th className='w-24 px-4 py-3 text-right font-normal'>
             {pointsLabel}
           </th>

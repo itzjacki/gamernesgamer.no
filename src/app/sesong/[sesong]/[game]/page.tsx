@@ -32,7 +32,7 @@ export default async function GamePage({ params }: Props) {
         href={`/sesong/${sesong}`}
         className='text-text-muted hover:text-accent focus-visible:outline-accent font-mono text-xs tracking-widest uppercase underline transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2'
       >
-        &larr; Tilbake til sesong {Number(sesong)}
+        &larr; Sesong {Number(sesong)}
       </Link>
 
       <Heading as='h1' aboveLine={`GG — Sesong ${Number(sesong)}`}>
