@@ -5,7 +5,8 @@
 ```
 src/
   app/                  Next.js App Router — pages and layouts
-    page.tsx            Redirects to current season (The Hall — planned, not yet built)
+    page.tsx            Redirects to current season. Front-page rework planned
+                        (The Hall was dropped — absorbed into /records + front page).
     layout.tsx          Root layout (head, fonts, grid background, container, nav)
     sesong/
       [sesong]/
@@ -13,15 +14,20 @@ src/
         [game]/
           page.tsx      Game detail page
     spillere/
-      page.tsx          Player index (planned)
+      page.tsx          Player index — BUILT. "Entrant sheet" of all players
+                        across all seasons (PlayerRoster); whole row links to
+                        the career page. Static roster data only (no results).
       [spiller]/
-        page.tsx        Player career page (planned)
-    records/
-      page.tsx          All-time Hall of Records (planned)
-    vs/[a]/[b]/
-      page.tsx          Head-to-head page (planned)
-    lore/
-      page.tsx          Skattkammeret (planned)
+        page.tsx        Player career page — BUILT. Back link → /spillere, then
+                        hero + trophy shelf, career ledger, season record, and
+                        card gallery. Reads getCareerView(slug); SSG via
+                        generateStaticParams() over getAllPlayerSlugs().
+    records/            All-time Hall of Records — PLANNED (dir not yet created).
+      page.tsx
+    vs/[a]/[b]/         Head-to-head page — PLANNED (dir not yet created).
+      page.tsx
+    lore/               Skattkammeret — PLANNED (dir not yet created).
+      page.tsx
     admin/               Admin panel (Google OAuth, invite-only). Live: login
                          + dashboard. Results UI planned.
       login/page.tsx     Sign-in page (ungated) — Google button, VERKSTED style.
@@ -42,23 +48,36 @@ src/
         AddAdminForm.tsx    'use client' — select a user + submit.
         RemoveAdminButton.tsx  'use client' — confirm + remove; last-admin
                          guard surfaced inline.
-        results/page.tsx Results entry form (planned — moved to Phase 5).
+        results/page.tsx Results entry form — PLANNED (Phase 5; not yet created).
     auth/
       callback/route.ts  OAuth code-exchange (exchangeCodeForSession). NOT under
                          /admin, so the proxy lets it through to finish sign-in.
-    api/og/             Vercel OG image generation (planned)
-  components/           Reusable React components (PascalCase .tsx). Primitives:
-                       Panel (bordered surface + optional eyebrow), Button
-                       (polymorphic button/a/link), StatList + StatRow (dl
-                       readout), SectionLabel, Heading. GoogleSignInButton is
-                       the one 'use client' (useFormStatus). Build primitives
-                       only when a real use exists.
+    api/og/             Vercel OG image generation — PLANNED (dir not yet created).
+  components/           Reusable React components (PascalCase .tsx).
+                       Primitives: Panel (bordered surface + optional eyebrow),
+                       Button (polymorphic button/a/link), StatList + StatRow (dl
+                       readout), SectionLabel, Heading. GoogleSignInButton is the
+                       one 'use client' (useFormStatus). Build primitives only
+                       when a real use exists.
+                       Season/game: SeasonHeader, StandingsTable,
+                       SeasonPointsChart, GamePointsMatrix (+ .module.css, native
+                       popover), GameCard, GamerCard (+ .module.css), ChampionHero,
+                       PowerUpCard, Statbar.
+                       Player career: PlayerHero, TrophyShelf (+ .module.css) +
+                       TrophyIcon (season tiers = real GG trophy SVG, metal-tinted;
+                       game-gold = small on-token cup), CareerLedger, SeasonRecord,
+                       CardGallery. Player index: PlayerRoster.
   data/sesong/
     01/ .. 04/
       gamers.ts         Gamer[] for the season
       games.ts          Game[] for the season
       power-ups.ts      PowerUp[] + curses — only when used
   lib/
+    players/
+      roster.ts         Static player roster across all seasons: allPlayers()
+                        (each player + their seasons + latest nickname/image) and
+                        playerSlug(name). Pure static data (no results layer) —
+                        drives the /spillere index. Slugs verified vs seed.sql.
     supabase/           Supabase clients + generated DB types
       read.ts           Server-only, no-cookie, publishable-key client for
                         public result reads (RLS-enforced; confirmed=true only).
@@ -67,21 +86,38 @@ src/
       proxy.ts          updateSession(): refreshes the session + gates /admin.
       database.types.ts GENERATED (supabase gen types --local). Do NOT hand-edit.
     results/            Read + derivation layer for tournament results
-      queries.ts        Public API: getSeasonView(n) / getGameView(n, slug).
-                        Server Components only. null → notFound(); throw → error.
-      fetch.ts          IO boundary — one raw per-season bundle. confirmed=true
-                        filtered here. Imports no derivation.
+      queries.ts        Public API: getSeasonView(n) / getGameView(n, slug) +
+                        getCareerView(slug) / getAllPlayerSlugs(). Server
+                        Components only. null → notFound(); throw → error. Also
+                        resolves hero portraits off the filesystem
+                        (public/images/heroes/<slug>.png) so compose stays pure.
+      fetch.ts          IO boundary. fetchSeasonBundle (one raw per-season
+                        bundle) + fetchAllSeasonBundles (thin parallel fan-out
+                        for career/records). confirmed=true filtered here. Imports
+                        no derivation.
       compose.ts        Joins DB view-models to static src/data/sesong content:
                         game by slug, player by name, season by padded slug.
+                        composeSeasonView / composeGameView / composeCareerView.
                         PURE; the one seam that imports both halves. Pages call
                         it when they need results + static content together.
       raw.ts            Raw row aliases over generated types (module-internal).
-      view-models.ts    Hand-authored camelCase shapes components consume.
-      derive/           PURE, sync, no IO — unit-tested against S1.
+      view-models.ts    Hand-authored camelCase shapes components consume
+                        (season/game views + the cross-season career views).
+      derive/           PURE, sync, no IO — unit-tested against the S1+S2 oracle.
         points.ts       ladder[placement] + Σ power-up deltas.
         players.ts      season_player.id → PlayerRef resolution.
+        series.ts       Cumulative points-over-games series (the race chart).
         index.ts        assembleSeasonView / assembleGameView.
-      __tests__/        Vitest: S1 + S2 fixtures, derivation + compose tests.
+        career/         Cross-season career derivation (shared by player pages
+                        + future /records).
+          index.ts      assembleCareer — runs the per-season assembler and reads
+                        its authoritative output (never re-derives placements).
+          ledger.ts     avg placement / career points / seasons / best-worst
+                        season (best/worst tiebreak = closeness to field max).
+          trophies.ts   season podium + per-game golds; sorted significance
+                        (gold→silver→bronze) then season age.
+      __tests__/        Vitest: S1 + S2 fixtures; derivation, series, compose,
+                        and career tests.
   types/                Shared TypeScript types
   styles/global.css     Tailwind import + @theme design tokens
   proxy.ts              Next.js Proxy (formerly middleware): refreshes the
@@ -89,7 +125,11 @@ src/
 public/
   fonts/
     neue-montreal/      Self-hosted Neue Montreal (Pangram Pangram, OFL)
-  images/               Static assets (gamers/<NN>/, game-thumbnails/<NN>/, power-ups/)
+  images/               Static assets: gamers/<NN>/, game-thumbnails/<NN>/,
+                        power-ups/, champions/<NN>.png (season-page hero cutouts),
+                        heroes/<slug>.png (player-page hero portraits), trophy.svg
+                        (the GG trophy, inlined by TrophyIcon). Champion/hero
+                        images are optional — pages fall back to card art.
 supabase/
   config.toml           Supabase CLI config (local stack, project link).
   migrations/           SOURCE OF TRUTH for the DB schema. Ordered SQL migrations
@@ -108,7 +148,9 @@ supabase/
 working-docs/           Secondary reference (the DB is the source of truth).
   game-formats.md       Data model + per-game format inventory
   game-placements.md    Verified historical points & placements (all 4 seasons)
-  cross-season-normalization.md  Open decision for /records + /vs
+  cross-season-normalization.md  Resolved decision for /records + /vs
+  game-title-abstraction.md  Planned title/genre layer above per-season games
+  records-vs-hall-directions.md  /records + /vs directions (The Hall dropped)
   result-spreadsheets/  Raw per-game CSVs per season (provenance, in git)
 ```
 
@@ -142,7 +184,12 @@ working-docs/           Secondary reference (the DB is the source of truth).
 ## Adding a new season
 
 1. Create `src/data/sesong/<NN>/` with `gamers.ts`, `games.ts` (+ `power-ups.ts` if needed).
+   Each gamer carries a `stats` block (the FIFA-card numbers) — all seasons incl.
+   S1 now have them.
 2. Add images under `public/images/gamers/<NN>/` and `public/images/game-thumbnails/<NN>/`.
+   Optional, by hand: `public/images/champions/<NN>.png` (season-page champion
+   cutout) and `public/images/heroes/<slug>.png` (player hero portraits) — pages
+   fall back to card art when absent.
 3. Seed results into Supabase.
 4. Update `currentSeason` in `src/data/sesong/index.ts` (or equivalent) to the new season.
 5. Landing page redirect and nav update automatically from `currentSeason`.
@@ -185,7 +232,7 @@ Trombone Champ: rounds group → H2H finals). Schema source of truth:
   (season_id, season_player_id, placement, note) — final placements, stored
   explicitly (not derived) because tiebreakers can override point totals.
 - Season points per game are DERIVED: `season_ladder[game_result.placement] +
-  SUM(power_up_use.points_delta)`. The ladder is season-wide (identical across all
+SUM(power_up_use.points_delta)`. The ladder is season-wide (identical across all
   games), in `season_ladder`; power-up deltas in `power_up_use`.
 - All `*_season_player_id` columns (incl. match.player_a/b) store
   `season_player.id`, NOT `player.id` — join to `player` through `season_player`.
