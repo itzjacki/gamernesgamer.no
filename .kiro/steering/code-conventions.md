@@ -1,74 +1,63 @@
+---
+inclusion: fileMatch
+fileMatchPattern: ['src/**/*.ts', 'src/**/*.tsx', 'src/**/*.css']
+---
+
 # Code Conventions
 
-## Principles
-
-- Prefer readable duplication over overly configurable generics.
-- Avoid clever code.
-
-## Formatting
-
-- Prettier (`prettier ^3`), single quotes (`singleQuote: true`), `prettier-plugin-tailwindcss`.
-- **Always run `npx prettier --write <files>` before finishing.** Part of done.
-- Quality gates: Prettier + TypeScript strict + `next build` + `npm run test`
-  (Vitest, results layer only).
+Prefer readable duplication over configurable generics. Avoid clever code.
 
 ## Components
 
-- Server Components by default. `'use client'` only for browser APIs / state / effects.
+- Server Components by default. `'use client'` only for browser APIs, state or
+  effects.
 - Reuse the shared primitives (`Panel`, `Button`, `StatList`/`StatRow`,
-  `SectionLabel`, `Heading`) instead of re-inlining surface/button/eyebrow
-  markup. Add a new primitive only when a real second use appears — not
-  speculatively.
-- Props typed with a local `interface Props` above the component:
-
-  ```tsx
-  interface Props {
-    title: string;
-    revealed: boolean;
-  }
-
-  export default function SeasonHeader({ title, revealed }: Props) { ... }
-  ```
-
-- Components representing data types (e.g. `GamerCard.tsx`) also `export` those interfaces.
-- Types not tied to one component live in `src/types/`.
-- Small rendering helpers defined inline above the return.
+  `SectionLabel`, `Heading`) instead of re-inlining surface, button or eyebrow
+  markup. Add a new primitive only when a real second use appears.
+- Type props with a local `interface Props` above the component. Components that
+  represent a data type (e.g. `GamerCard.tsx`) also export that interface. Types
+  not tied to one component live in `src/types/`.
+- Define small rendering helpers inline above the return.
 
 ## Reveal gating
 
-Hide unrevealed content with a boolean ternary, never by commenting out:
+Hide unrevealed content with a boolean ternary, never by commenting it out. Pages
+define `revealGamerCards` / `revealGames` / `revealPowerups` and pass them down:
 
 ```tsx
-const revealGames = true;
 {
   revealed ? <RealContent /> : <Placeholder />;
 } // placeholder: "?", "Mystisk spill", etc.
 ```
 
-Pages define `revealGamerCards` / `revealGames` / `revealPowerups` and pass them into cards.
+## React & Next.js
 
-## React & Next.js patterns
+- **Server Actions** for all mutations. No API routes unless Vercel OG needs one.
+- **Fetch in Server Components directly.** Add an API layer only if it
+  meaningfully simplifies things, decided at the point of need.
+- `<Suspense>` around async Server Components; `loading.tsx` and `error.tsx` at
+  the route level.
+- Dynamic routes pre-render via `generateStaticParams()`.
 
-- Prefer modern React and Next.js features over older patterns.
-- **Server Actions** for all mutations (results entry, admin operations) — no separate API routes unless Vercel OG requires it.
-- **Fetch data in Server Components directly** — no API layer in between unless it meaningfully simplifies things. Decide at the point of need, not upfront.
-- **`<Suspense>`** boundaries around async Server Components. Use `loading.tsx` for route-level skeletons.
-- **Error boundaries** (`error.tsx`) at the route level for graceful failure handling.
+## Imports & data files
 
-## Imports
-
-- `@/*` alias for all cross-directory imports: `import { games } from '@/data/sesong/04/games'`
-- Data files export named consts only: `export const games`, `export const gamers`, `export const powerUps`, `export const curses`.
-- Supabase: server client (`@/lib/supabase/server`) in Server Components/Actions. Browser client (`@/lib/supabase/client`) in `'use client'` only.
+- `@/*` alias for all cross-directory imports.
+- Data files export named consts only: `games`, `gamers`, `powerUps`, `curses`.
+- Supabase: the server client (`@/lib/supabase/server`) in Server Components and
+  Actions; the browser client (`@/lib/supabase/client`) in `'use client'` only.
 
 ## Styling
 
-- Tailwind utilities in markup. CSS Modules (`.module.css`) for the rare things utilities can't express.
-- Use design tokens from `src/styles/global.css` (`@theme`). Read it before styling — no raw hex values.
-- Mobile-first responsive design.
+- Tailwind utilities in markup; CSS Modules (`.module.css`) only for what
+  utilities can't express.
+- Use the tokens in `src/styles/global.css` (`@theme`) — no raw hex values.
+- Mobile-first.
 
-## Language & naming
+## Naming
 
-- All UI copy is Norwegian (`lang="no"`). Code identifiers mix English (types, props) and Norwegian domain terms (`sesong`, `gamers`).
-- Components: PascalCase (`GamerCard.tsx`). Data/type files: lowercase kebab-case (`power-ups.ts`).
-- Season dirs: zero-padded (`01`–`04`). Game slugs: kebab-case. Route segments: Norwegian (`sesong`, `spillere`).
+- Components: PascalCase (`GamerCard.tsx`). Data and type files: kebab-case
+  (`power-ups.ts`).
+- Season dirs are zero-padded (`01`–`04`). Game slugs are kebab-case and double
+  as data key and route segment.
+- Route segments and domain terms are Norwegian (`sesong`, `spillere`); types and
+  props are English.
