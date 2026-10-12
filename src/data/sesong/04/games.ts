@@ -4,6 +4,8 @@ export const games: Game[] = [
   {
     title: 'League of Legends',
     slug: 'league-of-legends-04',
+    titleId: 'league-of-legends',
+    formatTags: ['free-for-all'],
     thumbnailPath: '/images/game-thumbnails/4/league-of-legends-04.jpg',
     chosenBy: 'Jørgen',
     duration: '90 min',
@@ -16,6 +18,8 @@ export const games: Game[] = [
   {
     title: 'PEAK',
     slug: 'peak',
+    titleId: 'peak',
+    formatTags: ['climb', 'free-for-all'],
     thumbnailPath: '/images/game-thumbnails/4/peak.jpg',
     chosenBy: 'Jakob',
     duration: '60 min',
@@ -28,6 +32,8 @@ export const games: Game[] = [
   {
     title: 'Ratz Instagib',
     slug: 'ratz-instagib',
+    titleId: 'ratz-instagib',
+    formatTags: ['free-for-all'],
     thumbnailPath: '/images/game-thumbnails/4/ratz-instagib.jpg',
     chosenBy: 'William',
     duration: '75 min',
@@ -40,6 +46,8 @@ export const games: Game[] = [
   {
     title: 'Trombone Champ',
     slug: 'trombone-champ',
+    titleId: 'trombone-champ',
+    formatTags: ['score-attack', 'duel'],
     thumbnailPath: '/images/game-thumbnails/4/trombone-champ.jpg',
     chosenBy: 'Tobias',
     duration: '60 min',
@@ -52,6 +60,9 @@ export const games: Game[] = [
   {
     title: 'Counter-Strike 2',
     slug: 'counter-strike-2',
+    titleId: 'counter-strike',
+    formatTags: ['climb'],
+    genreTags: ['platformer'],
     thumbnailPath: '/images/game-thumbnails/4/counter-strike-2.jpg',
     chosenBy: 'William',
     duration: '75 min',
@@ -64,6 +75,8 @@ export const games: Game[] = [
   {
     title: "Garry's Mod",
     slug: 'garrys-mod',
+    titleId: 'garrys-mod',
+    formatTags: [],
     thumbnailPath: '/images/game-thumbnails/4/garrys-mod.jpg',
     chosenBy: 'Jørgen',
     duration: '60 min',
@@ -76,6 +89,8 @@ export const games: Game[] = [
   {
     title: 'FC 25',
     slug: 'fc-25',
+    titleId: 'fc-25',
+    formatTags: ['duel'],
     thumbnailPath: '/images/game-thumbnails/4/fc-25.jpg',
     chosenBy: 'Jakob',
     duration: '90 min',
@@ -88,6 +103,8 @@ export const games: Game[] = [
   {
     title: '2XKO',
     slug: '2xko',
+    titleId: '2xko',
+    formatTags: ['duel'],
     thumbnailPath: '/images/game-thumbnails/4/2xko.jpg',
     chosenBy: 'Tobias',
     duration: '90 min',

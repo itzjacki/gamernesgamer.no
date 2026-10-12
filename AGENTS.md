@@ -21,7 +21,8 @@ the event. Supabase holds the results; UI copy is Norwegian.
 - `npm run lint`
 - `npx prettier --write <files>`
 
-Before finishing: the build passes and Prettier has run on the changed files.
+Before finishing: the build passes, Prettier has run on the changed files, and
+the docs are updated (see Rules).
 
 ## Rules
 
@@ -40,7 +41,11 @@ Before finishing: the build passes and Prettier has run on the changed files.
   what may be pushed to prod without asking.
 - Use subagents for parallelizable or multi-step work; prefer the custom agents
   in `.kiro/agents/`.
-- After structural or behavioural changes, update the docs in `.kiro/steering/`.
+- **Docs follow the work, without being asked.** Whenever work is completed or
+  the project/structure changes, update the docs in the same piece of work:
+  `TODO.md` (what is built vs planned), the relevant `.kiro/steering/` files, and
+  any `working-docs/` plan the change touches. Don't ask first and don't leave it
+  as a follow-up.
 
 ## Read when relevant
 

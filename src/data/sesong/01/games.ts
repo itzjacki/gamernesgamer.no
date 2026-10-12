@@ -4,6 +4,8 @@ export const games: Game[] = [
   {
     title: 'Sjakk',
     slug: 'sjakk',
+    titleId: 'sjakk',
+    formatTags: ['duel'],
     thumbnailPath: '/images/game-thumbnails/1/sjakk.jpg',
     chosenBy: 'Tobias',
     duration: '30 min',
@@ -13,6 +15,8 @@ export const games: Game[] = [
   {
     title: 'Old School RuneScape',
     slug: 'old-school-runescape',
+    titleId: 'old-school-runescape',
+    formatTags: ['free-for-all'],
     thumbnailPath: '/images/game-thumbnails/1/old-school-runescape.jpg',
     chosenBy: 'Jakob',
     duration: '30 min',
@@ -22,6 +26,8 @@ export const games: Game[] = [
   {
     title: 'Counter-Strike: Global Offensive',
     slug: 'counter-strike-global-offensive',
+    titleId: 'counter-strike',
+    formatTags: ['duel'],
     thumbnailPath:
       '/images/game-thumbnails/1/counter-strike-global-offensive.jpg',
     chosenBy: 'William',
@@ -32,6 +38,8 @@ export const games: Game[] = [
   {
     title: 'The Elder Scrolls V: Skyrim',
     slug: 'the-elder-scrolls-v-skyrim',
+    titleId: 'the-elder-scrolls-v-skyrim',
+    formatTags: ['gold-rush'],
     thumbnailPath: '/images/game-thumbnails/1/the-elder-scrolls-v-skyrim.jpg',
     chosenBy: 'Jakob',
     duration: '60 min',
@@ -41,6 +49,8 @@ export const games: Game[] = [
   {
     title: 'Tetris',
     slug: 'tetris',
+    titleId: 'tetris',
+    formatTags: ['score-attack'],
     thumbnailPath: '/images/game-thumbnails/1/tetris.jpg',
     chosenBy: 'Jørgen',
     duration: '30 min',
@@ -50,6 +60,8 @@ export const games: Game[] = [
   {
     title: 'Pokemon Showdown!',
     slug: 'pokemon-showdown',
+    titleId: 'pokemon-showdown',
+    formatTags: ['duel'],
     thumbnailPath: '/images/game-thumbnails/1/pokemon-showdown.jpg',
     chosenBy: 'Jørgen',
     duration: '60 min',
@@ -59,6 +71,8 @@ export const games: Game[] = [
   {
     title: 'Trackmania',
     slug: 'trackmania',
+    titleId: 'trackmania',
+    formatTags: [],
     thumbnailPath: '/images/game-thumbnails/1/trackmania.jpg',
     chosenBy: 'Tobias',
     duration: '60 min',
@@ -68,6 +82,8 @@ export const games: Game[] = [
   {
     title: 'Flat Out 2',
     slug: 'flat-out-2',
+    titleId: 'flat-out-2',
+    formatTags: ['score-attack'],
     thumbnailPath: '/images/game-thumbnails/1/flat-out-2.jpg',
     chosenBy: 'William',
     duration: '45 min',

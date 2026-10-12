@@ -3,6 +3,7 @@ import type {
   SeasonView,
   CareerStats,
   CareerSeasonRow,
+  CareerGameRow,
 } from '../../view-models';
 import { assembleSeasonView } from '../index';
 import { deriveLedger } from './ledger';
@@ -32,6 +33,7 @@ export function assembleCareer(
   // Per-season rows for THIS player, plus the season-internal "closeness"
   // (player points / field-max points) used only as the best/worst tiebreak.
   const seasons: CareerSeasonRow[] = [];
+  const games: CareerGameRow[] = [];
   const closenessBySeason = new Map<number, number>();
   let name: string | null = null;
 
@@ -48,6 +50,18 @@ export function assembleCareer(
       isChampion: standing.isChampion,
     });
 
+    // Games are already ordinal-ordered by the assembler.
+    for (const g of view.games) {
+      const result = g.results.find((r) => r.player.slug === slug);
+      if (!result) continue;
+      games.push({
+        seasonNumber: view.seasonNumber,
+        seasonSlug: view.seasonSlug,
+        gameSlug: g.slug,
+        placement: result.placement,
+      });
+    }
+
     const fieldMax = Math.max(0, ...view.standings.map((s) => s.totalPoints));
     closenessBySeason.set(
       view.seasonNumber,
@@ -63,5 +77,6 @@ export function assembleCareer(
     ledger: deriveLedger(seasons, closenessBySeason),
     seasons,
     trophies: deriveTrophies(slug, views),
+    games,
   };
 }

@@ -11,8 +11,8 @@ Prefer readable duplication over configurable generics. Avoid clever code.
 
 - Server Components by default. `'use client'` only for browser APIs, state or
   effects.
-- Reuse the shared primitives (`Panel`, `Button`, `StatList`/`StatRow`,
-  `SectionLabel`, `Heading`) instead of re-inlining surface, button or eyebrow
+- Reuse the shared primitives (`Panel`, `Button`, `Checkbox`,
+  `StatList`/`StatRow`, `SectionLabel`, `Heading`) instead of re-inlining surface, button or eyebrow
   markup. Add a new primitive only when a real second use appears.
 - Type props with a local `interface Props` above the component. Components that
   represent a data type (e.g. `GamerCard.tsx`) also export that interface. Types
