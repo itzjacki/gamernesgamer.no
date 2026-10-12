@@ -26,10 +26,37 @@ export function assembleCareer(
   bundles: SeasonBundle[],
   slug: string,
 ): CareerStats | null {
-  const views: SeasonView[] = bundles
+  return careerFromViews(seasonViews(bundles), slug);
+}
+
+/**
+ * PURE. Every player's career, for the pages that compare players (/records).
+ * A player is anyone on a season roster with a final standing. Ordered by slug,
+ * only so the output is deterministic — callers rank it themselves.
+ */
+export function assembleAllCareers(bundles: SeasonBundle[]): CareerStats[] {
+  const views = seasonViews(bundles);
+  const slugs = new Set(
+    views.flatMap((view) => view.standings.map((s) => s.player.slug)),
+  );
+  return [...slugs]
+    .sort()
+    .map((slug) => careerFromViews(views, slug))
+    .filter((career) => career !== null);
+}
+
+/** Every season's assembled view, ascending by season number. */
+function seasonViews(bundles: SeasonBundle[]): SeasonView[] {
+  return bundles
     .map(assembleSeasonView)
     .sort((a, b) => a.seasonNumber - b.seasonNumber);
+}
 
+/** One player's career from already-assembled, season-ascending views. */
+function careerFromViews(
+  views: SeasonView[],
+  slug: string,
+): CareerStats | null {
   // Per-season rows for THIS player, plus the season-internal "closeness"
   // (player points / field-max points) used only as the best/worst tiebreak.
   const seasons: CareerSeasonRow[] = [];

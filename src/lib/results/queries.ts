@@ -4,9 +4,14 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fetchSeasonBundle, fetchAllSeasonBundles } from './fetch';
 import { assembleSeasonView, assembleGameView } from './derive';
-import { assembleCareer } from './derive/career';
-import { composeCareerView } from './compose';
-import type { SeasonView, GameView, CareerView } from './view-models';
+import { assembleCareer, assembleAllCareers } from './derive/career';
+import { composeCareerView, composeRecordsView } from './compose';
+import type {
+  SeasonView,
+  GameView,
+  CareerView,
+  RecordsView,
+} from './view-models';
 import { allPlayers } from '../players/roster';
 
 /**
@@ -72,6 +77,16 @@ export async function getCareerView(slug: string): Promise<CareerView | null> {
 
   const view = composeCareerView(stats);
   return { ...view, hero: resolveHeroImage(slug, view.hero) };
+}
+
+/**
+ * The /records page's read API: every season bundle, every player's career, and
+ * the records derived across them. Never null — with no confirmed results the
+ * board and every record are simply empty. Throws on a real fetch error.
+ */
+export async function getRecordsView(): Promise<RecordsView> {
+  const bundles = await fetchAllSeasonBundles();
+  return composeRecordsView(assembleAllCareers(bundles));
 }
 
 /** Prefer a dedicated hero portrait on disk; else keep the card-art fallback. */

@@ -144,9 +144,9 @@ slug)` in `src/lib/results/queries.ts`, backed by `read.ts` (publishable
 ## Phase 4 — Historical content & stats features 🚧
 
 Started. Phase 3 data is live and the shared UI primitives (`Panel`, `Button`,
-`StatList`/`StatRow`) are in place to build on. Season pages and player career
-pages are built. Next: the title/genre layer and `/records` (neither blocks the
-other — only the _genre_ records wait on the title layer).
+`StatList`/`StatRow`) are in place to build on. Season pages, player career
+pages, the title/genre layer and `/records` (first pass) are built. Next: the
+player-index follow-ups, then `/vs`.
 
 ### Build order (post-planning 2026-10-07)
 
@@ -167,13 +167,13 @@ the _genre_ stats (not the rest of any page).
    (`src/data/titles.ts`, `titleId`/`formatTags` on every instance), vocabularies
    and the tagging of all 34 games agreed with Jakob. Per-player tag stats are
    BUILT + unit-tested (`deriveTagStats`, joined in `composeCareerView`).
-   Surfaced on the career page (`TagRecord`). Remaining: /records superlatives
-   and /vs comparison. See `working-docs/game-title-abstraction.md`.
+   Surfaced on the career page (`TagRecord`) and on /records (`TagCrowns`).
+   Remaining: /vs comparison. See `working-docs/game-title-abstraction.md`.
 4. **Multi-season fetch** — DONE early. Built as `fetchAllSeasonBundles()` (a thin
    parallel fan-out over `fetchSeasonBundle`) for the career pages; /records reuses
    it, so this is no longer a blocker there.
-5. **/records** — career leaderboard (reuses step 2's derivation) + superlative wall.
-   Unblocked now (steps 2 + 4 are built); only its genre records wait on step 3.
+5. **/records** — BUILT (first pass): career board + record wall + category
+   crowns. See the must-have item below for what is left.
 6. **/vs/[a]/[b]** — last; needs a product-owner refinement pass on the relational
    stat set first (H2H W/L is the concrete starting stat).
 7. **Front page** rework — any time after /records exists to link to.
@@ -315,11 +315,43 @@ the _genre_ stats (not the rest of any page).
       career leaderboard becomes the headline board there) + the front page
       (champion hero). In a world with front page + player pages + /records, a
       separate Hall had no distinct job. See `working-docs/records-vs-hall-directions.md`.
-- [ ] **/records (Hall of Records):** All-time records + superlatives, topped by the
-      all-time career leaderboard (absorbs The Hall). Normalization RESOLVED;
-      directions + seed records in `working-docs/records-vs-hall-directions.md`.
-      No open build dependencies (multi-season fetch + career derivation are
-      built); genre records need the title/genre layer.
+- [~] **/records (Hall of Records):** BUILT (first pass), `src/app/records/`.
+  Scope and design came out of a product + design pass (2026-10-12) and
+  Jakob's decisions on it. Three parts:
+  - **Career board (`CareerBoard`)** — every player, ordered by summed season
+    placement-points (4/3/2/1), with a per-season placement strip, titles,
+    game wins and average game placement. The only accent at rest on the page
+    is the leader's position marker. The strip and the average drop out on
+    narrow screens.
+  - **Record wall (`RecordPlate`, eight plates in two groups)** — most game
+    wins, title specialist (a title played at least twice), home turf (wins
+    in own picks), away wins (wins in others' picks), longest win streak,
+    longest top-two streak (both run across season boundaries), best single
+    season (average game placement) and points ties won. Each plate: holder
+    name, the number, a scope stamp (`GG · S1–S4`), up to two runners-up, and
+    a native `<details>` with the games behind the number. Ties share the
+    plate (rank 1, 1, 3) — no hidden tiebreaks. No accent at rest, no
+    portraits. Each plate has a fragment id (`/records#beste-sesong`).
+  - **Category crowns (`TagCrowns`)** — one table, best player per tag (genre
+    and format together, `MIN_RANKED_GAMES` applied in the component).
+    Data layer: `assembleAllCareers` (derive/career), the pure
+    `derive/records/` (`deriveRecords`, unit-tested against the S1+S2 oracle),
+    `composeRecordsView`, `getRecordsView`. Decided against: roast / "worst at"
+    records (every one would name the same player), most-championships and
+    best-average as plates (they are board columns), a consolation plate for a
+    player who holds none. A game picked by a non-player (Kristin, S3) counts as
+    "away" for everyone. Remaining:
+  - [ ] **Copy.** Every label on the page is best-effort placeholder Norwegian
+        marked `TODO(copy)` (page title, section eyebrows, record names, unit
+        lines, disclosure labels, column heads) — needs Jakob's pass.
+  - [ ] **Visual review.** Checked in a browser for layout only (no overflow
+        at 375px or desktop, fonts load); not reviewed by eye for the
+        plate treatment or the flat no-accent wall.
+  - [ ] **No entry point.** Nothing links to /records yet — it arrives with
+        the front-page rework.
+  - [ ] **Deferred records:** biggest season-over-season climb (has happened
+        once), power-up impact (belongs with season superlatives), a
+        runner-up column on the crowns table.
 - [ ] **/vs/[a]/[b] (Head-to-head pages):** Relational stats (H2H W/L record, genre
       comparison, most-similar/most-different), NOT a per-game dump. Normalization
       RESOLVED; needs a product-owner refinement pass on the stat set first. See

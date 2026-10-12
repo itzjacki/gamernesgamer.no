@@ -14,8 +14,11 @@ import type {
   CareerView,
   CareerCard,
   CareerTrophyView,
+  RecordGameRow,
+  RecordsView,
 } from './view-models';
 import { deriveTagStats } from './derive/career/tags';
+import { deriveRecords } from './derive/records';
 
 /**
  * PURE. No IO, no async, no React. Joins the DB-derived view-models
@@ -318,4 +321,37 @@ export function composeCareerView(stats: CareerStats): CareerView {
       taggedGames.filter((g) => !g.result.ownPick),
     ),
   };
+}
+
+/* -------------------------------------------------------------------------- */
+/* Records (all players, cross-season)                                        */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Join every player's CareerStats to the static facts the records need — game
+ * title, the cross-season title it belongs to, its tags, and who chose it —
+ * then derive the records. Same fail-loud stance as the other composers.
+ */
+export function composeRecordsView(careers: CareerStats[]): RecordsView {
+  return deriveRecords(
+    careers.map((stats) => ({
+      player: { slug: stats.slug, name: stats.name },
+      seasons: stats.seasons,
+      games: stats.games.map((row): RecordGameRow => {
+        const content = seasonContent(row.seasonSlug);
+        const game = requireGame(gameBySlug(content.games), row.gameSlug);
+        return {
+          seasonNumber: row.seasonNumber,
+          seasonSlug: row.seasonSlug,
+          gameSlug: row.gameSlug,
+          gameTitle: game.title,
+          placement: row.placement,
+          ownPick: game.chosenBy === stats.name,
+          titleId: game.titleId,
+          titleName: titles[game.titleId].name,
+          tags: gameTags(game),
+        };
+      }),
+    })),
+  );
 }

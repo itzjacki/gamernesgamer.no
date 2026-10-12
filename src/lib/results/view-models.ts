@@ -147,10 +147,8 @@ export interface GameView {
  * (nicknames, card art, game titles) to produce the composed `*View` shapes a
  * page consumes. Same split as the season model.
  *
- * Scope: ONE player's career. The all-time board (/records) will reuse the
- * ledger + trophy COUNTS derivation across all players, but those composed,
- * page-shaped types stay career-only until /records is a real second caller
- * (extract-on-second-use).
+ * Scope: ONE player's career. The all-players shapes /records renders from are
+ * further down ("Records").
  */
 
 /** Which kind of trophy — drives both the icon and the hover label template. */
@@ -323,4 +321,125 @@ export interface CareerView {
    * people pick what they are good at, which skews the full list.
    */
   tagStatsWithoutOwnPicks: TagStat<Tag>[];
+}
+
+/* -------------------------------------------------------------------------- */
+/* Records (all players, cross-season)                                        */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Records view-models. Where a career view is ONE player across seasons, these
+ * compare ALL players. Everything normalizes off placement, never raw points
+ * (ladders differ per season). Each record is a best-first list of
+ * `RecordEntry` with shared ranks: a tie is two rank-1 entries, never a hidden
+ * tiebreak.
+ */
+
+/** A player as the records name them — the cross-season identity. */
+export interface RecordPlayer {
+  slug: string;
+  name: string;
+}
+
+/** A season a record or the board refers to. */
+export interface RecordSeason {
+  seasonNumber: number;
+  seasonSlug: string;
+}
+
+/**
+ * One game a player played, with the static facts the records need (title
+ * identity and tags). Joined in compose, so the derivation imports no static
+ * data — same arrangement as `deriveTagStats`.
+ */
+export interface RecordGameRow extends TagGameResult {
+  /** The cross-season title this instance belongs to (CS:GO and CS2 are one). */
+  titleId: string;
+  titleName: string;
+  tags: Tag[];
+}
+
+/** One player's input to the records derivation. */
+export interface RecordsPlayerInput {
+  player: RecordPlayer;
+  /** One row per season played, ascending. */
+  seasons: CareerSeasonRow[];
+  /** Every game played, ascending by season, then game ordinal (play order). */
+  games: RecordGameRow[];
+}
+
+/** One season where two players tied on points and placement split them. */
+export interface RecordTiebreak {
+  season: RecordSeason;
+  opponent: RecordPlayer;
+  /** True when this player got the better placement. */
+  won: boolean;
+}
+
+/** One player's line in a record. */
+export interface RecordEntry {
+  player: RecordPlayer;
+  /** 1-based. Entries that tie share a rank (1, 1, 3). */
+  rank: number;
+  /** The figure the record is about (a count, a streak length, an average). */
+  value: number;
+  /** The sample behind `value`, for "x of y" records and averages. */
+  outOf?: number;
+  /** The season the entry is about (best single season). */
+  season?: RecordSeason;
+  /** The title the entry is about (title specialist). */
+  title?: { id: string; name: string };
+  /** The seasons behind the entry (tiebreak record), ascending. */
+  tiebreaks?: RecordTiebreak[];
+  /** The games behind the figure, in play order. Empty when not game-based. */
+  games: TagGameResult[];
+}
+
+/** Who is best at one tag: every player's average under it, best first. */
+export interface TagCrown {
+  tag: Tag;
+  /** `value` is the average placement, `outOf` the games played under the tag. */
+  entries: RecordEntry[];
+}
+
+/** One player's line on the all-time career board. */
+export interface CareerBoardRow {
+  player: RecordPlayer;
+  /** 1-based; shared when every ordering key is equal. */
+  rank: number;
+  /** Sum of season placement-points (1st = 4 … 4th = 1). The ordering key. */
+  placementPoints: number;
+  /** Final placement per season, aligned with `RecordsView.seasons`; null = did not play. */
+  placements: (number | null)[];
+  /** Seasons won. */
+  championships: number;
+  /** Individual games won. */
+  gameWins: number;
+  /** Mean placement over every game played, raw. 0 when none. */
+  averageGamePlacement: number;
+}
+
+/** Everything the /records page renders from. */
+export interface RecordsView {
+  /** Every season with results, ascending — the scope the records cover. */
+  seasons: RecordSeason[];
+  board: CareerBoardRow[];
+  /** Games won. */
+  mostGameWins: RecordEntry[];
+  /** Each player's best season by average game placement. */
+  bestSeason: RecordEntry[];
+  /** Consecutive game wins in play order, running across seasons. */
+  longestWinStreak: RecordEntry[];
+  /** Consecutive games finishing first or second, same ordering. */
+  longestTopTwoStreak: RecordEntry[];
+  /** Wins in games the player chose; `outOf` is how many they chose. */
+  homeTurf: RecordEntry[];
+  /** Wins in games someone else chose; `outOf` is how many of those they played. */
+  awayWins: RecordEntry[];
+  /** Most wins at one title the player has played at least twice. */
+  titleSpecialist: RecordEntry[];
+  /** Points ties won; `outOf` is how many the player was part of. */
+  tiebreaks: RecordEntry[];
+  /** One crown per tag, unfiltered — the consumer applies any minimum sample. */
+  tagCrowns: TagCrown[];
 }

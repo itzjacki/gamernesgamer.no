@@ -9,6 +9,7 @@ src/
     page.tsx            Redirects to the current season.
     sesong/[sesong]/    Season page; [game]/ is the game page.
     spillere/           Player index; [spiller]/ is the career page.
+    records/            All-time career board, record wall, category crowns.
     admin/              login/ is ungated. Everything under (protected)/ sits
                         behind the allowlist gate in its layout.tsx.
     auth/callback/      OAuth code-exchange. Deliberately outside /admin.
@@ -39,20 +40,25 @@ working-docs/           Secondary reference: decisions, format inventory, raw CS
 Each file has one job; keep the boundaries.
 
 - `queries.ts` — the public API pages call: `getSeasonView(n)`,
-  `getGameView(n, slug)`, `getCareerView(slug)`, `getAllPlayerSlugs()`. Returns
-  `null` for not-found; throws on error. Also resolves hero portraits off the
-  filesystem so `compose` stays pure.
+  `getGameView(n, slug)`, `getCareerView(slug)`, `getAllPlayerSlugs()`,
+  `getRecordsView()`. Returns `null` for not-found; throws on error. Also
+  resolves hero portraits off the filesystem so `compose` stays pure.
 - `fetch.ts` — the IO boundary. `fetchSeasonBundle` and `fetchAllSeasonBundles`.
   Filters `confirmed = true`. Imports no derivation.
 - `derive/` — pure, synchronous, no IO. Unit-tested. `derive/career/` is the
   cross-season derivation shared by player pages and `/records`; it reads the
   per-season assembler's output and never re-derives placements. `derive/`
   imports no static data, so `derive/career/tags.ts` (`deriveTagStats`) takes
-  rows whose tags the caller has already resolved.
+  rows whose tags the caller has already resolved. `derive/records/` compares
+  all players (`deriveRecords`: the career board and every record on
+  `/records`), on the same terms: its game rows arrive with title, tags and
+  own-pick flag already joined. Every record is a best-first list with shared
+  ranks — a tie stays a tie.
 - `compose.ts` — pure. The one seam that joins DB view-models to static
   `src/data` content (game by slug, player by name, season by padded slug, title
   by `titleId`). It resolves each game's tags (`gameTags`) and calls
-  `deriveTagStats` to fill `CareerView.tagStats`.
+  `deriveTagStats` to fill `CareerView.tagStats`. `composeRecordsView` does the
+  same join for all players and calls `deriveRecords`.
 - `view-models.ts` — the hand-authored camelCase shapes components consume.
 - `raw.ts` — raw row aliases over the generated types. Module-internal.
 
@@ -104,7 +110,8 @@ stats or UI without a reason.
 
 Any minimum sample for ranking a tag (agreed: 3 games) belongs to the consuming
 component, not to the derivation or compose. It lives in `src/lib/tag-ranking.ts`
-(`MIN_RANKED_GAMES`, `splitRanked`), shared by `TagRecord` and `CareerLedger`.
+(`MIN_RANKED_GAMES`, `splitRanked`), shared by `TagRecord`, `CareerLedger` and
+`TagCrowns`.
 
 ## Adding a new season
 
