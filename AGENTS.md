@@ -14,7 +14,8 @@ Gamernes Gamer — Next.js (App Router) site on Vercel for a recurring friends g
 
 ## Commands
 
-- Build: `npm run build` (primary correctness check — no tests)
+- Build: `npm run build` (primary correctness check)
+- Test: `npm run test` (Vitest, results layer only — `src/lib/results/__tests__`)
 - Dev: `npm run dev`
 - Preview: `npm run start`
 - Lint: `npm run lint` (`eslint .`)
