@@ -19,6 +19,7 @@ src/
   data/tag-labels.ts    Norwegian display labels for every tag.
   lib/
     players/roster.ts   Static cross-season roster and playerSlug().
+    tag-ranking.ts      Presentation rule: which tags have enough games to rank.
     supabase/           Clients, proxy session helper, generated database.types.ts.
     results/            Results read + derivation layer (see below).
   types/                Shared types.
@@ -102,8 +103,8 @@ fails the build without a label), and the career page shows one table
 stats or UI without a reason.
 
 Any minimum sample for ranking a tag (agreed: 3 games) belongs to the consuming
-component, not to the derivation or compose — today that is `MIN_GAMES` in
-`TagRecord`.
+component, not to the derivation or compose. It lives in `src/lib/tag-ranking.ts`
+(`MIN_RANKED_GAMES`, `splitRanked`), shared by `TagRecord` and `CareerLedger`.
 
 ## Adding a new season
 

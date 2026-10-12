@@ -238,6 +238,11 @@ export interface CareerLedger {
   seasonsPlayed: number;
   /** Mean of final season placements, raw (unrounded). Display with toFixed(1). */
   averagePlacement: number;
+  /**
+   * Mean placement across every individual game played, raw (unrounded).
+   * Display with toFixed(1). 0 when no game results exist yet.
+   */
+  averageGamePlacement: number;
   /** Sum of every season's total points. */
   careerPoints: number;
   /** Best (lowest-placement; tiebreak = closeness) season's number. */
