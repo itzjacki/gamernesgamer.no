@@ -17,9 +17,9 @@ social hub — the site produces artifacts that feed into it.
 - **Cross-season point normalization:** RESOLVED. Normalize off **placement**
   (4/3/2/1), career = sum of season placement-points, two separate normalizations
   (season-level → career board; per-game → records/vs, top-anchored). No schema
-  change; needs a multi-season fetch (`fetch.ts` is single-season today). Full
-  decision: `working-docs/cross-season-normalization.md` (delete when /records + /vs
-  ship). Unblocks /records and /vs.
+  change; the multi-season fetch it needed is built (`fetchAllSeasonBundles()`).
+  Full decision: `working-docs/cross-season-normalization.md` (delete when
+  /records + /vs ship). Unblocks /records and /vs.
 - **Game title abstraction + genre tags:** PLANNED. Today's `Game` is already a
   per-season _instance_; introduce a stable **`title`** layer above it (identity +
   multi-valued genre tags; CS:GO ≈ CS2; LoL instances share a title) and an
@@ -51,11 +51,12 @@ See `design.md` for the full system.
 
 ---
 
-## Phase 3 — Backend + admin panel
+## Phase 3 — Backend + admin panel ✅
 
 Supabase (Postgres + Auth) + the custom admin panel. Prerequisite for all
-results-based features. Data, Auth, and RLS are in; the admin panel UI (login +
-results entry) and the server actions for public reads are what's left.
+results-based features. Data, Auth, RLS, the admin panel (login, admin
+management, DB overview) and the public read layer are all in. Results entry
+moved to Phase 5.
 
 **Scope:**
 
@@ -140,17 +141,17 @@ slug)` in `src/lib/results/queries.ts`, backed by `read.ts` (publishable
 ## Phase 4 — Historical content & stats features 🚧
 
 Started. Phase 3 data is live and the shared UI primitives (`Panel`, `Button`,
-`StatList`/`StatRow`) are in place to build on. First target: enhanced season
-pages (wire `getSeasonView(n)` into `/sesong/[n]`). `/records` + `/vs` stay
-blocked on cross-season normalization.
+`StatList`/`StatRow`) are in place to build on. Season pages and player career
+pages are built. Next: the title/genre layer and `/records` (neither blocks the
+other — only the _genre_ records wait on the title layer).
 
 ### Build order (post-planning 2026-10-07)
 
-Dependency-driven, not top-to-bottom. The three sharp dependencies: a **multi-season
-fetch** (`fetch.ts` is single-season) blocks only /records + /vs; the **title/genre
-layer** blocks only the _genre_ stats (not the rest of any page); the **career
-placement-points derivation** (4/3/2/1 sum) is shared by player pages + /records —
-build it once, pure + tested.
+Dependency-driven, not top-to-bottom. Of the three sharp dependencies, two are
+now built: the **multi-season fetch** (`fetchAllSeasonBundles()`) and the **career
+placement-points derivation** (`derive/career`, 4/3/2/1 sum, shared by player
+pages + /records). The one left is the **title/genre layer**, which blocks only
+the _genre_ stats (not the rest of any page).
 
 1. **Season pages** — functionally done; remaining work is Jakob's manual visual
    polish (champion-hero cutouts), which does NOT block anything below. Feature
@@ -166,8 +167,8 @@ build it once, pure + tested.
 4. **Multi-season fetch** — DONE early. Built as `fetchAllSeasonBundles()` (a thin
    parallel fan-out over `fetchSeasonBundle`) for the career pages; /records reuses
    it, so this is no longer a blocker there.
-5. **/records** — career leaderboard (reuses step 2's derivation) + superlative wall;
-   now unblocked by steps 3 + 4.
+5. **/records** — career leaderboard (reuses step 2's derivation) + superlative wall.
+   Unblocked now (steps 2 + 4 are built); only its genre records wait on step 3.
 6. **/vs/[a]/[b]** — last; needs a product-owner refinement pass on the relational
    stat set first (H2H W/L is the concrete starting stat).
 7. **Front page** rework — any time after /records exists to link to.
@@ -178,8 +179,7 @@ build it once, pure + tested.
 
 - [~] **Season pages (enhanced):** Largely built — `/sesong/[sesong]/page.tsx`
   has a `finished`/`live` branch wired to `getSeasonView(n)` +
-  `composeSeasonView` (so the read layer IS now consumed by a page — the
-  "not yet consumed" note in Phase 3 is stale), with final standings
+  `composeSeasonView`, with final standings
   (`StandingsTable`), the points-over-games chart (`SeasonPointsChart`),
   champion hero, participants, and the games grid. `upcoming` seasons keep
   the hype poster. **Remaining work is manual visual polish (blocked by
@@ -257,8 +257,8 @@ build it once, pure + tested.
   the ambient-polish section after Phase 5). Pure static data
   (`src/lib/players/roster.ts`: `allPlayers()` + `playerSlug()`, slug verified
   against `seed.sql`) — no results layer, so no career stats yet. Follow-up
-  (ALL gated on the career placement-points derivation — build-order step 2,
-  shared with /records):
+  (all UNBLOCKED — the career derivation they were gated on, `derive/career`,
+  now exists):
   - [ ] **Career-stats columns.** The seasons-appeared column was removed (it said
         nothing while everyone has played every season). When career stats land,
         add the first real right-hand mono column(s) — championships / total career
@@ -284,6 +284,15 @@ build it once, pure + tested.
       career leaderboard becomes the headline board there) + the front page
       (champion hero). In a world with front page + player pages + /records, a
       separate Hall had no distinct job. See `working-docs/records-vs-hall-directions.md`.
+- [ ] **/records (Hall of Records):** All-time records + superlatives, topped by the
+      all-time career leaderboard (absorbs The Hall). Normalization RESOLVED;
+      directions + seed records in `working-docs/records-vs-hall-directions.md`.
+      No open build dependencies (multi-season fetch + career derivation are
+      built); genre records need the title/genre layer.
+- [ ] **/vs/[a]/[b] (Head-to-head pages):** Relational stats (H2H W/L record, genre
+      comparison, most-similar/most-different), NOT a per-game dump. Normalization
+      RESOLVED; needs a product-owner refinement pass on the stat set first. See
+      `working-docs/records-vs-hall-directions.md`. Genre stats need the title/genre layer.
 - [ ] **Season pages — feature expansion (END of Phase 4):** Deliberately deferred
       until after the other stats/content pages (player pages, /records, /vs) are
       built. The season page is functionally complete now; this is the "go deeper"
@@ -309,14 +318,6 @@ build it once, pure + tested.
 
 ### Explore later
 
-- [ ] **/records (Hall of Records):** All-time records + superlatives, topped by the
-      all-time career leaderboard (absorbs The Hall). Normalization RESOLVED;
-      directions + seed records in `working-docs/records-vs-hall-directions.md`.
-      Build dependency: multi-season fetch.
-- [ ] **/vs/[a]/[b] (Head-to-head pages):** Relational stats (H2H W/L record, genre
-      comparison, most-similar/most-different), NOT a per-game dump. Normalization
-      RESOLVED; needs a product-owner refinement pass on the stat set first. See
-      `working-docs/records-vs-hall-directions.md`. Genre stats need the title/genre layer.
 - [ ] **Collectible card expansion:** Moment cards (MVP, record-breaker, "the collapse")
 - [ ] **OG/shareable images:** Champion card, podium, player stat cards via Vercel OG
 - [ ] **Skattkammeret (/lore):** Floating wall of videos, memes, lore. Scope depends on media volume.
