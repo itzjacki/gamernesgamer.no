@@ -42,6 +42,11 @@ describe('assembleCareer — Tobias (champion both seasons)', () => {
     expect(career.ledger.averagePlacement).toBe(1);
   });
 
+  it('derives average game placement over all 16 games (32 / 16)', () => {
+    // game-placements.md: S1 2,3,2,2,1,4,1,1 + S2 3,1,2,3,2,1,2,2 = 32.
+    expect(career.ledger.averageGamePlacement).toBe(2);
+  });
+
   it('awards two season-golds and five game-golds', () => {
     const kinds = career.trophies.map((t) => t.kind);
     expect(kinds.filter((k) => k === 'season-gold')).toHaveLength(2);
@@ -172,6 +177,12 @@ describe('assembleCareer — placements and tiebreak', () => {
     const jakob = assembleCareer(bundles, 'jakob')!;
     expect(jakob.ledger.averagePlacement).toBe(3);
     expect(jakob.ledger.careerPoints).toBe(52); // 20 + 32
+  });
+
+  it('derives average game placement 2.625 for Jakob (42 / 16)', () => {
+    // game-placements.md: S1 3,2,3,1,4,2,2,3 + S2 4,4,1,2,4,2,1,4 = 42.
+    const jakob = assembleCareer(bundles, 'jakob')!;
+    expect(jakob.ledger.averageGamePlacement).toBe(2.625);
   });
 
   it('awards Jørgen two season-silvers (2nd both seasons) and five game-golds', () => {

@@ -235,7 +235,8 @@ the _genre_ stats (not the rest of any page).
       is now wired in — season tiers render the actual trophy SVG metal-tinted
       gold/silver/bronze, game-golds keep the small on-token cup; see
       `TrophyIcon.tsx`), a `CareerLedger` instrument-panel (avg placement as the
-      headline skill stat, career points, seasons played, best/worst season), a
+      headline skill stat, career points, seasons played, then best/worst
+      season, best category, avg game placement — eight cells, no blanks), a
       `SeasonRecord` mono stepped readout (not a chart, by decision), a FUTBIN-style
       `CardGallery` of all per-season FIFA cards, and a "&larr; Alle spillere" back
       link up to the index. Trophies sort by significance (gold→silver→bronze) then
@@ -260,8 +261,9 @@ the _genre_ stats (not the rest of any page).
         by more games, then more wins. Each tag name is a
         native-popover trigger (same no-JS pattern as `GamePointsMatrix`)
         listing the games behind the row: title linking to the game page,
-        season and placement. The component owns the ranking cutoff
-        (`MIN_GAMES = 3`): tags below it are collapsed by default in a native
+        season and placement. The ranking cutoff is applied on the
+        consuming side (`MIN_RANKED_GAMES = 3` in `src/lib/tag-ranking.ts`,
+        shared with `CareerLedger`'s best-category cell): tags below it are collapsed by default in a native
         `<details>` ("Vis flere"), under a caption explaining they are not
         ranked. A checkbox in the frame's footer row ("Uten egne
         spillvalg", off by default; the custom VERKSTED `Checkbox` primitive) leaves out the games the player chose themselves, since

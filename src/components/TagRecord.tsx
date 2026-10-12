@@ -4,6 +4,7 @@ import SectionLabel from './SectionLabel';
 import styles from './TagRecord.module.css';
 import { tagLabels } from '@/data/tag-labels';
 import type { TagStat } from '@/lib/results/view-models';
+import { MIN_RANKED_GAMES, splitRanked } from '@/lib/tag-ranking';
 import type { Tag } from '@/types/tag';
 
 /**
@@ -13,9 +14,10 @@ import type { Tag } from '@/types/tag';
  * follow the title, which follow one season's instance), not something a reader
  * needs.
  *
- * The stats arrive unfiltered and sorted best first. This component owns the
- * ranking cutoff (owner call — not the data layer's job): a tag needs MIN_GAMES
- * games to be named best or worst. Tags below it are collapsed by default in a
+ * The stats arrive unfiltered and sorted best first. The ranking cutoff is
+ * applied here, on the consuming side (owner call — not the data layer's job):
+ * a tag needs MIN_RANKED_GAMES games (`@/lib/tag-ranking`, shared with
+ * CareerLedger) to be named best or worst. Tags below it are collapsed by default in a
  * native <details>, under a caption that states why they are not ranked.
  *
  * Each tag name is a native-popover trigger (`<button popovertarget>` +
@@ -33,8 +35,6 @@ import type { Tag } from '@/types/tag';
  * champion / rank-1 data. Shares SeasonRecord's table grammar and CareerLedger's
  * `bg-border` + `gap-px` hairline technique.
  */
-
-const MIN_GAMES = 3;
 
 interface Props {
   stats: TagStat<Tag>[];
@@ -67,8 +67,7 @@ function TagBody({
 }) {
   if (stats.length === 0) return null;
 
-  const ranked = stats.filter((s) => s.games >= MIN_GAMES);
-  const unranked = stats.filter((s) => s.games < MIN_GAMES);
+  const { ranked, unranked } = splitRanked(stats);
   const best = ranked[0];
   const worst = ranked[ranked.length - 1];
 
@@ -247,7 +246,7 @@ function TagBody({
               className={`border-border border-b px-3 py-3 text-left sm:px-4 ${eyebrowRow}`}
             >
               {/* TODO(copy): explainer — best-effort. */}
-              Under {MIN_GAMES} spill · ikke rangert
+              Under {MIN_RANKED_GAMES} spill · ikke rangert
             </caption>
             {columns}
             <thead className='sr-only'>{headRow}</thead>

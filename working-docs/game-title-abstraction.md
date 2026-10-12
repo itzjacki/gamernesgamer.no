@@ -99,7 +99,8 @@ files.
 - Placement is used raw, with no field-size adjustment (a win is a win, per
   `cross-season-normalization.md`).
 - **No minimum sample in the producers.** The consuming component decides which
-  tags have enough games to be ranked; the agreed cutoff is 3.
+  tags have enough games to be ranked; the agreed cutoff is 3
+  (`src/lib/tag-ranking.ts`, shared by `TagRecord` and `CareerLedger`).
 
 ## Remaining
 

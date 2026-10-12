@@ -48,7 +48,7 @@ export default async function PlayerCareerPage({ params }: Props) {
       </section>
 
       <section id='ledger' className='flex flex-col gap-6'>
-        <CareerLedger ledger={ledger} />
+        <CareerLedger ledger={ledger} tagStats={tagStats} />
       </section>
 
       <section id='season-record' className='flex flex-col gap-8'>

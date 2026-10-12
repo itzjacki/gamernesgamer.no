@@ -74,7 +74,7 @@ export function assembleCareer(
   return {
     slug,
     name,
-    ledger: deriveLedger(seasons, closenessBySeason),
+    ledger: deriveLedger(seasons, closenessBySeason, games),
     seasons,
     trophies: deriveTrophies(slug, views),
     games,
