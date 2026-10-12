@@ -6,13 +6,10 @@ Source of truth for steering, skills and agents is `.kiro/` (the user works most
 
 - `.claude/skills`, `.claude/agents` and `.mcp.json` are symlinks into `.kiro/`.
 
-Always-on steering:
-
-@.kiro/steering/code-conventions.md
-@.kiro/steering/tech.md
-
 Read on demand (not imported, to keep context small):
 
+- `.kiro/steering/code-conventions.md` – when making non-trivial code changes
+- `.kiro/steering/tech.md` – when making technology decisions
 - `.kiro/steering/structure.md` — before adding/moving files, routes, components, or seasons, and before DB/migration work.
 - `.kiro/steering/design.md` — before any UI or styling work.
 - `.kiro/steering/product.md` — before feature-scope or roadmap decisions.
