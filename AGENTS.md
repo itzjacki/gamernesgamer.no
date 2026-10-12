@@ -8,66 +8,46 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 <!-- END:nextjs-agent-rules -->
 
-# AGENTS.md
+# Gamernes Gamer
 
-Gamernes Gamer — Next.js (App Router) site on Vercel for a recurring friends gaming tournament. Monument and archive of seasons, players, results, and memorable moments.
+Next.js App Router site on Vercel for a recurring friends' gaming tournament: a
+permanent archive of seasons, players and results, and a live companion during
+the event. Supabase holds the results; UI copy is Norwegian.
 
 ## Commands
 
-- Build: `npm run build` (primary correctness check)
-- Test: `npm run test` (Vitest, results layer only — `src/lib/results/__tests__`)
-- Dev: `npm run dev`
-- Preview: `npm run start`
-- Lint: `npm run lint` (`eslint .`)
-- Format: `npx prettier --write <files>` (single quotes, `prettier-plugin-tailwindcss`)
+- `npm run build` — primary correctness check (TypeScript strict + Next compile)
+- `npm run test` — Vitest, pure results layer only (`src/lib/results/__tests__`)
+- `npm run lint`
+- `npx prettier --write <files>`
 
-## Stack
+Before finishing: the build passes and Prettier has run on the changed files.
 
-- **Next.js App Router** — Server Components by default, `'use client'` only when needed
-- **Tailwind CSS v4** — tokens in `src/styles/global.css` via `@theme`
-- **Supabase** — Postgres (results data) + Auth (admin allowlist). Use `@supabase/ssr`.
-  - Server client: `@/lib/supabase/server` (Server Components, Server Actions)
-  - Browser client: `@/lib/supabase/client` (`'use client'` components only)
-- **Vercel OG / Satori** — shareable image generation at `src/app/api/og/`
-- **TypeScript strict** throughout
+## Rules
 
-## Guidelines
+- **Structural changes:** propose and get approval before implementing.
+- **Public copy is human-written.** Never write real public-facing copy, however
+  small — make it obvious placeholder and flag it. Exempt: admin-only UI
+  (`src/app/admin/**`), where you write real Norwegian directly, and invisible
+  a11y text.
+- **Data split:** static content (gamers, games, power-ups) lives in
+  `src/data/sesong/<NN>/`, never in the DB. Results live in Supabase only; the DB
+  is the source of truth and `working-docs/` is secondary reference.
+- **Admin routes** (`src/app/admin/`) check the Supabase session server-side.
+  Never gate auth client-side.
+- **Database:** schema changes go through migrations. Read
+  `.kiro/steering/tech.md` before any DB work — it defines the apply path and
+  what may be pushed to prod without asking.
+- Use subagents for parallelizable or multi-step work; prefer the custom agents
+  in `.kiro/agents/`.
+- After structural or behavioural changes, update the docs in `.kiro/steering/`.
 
-- Structural changes: propose + get approval before implementing.
-- Run `npm run build` and Prettier on changed files before finishing.
-- Static content (gamers, games, power-ups) lives in `src/data/sesong/<NN>/`. Never put it in the database.
-- Results data (per-player points, finishing positions) lives in Supabase only —
-  the DB is the source of truth (S1–S4 seeded via `supabase/seed.sql`, on prod).
-  `working-docs/` (markdown + `result-spreadsheets/` CSVs) is secondary reference.
-- Admin routes (`src/app/admin/`) must check Supabase session server-side. Never client-side auth gating.
-- Use `@/*` import alias. Match existing patterns and tokens in `src/styles/global.css`.
-- UI copy is Norwegian. Roster and power-ups vary per season — treat as per-season data.
-- You will never write real **public-facing** copy for the site. If you write
-  public copy, make it clearly placeholder — it's crucial that all public-facing
-  copy is written by humans, no matter how small. This rule applies ONLY to
-  public-facing surfaces. **Admin-only UI (`src/app/admin/**`) is exempt\*\*: you
-  may write real Norwegian copy there directly. Invisible text (a11y snippets)
-  is also exempt everywhere.
-- Use subagents frequently for parallelizable or multi-step work. Prefer custom agents in `.kiro/agents/` when available.
-- Update steering docs in `.kiro/steering/` after any structural or behavioral changes to the project.
+## Read when relevant
 
-## Site map
-
-- `/` — Redirects to current season (The Hall — dropped; front-page rework planned)
-- `/sesong/[n]` — Season detail (standings, games, power-ups)
-- `/sesong/[n]/[game]` — Game detail
-- `/spillere` — Player index (built)
-- `/spillere/[spiller]` — Player career page (built)
-- `/records` — Hall of Records (planned)
-- `/vs/[a]/[b]` — Head-to-head (planned)
-- `/lore` — Skattkammeret (planned)
-- `/admin` — Admin panel: login + dashboard + admin management (built); results
-  entry (planned, Phase 5). Protected server-side.
-
-## See also
-
-- `.kiro/steering/structure.md` — full directory layout and "add a season" workflow
-- `.kiro/steering/tech.md` — stack details and constraints
-- `.kiro/steering/code-conventions.md` — component patterns, naming, formatting
-- `.kiro/steering/product.md` — product vision and feature roadmap context
-- `TODO.md` — active expansion plan with phases and open questions
+- `.kiro/steering/code-conventions.md` — before non-trivial code changes.
+- `.kiro/steering/structure.md` — before adding or moving files, routes or
+  seasons, and before touching the results layer or schema.
+- `.kiro/steering/tech.md` — before DB, migration, auth or env work.
+- `.kiro/steering/design.md` — before any UI or styling work.
+- `.kiro/steering/product.md` — before feature-scope decisions.
+- `TODO.md` — the active plan: phases, build order, what is built vs planned.
