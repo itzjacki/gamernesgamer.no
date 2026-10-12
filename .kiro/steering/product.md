@@ -34,16 +34,17 @@ stat cards) that people drop into it.
 - "Reveal" flags to hide/show games, gamers, and power-ups until unveiled
 - A countdown component for building anticipation before a tournament
 - Archive of past seasons (currently seasons 1–4)
+- Player index and career pages (`/spillere`, `/spillere/[spiller]`)
 
 ### Planned
 
-- **The Hall** — a proper landing page celebrating the champion lineage, not just
-  the most recent season
-- **Player career pages** — all-time stats, championships, win rate, head-to-head
-  records per player
+- **Front page rework** — a landing page celebrating the champion lineage, not just
+  the most recent season (The Hall was dropped; its ideas are absorbed into
+  /records + the front page). `/` currently redirects to the current season.
 - **Live leaderboard** — real-time standings during the 2-day tournament (polling)
-- **Admin panel** — custom results entry for a small group of trusted admins;
-  replaces the spreadsheet
+- **Results entry** — custom results entry for a small group of trusted admins;
+  replaces the spreadsheet (admin login, dashboard and admin management are built;
+  the entry form is Phase 5)
 - **Shareable images** — champion card, podium, player stat cards via Vercel OG,
   for dropping into the group chat
 - **Hall of Records** — all-time records and superlatives across all seasons
