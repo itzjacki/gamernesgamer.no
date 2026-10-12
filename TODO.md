@@ -20,14 +20,17 @@ social hub — the site produces artifacts that feed into it.
   change; the multi-season fetch it needed is built (`fetchAllSeasonBundles()`).
   Full decision: `working-docs/cross-season-normalization.md` (delete when
   /records + /vs ship). Unblocks /records and /vs.
-- **Game title abstraction + genre tags:** PLANNED. Today's `Game` is already a
-  per-season _instance_; introduce a stable **`title`** layer above it (identity +
-  multi-valued genre tags; CS:GO ≈ CS2; LoL instances share a title) and an
-  additive `titleId` on each instance. No DB schema change — static-data refactor in
-  `src/data`. Genre tags are human-entered (part of data entry; Jakob seeds S1–S4
-  manually; taxonomy deferred to build). Full plan:
-  `working-docs/game-title-abstraction.md` (delete when built). Unlocks best/worst
-  genre on career pages and genre comparison on /vs.
+- **Game title abstraction + genre/format tags:** DATA LAYER BUILT, S1–S4 tagged.
+  A stable **title** registry (`src/data/titles.ts`: identity + `genreTags`;
+  CS:GO ≈ CS2; LoL instances share a title) sits above the per-season `Game`
+  instance, which gained `titleId`, `formatTags` (what the contest was: duel,
+  gold-rush, speedrun, …; may be empty) and an optional `genreTags` override
+  (only CS2 parkour uses it). Static data only, no DB change; both vocabularies
+  are closed TS unions. Per-player stats by tag are derived and composed
+  (`CareerView.tagStats`, genre and format ranked together as one `Tag` list)
+  and shown on the career page.
+  Decisions: `working-docs/game-title-abstraction.md` (delete when the stats
+  ship). Unlocks best/worst genre on career pages and genre comparison on /vs.
 - **Editorial appetite:** Several "monument" features (season recaps, "how it went down"
   blocks, Skattkammeret lore content) require written content from Jakob. Scope of these
   features depends on how much curation is realistic.
@@ -160,10 +163,12 @@ the _genre_ stats (not the rest of any page).
    must-have below). The shared career derivation (`derive/career`: placement-points
    / avg-placement / trophies, pure + unit-tested against the S1+S2 oracle) now
    exists. Best/worst-genre stat still deferred (waits on the title layer).
-3. **Title/genre abstraction + seed S1–S4 genres** — self-contained static-data
-   refactor Jakob does manually; pin the genre taxonomy first. Lights up genre stats
-   for /records, /vs, and retroactively the player pages. See
-   `working-docs/game-title-abstraction.md`.
+3. **Title/genre abstraction + S1–S4 tags** — data layer BUILT
+   (`src/data/titles.ts`, `titleId`/`formatTags` on every instance), vocabularies
+   and the tagging of all 34 games agreed with Jakob. Per-player tag stats are
+   BUILT + unit-tested (`deriveTagStats`, joined in `composeCareerView`).
+   Surfaced on the career page (`TagRecord`). Remaining: /records superlatives
+   and /vs comparison. See `working-docs/game-title-abstraction.md`.
 4. **Multi-season fetch** — DONE early. Built as `fetchAllSeasonBundles()` (a thin
    parallel fan-out over `fetchSeasonBundle`) for the career pages; /records reuses
    it, so this is no longer a blocker there.
@@ -245,7 +250,31 @@ the _genre_ stats (not the rest of any page).
   - [ ] **Career-stat OG card** — DEFERRED until hero portraits exist, since the
         final hero art may change the component shape the OG card mirrors. Hero
         shape is already OG-export-ready when we pick it up.
-  - [ ] **Best/worst genre stat** — BLOCKED on the title/genre layer.
+  - [x] **Best/worst category (`TagRecord`).** BUILT. A `tag-record` section
+        between the season record and the card gallery: ONE full-width
+        `TagRecord` with genre and format tags ranked together (decision: the
+        genre/format split is a data-entry detail, not a reader-facing
+        distinction). A best/worst headline sits over the full breakdown table
+        (games, wins, average placement to one decimal). Rows are sorted best
+        first; averages that read the same at one decimal are tied and broken
+        by more games, then more wins. Each tag name is a
+        native-popover trigger (same no-JS pattern as `GamePointsMatrix`)
+        listing the games behind the row: title linking to the game page,
+        season and placement. The component owns the ranking cutoff
+        (`MIN_GAMES = 3`): tags below it are collapsed by default in a native
+        `<details>` ("Vis flere"), under a caption explaining they are not
+        ranked. A checkbox in the frame's footer row ("Uten egne
+        spillvalg", off by default; the custom VERKSTED `Checkbox` primitive) leaves out the games the player chose themselves, since
+        people pick what they are good at; both variants are prerendered and
+        toggled in CSS alone (`:has(input:checked)`, no JS). Accent only on
+        game wins inside the popover (rank-1 data) and on the checked checkbox;
+        nothing else takes it at rest. Display labels live in
+        `src/data/tag-labels.ts`. **All copy is best-effort Norwegian marked
+        `TODO(copy)`** (tag labels, "Best i" / "Svakest i" eyebrows, "Kategori"
+        and the other column heads, disclosure labels, explainer caption, the
+        own-picks filter label) —
+        needs Jakob's pass. Builds and prerenders with the full S1–S4 data; the
+        visual result has not been reviewed in a browser yet.
   - [x] **Rivaler section — CUT until /vs lands.** Was a raw `Placeholder` panel;
         removed entirely rather than shipping a stub. Revisit as a compact H2H
         teaser once `/vs/[a]/[b]` exists (see the H2H-widget strong idea).

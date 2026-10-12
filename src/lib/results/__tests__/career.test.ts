@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { assembleCareer } from '../derive/career';
 import { deriveTrophies } from '../derive/career/trophies';
+import { deriveTagStats } from '../derive/career/tags';
 import { composeCareerView } from '../compose';
 import type { PlayerRef, SeasonView } from '../view-models';
 import { s1Bundle } from './s1.fixtures';
@@ -58,6 +59,111 @@ describe('assembleCareer — Tobias (champion both seasons)', () => {
       .filter((t) => t.kind === 'game-gold')
       .map((t) => t.seasonNumber);
     expect(gameSeasons).toEqual([...gameSeasons].sort((a, b) => a - b));
+  });
+});
+
+describe('assembleCareer — per-game rows', () => {
+  const career = assembleCareer(bundles, 'tobias')!;
+
+  it('emits one row per game played, season-ascending', () => {
+    expect(career.games).toHaveLength(16);
+    const seasons = career.games.map((g) => g.seasonNumber);
+    expect(seasons).toEqual([...seasons].sort((a, b) => a - b));
+  });
+
+  it('carries the authoritative game placement (wins match the game-golds)', () => {
+    const wins = career.games
+      .filter((g) => g.placement === 1)
+      .map((g) => g.gameSlug);
+    expect(wins).toEqual([
+      'tetris',
+      'trackmania',
+      'flat-out-2',
+      'curve-fever',
+      'wreckfest',
+    ]);
+  });
+});
+
+describe('deriveTagStats', () => {
+  const p = (placement: number) => ({ placement });
+
+  it('counts a multi-tag game toward every one of its tags', () => {
+    const stats = deriveTagStats([
+      { tags: ['a', 'b'], result: p(1) },
+      { tags: ['a'], result: p(3) },
+    ]);
+    expect(stats.find((s) => s.tag === 'a')).toEqual({
+      tag: 'a',
+      games: 2,
+      wins: 1,
+      averagePlacement: 2,
+      results: [p(1), p(3)],
+    });
+    expect(stats.find((s) => s.tag === 'b')).toEqual({
+      tag: 'b',
+      games: 1,
+      wins: 1,
+      averagePlacement: 1,
+      results: [p(1)],
+    });
+  });
+
+  it('ignores untagged games and applies no minimum sample', () => {
+    const stats = deriveTagStats([
+      { tags: [], result: p(2) },
+      { tags: ['solo'], result: p(4) },
+    ]);
+    expect(stats).toEqual([
+      { tag: 'solo', games: 1, wins: 0, averagePlacement: 4, results: [p(4)] },
+    ]);
+  });
+
+  it('carries each result through untouched, in input order', () => {
+    const first = { placement: 2, id: 'first' };
+    const second = { placement: 1, id: 'second' };
+    const [stat] = deriveTagStats([
+      { tags: ['a'], result: first },
+      { tags: ['a'], result: second },
+    ]);
+    expect(stat.results).toEqual([first, second]);
+  });
+
+  it('orders best first: average placement, then games, then wins, then tag', () => {
+    const stats = deriveTagStats([
+      // avg 2.0 — three games, no wins.
+      { tags: ['more-games'], result: p(2) },
+      { tags: ['more-games'], result: p(2) },
+      { tags: ['more-games'], result: p(2) },
+      // avg 2.0 — two games, one win: fewer games loses despite the win.
+      { tags: ['fewer-games'], result: p(1) },
+      { tags: ['fewer-games'], result: p(3) },
+      // avg 2.0 — two games, no wins: same games, fewer wins.
+      { tags: ['no-wins'], result: p(2) },
+      { tags: ['no-wins'], result: p(2) },
+      // avg 2.0 — identical to no-wins, so tag name decides.
+      { tags: ['a-no-wins'], result: p(2) },
+      { tags: ['a-no-wins'], result: p(2) },
+      { tags: ['best'], result: p(1) },
+    ]);
+    expect(stats.map((s) => s.tag)).toEqual([
+      'best',
+      'more-games',
+      'fewer-games',
+      'a-no-wins',
+      'no-wins',
+    ]);
+  });
+
+  it('treats averages that display the same (one decimal) as tied', () => {
+    // 2.25 and 2.333… both show as 2.3, so the tag with more games leads even
+    // though its raw average is the higher one.
+    const stats = deriveTagStats([
+      ...[2, 2, 2, 3].map((n) => ({ tags: ['four'], result: p(n) })),
+      ...[2, 2, 3, 2, 2, 3].map((n) => ({ tags: ['six'], result: p(n) })),
+    ]);
+    expect(stats.map((s) => s.tag)).toEqual(['six', 'four']);
+    expect(stats[0].averagePlacement).toBeCloseTo(2.333, 3);
   });
 });
 
@@ -127,6 +233,82 @@ describe('composeCareerView — static content join', () => {
     expect(view.hero.imagePath).toBe(
       view.cards[view.cards.length - 1].imagePath,
     );
+  });
+
+  it('aggregates a genre tag through the title (Tobias won all three racing games)', () => {
+    // trackmania + flat-out-2 (S1) + wreckfest (S2), all placement 1.
+    const racing = view.tagStats.find((s) => s.tag === 'racing')!;
+    expect(racing).toMatchObject({
+      tag: 'racing',
+      games: 3,
+      wins: 3,
+      averagePlacement: 1,
+    });
+    // The games behind the row, chronological, with their static titles joined.
+    expect(racing.results).toEqual([
+      {
+        seasonNumber: 1,
+        seasonSlug: '01',
+        gameSlug: 'trackmania',
+        gameTitle: 'Trackmania',
+        placement: 1,
+        ownPick: true,
+      },
+      {
+        seasonNumber: 1,
+        seasonSlug: '01',
+        gameSlug: 'flat-out-2',
+        gameTitle: 'Flat Out 2',
+        placement: 1,
+        ownPick: false,
+      },
+      {
+        seasonNumber: 2,
+        seasonSlug: '02',
+        gameSlug: 'wreckfest',
+        gameTitle: 'Wreckfest',
+        placement: 1,
+        ownPick: true,
+      },
+    ]);
+  });
+
+  it('counts a multi-genre title toward each genre', () => {
+    // card: hearthstone, poker. strategy: sjakk, pokemon, warcraft-3,
+    // total-war-empire + hearthstone (tagged card AND strategy).
+    expect(view.tagStats.find((s) => s.tag === 'card')?.games).toBe(2);
+    expect(view.tagStats.find((s) => s.tag === 'strategy')?.games).toBe(5);
+  });
+
+  it('aggregates a format tag from the instance', () => {
+    // duel: sjakk, csgo, pokemon, hearthstone, total-war-empire, lol-02.
+    expect(view.tagStats.find((s) => s.tag === 'duel')?.games).toBe(6);
+  });
+
+  it('ranks genre and format tags together in one best-first list', () => {
+    // 16 games: one genre tag each (hearthstone has two) = 17, plus one format
+    // tag each except trackmania (none) = 15.
+    expect(view.tagStats.reduce((n, s) => n + s.games, 0)).toBe(32);
+    const averages = view.tagStats.map((s) =>
+      Number(s.averagePlacement.toFixed(1)),
+    );
+    expect(averages).toEqual([...averages].sort((a, b) => a - b));
+  });
+
+  it('flags the games the player chose and offers the stats without them', () => {
+    const own = view.tagStats
+      .flatMap((s) => s.results)
+      .filter((r) => r.ownPick)
+      .map((r) => r.gameSlug);
+    // Tobias chose two games per season in S1 + S2.
+    expect(new Set(own).size).toBe(4);
+
+    const without = view.tagStatsWithoutOwnPicks.flatMap((s) => s.results);
+    expect(without.some((r) => r.ownPick)).toBe(false);
+    // 32 tag-counted games in total (see above), minus those under own picks.
+    const all = view.tagStats.flatMap((s) => s.results);
+    expect(without).toHaveLength(all.filter((r) => !r.ownPick).length);
+    expect(without.length).toBeLessThan(all.length);
   });
 
   it('joins game titles onto game-gold trophies only', () => {

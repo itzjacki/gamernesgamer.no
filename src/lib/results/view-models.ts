@@ -13,6 +13,7 @@
  */
 
 import type { GamerStats } from '@/types/gamer';
+import type { Tag } from '@/types/tag';
 
 /**
  * A player resolved for display. Collapses season_player + player identity and
@@ -187,6 +188,50 @@ export interface CareerSeasonRow {
   isChampion: boolean;
 }
 
+/** One game the player played — their final placement in it. */
+export interface CareerGameRow {
+  seasonNumber: number;
+  seasonSlug: string;
+  /** game.slug — the join key to static content (title, tags) in compose. */
+  gameSlug: string;
+  /** Authoritative final placement in this game (from game_result). */
+  placement: number;
+}
+
+/** One game behind a tag stat: which game, and where the player finished. */
+export interface TagGameResult {
+  seasonNumber: number;
+  seasonSlug: string;
+  /** game.slug — with seasonSlug, the route to the game page. */
+  gameSlug: string;
+  /** Static game title, joined in compose. */
+  gameTitle: string;
+  /** Authoritative final placement in this game (from game_result). */
+  placement: number;
+  /** True when the player chose this game themselves (static `chosenBy`). */
+  ownPick: boolean;
+}
+
+/**
+ * One tag's aggregate over the games a player played under it. No minimum
+ * sample is applied here — a tag with a single game is still listed. Deciding
+ * which tags are meaningful enough to rank is the consuming component's call.
+ */
+export interface TagStat<
+  T extends string,
+  R extends { placement: number } = TagGameResult,
+> {
+  tag: T;
+  /** Games played under this tag (results.length). */
+  games: number;
+  /** How many of those the player won (placement 1). */
+  wins: number;
+  /** Mean game placement, raw (unrounded). Lower is better. Display with toFixed(1). */
+  averagePlacement: number;
+  /** The games themselves, in the order they were given (chronological). */
+  results: R[];
+}
+
 /** Flat career totals — the ledger readout. */
 export interface CareerLedger {
   /** Seasons the player competed in. */
@@ -218,6 +263,8 @@ export interface CareerStats {
    * gold→silver→bronze), then game-gold (by season, then game ordinal).
    */
   trophies: CareerTrophy[];
+  /** Every game the player played, ascending by season, then game ordinal. */
+  games: CareerGameRow[];
 }
 
 /* -------- composed (static content joined) -------- */
@@ -260,4 +307,15 @@ export interface CareerView {
   trophies: CareerTrophyView[];
   /** All per-season cards, ascending by season (the FUTBIN-style gallery). */
   cards: CareerCard[];
+  /**
+   * Per-tag aggregates over every game played, best first. Genre and format
+   * tags rank together in one list. Unfiltered — every tag the player has a
+   * game under is present.
+   */
+  tagStats: TagStat<Tag>[];
+  /**
+   * The same aggregates with the games the player chose themselves left out —
+   * people pick what they are good at, which skews the full list.
+   */
+  tagStatsWithoutOwnPicks: TagStat<Tag>[];
 }

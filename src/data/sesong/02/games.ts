@@ -4,6 +4,8 @@ export const games: Game[] = [
   {
     title: 'Hearthstone',
     slug: 'hearthstone',
+    titleId: 'hearthstone',
+    formatTags: ['duel'],
     thumbnailPath: '/images/game-thumbnails/2/hearthstone.jpg',
     chosenBy: 'William',
     duration: '30 min',
@@ -39,6 +41,8 @@ export const games: Game[] = [
   {
     title: 'Curve Fever',
     slug: 'curve-fever',
+    titleId: 'curve-fever',
+    formatTags: ['free-for-all'],
     thumbnailPath: '/images/game-thumbnails/2/curve-fever.jpg',
     chosenBy: 'Tobias',
     duration: '30 min',
@@ -56,6 +60,8 @@ export const games: Game[] = [
   {
     title: 'The Sims 4',
     slug: 'the-sims-4',
+    titleId: 'the-sims-4',
+    formatTags: ['gold-rush'],
     thumbnailPath: '/images/game-thumbnails/2/the-sims-4.jpg',
     videoEmbedUrl:
       'https://www.youtube.com/embed/TdZfbh7AdCM?si=5KXcv52O3s0yggRO',
@@ -91,6 +97,8 @@ export const games: Game[] = [
   {
     title: 'Warcraft 3',
     slug: 'warcraft-3',
+    titleId: 'warcraft-3',
+    formatTags: ['free-for-all'],
     thumbnailPath: '/images/game-thumbnails/2/warcraft-3.jpg',
     chosenBy: 'William',
     duration: '60 min',
@@ -108,6 +116,8 @@ export const games: Game[] = [
   {
     title: "Poker - Texas Hold'em",
     slug: 'poker',
+    titleId: 'poker',
+    formatTags: ['free-for-all'],
     thumbnailPath: '/images/game-thumbnails/2/poker.jpg',
     chosenBy: 'Jørgen',
     duration: '60 min',
@@ -127,6 +137,8 @@ export const games: Game[] = [
   {
     title: 'Wreckfest',
     slug: 'wreckfest',
+    titleId: 'wreckfest',
+    formatTags: ['free-for-all'],
     thumbnailPath: '/images/game-thumbnails/2/wreckfest.jpg',
     chosenBy: 'Tobias',
     duration: '60 min',
@@ -195,6 +207,8 @@ export const games: Game[] = [
   {
     title: 'Total War: Empire',
     slug: 'total-war-empire',
+    titleId: 'total-war-empire',
+    formatTags: ['duel'],
     thumbnailPath: '/images/game-thumbnails/2/total-war-empire.jpg',
     videoEmbedUrl:
       'https://www.youtube.com/embed/WSD3k5_TgH4?si=FQulanI70-yWG3Cd',
@@ -247,6 +261,8 @@ export const games: Game[] = [
   {
     title: 'League of Legends',
     slug: 'league-of-legends-02',
+    titleId: 'league-of-legends',
+    formatTags: ['duel'],
     thumbnailPath: '/images/game-thumbnails/2/league-of-legends.jpg',
     chosenBy: 'Jørgen',
     duration: '30 min',

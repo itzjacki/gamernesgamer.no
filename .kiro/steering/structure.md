@@ -15,6 +15,8 @@ src/
   components/           Shared components and the UI primitives.
   data/sesong/<NN>/     Static season content: gamers.ts, games.ts, power-ups.ts.
     index.ts            Season registry + `currentSeason`.
+  data/titles.ts        Cross-season title registry (see "Titles and tags").
+  data/tag-labels.ts    Norwegian display labels for every tag.
   lib/
     players/roster.ts   Static cross-season roster and playerSlug().
     supabase/           Clients, proxy session helper, generated database.types.ts.
@@ -43,9 +45,13 @@ Each file has one job; keep the boundaries.
   Filters `confirmed = true`. Imports no derivation.
 - `derive/` — pure, synchronous, no IO. Unit-tested. `derive/career/` is the
   cross-season derivation shared by player pages and `/records`; it reads the
-  per-season assembler's output and never re-derives placements.
+  per-season assembler's output and never re-derives placements. `derive/`
+  imports no static data, so `derive/career/tags.ts` (`deriveTagStats`) takes
+  rows whose tags the caller has already resolved.
 - `compose.ts` — pure. The one seam that joins DB view-models to static
-  `src/data/sesong` content (game by slug, player by name, season by padded slug).
+  `src/data` content (game by slug, player by name, season by padded slug, title
+  by `titleId`). It resolves each game's tags (`gameTags`) and calls
+  `deriveTagStats` to fill `CareerView.tagStats`.
 - `view-models.ts` — the hand-authored camelCase shapes components consume.
 - `raw.ts` — raw row aliases over the generated types. Module-internal.
 
@@ -64,10 +70,47 @@ SUM(power_up_use.points_delta)`.
 - Every `*_season_player_id` column, and `match.player_a`/`player_b`, stores
   `season_player.id` — not `player.id`. Join to `player` through `season_player`.
 
+## Titles and tags
+
+A `Game` in `src/data/sesong/<NN>/games.ts` is one season's _instance_. Its
+stable identity across seasons is a **title** in `src/data/titles.ts` (CS:GO and
+CS2 are one title; the LoL instances share one), linked by `titleId`.
+
+- `genreTags` live on the title: what kind of game it is.
+- `formatTags` live on the instance: what the contest was (`duel`, `gold-rush`,
+  `speedrun`, …). May be `[]` when the game was played in its genre's standard
+  way.
+- An instance may set its own `genreTags` to replace the title's, only when it
+  was not the title's usual genre (CS2 as a parkour map).
+
+The two vocabularies are closed unions in `src/types/tag.ts` (`GenreTag`,
+`FormatTag`) and are human judgement — agree new tags with Jakob. `formatTags`
+are hand-tagged on purpose, not derived from the DB's `stage.kind`, which
+records how results are stored.
+
+**Where a tag is attached is a data decision only.** Everything that reads tags
+treats them as one concept, `Tag = GenreTag | FormatTag`: compose merges a
+game's genre and format tags (`gameTags`), `CareerView.tagStats` is one list
+(games, wins, average placement and the underlying game results per tag,
+unfiltered; best first, with averages equal at one decimal tied and broken by
+more games, then more wins), with a sibling `tagStatsWithoutOwnPicks` that
+leaves out the games the player chose (`Game.chosenBy` equal to the player's
+name), the labels
+are one map (`src/data/tag-labels.ts`, a `Record<Tag, string>` so a new tag
+fails the build without a label), and the career page shows one table
+(`src/components/TagRecord.tsx`). Don't reintroduce a genre/format split in the
+stats or UI without a reason.
+
+Any minimum sample for ranking a tag (agreed: 3 games) belongs to the consuming
+component, not to the derivation or compose — today that is `MIN_GAMES` in
+`TagRecord`.
+
 ## Adding a new season
 
 1. Create `src/data/sesong/<NN>/` with `gamers.ts` and `games.ts` (plus
    `power-ups.ts` if used). Each gamer carries a `stats` block for the card.
+   Each game needs a `titleId` (add a new title to `src/data/titles.ts` if the
+   game has not appeared before) and `formatTags`.
 2. Add images under `public/images/gamers/<NN>/` and
    `public/images/game-thumbnails/<NN>/`.
 3. Register the season in `src/data/sesong/index.ts` and set `currentSeason`. The

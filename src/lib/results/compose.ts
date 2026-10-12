@@ -1,7 +1,9 @@
 import type { Game } from '@/types/game';
 import type { Gamer } from '@/types/gamer';
 import type { PowerUp } from '@/types/power-up';
+import type { Tag } from '@/types/tag';
 import { seasonData, isSeason } from '@/data/sesong';
+import { titles } from '@/data/titles';
 import type { SeasonData } from '@/data/sesong';
 import type {
   SeasonView,
@@ -13,6 +15,7 @@ import type {
   CareerCard,
   CareerTrophyView,
 } from './view-models';
+import { deriveTagStats } from './derive/career/tags';
 
 /**
  * PURE. No IO, no async, no React. Joins the DB-derived view-models
@@ -131,6 +134,17 @@ function requireGame(map: Map<string, Game>, slug: string): Game {
     );
   }
   return game;
+}
+
+/**
+ * Every tag a game instance carries: its title's genre tags (or the instance's
+ * own, when it overrides them) plus the instance's format tags.
+ */
+function gameTags(game: Game): Tag[] {
+  return [
+    ...(game.genreTags ?? titles[game.titleId].genreTags),
+    ...game.formatTags,
+  ];
 }
 
 function requireGamer(map: Map<string, Gamer>, name: string): Gamer {
@@ -271,6 +285,22 @@ export function composeCareerView(stats: CareerStats): CareerView {
     return { ...t, gameTitle: game.title };
   });
 
+  const taggedGames = stats.games.map((row) => {
+    const content = seasonContent(row.seasonSlug);
+    const game = requireGame(gameBySlug(content.games), row.gameSlug);
+    return {
+      tags: gameTags(game),
+      result: {
+        seasonNumber: row.seasonNumber,
+        seasonSlug: row.seasonSlug,
+        gameSlug: row.gameSlug,
+        gameTitle: game.title,
+        placement: row.placement,
+        ownPick: game.chosenBy === stats.name,
+      },
+    };
+  });
+
   return {
     slug: stats.slug,
     hero: {
@@ -283,5 +313,9 @@ export function composeCareerView(stats: CareerStats): CareerView {
     seasons: stats.seasons,
     trophies,
     cards,
+    tagStats: deriveTagStats(taggedGames),
+    tagStatsWithoutOwnPicks: deriveTagStats(
+      taggedGames.filter((g) => !g.result.ownPick),
+    ),
   };
 }

@@ -4,6 +4,8 @@ export const games: Game[] = [
   {
     title: 'World of Warcraft',
     slug: 'world-of-warcraft',
+    titleId: 'world-of-warcraft',
+    formatTags: ['gold-rush'],
     thumbnailPath: '/images/game-thumbnails/3/world-of-warcraft.jpg',
     chosenBy: 'William',
     duration: '60 min',
@@ -21,6 +23,8 @@ export const games: Game[] = [
   {
     title: 'BattleBlock Theater',
     slug: 'battleblock-theater',
+    titleId: 'battleblock-theater',
+    formatTags: ['score-attack'],
     thumbnailPath: '/images/game-thumbnails/3/battleblock-theater.jpg',
     chosenBy: 'Kristin',
     duration: '60 min',
@@ -46,6 +50,8 @@ export const games: Game[] = [
   {
     title: 'Kerbal Space Program',
     slug: 'kerbal-space-program',
+    titleId: 'kerbal-space-program',
+    formatTags: ['score-attack'],
     thumbnailPath: '/images/game-thumbnails/3/kerbal-space-program.jpg',
     chosenBy: 'Jakob',
     duration: '60 min',
@@ -61,6 +67,8 @@ export const games: Game[] = [
   {
     title: 'GeoGuessr',
     slug: 'geoguessr',
+    titleId: 'geoguessr',
+    formatTags: ['score-attack'],
     thumbnailPath: '/images/game-thumbnails/3/geoguessr.jpg',
     chosenBy: 'Jørgen',
     duration: '60 min',
@@ -82,6 +90,8 @@ export const games: Game[] = [
   {
     title: 'Jump King',
     slug: 'jump-king',
+    titleId: 'jump-king',
+    formatTags: ['climb'],
     thumbnailPath: '/images/game-thumbnails/3/jump-king.jpg',
     chosenBy: 'Tobias',
     duration: '60 min',
@@ -94,6 +104,8 @@ export const games: Game[] = [
   {
     title: 'Planet Coaster',
     slug: 'planet-coaster',
+    titleId: 'planet-coaster',
+    formatTags: ['score-attack'],
     thumbnailPath: '/images/game-thumbnails/3/planet-coaster.jpg',
     chosenBy: 'Jørgen',
     duration: '60 min',
@@ -106,6 +118,8 @@ export const games: Game[] = [
   {
     title: 'War Thunder',
     slug: 'war-thunder',
+    titleId: 'war-thunder',
+    formatTags: ['duel'],
     thumbnailPath: '/images/game-thumbnails/3/war-thunder.jpg',
     chosenBy: 'Jakob',
     duration: '60 min',
@@ -125,6 +139,8 @@ export const games: Game[] = [
   {
     title: 'Hollow Knight',
     slug: 'hollow-knight',
+    titleId: 'hollow-knight',
+    formatTags: ['speedrun'],
     thumbnailPath: '/images/game-thumbnails/3/hollow-knight.jpg',
     chosenBy: 'Kristin',
     duration: '60 min',
@@ -149,6 +165,8 @@ export const games: Game[] = [
   {
     title: 'Pummel Party',
     slug: 'pummel-party',
+    titleId: 'pummel-party',
+    formatTags: ['free-for-all'],
     thumbnailPath: '/images/game-thumbnails/3/pummel-party.jpg',
     chosenBy: 'Tobias',
     duration: '60 min',
@@ -161,6 +179,8 @@ export const games: Game[] = [
   {
     title: "PlayerUnknown's Battlegrounds",
     slug: 'pubg',
+    titleId: 'pubg',
+    formatTags: ['battle-royale', 'free-for-all'],
     thumbnailPath: '/images/game-thumbnails/3/pubg.jpg',
     chosenBy: 'William',
     duration: '60 min',

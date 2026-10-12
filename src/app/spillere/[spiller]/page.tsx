@@ -6,6 +6,7 @@ import TrophyShelf from '@/components/TrophyShelf';
 import CareerLedger from '@/components/CareerLedger';
 import SeasonRecord from '@/components/SeasonRecord';
 import CardGallery from '@/components/CardGallery';
+import TagRecord from '@/components/TagRecord';
 
 interface Props {
   params: Promise<{ spiller: string }>;
@@ -23,7 +24,15 @@ export default async function PlayerCareerPage({ params }: Props) {
     notFound();
   }
 
-  const { hero, ledger, seasons, trophies, cards } = career;
+  const {
+    hero,
+    ledger,
+    seasons,
+    trophies,
+    cards,
+    tagStats,
+    tagStatsWithoutOwnPicks,
+  } = career;
 
   return (
     <>
@@ -44,6 +53,13 @@ export default async function PlayerCareerPage({ params }: Props) {
 
       <section id='season-record' className='flex flex-col gap-8'>
         <SeasonRecord seasons={seasons} label='Resultater' />
+      </section>
+
+      <section id='tag-record' className='flex flex-col gap-8'>
+        <TagRecord
+          stats={tagStats}
+          statsWithoutOwnPicks={tagStatsWithoutOwnPicks}
+        />
       </section>
 
       <section id='cards' className='flex flex-col gap-8'>
