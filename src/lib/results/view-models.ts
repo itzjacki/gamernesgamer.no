@@ -456,7 +456,16 @@ export interface RecordTiebreak {
   won: boolean;
 }
 
-/** One player's line in a record. */
+/**
+ * One player's line in a record.
+ *
+ * Besides `player`, `rank`, `value` and `games`, this is a bag of optional
+ * fields (`season`, `title`, `tiebreaks`, `seasonPoints`, `matchLines`,
+ * `matches`, `opponent`, `split`, `partner`, `pair`), one or two per kind of
+ * record, and nothing in the type says which record sets which. That is fine
+ * at this size. If more record kinds are added, split it into a discriminated
+ * union (one variant per kind) rather than adding more optionals.
+ */
 export interface RecordEntry {
   player: RecordPlayer;
   /** 1-based. Entries that tie share a rank (1, 1, 3). */
