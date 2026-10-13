@@ -23,6 +23,8 @@ import styles from './RecordPlate.module.css';
  *   the grounds that every plate names a winner; the page read too flat.) The
  *   name and the runners-up stay neutral and earn accent on hover; game wins
  *   in the opened list keep it.
+ * - A record can be held by a PAIR (closest rivalry): an entry with a `partner`
+ *   shows both names, each linking to its own player.
  * - No portraits: one player on several plates would repeat the same face.
  * - The figure is a native-popover trigger (`<button popovertarget>` +
  *   `[popover]`, no JS, stays a Server Component — the same pattern as
@@ -64,6 +66,37 @@ const nameLink =
   'hover:text-accent focus-visible:outline-accent underline-offset-2 transition-colors duration-150 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2';
 const link =
   'hover:text-accent focus-visible:outline-accent underline underline-offset-2 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2';
+
+/** A stable key for an entry: the player, plus the partner in a pair record. */
+const entryKey = (entry: RecordEntry) =>
+  entry.partner
+    ? `${entry.player.slug}-${entry.partner.slug}`
+    : entry.player.slug;
+
+/** An entry's name(s) as plain text: "Jakob", or "Jakob – Tobias" for a pair. */
+const plainNames = (entry: RecordEntry) =>
+  entry.partner
+    ? `${entry.player.name} – ${entry.partner.name}`
+    : entry.player.name;
+
+/** An entry's name(s), each linking to that player's page. */
+function Names({ entry }: { entry: RecordEntry }) {
+  return (
+    <>
+      <Link href={`/spillere/${entry.player.slug}`} className={nameLink}>
+        {entry.player.name}
+      </Link>
+      {entry.partner && (
+        <>
+          {' – '}
+          <Link href={`/spillere/${entry.partner.slug}`} className={nameLink}>
+            {entry.partner.name}
+          </Link>
+        </>
+      )}
+    </>
+  );
+}
 
 /** The games behind a figure: title (to the game page), season, placement. */
 function GameLines({ entry }: { entry: RecordEntry }) {
@@ -137,14 +170,9 @@ export default function RecordPlate({
         {/* Tied holders share one line, comma-separated. */}
         <p className='text-text text-xl'>
           {holders.map((holder, i) => (
-            <Fragment key={holder.player.slug}>
+            <Fragment key={entryKey(holder)}>
               {i > 0 && ', '}
-              <Link
-                href={`/spillere/${holder.player.slug}`}
-                className={nameLink}
-              >
-                {holder.player.name}
-              </Link>
+              <Names entry={holder} />
             </Fragment>
           ))}
         </p>
@@ -180,9 +208,9 @@ export default function RecordPlate({
             <p className={styles.heading}>{label}</p>
             <div className={`flex flex-col gap-4 ${styles.body}`}>
               {holders.map((holder) => (
-                <div key={holder.player.slug} className='flex flex-col'>
+                <div key={entryKey(holder)} className='flex flex-col'>
                   {shared && (
-                    <p className={`pt-3 ${eyebrow}`}>{holder.player.name}</p>
+                    <p className={`pt-3 ${eyebrow}`}>{plainNames(holder)}</p>
                   )}
                   {detail(holder)}
                 </div>
@@ -194,34 +222,31 @@ export default function RecordPlate({
             <ol className='border-border border-t py-2'>
               {runnersUp.map((entry) => (
                 <li
-                  key={entry.player.slug}
+                  key={entryKey(entry)}
                   className='flex items-baseline justify-between gap-4 py-1'
                 >
                   <span className='sr-only'>plass {entry.rank}: </span>
-                  <Link
-                    href={`/spillere/${entry.player.slug}`}
-                    className={`text-text mr-auto text-sm ${nameLink}`}
-                  >
-                    {entry.player.name}
-                  </Link>
+                  <span className='text-text mr-auto text-sm'>
+                    <Names entry={entry} />
+                  </span>
                   {/* The same detail as the holder's, for this player. */}
                   <button
                     type='button'
-                    popoverTarget={`${popoverId}-${entry.player.slug}`}
+                    popoverTarget={`${popoverId}-${entryKey(entry)}`}
                     className={`text-text-muted font-mono text-sm tabular-nums ${styles.trigger} ${styles.quiet}`}
-                    style={anchorFor(`${popoverId}-${entry.player.slug}`)}
+                    style={anchorFor(`${popoverId}-${entryKey(entry)}`)}
                   >
                     {figure(entry)}
                     <span className='sr-only'>. {detailLabel}</span>
                   </button>
                   <div
-                    id={`${popoverId}-${entry.player.slug}`}
+                    id={`${popoverId}-${entryKey(entry)}`}
                     popover='auto'
                     className={styles.popover}
-                    style={anchorFor(`${popoverId}-${entry.player.slug}`)}
+                    style={anchorFor(`${popoverId}-${entryKey(entry)}`)}
                   >
                     <p className={styles.heading}>
-                      {label} · {entry.player.name}
+                      {label} · {plainNames(entry)}
                     </p>
                     <div className={styles.body}>{detail(entry)}</div>
                   </div>

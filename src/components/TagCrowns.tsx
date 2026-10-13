@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Fragment } from 'react';
 import Checkbox from './Checkbox';
+import GameListPopover from './GameListPopover';
 import UnrankedRows, { unrankedCaption } from './UnrankedRows';
 import { tagLabels } from '@/data/tag-labels';
 import type { TagCrown } from '@/lib/results/view-models';
@@ -42,9 +43,12 @@ const eyebrowRow =
 /** The ranked table and the folded-away unranked one, for one set of crowns. */
 function CrownsBody({
   crowns,
+  idPrefix,
   className,
 }: {
   crowns: TagCrown[];
+  /** Keeps popover ids unique: TagCrowns renders two of these. */
+  idPrefix: string;
   className: string;
 }) {
   const rows = crowns
@@ -97,7 +101,21 @@ function CrownsBody({
           scope='row'
           className='text-text-muted py-3 pr-1 pl-3 font-normal wrap-break-word hyphens-auto sm:px-4'
         >
-          {tagLabels[tag]}
+          {/* The games behind the row: the holder's under this tag, one
+              group per player when the crown is shared. */}
+          <GameListPopover
+            id={`crown-games-${idPrefix}-${tag}`}
+            label={tagLabels[tag]}
+            heading={
+              holders.length === 1
+                ? `${tagLabels[tag]} · ${first.player.name}`
+                : tagLabels[tag]
+            }
+            groups={holders.map((holder) => ({
+              name: holders.length > 1 ? holder.player.name : undefined,
+              results: holder.games,
+            }))}
+          />
         </th>
         {/* Tied holders share one line, comma-separated (as on the record
             plates); a long tie wraps inside the column. */}
@@ -169,10 +187,12 @@ export default function TagCrowns({ crowns, crownsWithoutOwnPicks }: Props) {
     <div className='group/own border-border bg-border flex flex-col gap-px border'>
       <CrownsBody
         crowns={crowns}
+        idPrefix='all'
         className='flex group-has-[input:checked]/own:hidden'
       />
       <CrownsBody
         crowns={crownsWithoutOwnPicks}
+        idPrefix='others'
         className='hidden group-has-[input:checked]/own:flex'
       />
       <div className='bg-bg px-3 sm:px-4'>

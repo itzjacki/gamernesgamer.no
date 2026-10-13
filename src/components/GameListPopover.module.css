@@ -1,9 +1,9 @@
 /*
- * Native-popover game list for TagRecord: the tag name is the trigger, the
- * panel lists the games behind that row. Same platform-only approach as
- * GamePointsMatrix (`[popover]` + `popovertarget`, no JS, Server Component):
- * CSS Anchor Positioning where supported, the browser's centered top-layer
- * popover otherwise.
+ * The game-list popover (GameListPopover): a word is the trigger, the panel
+ * lists the games behind it. Same platform-only approach as GamePointsMatrix
+ * (`[popover]` + `popovertarget`, no JS, Server Component): CSS Anchor
+ * Positioning where supported, the browser's centered top-layer popover
+ * otherwise.
  *
  * Tokens come from src/styles/global.css @theme. No raw hex, no shadow, no
  * radius — VERKSTED surface language.
@@ -62,6 +62,9 @@
   width: max-content;
   max-width: min(24rem, calc(100vw - 2rem));
   height: max-content;
+  /* A long list scrolls inside the panel, not the page. */
+  max-height: min(26rem, calc(100vh - 2rem));
+  overflow-y: auto;
   margin: auto;
 }
 
@@ -69,6 +72,17 @@
   margin: 0;
   padding: 0.625rem 0.75rem;
   border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* A named group inside the panel (one tied holder's games). */
+.group {
+  margin: 0;
+  padding: 0.625rem 0.75rem 0.25rem;
   color: var(--color-text-muted);
   font-family: var(--font-mono);
   font-size: 0.75rem;

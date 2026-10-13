@@ -109,6 +109,7 @@ function careerFromViews(
         gameSlug: g.slug,
         placement: result.placement,
         powerUpDelta: result.powerUpDelta,
+        ordinal: g.ordinal,
       });
     }
 

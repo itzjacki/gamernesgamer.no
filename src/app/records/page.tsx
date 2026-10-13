@@ -175,6 +175,15 @@ export default async function RecordsPage() {
               }
               detailLabel='Vis egne spillvalg'
             />
+            <RecordPlate
+              id='seiersleder'
+              label='Lengst på tronen'
+              scope={allSeasons}
+              entries={records.winsLeader}
+              figure={count}
+              unit={(e) => `runder som personen med flest seire totalt`}
+              detailLabel='Vis spillene'
+            />
           </ul>
         </div>
 
@@ -219,13 +228,20 @@ export default async function RecordsPage() {
             />
             <RecordPlate
               id='finisheren'
-              label='Best finisher'
+              label='Beste finisher'
               scope={allSeasons}
               entries={records.seasonCloser}
               figure={(e) => e.value.toFixed(2)}
-              unit={(e) =>
-                `snitt i sesongens siste spill · ${e.outOf} sesonger`
-              }
+              unit={(e) => `snitt i sesongens siste spill`}
+              detailLabel='Vis spillene'
+            />
+            <RecordPlate
+              id='apneren'
+              label='Beste åpner'
+              scope={allSeasons}
+              entries={records.seasonOpener}
+              figure={(e) => e.value.toFixed(2)}
+              unit={(e) => `snitt i sesongens første spill`}
               detailLabel='Vis spillene'
             />
           </ul>
@@ -357,6 +373,30 @@ export default async function RecordsPage() {
               unit={(e) => `H2H-seiere på rad mot ${e.opponent?.name}`}
               detailLabel='Vis matchene'
               detail={matchList}
+            />
+            <RecordPlate
+              id='jevneste-rivaleri'
+              label='Jevneste rivaleri'
+              scope={allSeasons}
+              entries={records.rivalries}
+              figure={(e) => `${e.pair?.ahead}–${e.pair?.behind}`}
+              unit={() => 'innbyrdes score i spill'}
+              detailLabel='Vis per sesong'
+              detail={(entry) => (
+                <ul className='flex flex-col'>
+                  {entry.pair?.seasons.map((line) => (
+                    <li
+                      key={line.season.seasonSlug}
+                      className={`grid-cols-[1fr_auto] ${detailRow}`}
+                    >
+                      <SeasonTag number={line.season.seasonNumber} />
+                      <span className='font-mono tabular-nums'>
+                        {line.ahead}–{line.behind}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             />
             <RecordPlate
               id='tiebreaker-spill'

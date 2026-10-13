@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Checkbox from './Checkbox';
 import SectionLabel from './SectionLabel';
-import styles from './TagRecord.module.css';
+import GameListPopover from './GameListPopover';
 import UnrankedRows, { unrankedCaption } from './UnrankedRows';
 import { tagLabels } from '@/data/tag-labels';
 import type { TagStat } from '@/lib/results/view-models';
@@ -22,9 +22,8 @@ import type { Tag } from '@/types/tag';
  * (`UnrankedRows`, shared with TagCrowns), under a caption that states why they
  * are not ranked.
  *
- * Each tag name is a native-popover trigger (`<button popovertarget>` +
- * `[popover]` — no JS, stays a Server Component) listing the games behind the
- * row: title (linking to the game page), season and placement.
+ * Each tag name opens the games behind the row (`GameListPopover`, shared with
+ * TagCrowns): title (linking to the game page), season and placement.
  *
  * The unranked rows are a second table (a <details> can't wrap table rows), so
  * both tables use a fixed layout with the same <colgroup> to keep their columns
@@ -124,56 +123,13 @@ function TagBody({
   );
 
   /** The tag name as a popover trigger, plus the games behind the row. */
-  const tagCell = (stat: TagStat<Tag>) => {
-    const popoverId = `tag-games-${idPrefix}-${stat.tag}`;
-    // A unique dashed-ident anchor name per row, bridged to the CSS module via
-    // an inline custom property on both the trigger and its popover.
-    const anchorStyle = { '--anchor': `--${popoverId}` } as React.CSSProperties;
-
-    return (
-      <>
-        <button
-          type='button'
-          popoverTarget={popoverId}
-          className={styles.trigger}
-          style={anchorStyle}
-        >
-          {tagLabels[stat.tag]}
-        </button>
-        <div
-          id={popoverId}
-          popover='auto'
-          className={styles.popover}
-          style={anchorStyle}
-        >
-          <p className={styles.heading}>{tagLabels[stat.tag]}</p>
-          <ul className={styles.lines}>
-            {stat.results.map((r) => (
-              <li key={`${r.seasonSlug}-${r.gameSlug}`} className={styles.line}>
-                <Link
-                  href={`/sesong/${r.seasonSlug}/${r.gameSlug}`}
-                  className={styles.game}
-                >
-                  {r.gameTitle}
-                </Link>
-                <span className={styles.season}>
-                  <span className='sr-only'>sesong </span>
-                  <span aria-hidden='true'>S</span>
-                  {r.seasonNumber}
-                </span>
-                <span
-                  className={`${styles.placement} ${r.placement === 1 ? styles.win : ''}`}
-                >
-                  <span className='sr-only'>plass </span>
-                  {r.placement}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </>
-    );
-  };
+  const tagCell = (stat: TagStat<Tag>) => (
+    <GameListPopover
+      id={`tag-games-${idPrefix}-${stat.tag}`}
+      label={tagLabels[stat.tag]}
+      groups={[{ results: stat.results }]}
+    />
+  );
 
   const row = (stat: TagStat<Tag>, isRanked: boolean) => (
     <tr key={stat.tag} className='border-border border-b last:border-b-0'>
