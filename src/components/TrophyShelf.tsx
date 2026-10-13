@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { CareerTrophyView } from '@/lib/results/view-models';
+import Popover from './Popover';
 import TrophyIcon from './TrophyIcon';
 import styles from './TrophyShelf.module.css';
 
@@ -64,7 +65,6 @@ export default function TrophyShelf({ trophies }: Props) {
     <ul className='flex flex-wrap items-center gap-2'>
       {trophies.map((t, i) => {
         const id = trophyId(t, i);
-        const anchorStyle = { '--anchor': `--${id}` } as React.CSSProperties;
         const label = trophyLabel(t);
         const ariaLabel = label.sub
           ? `${label.main}, ${label.sub}`
@@ -72,30 +72,27 @@ export default function TrophyShelf({ trophies }: Props) {
 
         return (
           <li key={id}>
-            <button
-              type='button'
-              popoverTarget={id}
+            <Popover
+              id={id}
+              tone='none'
               className={styles.trigger}
-              style={anchorStyle}
-              aria-label={ariaLabel}
+              label={ariaLabel}
+              panel={
+                <>
+                  <span className={styles.label}>
+                    {label.main}
+                    {label.sub && (
+                      <span className={styles.sub}>{label.sub}</span>
+                    )}
+                  </span>
+                  <Link href={trophyHref(t)} className={styles.link}>
+                    Gå til{t.kind === 'game-gold' ? ' spill' : ' sesong'}
+                  </Link>
+                </>
+              }
             >
               <TrophyIcon kind={t.kind} />
-            </button>
-
-            <div
-              id={id}
-              popover='auto'
-              className={styles.popover}
-              style={anchorStyle}
-            >
-              <span className={styles.label}>
-                {label.main}
-                {label.sub && <span className={styles.sub}>{label.sub}</span>}
-              </span>
-              <Link href={trophyHref(t)} className={styles.link}>
-                Gå til{t.kind === 'game-gold' ? ' spill' : ' sesong'}
-              </Link>
-            </div>
+            </Popover>
           </li>
         );
       })}

@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { Fragment } from 'react';
 import type { RecordEntry } from '@/lib/results/view-models';
+import Popover, { PopoverGroup } from './Popover';
 import RecordLines from './RecordLines';
-import styles from './RecordPlate.module.css';
 
 /**
  * One record on the /records wall: who holds it, the number, and the three
@@ -25,13 +25,14 @@ import styles from './RecordPlate.module.css';
  *   name and the runners-up stay neutral and earn accent on hover; game wins
  *   in the opened list keep it.
  * - A record can be held by a PAIR (closest rivalry): an entry with a `partner`
- *   shows both names, each linking to its own player.
+ *   shows both names. By default each name links to its own player; a record
+ *   that is ABOUT two players passes `pairLink`, and the names become one
+ *   link to that pair's /vs page.
  * - No portraits: one player on several plates would repeat the same face.
- * - The figure is a native-popover trigger (`<button popovertarget>` +
- *   `[popover]`, no JS, stays a Server Component — the same pattern as
- *   GamePointsMatrix and TagRecord), marked with a dotted underline. The panel
- *   lists the games behind the number (`RecordLines`); each runner-up's
- *   figure opens the same list for that player.
+ * - The figure is a `Popover` trigger (native popover, no JS, stays a Server
+ *   Component), marked with a dotted underline. The panel lists the games
+ *   behind the number (`RecordLines`); each runner-up's figure opens the same
+ *   list for that player.
  */
 
 interface Props {
@@ -53,6 +54,12 @@ interface Props {
    * Defaults to the list of their games.
    */
   detail?: (entry: RecordEntry) => React.ReactNode;
+  /**
+   * Names an entry as ONE link instead of a link per player — the records
+   * about two players ("Jakob – Tobias", "Jørgen på William") point at that
+   * pair's /vs page. `text` is also what the popover headings call the entry.
+   */
+  pairLink?: (entry: RecordEntry) => { text: string; href: string };
 }
 
 /**
@@ -77,8 +84,25 @@ const plainNames = (entry: RecordEntry) =>
     ? `${entry.player.name} – ${entry.partner.name}`
     : entry.player.name;
 
-/** An entry's name(s), each linking to that player's page. */
-function Names({ entry }: { entry: RecordEntry }) {
+/**
+ * An entry's name(s), each linking to that player's page — or, with
+ * `pairLink`, the whole string as one link to the pair's /vs page.
+ */
+function Names({
+  entry,
+  pairLink,
+}: {
+  entry: RecordEntry;
+  pairLink?: Props['pairLink'];
+}) {
+  if (pairLink) {
+    const { text, href } = pairLink(entry);
+    return (
+      <Link href={href} className={nameLink}>
+        {text}
+      </Link>
+    );
+  }
   return (
     <>
       <Link href={`/spillere/${entry.player.slug}`} className={nameLink}>
@@ -125,6 +149,7 @@ export default function RecordPlate({
   unit,
   detailLabel,
   detail = gameLines,
+  pairLink,
 }: Props) {
   const holders = entries.filter((e) => e.rank === 1);
   if (holders.length === 0) return null;
@@ -133,11 +158,9 @@ export default function RecordPlate({
   const shared = holders.length > 1;
 
   const popoverId = `record-${id}`;
-  // A unique dashed-ident anchor name per trigger, bridged to the CSS module
-  // via an inline custom property on both the trigger and its popover.
-  const anchorFor = (name: string) =>
-    ({ '--anchor': `--${name}` }) as React.CSSProperties;
-  const anchorStyle = anchorFor(popoverId);
+  /** What an entry is called in plain text (popover headings, group names). */
+  const nameOf = (entry: RecordEntry) =>
+    pairLink ? pairLink(entry).text : plainNames(entry);
 
   return (
     // An odd plate left alone on the last row spans it, so the wall has no hole.
@@ -156,7 +179,7 @@ export default function RecordPlate({
           {holders.map((holder, i) => (
             <Fragment key={entryKey(holder)}>
               {i > 0 && ', '}
-              <Names entry={holder} />
+              <Names entry={holder} pairLink={pairLink} />
             </Fragment>
           ))}
         </p>
@@ -169,37 +192,27 @@ export default function RecordPlate({
               number at its baseline. A long unit wraps inside its own column
               and grows UPWARD (last-baseline alignment), so its final line
               always sits on the figure's baseline. */}
-          <p className='flex items-baseline-last gap-2 pb-4'>
-            <button
-              type='button'
-              popoverTarget={popoverId}
-              className={`text-accent shrink-0 font-mono text-3xl leading-none tabular-nums ${styles.trigger}`}
-              style={anchorStyle}
+          <div className='flex items-baseline-last gap-2 pb-4'>
+            <Popover
+              id={popoverId}
+              heading={label}
+              tone='accent'
+              className='text-accent shrink-0 font-mono text-3xl leading-none tabular-nums'
+              panel={holders.map((holder) => (
+                <PopoverGroup
+                  key={entryKey(holder)}
+                  name={shared ? nameOf(holder) : undefined}
+                >
+                  {detail(holder)}
+                </PopoverGroup>
+              ))}
             >
               {figure(holders[0])}
               <span className='sr-only'>. {detailLabel}</span>
-            </button>
+            </Popover>
             <span className='text-text-muted font-mono text-xs'>
               {unit(holders[0])}
             </span>
-          </p>
-          <div
-            id={popoverId}
-            popover='auto'
-            className={styles.popover}
-            style={anchorStyle}
-          >
-            <p className={styles.heading}>{label}</p>
-            <div className={`flex flex-col gap-4 ${styles.body}`}>
-              {holders.map((holder) => (
-                <div key={entryKey(holder)} className='flex flex-col'>
-                  {shared && (
-                    <p className={`pt-3 ${eyebrow}`}>{plainNames(holder)}</p>
-                  )}
-                  {detail(holder)}
-                </div>
-              ))}
-            </div>
           </div>
 
           {runnersUp.length > 0 && (
@@ -211,29 +224,19 @@ export default function RecordPlate({
                 >
                   <span className='sr-only'>plass {entry.rank}: </span>
                   <span className='text-text mr-auto text-sm'>
-                    <Names entry={entry} />
+                    <Names entry={entry} pairLink={pairLink} />
                   </span>
                   {/* The same detail as the holder's, for this player. */}
-                  <button
-                    type='button'
-                    popoverTarget={`${popoverId}-${entryKey(entry)}`}
-                    className={`text-text-muted font-mono text-sm tabular-nums ${styles.trigger} ${styles.quiet}`}
-                    style={anchorFor(`${popoverId}-${entryKey(entry)}`)}
+                  <Popover
+                    id={`${popoverId}-${entryKey(entry)}`}
+                    heading={`${label} · ${nameOf(entry)}`}
+                    dense
+                    className='text-text-muted font-mono text-sm tabular-nums'
+                    panel={detail(entry)}
                   >
                     {figure(entry)}
                     <span className='sr-only'>. {detailLabel}</span>
-                  </button>
-                  <div
-                    id={`${popoverId}-${entryKey(entry)}`}
-                    popover='auto'
-                    className={styles.popover}
-                    style={anchorFor(`${popoverId}-${entryKey(entry)}`)}
-                  >
-                    <p className={styles.heading}>
-                      {label} · {plainNames(entry)}
-                    </p>
-                    <div className={styles.body}>{detail(entry)}</div>
-                  </div>
+                  </Popover>
                 </li>
               ))}
               {/* Empty rows keep the list the same height on every plate, so

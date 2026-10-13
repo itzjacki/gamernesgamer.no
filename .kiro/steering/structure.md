@@ -10,6 +10,8 @@ src/
     sesong/[sesong]/    Season page; [game]/ is the game page.
     spillere/           Player index; [spiller]/ is the career page.
     records/            All-time career board, record wall, category crowns.
+    vs/[a]/[b]/         Head-to-head page for one ORDERED pair of players: the
+                        first slug is the left-hand side, so both orders exist.
     admin/              login/ is ungated. Everything under (protected)/ sits
                         behind the allowlist gate in its layout.tsx.
     auth/callback/      OAuth code-exchange. Deliberately outside /admin.
@@ -41,7 +43,8 @@ Each file has one job; keep the boundaries.
 
 - `queries.ts` — the public API pages call: `getSeasonView(n)`,
   `getGameView(n, slug)`, `getCareerView(slug)`, `getAllPlayerSlugs()`,
-  `getRecordsView()`. Returns `null` for not-found; throws on error. Also
+  `getRecordsView()`, `getPairView(a, b)`, `getPairSummaries(slug)`,
+  `getAllPairSlugs()`. Returns `null` for not-found; throws on error. Also
   resolves hero portraits off the filesystem so `compose` stays pure.
 - `fetch.ts` — the IO boundary. `fetchSeasonBundle` and `fetchAllSeasonBundles`.
   Filters `confirmed = true`. Imports no derivation. The bundle also carries
@@ -60,14 +63,20 @@ Each file has one job; keep the boundaries.
   `index.ts` (placement- and season-based records, and the assembly),
   `match-records.ts` (head-to-head matches), `rivalries.ts` (the pair record),
   over shared `helpers.ts`, `rank.ts` and `streaks.ts`. A new record is a
-  function there, a field on `RecordsView`, and a `RecordPlate` on the page. `derive/matches.ts` decides each head-to-head
+  function there, a field on `RecordsView`, and a `RecordPlate` on the page.
+  `derive/pair.ts` (`derivePair`) describes ONE pair for `/vs` from those same
+  joined rows: every figure is over what the two shared (games both played,
+  seasons both finished, matches against each other), never over a whole
+  career, and its sides are `a`/`b` in the order asked for. `derive/matches.ts` decides each head-to-head
   match from its game rows (the outcome is never stored) and puts the decided
   ones on `GameSummary.matches`; careers and the match records read from there.
 - `compose.ts` — pure. The one seam that joins DB view-models to static
   `src/data` content (game by slug, player by name, season by padded slug, title
   by `titleId`). It resolves each game's tags (`gameTags`) and calls
   `deriveTagStats` to fill `CareerView.tagStats`. `composeRecordsView` does the
-  same join for all players and calls `deriveRecords`.
+  same join for all players (`recordsInputs`) and calls `deriveRecords`;
+  `composePairView` and `composePairSummaries` reuse that join for `/vs` and
+  the career page's head-to-head list.
 - `view-models.ts` — the hand-authored camelCase shapes components consume.
 - `raw.ts` — raw row aliases over the generated types. Module-internal.
 

@@ -1,0 +1,236 @@
+/*
+ * The site's one detail-on-demand popover (Popover.tsx): a trigger and the
+ * panel it opens. Behaviour is 100% platform — `[popover]` + `popovertarget`
+ * give toggle, light-dismiss and Escape with no JS, so every user stays a
+ * Server Component. The panel is placed with CSS Anchor Positioning where
+ * supported and falls back to the browser's centred top-layer popover; it
+ * renders in the top layer, so a table's overflow cannot clip it.
+ *
+ * Also the single source of the panel's typography: the heading, a named
+ * group, and the list rows (RecordLines) are styled here, so a popover reads
+ * the same on every page.
+ *
+ * Tokens come from src/styles/global.css @theme. No raw hex, no shadow, no
+ * radius — VERKSTED surface language.
+ *
+ * Note on the cascade: these rules are unlayered, so they beat Tailwind's
+ * utilities. The trigger therefore sets NO colour, face or size (Preflight
+ * already makes a <button> inherit them) — those come from utility classes on
+ * the button or from its context.
+ */
+
+/* ---- Trigger ----------------------------------------------------------- */
+
+.trigger {
+  position: relative;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: inherit;
+  cursor: pointer;
+}
+
+/* Expand the touch/click target to >=44px without growing the line. */
+.trigger::after {
+  content: '';
+  position: absolute;
+  inset: 50% 50% 50% 50%;
+  min-width: 44px;
+  min-height: 44px;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+}
+
+/* In a dense list (rows ~28px apart) the target stops at the row's height
+   rather than overlapping the rows above and below. */
+.dense::after {
+  min-height: 28px;
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* The default look: a word or figure with a hairline dotted underline — the
+   "there's more here" affordance — that earns the accent on hover. */
+.word {
+  text-decoration: underline dotted var(--color-text-muted);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color 150ms;
+}
+
+.word:hover {
+  color: var(--color-accent);
+  text-decoration-color: var(--color-accent);
+}
+
+/* A figure that is already accent at rest (a record, a best): the underline
+   is accent too, and hover firms it up instead of changing the colour. */
+.accent {
+  text-decoration: underline dotted var(--color-accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 6px;
+}
+
+.accent:hover {
+  text-decoration-style: solid;
+}
+
+/* ---- Panel ------------------------------------------------------------- */
+
+.panel {
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  /* The panel sits inside its trigger's cell or label; don't inherit that
+     context's colour, face, size, weight, case, tracking or alignment. */
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 1.5;
+  text-align: left;
+  text-transform: none;
+  /* Fallback (no anchor-positioning support): centred in the viewport. */
+  position: fixed;
+  inset: 0;
+  width: max-content;
+  min-width: min(14rem, calc(100vw - 2rem));
+  max-width: min(24rem, calc(100vw - 2rem));
+  height: max-content;
+  /* A long list scrolls inside the panel, not the page. */
+  max-height: min(26rem, calc(100vh - 2rem));
+  overflow-y: auto;
+  scrollbar-color: var(--color-text-muted) var(--color-bg);
+  scrollbar-width: thin;
+  margin: auto;
+}
+
+.heading {
+  margin: 0;
+  padding: 0.625rem 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* A named group inside the panel (one tied holder's games). */
+.group {
+  margin: 0;
+  padding: 0.625rem 0.75rem 0.25rem;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* The first group sits right under the heading's own rule. */
+.heading + div > .group {
+  border-top: 0;
+}
+
+/* ---- List rows (RecordLines) ------------------------------------------- */
+
+.lines {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.line {
+  display: grid;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.line + .line {
+  border-top: 1px solid var(--color-border);
+}
+
+/* The row's subject: a game title (a link) or a plain label. */
+.title {
+  font-family: var(--font-sans);
+}
+
+a.title {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 150ms;
+}
+
+a.title:hover {
+  color: var(--color-accent);
+}
+
+a.title:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.meta,
+.value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.meta {
+  color: var(--color-text-muted);
+}
+
+/* Rank-1 data (a game win) earns the accent, as in SeasonRecord. */
+.win {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+/* ---- Anchored placement ------------------------------------------------ */
+
+/*
+ * Each trigger passes a unique anchor name via the inline `--anchor` custom
+ * property, and its panel reads the same one. Feature-detected with
+ * `anchor-name`, so unsupported browsers keep the centred fallback above.
+ */
+@supports (anchor-name: --x) {
+  .anchor {
+    anchor-name: var(--anchor);
+  }
+
+  .panel {
+    position: absolute;
+    inset: auto;
+    margin: 0.5rem 0;
+    position-anchor: var(--anchor);
+    position-area: block-end span-inline-end;
+    position-try-fallbacks:
+      block-start span-inline-end,
+      block-end span-inline-start,
+      block-start span-inline-start;
+  }
+
+  /* On a phone a list panel is nearly as wide as the screen, so hanging it
+     off the trigger's edge pushes it past the other one. Keep it under the
+     trigger but span the viewport instead. */
+  @media (max-width: 40rem) {
+    .panel {
+      position-area: none;
+      position-try-fallbacks: none;
+      top: calc(anchor(bottom) + 0.5rem);
+      right: 1rem;
+      left: 1rem;
+      width: auto;
+      max-width: none;
+      margin: 0;
+    }
+  }
+}

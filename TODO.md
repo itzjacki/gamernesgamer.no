@@ -18,8 +18,8 @@ social hub — the site produces artifacts that feed into it.
   (4/3/2/1), career = sum of season placement-points, two separate normalizations
   (season-level → career board; per-game → records/vs, top-anchored). No schema
   change; the multi-season fetch it needed is built (`fetchAllSeasonBundles()`).
-  Full decision: `working-docs/cross-season-normalization.md` (delete when
-  /records + /vs ship). Unblocks /records and /vs.
+  The working doc that held the full decision was deleted when /records and
+  /vs shipped (2026-10-14); it is in git history.
 - **Game title abstraction + genre/format tags:** DATA LAYER BUILT, S1–S4 tagged.
   A stable **title** registry (`src/data/titles.ts`: identity + `genreTags`;
   CS:GO ≈ CS2; LoL instances share a title) sits above the per-season `Game`
@@ -28,9 +28,10 @@ social hub — the site produces artifacts that feed into it.
   (only CS2 parkour uses it). Static data only, no DB change; both vocabularies
   are closed TS unions. Per-player stats by tag are derived and composed
   (`CareerView.tagStats`, genre and format ranked together as one `Tag` list)
-  and shown on the career page.
-  Decisions: `working-docs/game-title-abstraction.md` (delete when the stats
-  ship). Unlocks best/worst genre on career pages and genre comparison on /vs.
+  and shown on the career page, /records and /vs.
+  The working doc that held the decisions was deleted once the tag stats
+  were on /records and /vs (2026-10-14); it is in git history, and the model
+  is described in `.kiro/steering/structure.md` ("Titles and tags").
 - **Editorial appetite:** Several "monument" features (season recaps, "how it went down"
   blocks, Skattkammeret lore content) require written content from Jakob. Scope of these
   features depends on how much curation is realistic.
@@ -145,8 +146,8 @@ slug)` in `src/lib/results/queries.ts`, backed by `read.ts` (publishable
 
 Started. Phase 3 data is live and the shared UI primitives (`Panel`, `Button`,
 `StatList`/`StatRow`) are in place to build on. Season pages, player career
-pages, the player index, the title/genre layer and `/records` are built.
-Next: `/vs`.
+pages, the player index, the title/genre layer, `/records` and `/vs` are
+built, with their copy reviewed. Next: the front page and site navigation.
 
 ### Build order (post-planning 2026-10-07)
 
@@ -167,16 +168,17 @@ the _genre_ stats (not the rest of any page).
    (`src/data/titles.ts`, `titleId`/`formatTags` on every instance), vocabularies
    and the tagging of all 34 games agreed with Jakob. Per-player tag stats are
    BUILT + unit-tested (`deriveTagStats`, joined in `composeCareerView`).
-   Surfaced on the career page (`TagRecord`) and on /records (`TagCrowns`).
-   Remaining: /vs comparison. See `working-docs/game-title-abstraction.md`.
+   Surfaced on the career page (`TagRecord`), on /records (`TagCrowns`) and
+   on /vs (who finished ahead per category). Nothing remaining.
 4. **Multi-season fetch** — DONE early. Built as `fetchAllSeasonBundles()` (a thin
    parallel fan-out over `fetchSeasonBundle`) for the career pages; /records reuses
    it, so this is no longer a blocker there.
 5. **/records** — BUILT: career board + record wall (22 plates) + category
    crowns. See the must-have item below for what is left.
-6. **/vs/[a]/[b]** — last; needs a product-owner refinement pass on the relational
-   stat set first (H2H W/L is the concrete starting stat).
+6. **/vs/[a]/[b]** — BUILT and reviewed, with its entry points on the career
+   page and /records. See the must-have item below.
 7. **Front page** rework — any time after /records exists to link to.
+   **Site navigation** goes with it (see the must-have item below).
 8. **Season-page feature expansion** — end of Phase 4, after the other stats/content
    pages (see must-have item below).
 
@@ -271,9 +273,13 @@ the _genre_ stats (not the rest of any page).
         nothing else takes it at rest. Display labels live in
         `src/data/tag-labels.ts`. All copy is reviewed by Jakob. Builds and prerenders with the full S1–S4 data; the
         visual result has not been reviewed in a browser yet.
-  - [x] **Rivaler section — CUT until /vs lands.** Was a raw `Placeholder` panel;
-        removed entirely rather than shipping a stub. Revisit as a compact H2H
-        teaser once `/vs/[a]/[b]` exists (see the H2H-widget strong idea).
+  - [x] **Rivaler section — replaced by a head-to-head list.** The raw
+        `Placeholder` panel was cut; now that `/vs/[a]/[b]` exists, the career
+        page has a head-to-head list (`PairSummaryList`) between the category
+        record and the card gallery: one row per opponent with games finished
+        ahead each way, the /vs gauge and the match record, the whole row
+        linking to that pair with this player on the left. Copy reviewed by
+        Jakob (2026-10-14).
 - [~] **Player index (/spillere):** BUILT. All players across all seasons as a
   stack of VERKSTED nameplates (`PlayerRoster`) — one six-cell-tall band per
   player, the whole band linking to the career page. Identity and nickname
@@ -295,17 +301,19 @@ the _genre_ stats (not the rest of any page).
         "Regjerende mester" beside it in the header strip (CSS only: the plate
         is one link, so the mark cannot be a popover trigger; the label is
         transparent at rest, so screen readers still get it). No hover on
-        touch screens. **The label is best-effort Norwegian marked
-        `TODO(copy)`** — needs Jakob's pass. Replaced an earlier pass that
-        drew one gold trophy per title.
+        touch screens. Label reviewed by Jakob (2026-10-14). Replaced an
+        earlier pass that drew one gold trophy per title.
   - [x] **Sort by average placement.** Ordered by average season placement,
         best first; the small mono rank mark on each plate is a real all-time
         ranking. Equal averages keep the /records board order
         (placement-points, then titles, then average game placement), so the
         two pages cannot disagree; plates equal on all of it share a rank. A
         player with no finished season yet sorts last with no rank mark and
-        "–" for the average. Accent at rest is the leader's rank mark only, as
-        on `CareerBoard`.
+        "–" for the average. Accent at rest (Jakob, 2026-10-14) is the rank mark on
+        EVERY plate: consistent down the sheet, not a prize for the highest
+        number. Tried and dropped the same day: accent only on the leader's
+        mark (almost no red), on title counts above zero (number-based), and
+        on the diagonal (works on /vs, not here).
   - [x] **Visual rework.** Built and approved by Jakob (2026-10-13). Each plate is ruled like the site's other instruments: a
         mono header strip (rank mark, champion mark), the name (Neue Montreal 800) over the mono nickname, and a footer of hairline-divided figure
         cells (mono eyebrow + mono figure, as in `CareerLedger`). The portrait
@@ -317,19 +325,35 @@ the _genre_ stats (not the rest of any page).
         the colour and turns the border, the diagonal and the name accent. The
         portrait is the dedicated hero image (`public/images/heroes/<slug>.png`,
         via `findHeroImage` in `queries.ts`, shared with the career hero) when
-        one exists, else the latest card art, cropped from the top. Ideas not tried: an accent duotone instead of greyscale, the figure
-        breaking out of the plate's top edge.
+        one exists, else the latest card art, cropped from the top. Idea not tried: the figure breaking out of the
+        plate's top edge. (An accent duotone on hover was tried on /vs and
+        dropped — see there.)
   - [ ] **Real portraits** (Jakob). No dedicated hero image exists yet, so
         every plate shows card art as a placeholder — the same manual step as
         the career page's "Dedicated hero portraits". Revisit the top crop
         once the real images land.
+- [ ] **Site navigation.** Deliberately not wired up yet (Jakob,
+      2026-10-14: "we'll wire up navigation later") — but it is needed, for the
+      site in general and not just one page. Today the header (`SeasonHeader`)
+      only switches seasons, so:
+  - /records has NO inbound link at all.
+  - /vs is reachable only from a career page's head-to-head list, the two
+    pair plates on /records, and its own pair switcher. There is no /vs index
+    (a small matrix of all pairs would give the nav one target).
+  - /spillere is reachable only by URL and from the back links on the career
+    and /vs pages.
+
+  Needs a decision on where the links live (the header, the front page, or
+  both) before building.
+
 - [ ] **Front page (/):** Latest-champion hero + entry points into seasons,
       players, and /records. The live-companion surface (recency); it is NOT the
       all-time career board.
 - [x] ~~**The Hall (/):**~~ **DROPPED** — absorbed into /records (the all-time
       career leaderboard becomes the headline board there) + the front page
       (champion hero). In a world with front page + player pages + /records, a
-      separate Hall had no distinct job. See `working-docs/records-vs-hall-directions.md`.
+      separate Hall had no distinct job. (The directions doc this came from was
+      deleted when /records and /vs shipped; it is in git history.)
 - [~] **/records (Hall of Records):** BUILT, `src/app/records/`. Three parts:
   - **Career board (`CareerBoard`)** — every player, ordered by summed season
     placement-points (4/3/2/1), with a per-season placement strip, titles and
@@ -417,24 +441,154 @@ the _genre_ stats (not the rest of any page).
         (shared with the career page).
   - [ ] **Phone review.** Checked at 375px for overflow only; the plates and
         popovers have not been reviewed by eye on a phone.
-  - [ ] **No entry point.** Nothing links to /records yet — it arrives with
-        the front-page rework.
+  - [ ] **No entry point.** Nothing links to /records yet — see the
+        "Site navigation" must-have.
   - [ ] **`RecordEntry` is a bag of optional fields** (`season`, `title`,
         `tiebreaks`, `seasonPoints`, `matchLines`, `matches`, `opponent`,
         `split`, `partner`, `pair`), one or two per record kind. Fine at
         this size; if more record kinds are added, split it into a
         discriminated union.
-  - [ ] **Three near-identical popover stylesheets** (`GamePointsMatrix`,
-        `GameListPopover`, `RecordPlate`) share their trigger, panel and
-        anchor-positioning rules. Left separate on purpose for now (their
-        triggers differ); worth one shared module if a fourth appears.
+  - [x] **One popover for the whole site** (2026-10-14). The three
+        near-identical popover stylesheets (`GamePointsMatrix`,
+        `GameListPopover`, `RecordPlate`) and the trophy shelf's fourth are
+        gone: every popover is now the `Popover` primitive
+        (`src/components/Popover.tsx` + `Popover.module.css`), and every list
+        inside one is `RecordLines`, styled by the same stylesheet. So a
+        popover opens, positions and reads alike on the season page, the
+        career page, /records and /vs: 13px rows (title in the text face,
+        season and figure in mono), a 12px mono heading. Triggers differ only
+        by `tone` (`word`, `accent`, or `none` for the boxed trophy).
   - [ ] **Deferred records:** biggest season-over-season climb (has happened
         once), a runner-up column on the crowns table.
 
-- [ ] **/vs/[a]/[b] (Head-to-head pages):** Relational stats (H2H W/L record, genre
-      comparison, most-similar/most-different), NOT a per-game dump. Normalization
-      RESOLVED; needs a product-owner refinement pass on the stat set first. See
-      `working-docs/records-vs-hall-directions.md`. Genre stats need the title/genre layer.
+- [x] **/vs/[a]/[b] (Head-to-head pages):** BUILT (2026-10-13/14),
+      `src/app/vs/[a]/[b]/`; reviewed by Jakob, copy included. What is left is
+      under "Follow-ups" at the end of this item. One page per ORDERED pair:
+      the first slug is the left-hand side, so /vs/x/y and /vs/y/x are two pages
+      (decision: it lets a page have a "protagonist" — arriving from your own
+      career page puts you on the left). Every figure is over what the two shared
+      (games both played, seasons both finished, matches against each other),
+      never over either career. Decisions came from a product-owner + designer
+      sparring pass, then Jakob's calls.
+  - **Masthead (`PairHero`)** — names at the outer edges, the two portraits
+    meeting in the middle across one accent diagonal (the page's only "vs"),
+    and the headline reading along the foot: **games finished ahead** (Jakob's
+    call: finished-ahead first, match record second). Games placed level are
+    counted separately and shown only when there are any. Each side — name
+    and portrait together — is ONE link to that player's career page;
+    hovering anywhere on a side brings its portrait's colour back and turns
+    its name accent (the portrait's clip-path is also its hit area).
+  - **Game by game (`PairTrace`)** — every shared game in play order, one
+    block per season: a column per game with side a's final placement above a
+    hairline and side b's below it. The placement that finished ahead is
+    strong (plain text colour, medium weight), the other muted; level games
+    leave both muted. A game win is deliberately NOT told apart from any other
+    game finished ahead, and nothing is accent (Jakob's call, 2026-10-14).
+    Each block ends in the season's tally, which opens the games. Replaced a
+    first version that drew a tick above or below a line per game, with height
+    for the placement gap — it was too hard to read.
+  - **The balance, in three groups of `PairRow` cells** (Jakob's split,
+    2026-10-14 — it was one "Balanse" wall before):
+    - _Matches_ — H2H matches won (one match counts as one whatever its length
+      — decision — with one smaller axis per series length, "best of 1/3/5",
+      centred underneath as sub-parts (`PairMini`)), and the longest run of
+      match wins each way plus the current run (needs 3 matches). The whole
+      group is hidden when the pair never met in a match.
+    - _Games_ — games finished ahead (the masthead's reading again, on
+      purpose, here with a popover of every shared game); the longest run of
+      games finished ahead each way plus the current run (a level game breaks
+      a run); and who finished ahead split by whose pick the game was (three
+      `PairMini`s).
+    - _Seasons_ — seasons finished ahead, with the seasons table in the same
+      frame: per shared season, both final placements and both points totals.
+      A season won (1st) is accent. The frame closes with mirrored
+      `PairMoment` plates, one per side: that player's best season against the
+      other (the largest points margin in a season they finished ahead in).
+      Both plates always show: a side that never finished a season ahead
+      gets the plate with a muted dash (Jakob's call, 2026-10-14 — it was
+      omitted silently before). The figure is accent, as on a record plate.
+
+    A "who won when the two took first and second" row was built and removed
+    by Jakob as unintuitive — don't re-propose it.
+
+  - **Categories** — per tag, who finished ahead over the shared games under
+    it, most level first; `MIN_RANKED_GAMES` applies to the shared games, the
+    rest fold into `UnrankedRows` (muted, and still with a needle). The names
+    and their popover are set like the career page's category table: the name
+    is a `GameListPopover` trigger (text face, semibold when ranked), and the
+    panel lists each game with both placements ("2–4", via a new optional
+    `opponentPlacement` on its results). A pair's rows are never accent — no
+    red "1". The pick-split labels and the best-of labels open the same
+    panel (for the best-of ones the two figures are the series score).
+  - **No separate "moments" section** (removed by Jakob, 2026-10-14). It
+    held the best-season plates, now in the Seasons group, and two "longest
+    run ahead" plates, cut because they repeated the Games group's run row.
+  - **Pair switcher** — plain links to each side's other pairs.
+
+  **The comparison grammar:** one reading on a shared axis, never two columns.
+  Both figures share a colour and weight; a needle on a hairline gauge leans
+  toward whoever has more (centre when level). Every gauge has its needle,
+  whatever the sample: a first version hid it under 3 decided games, and the
+  bare axis read as a bug. Nothing accents "the leader" — in a lopsided
+  pairing that would paint one side top to bottom. Counts, never percentages.
+
+  **Red on the page** (Jakob's rule of thumb, 2026-10-14: every screenful
+  should have some): the masthead diagonal; every gauge needle (it marks the
+  reading, not a player); season wins in the seasons table; and the
+  best-season figures. Still never the figure of whoever is ahead, and the
+  figures inside the /vs popovers are plain too (a red "1" there was removed
+  by Jakob, 2026-10-14).
+
+  **Entry points:** the career page's head-to-head list (`PairSummaryList`,
+  one row per opponent linking to that pair, replacing the cut "Rivaler"
+  section); the two pair plates on /records ("Lengste tak på motstander",
+  "Jevneste rivaleri"), whose names are one link to the pair ("Jørgen på
+  William", "Jakob – Tobias" — `RecordPlate`'s `pairLink`, for the holder and
+  the runners-up alike) instead of a link per player; and the switcher. No /vs
+  index yet. (A "Se oppgjøret" link in the plates' footer row came first and
+  was removed by Jakob, 2026-10-14.)
+
+  **Data layer:** `derive/pair.ts` (`derivePair`, pure, reads the same joined
+  rows as the records) → `composePairView` / `composePairSummaries` →
+  `getPairView(a, b)`, `getPairSummaries(slug)`, `getAllPairSlugs()`.
+  Unit-tested against the S1+S2 oracle (`pair.test.ts`). No new fetch or
+  storage.
+
+  Follow-ups:
+  - [x] **Copy.** Reviewed and rewritten by Jakob (2026-10-14): the whole /vs
+        page, the career page's head-to-head list, and the two pair plates on
+        /records. No `TODO(copy)` marker is left anywhere in `src/`. The
+        labels quoted in this item are descriptions, not the live strings —
+        read the code for those.
+  - [x] **Jakob's review of the page** (2026-10-14): the masthead links,
+        the game-by-game block, the sub-axes, the removed one-two row, the
+        three balance groups, the needle on every gauge, and the moments
+        section folded into Seasons. The needle leaning toward the leader
+        (rather than a share bar) is confirmed. The two "longest run" rows
+        deliberately have no popover — the game-by-game block above shows the
+        runs.
+  - [x] **Hover tint — tried and dropped (2026-10-14).** An accent duotone on
+        hover (an accent layer multiplied over the greyscale portrait, masked
+        by the image) replaced the colour-on-hover on the /vs masthead for one
+        round. Jakob: it does not really work. Both /vs and the player index
+        restore the photo's own colour on hover. Don't re-propose it.
+  - [x] **Popover stylesheet.** Done: /vs uses the site-wide `Popover`
+        (see the note under /records).
+  - [x] **Screen readers** (2026-10-14, a light pass): the game-by-game grid
+        stays hidden from assistive tech, but each season now carries a
+        visually hidden list naming every game with both placements; an empty
+        best-season plate reads "Ingen" rather than a bare dash.
+  - [ ] **Diagonal portrait.** `PairHero` and `PlayerRoster` each draw the
+        clipped greyscale portrait and its diagonal hairline; extract a shared
+        primitive if a third use appears.
+  - [ ] **Later:** a /vs index (a small matrix of all pairs), per-match
+        scorelines, an OG image. Cut by decision: finals/deciders between the
+        two (samples of one to three), round-level stats, power-up stats,
+        percentages, "nemesis"-style labels.
+  - [x] The temporary working docs `records-vs-hall-directions.md` and
+        `cross-season-normalization.md` were deleted (2026-10-14), as their
+        own headers asked once /records and /vs shipped.
+
 - [ ] **Season pages — feature expansion (END of Phase 4):** Deliberately deferred
       until after the other stats/content pages (player pages, /records, /vs) are
       built. The season page is functionally complete now; this is the "go deeper"
@@ -453,9 +607,8 @@ the _genre_ stats (not the rest of any page).
       sheet's bottom line interactive; the standings/player pages are where a
       season rollup is new information).
 - [ ] **Champion card treatment:** Special visual variant for the season winner
-- [ ] **H2H widget on player pages:** Compact head-to-head record vs. each other
-      player. This is the intended replacement for the career page's cut "Rivaler"
-      section — build it when `/vs/[a]/[b]` lands.
+- [x] **H2H widget on player pages:** BUILT with /vs as the career page's "Mot
+      de andre" list (`PairSummaryList`).
 - [ ] **Attached media on game/season pages:** Clips, screenshots, memes in context
 
 ### Explore later

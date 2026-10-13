@@ -1,9 +1,7 @@
 /*
- * Native-popover trophy shelf. Same platform mechanism as
- * GamePointsMatrix.module.css: `[popover]` + `popovertarget` give toggle,
- * light-dismiss, and Escape with no JS, so TrophyShelf stays a Server
- * Component. Positioning uses CSS Anchor Positioning where supported and
- * degrades to the browser's default centered top-layer popover otherwise.
+ * The trophy shelf's own pieces: the boxed trigger and the panel's label and
+ * link. The popover itself (behaviour, panel surface, anchoring) is the shared
+ * Popover component.
  *
  * Tokens come from src/styles/global.css @theme. No raw hex, no shadow, no
  * radius — VERKSTED surface language.
@@ -34,22 +32,7 @@
   outline-offset: 2px;
 }
 
-/* ---- Popover panel ---------------------------------------------------- */
-
-.popover {
-  margin: 0;
-  padding: 0;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg);
-  color: var(--color-text);
-  /* Fallback (no anchor-positioning support): centered in the viewport. */
-  position: fixed;
-  inset: 0;
-  width: max-content;
-  max-width: min(16rem, calc(100vw - 2rem));
-  height: max-content;
-  margin: auto;
-}
+/* ---- Panel content (the panel itself is the shared Popover's) --------- */
 
 .label {
   display: block;
@@ -90,22 +73,4 @@
 .link:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: -2px;
-}
-
-@supports (anchor-name: --x) {
-  .trigger {
-    anchor-name: var(--anchor);
-  }
-
-  .popover {
-    position: absolute;
-    inset: auto;
-    margin: 0;
-    position-anchor: var(--anchor);
-    position-area: block-end span-inline-end;
-    position-try-fallbacks:
-      block-start span-inline-end,
-      block-end span-inline-start,
-      block-start span-inline-start;
-  }
 }

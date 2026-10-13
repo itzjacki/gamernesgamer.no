@@ -16,7 +16,8 @@ Prefer readable duplication over configurable generics. Avoid clever code.
   checkbox with `:has(input:checked)` to switch between two prerendered
   variants. All the stats pages are interactive this way with no client code.
 - Reuse the shared primitives (`Panel`, `Button`, `Checkbox`,
-  `StatList`/`StatRow`, `SectionLabel`, `Heading`) instead of re-inlining surface, button or eyebrow
+  `StatList`/`StatRow`, `SectionLabel`, `Heading`, `Popover` with
+  `RecordLines`) instead of re-inlining surface, button, eyebrow or popover
   markup. Add a new primitive only when a real second use appears.
 - Type props with a local `interface Props` above the component. Components that
   represent a data type (e.g. `GamerCard.tsx`) also export that interface. Types

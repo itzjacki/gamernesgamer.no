@@ -35,6 +35,17 @@ figures on /records, the gamer-card diagonal. Everything else earns accent on
 interaction. Rank-1 data may take it freely; it doesn't need rationing to one
 mark per page.
 
+On a two-player page (/vs) "ahead of the other" is not rank-1 data: never
+accent the leader of a stat, or a one-sided pairing paints one side red. The
+relation is shown by position (a needle on a gauge) or by weight (the
+placement that finished ahead in plain text colour, the other muted).
+
+Rule of thumb for any page: every screenful should carry some accent. Where
+there is no rank-1 datum to spend it on, put it on the instrument rather than
+on a person — on /vs that is the masthead diagonal and every gauge needle,
+alongside the real rank-1 data (season wins, moment figures, game wins in the
+popovers).
+
 **Type:** Neue Montreal (self-hosted) for display (800) and body (400); Martian
 Mono (400) for metadata.
 
@@ -60,10 +71,13 @@ Mono (400) for metadata.
 - Focus: 2px solid accent outline, 2px offset.
 - Table rows: no hover state.
 - Detail on demand: a number or word with more behind it is a native-popover
-  trigger marked with a dotted underline (`GamePointsMatrix`,
-  `GameListPopover`, `RecordPlate`). Prefer it to a `<details>` row when the
-  detail is supplementary; keep `<details>` for folding away more of the same
-  list (`UnrankedRows`).
+  trigger marked with a dotted underline. There is ONE popover on the site,
+  the `Popover` primitive, and one list inside it, `RecordLines`; both are
+  styled by `Popover.module.css`, so every popover opens, positions and reads
+  alike (13px rows, a 12px mono heading). Never add a second popover
+  stylesheet — give `Popover` a new `tone` if a trigger needs a new look.
+  Prefer a popover to a `<details>` row when the detail is supplementary; keep
+  `<details>` for folding away more of the same list (`UnrankedRows`).
 
 ## Anti-slop rules
 

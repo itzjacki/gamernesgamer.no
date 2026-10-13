@@ -15,10 +15,14 @@ import type {
   CareerCard,
   CareerTrophyView,
   RecordGameRow,
+  RecordsPlayerInput,
   RecordsView,
+  PairView,
+  PairSummary,
 } from './view-models';
 import { deriveTagStats } from './derive/career/tags';
 import { deriveRecords } from './derive/records';
+import { derivePair } from './derive/pair';
 
 /**
  * PURE. No IO, no async, no React. Joins the DB-derived view-models
@@ -329,10 +333,11 @@ export function composeCareerView(stats: CareerStats): CareerView {
 
 /**
  * Join every player's CareerStats to the static facts the records need — game
- * title, the cross-season title it belongs to, its tags, and who chose it —
- * then derive the records. Same fail-loud stance as the other composers.
+ * title, the cross-season title it belongs to, its tags, and who chose it.
+ * Shared by the records and the pair views, so both read the same rows. Same
+ * fail-loud stance as the other composers.
  */
-export function composeRecordsView(careers: CareerStats[]): RecordsView {
+function recordsInputs(careers: CareerStats[]): RecordsPlayerInput[] {
   // One game index per season, built on first use — every game and match row
   // of every player looks its game up here.
   const indexes = new Map<string, Map<string, Game>>();
@@ -345,30 +350,117 @@ export function composeRecordsView(careers: CareerStats[]): RecordsView {
     return requireGame(index, row.gameSlug);
   };
 
-  return deriveRecords(
-    careers.map((stats) => ({
-      player: { slug: stats.slug, name: stats.name },
-      seasons: stats.seasons,
-      games: stats.games.map((row): RecordGameRow => {
-        const game = gameOf(row);
-        return {
-          seasonNumber: row.seasonNumber,
-          seasonSlug: row.seasonSlug,
-          gameSlug: row.gameSlug,
-          gameTitle: game.title,
-          placement: row.placement,
-          ownPick: game.chosenBy === stats.name,
-          titleId: game.titleId,
-          titleName: titles[game.titleId].name,
-          tags: gameTags(game),
-          powerUpDelta: row.powerUpDelta,
-          ordinal: row.ordinal,
-        };
-      }),
-      matches: stats.matches.map((row) => ({
-        ...row,
-        gameTitle: gameOf(row).title,
-      })),
+  return careers.map((stats) => ({
+    player: { slug: stats.slug, name: stats.name },
+    seasons: stats.seasons,
+    games: stats.games.map((row): RecordGameRow => {
+      const game = gameOf(row);
+      return {
+        seasonNumber: row.seasonNumber,
+        seasonSlug: row.seasonSlug,
+        gameSlug: row.gameSlug,
+        gameTitle: game.title,
+        placement: row.placement,
+        ownPick: game.chosenBy === stats.name,
+        titleId: game.titleId,
+        titleName: titles[game.titleId].name,
+        tags: gameTags(game),
+        powerUpDelta: row.powerUpDelta,
+        ordinal: row.ordinal,
+      };
+    }),
+    matches: stats.matches.map((row) => ({
+      ...row,
+      gameTitle: gameOf(row).title,
     })),
-  );
+  }));
+}
+
+/** Join every player's career to static content, then derive the records. */
+export function composeRecordsView(careers: CareerStats[]): RecordsView {
+  return deriveRecords(recordsInputs(careers));
+}
+
+/* -------------------------------------------------------------------------- */
+/* Pair (two players, head to head)                                           */
+/* -------------------------------------------------------------------------- */
+
+/** True when the two have at least one game in common. */
+function shareAGame(a: RecordsPlayerInput, b: RecordsPlayerInput): boolean {
+  const theirs = new Set(b.games.map((g) => `${g.seasonSlug}/${g.gameSlug}`));
+  return a.games.some((g) => theirs.has(`${g.seasonSlug}/${g.gameSlug}`));
+}
+
+/**
+ * The /vs view for `slugA` against `slugB`, in that order (the first is side
+ * `a`). Joins the pair derivation to each player's latest nickname and card
+ * art (the dedicated hero portrait, if any, is resolved in queries.ts — compose
+ * stays IO-free) and to who else each has played, for the pair switcher.
+ *
+ * Null when either slug is unknown, the two are the same player, or they have
+ * never shared a game.
+ */
+export function composePairView(
+  careers: CareerStats[],
+  slugA: string,
+  slugB: string,
+): PairView | null {
+  const inputs = recordsInputs(careers);
+  const a = inputs.find((p) => p.player.slug === slugA);
+  const b = inputs.find((p) => p.player.slug === slugB);
+  if (!a || !b) return null;
+
+  const stats = derivePair(a, b);
+  if (!stats) return null;
+
+  const side = (input: RecordsPlayerInput) => {
+    // Latest season played (rows are season-ascending, so the last one).
+    const latest = input.seasons[input.seasons.length - 1];
+    const gamer = requireGamer(
+      gamerByName(seasonContent(latest.seasonSlug).gamers),
+      input.player.name,
+    );
+    return {
+      ...input.player,
+      nickname: gamer.nickname,
+      imagePath: gamer.imagePath,
+      opponents: inputs
+        .filter((other) => other !== input && shareAGame(input, other))
+        .map((other) => other.player),
+    };
+  };
+
+  return { ...stats, a: side(a), b: side(b) };
+}
+
+/**
+ * One line per opponent for a player's career page: who finished ahead over
+ * their shared games, and their match record. Ordered by opponent name; an
+ * opponent the player never shared a game with is left out. Empty when the
+ * slug is unknown.
+ */
+export function composePairSummaries(
+  careers: CareerStats[],
+  slug: string,
+): PairSummary[] {
+  const inputs = recordsInputs(careers);
+  const me = inputs.find((p) => p.player.slug === slug);
+  if (!me) return [];
+
+  return inputs
+    .flatMap((other): PairSummary[] => {
+      const pair = derivePair(me, other);
+      if (!pair) return [];
+      return [
+        {
+          opponent: other.player,
+          ahead: pair.finishedAhead.a,
+          behind: pair.finishedAhead.b,
+          level: pair.finishedAhead.level,
+          matchWins: pair.matches.a,
+          matchLosses: pair.matches.b,
+        },
+      ];
+    })
+    .sort((x, y) => x.opponent.name.localeCompare(y.opponent.name, 'no'));
 }
