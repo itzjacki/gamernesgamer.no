@@ -1,23 +1,24 @@
 import Link from 'next/link';
 import { Fragment } from 'react';
 import type { RecordEntry } from '@/lib/results/view-models';
+import RecordLines from './RecordLines';
 import styles from './RecordPlate.module.css';
 
 /**
  * One record on the /records wall: who holds it, the number, and the three
- * players behind them (the whole field of four). The holder's name sits at the top (sentence case,
- * regular weight, a step larger than the rest); the mono figure, with its unit running on
- * from it on the same line, sits along the bottom of the upper area, directly
- * over the runners-up. Neither is large: the name leads, the figure is a
- * modest readout. `bg-bg` inside a `bg-border` + `gap-px` hairline wall, like a
- * CareerLedger cell.
+ * players behind them (the whole field of four). The holder's name sits at the
+ * top (sentence case, regular weight, a step larger than the rest); the mono
+ * figure, with its unit running on from it on the same line, sits along the
+ * bottom of the upper area, directly over the runners-up. Neither is large:
+ * the name leads, the figure is a modest readout. `bg-bg` inside a `bg-border`
+ * + `gap-px` hairline wall, like a CareerLedger cell.
  *
  * A plate is written to stand alone when cropped into the group chat: its own
  * label, a scope stamp saying which seasons it covers, and the runners-up that
  * give the number its meaning.
  *
- * - Ties: every rank-1 entry is a holder, on one line, over one shared figure. No
- *   tiebreak is applied here that the reader can't see.
+ * - Ties: every rank-1 entry is a holder, on one line, over one shared figure.
+ *   No tiebreak is applied here that the reader can't see.
  * - The holder's FIGURE carries the accent at rest: it is the record, the
  *   rank-1 datum of the plate. (An earlier pass kept the wall accent-free, on
  *   the grounds that every plate names a winner; the page read too flat.) The
@@ -29,16 +30,15 @@ import styles from './RecordPlate.module.css';
  * - The figure is a native-popover trigger (`<button popovertarget>` +
  *   `[popover]`, no JS, stays a Server Component — the same pattern as
  *   GamePointsMatrix and TagRecord), marked with a dotted underline. The panel
- *   lists the games behind the number; each runner-up's figure opens the same
- *   list for that player. It replaced a <details> at the foot of
- *   the plate, which read as a continuation of the runners-up list.
+ *   lists the games behind the number (`RecordLines`); each runner-up's
+ *   figure opens the same list for that player.
  */
 
 interface Props {
   /** Fragment id, so a link can go with a screenshot (`/records#<id>`). */
   id: string;
   label: string;
-  /** Which seasons the record covers, e.g. "GG · S1–S4". */
+  /** Which seasons the record covers, e.g. "S1–S4". */
   scope: string;
   /** The record's entries, best first with shared ranks. */
   entries: RecordEntry[];
@@ -64,8 +64,6 @@ const MAX_RUNNERS_UP = 3;
 const eyebrow = 'text-text-muted font-mono text-xs tracking-widest uppercase';
 const nameLink =
   'hover:text-accent focus-visible:outline-accent underline-offset-2 transition-colors duration-150 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2';
-const link =
-  'hover:text-accent focus-visible:outline-accent underline underline-offset-2 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2';
 
 /** A stable key for an entry: the player, plus the partner in a pair record. */
 const entryKey = (entry: RecordEntry) =>
@@ -99,36 +97,22 @@ function Names({ entry }: { entry: RecordEntry }) {
 }
 
 /** The games behind a figure: title (to the game page), season, placement. */
-function GameLines({ entry }: { entry: RecordEntry }) {
+function gameLines(entry: RecordEntry) {
   return (
-    <ul className='flex flex-col'>
-      {entry.games.map((game) => (
-        <li
-          key={`${game.seasonSlug}-${game.gameSlug}`}
-          className='border-border grid grid-cols-[1fr_auto_auto] items-baseline gap-4 border-t py-2 first:border-t-0'
-        >
-          <Link
-            href={`/sesong/${game.seasonSlug}/${game.gameSlug}`}
-            className={`text-sm ${link}`}
-          >
-            {game.gameTitle}
-          </Link>
-          <span className='text-text-muted font-mono text-sm tabular-nums'>
-            <span className='sr-only'>sesong </span>
-            <span aria-hidden='true'>S</span>
-            {game.seasonNumber}
-          </span>
-          <span
-            className={`font-mono text-sm tabular-nums ${
-              game.placement === 1 ? 'text-accent font-bold' : 'text-text'
-            }`}
-          >
+    <RecordLines
+      lines={entry.games.map((game) => ({
+        key: `${game.seasonSlug}-${game.gameSlug}`,
+        game,
+        seasonNumber: game.seasonNumber,
+        value: (
+          <>
             <span className='sr-only'>plass </span>
             {game.placement}
-          </span>
-        </li>
-      ))}
-    </ul>
+          </>
+        ),
+        accent: game.placement === 1,
+      }))}
+    />
   );
 }
 
@@ -140,7 +124,7 @@ export default function RecordPlate({
   figure,
   unit,
   detailLabel,
-  detail = (holder) => <GameLines entry={holder} />,
+  detail = gameLines,
 }: Props) {
   const holders = entries.filter((e) => e.rank === 1);
   if (holders.length === 0) return null;

@@ -29,3 +29,12 @@ export function rankEntries(
 /** Higher `value` first — the ordering of every plain count record. */
 export const byValueDesc = (a: UnrankedEntry, b: UnrankedEntry) =>
   b.value - a.value;
+
+/** `value` as a share of `outOf`, higher first; then the larger sample. */
+export const byRateDesc = (a: UnrankedEntry, b: UnrankedEntry) =>
+  b.value / (b.outOf || 1) - a.value / (a.outOf || 1) ||
+  (b.outOf ?? 0) - (a.outOf ?? 0);
+
+/** Count records name who did something, not who didn't: drop the zeros. */
+export const withoutZeros = (entries: UnrankedEntry[]) =>
+  entries.filter((e) => e.value > 0);

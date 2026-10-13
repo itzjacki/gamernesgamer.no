@@ -333,13 +333,24 @@ export function composeCareerView(stats: CareerStats): CareerView {
  * then derive the records. Same fail-loud stance as the other composers.
  */
 export function composeRecordsView(careers: CareerStats[]): RecordsView {
+  // One game index per season, built on first use — every game and match row
+  // of every player looks its game up here.
+  const indexes = new Map<string, Map<string, Game>>();
+  const gameOf = (row: { seasonSlug: string; gameSlug: string }) => {
+    let index = indexes.get(row.seasonSlug);
+    if (!index) {
+      index = gameBySlug(seasonContent(row.seasonSlug).games);
+      indexes.set(row.seasonSlug, index);
+    }
+    return requireGame(index, row.gameSlug);
+  };
+
   return deriveRecords(
     careers.map((stats) => ({
       player: { slug: stats.slug, name: stats.name },
       seasons: stats.seasons,
       games: stats.games.map((row): RecordGameRow => {
-        const content = seasonContent(row.seasonSlug);
-        const game = requireGame(gameBySlug(content.games), row.gameSlug);
+        const game = gameOf(row);
         return {
           seasonNumber: row.seasonNumber,
           seasonSlug: row.seasonSlug,
@@ -356,10 +367,7 @@ export function composeRecordsView(careers: CareerStats[]): RecordsView {
       }),
       matches: stats.matches.map((row) => ({
         ...row,
-        gameTitle: requireGame(
-          gameBySlug(seasonContent(row.seasonSlug).games),
-          row.gameSlug,
-        ).title,
+        gameTitle: gameOf(row).title,
       })),
     })),
   );

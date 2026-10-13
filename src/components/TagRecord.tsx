@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import Checkbox from './Checkbox';
 import SectionLabel from './SectionLabel';
 import GameListPopover from './GameListPopover';

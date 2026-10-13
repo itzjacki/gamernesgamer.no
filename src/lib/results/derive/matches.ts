@@ -30,10 +30,9 @@ export function matchesByGame(
 
   const rowsByMatch = new Map<string, typeof bundle.matchGames>();
   for (const row of bundle.matchGames) {
-    rowsByMatch.set(row.match_id, [
-      ...(rowsByMatch.get(row.match_id) ?? []),
-      row,
-    ]);
+    const rows = rowsByMatch.get(row.match_id);
+    if (rows) rows.push(row);
+    else rowsByMatch.set(row.match_id, [row]);
   }
 
   /** Games won by each side, from either encoding (see above). */

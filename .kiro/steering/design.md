@@ -59,6 +59,11 @@ Mono (400) for metadata.
 - Link: underlined at rest, accent on hover.
 - Focus: 2px solid accent outline, 2px offset.
 - Table rows: no hover state.
+- Detail on demand: a number or word with more behind it is a native-popover
+  trigger marked with a dotted underline (`GamePointsMatrix`,
+  `GameListPopover`, `RecordPlate`). Prefer it to a `<details>` row when the
+  detail is supplementary; keep `<details>` for folding away more of the same
+  list (`UnrankedRows`).
 
 ## Anti-slop rules
 
