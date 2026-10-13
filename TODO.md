@@ -354,7 +354,7 @@ the _genre_ stats (not the rest of any page).
       (champion hero). In a world with front page + player pages + /records, a
       separate Hall had no distinct job. (The directions doc this came from was
       deleted when /records and /vs shipped; it is in git history.)
-- [~] **/records (Hall of Records):** BUILT, `src/app/records/`. Three parts:
+- [x] **/records (Hall of Records):** BUILT and reviewed, `src/app/records/`. Three parts:
   - **Career board (`CareerBoard`)** — every player, ordered by summed season
     placement-points (4/3/2/1), with a per-season placement strip, titles and
     game wins. The leader's position marker carries the accent. The strip
@@ -427,6 +427,9 @@ the _genre_ stats (not the rest of any page).
     season page); fastest to five wins; the H2H rock-paper-scissors cycle
     (no holder, one result breaks it); card stats vs. results (belongs with
     the player cards).
+  - Deferred at first, then cut by Jakob (2026-10-14): biggest
+    season-over-season climb (it has happened once); a runner-up column on
+    the crowns table.
   - Would need round-level data (`round`/`round_result`, not fetched yet):
     rounds won in games the player did not win; largest share of the field's
     combined score in one game; share of individual rounds won (one player
@@ -435,19 +438,13 @@ the _genre_ stats (not the rest of any page).
     power-up affects its own user); team/duo records (team composition in
     the one 2v2 game is not stored).
 
-  Remaining:
+  Closed out (nothing is left on the page itself; linking to it is the "Site
+  navigation" item):
   - [x] **Copy.** Jakob's pass is done on the page (2026-10-13), including
         the "Vis flere" disclosure labels and caption in `UnrankedRows`
         (shared with the career page).
-  - [ ] **Phone review.** Checked at 375px for overflow only; the plates and
-        popovers have not been reviewed by eye on a phone.
-  - [ ] **No entry point.** Nothing links to /records yet — see the
-        "Site navigation" must-have.
-  - [ ] **`RecordEntry` is a bag of optional fields** (`season`, `title`,
-        `tiebreaks`, `seasonPoints`, `matchLines`, `matches`, `opponent`,
-        `split`, `partner`, `pair`), one or two per record kind. Fine at
-        this size; if more record kinds are added, split it into a
-        discriminated union.
+  - [x] **Phone review.** Jakob has looked at it on mobile (2026-10-14): it
+        looks good.
   - [x] **One popover for the whole site** (2026-10-14). The three
         near-identical popover stylesheets (`GamePointsMatrix`,
         `GameListPopover`, `RecordPlate`) and the trophy shelf's fourth are
@@ -458,8 +455,6 @@ the _genre_ stats (not the rest of any page).
         career page, /records and /vs: 13px rows (title in the text face,
         season and figure in mono), a 12px mono heading. Triggers differ only
         by `tone` (`word`, `accent`, or `none` for the boxed trophy).
-  - [ ] **Deferred records:** biggest season-over-season climb (has happened
-        once), a runner-up column on the crowns table.
 
 - [x] **/vs/[a]/[b] (Head-to-head pages):** BUILT (2026-10-13/14),
       `src/app/vs/[a]/[b]/`; reviewed by Jakob, copy included. What is left is
@@ -607,8 +602,8 @@ the _genre_ stats (not the rest of any page).
       sheet's bottom line interactive; the standings/player pages are where a
       season rollup is new information).
 - [ ] **Champion card treatment:** Special visual variant for the season winner
-- [x] **H2H widget on player pages:** BUILT with /vs as the career page's "Mot
-      de andre" list (`PairSummaryList`).
+- [x] **H2H widget on player pages:** BUILT with /vs as the career page's
+      head-to-head list (`PairSummaryList`).
 - [ ] **Attached media on game/season pages:** Clips, screenshots, memes in context
 
 ### Explore later
