@@ -48,8 +48,14 @@ interface Props {
  *
  * Portraits are desaturated at rest so photos from different seasons and
  * sources read as one set; a plate gets its colour back (and the accent on
- * its border, diagonal and name) on hover/focus. Accent at rest is the
- * leader's rank mark only, as on CareerBoard.
+ * its border, diagonal and name) on hover/focus.
+ *
+ * Accent at rest is the rank mark, on EVERY plate — the same mark in the same
+ * place, whoever it is, so the red is a consistent rhythm down the sheet
+ * rather than a prize for the highest number. (Tried and dropped: accent only
+ * on the leader's mark, which left the sheet almost without red; accent on
+ * title counts above zero, which made it depend on the numbers; and an accent
+ * diagonal, which does not work here although it does on /vs.)
  *
  * Rendered as a Server Component: no client JS.
  */
@@ -108,11 +114,7 @@ function PlayerPlate({ entry }: { entry: RosterEntry }) {
         className={`border-border flex h-8 shrink-0 items-center gap-3 border-b px-4 sm:h-10 sm:px-8 ${clearOfPortrait}`}
       >
         {career && (
-          <span
-            className={`font-mono text-xs tracking-widest tabular-nums ${
-              career.rank === 1 ? 'text-accent' : 'text-text-muted'
-            }`}
-          >
+          <span className='text-accent font-mono text-xs tracking-widest tabular-nums'>
             <span className='sr-only'>Plass </span>
             {String(career.rank).padStart(2, '0')}
           </span>

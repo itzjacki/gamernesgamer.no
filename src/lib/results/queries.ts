@@ -5,12 +5,19 @@ import path from 'node:path';
 import { fetchSeasonBundle, fetchAllSeasonBundles } from './fetch';
 import { assembleSeasonView, assembleGameView } from './derive';
 import { assembleCareer, assembleAllCareers } from './derive/career';
-import { composeCareerView, composeRecordsView } from './compose';
+import {
+  composeCareerView,
+  composePairSummaries,
+  composePairView,
+  composeRecordsView,
+} from './compose';
 import type {
   SeasonView,
   GameView,
   CareerView,
   RecordsView,
+  PairView,
+  PairSummary,
 } from './view-models';
 import { allPlayers } from '../players/roster';
 
@@ -87,6 +94,54 @@ export async function getCareerView(slug: string): Promise<CareerView | null> {
 export async function getRecordsView(): Promise<RecordsView> {
   const bundles = await fetchAllSeasonBundles();
   return composeRecordsView(assembleAllCareers(bundles));
+}
+
+/**
+ * Every ordered pair of players for generateStaticParams on /vs/[a]/[b]. Both
+ * orders are listed: the first slug is the page's left-hand side, so /vs/x/y
+ * and /vs/y/x are two pages. Pure static data: a pair is two players who share
+ * a season roster. A pair with no confirmed results in common still gets a
+ * param; getPairView then returns null → notFound().
+ */
+export function getAllPairSlugs(): { a: string; b: string }[] {
+  const players = allPlayers();
+  return players.flatMap((a) =>
+    players
+      .filter(
+        (b) =>
+          b.slug !== a.slug && b.seasons.some((s) => a.seasons.includes(s)),
+      )
+      .map((b) => ({ a: a.slug, b: b.slug })),
+  );
+}
+
+/**
+ * The /vs page's read API: `a` against `b`, in that order. Null when either
+ * slug is unknown, they are the same player, or the two never shared a game
+ * (→ notFound()); throws on a real fetch error.
+ */
+export async function getPairView(
+  a: string,
+  b: string,
+): Promise<PairView | null> {
+  const bundles = await fetchAllSeasonBundles();
+  const view = composePairView(assembleAllCareers(bundles), a, b);
+  if (!view) return null;
+
+  const withHero = (side: PairView['a']) => ({
+    ...side,
+    imagePath: findHeroImage(side.slug) ?? side.imagePath,
+  });
+  return { ...view, a: withHero(view.a), b: withHero(view.b) };
+}
+
+/**
+ * The career page's head-to-head list: one line per opponent the player has
+ * shared a game with. Empty for an unknown slug.
+ */
+export async function getPairSummaries(slug: string): Promise<PairSummary[]> {
+  const bundles = await fetchAllSeasonBundles();
+  return composePairSummaries(assembleAllCareers(bundles), slug);
 }
 
 /**

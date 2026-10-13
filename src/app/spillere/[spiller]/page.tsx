@@ -1,12 +1,18 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { getCareerView, getAllPlayerSlugs } from '@/lib/results/queries';
+import {
+  getCareerView,
+  getAllPlayerSlugs,
+  getPairSummaries,
+} from '@/lib/results/queries';
 import PlayerHero from '@/components/PlayerHero';
 import TrophyShelf from '@/components/TrophyShelf';
 import CareerLedger from '@/components/CareerLedger';
 import SeasonRecord from '@/components/SeasonRecord';
 import CardGallery from '@/components/CardGallery';
 import TagRecord from '@/components/TagRecord';
+import SectionLabel from '@/components/SectionLabel';
+import PairSummaryList from '@/components/PairSummaryList';
 
 interface Props {
   params: Promise<{ spiller: string }>;
@@ -23,6 +29,7 @@ export default async function PlayerCareerPage({ params }: Props) {
   if (!career) {
     notFound();
   }
+  const rivals = await getPairSummaries(spiller);
 
   const {
     hero,
@@ -61,6 +68,21 @@ export default async function PlayerCareerPage({ params }: Props) {
           statsWithoutOwnPicks={tagStatsWithoutOwnPicks}
         />
       </section>
+
+      {rivals.length > 0 && (
+        <section id='head-to-head' className='flex flex-col gap-6'>
+          <SectionLabel>Innbyrdes statistikk</SectionLabel>
+          <PairSummaryList
+            player={{ slug: career.slug, name: hero.name }}
+            summaries={rivals}
+            labels={{
+              opponent: 'Motstander',
+              games: 'I spill',
+              matches: 'I matcher',
+            }}
+          />
+        </section>
+      )}
 
       <section id='cards' className='flex flex-col gap-8'>
         <CardGallery cards={cards} playerName={hero.name} label='Samlekort' />

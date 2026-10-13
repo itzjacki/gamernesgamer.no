@@ -1,4 +1,5 @@
-import styles from './GamePointsMatrix.module.css';
+import Popover from './Popover';
+import RecordLines from './RecordLines';
 
 /**
  * GamePointsMatrix — the per-game points "box score" for a finished season.
@@ -100,44 +101,31 @@ function PopoverCell({
   cell: MatrixCell;
   popoverId: string;
 }) {
-  // A unique dashed-ident anchor name per cell, bridged to the CSS module via
-  // an inline custom property on both the trigger and its popover.
-  const anchorName = `--${popoverId}`;
-  const anchorStyle = { '--anchor': anchorName } as React.CSSProperties;
-
   return (
     <td className='relative px-3 py-3 text-center font-mono text-sm tabular-nums'>
-      <button
-        type='button'
-        popoverTarget={popoverId}
-        className={styles.trigger}
-        style={anchorStyle}
-        aria-label={`${cell.points} poeng, vis poengfordeling`}
-      >
-        <span className={styles.affordance}>{cell.points}</span>
-      </button>
-
-      <div
+      <Popover
         id={popoverId}
-        popover='auto'
-        className={styles.popover}
-        style={anchorStyle}
+        label={`${cell.points} poeng, vis poengfordeling`}
+        className='text-text'
+        panel={
+          <RecordLines
+            lines={[
+              {
+                key: 'ladder',
+                label: 'Poeng fra spillet',
+                value: cell.ladderPoints,
+              },
+              ...cell.powerUpUses.map((use, i) => ({
+                key: `${use.name}-${i}`,
+                label: use.name,
+                value: signedDelta(use.pointsDelta),
+              })),
+            ]}
+          />
+        }
       >
-        <ul className={styles.lines}>
-          <li className={styles.line}>
-            <span className={styles.lineName}>Poeng fra spillet</span>
-            <span className={styles.lineDelta}>{cell.ladderPoints}</span>
-          </li>
-          {cell.powerUpUses.map((use, i) => (
-            <li key={`${use.name}-${i}`} className={styles.line}>
-              <span className={styles.lineName}>{use.name}</span>
-              <span className={styles.lineDelta}>
-                {signedDelta(use.pointsDelta)}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </div>
+        {cell.points}
+      </Popover>
     </td>
   );
 }

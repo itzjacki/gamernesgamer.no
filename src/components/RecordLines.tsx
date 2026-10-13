@@ -1,18 +1,23 @@
 import Link from 'next/link';
+import styles from './Popover.module.css';
 
 /**
- * The list inside a record's popover: what is behind the number. One row per
- * game (title linking to the game page, season, value) or per season (season,
- * value). RecordPlate uses it for its default "games behind the figure" list,
- * and /records builds the other details (matches, points, power-ups, pairs)
- * from the same rows so every popover reads alike.
+ * The list inside a popover: what is behind a number or a word. One row per
+ * game (title linking to the game page, season, value), per season (season,
+ * value) or per plain label (label, value). Every popover list on the site is
+ * built from these rows — the games behind a category, a record, a pair's
+ * tally, a points breakdown — so they all read alike. Styled by the shared
+ * popover stylesheet.
  */
 
 export interface RecordLine {
   key: string;
-  /** The game the row is about; leave out for a row about a whole season. */
+  /** The game the row is about; its title links to the game page. */
   game?: { seasonSlug: string; gameSlug: string; gameTitle: string };
-  seasonNumber: number;
+  /** A plain subject instead of a game (a power-up, "points from the game"). */
+  label?: string;
+  /** The season the row is from or about; leave out for a label row. */
+  seasonNumber?: number;
   /** The row's figure, set in the mono face on the right. */
   value?: React.ReactNode;
   /** Rank-1 data (a game win): the value takes the accent. */
@@ -21,42 +26,44 @@ export interface RecordLine {
   text?: string;
 }
 
-const row =
-  'border-border grid items-baseline gap-4 border-t py-2 text-sm first:border-t-0';
-const link =
-  'hover:text-accent focus-visible:outline-accent underline underline-offset-2 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2';
-
 export default function RecordLines({ lines }: { lines: RecordLine[] }) {
   return (
-    <ul className='flex flex-col'>
+    <ul className={styles.lines}>
       {lines.map((line) => {
-        const columns = line.game
-          ? 'grid-cols-[1fr_auto_auto]'
-          : line.text
-            ? 'grid-cols-[auto_1fr]'
-            : 'grid-cols-[1fr_auto]';
+        const hasSubject = line.game !== undefined || line.label !== undefined;
+        const hasSeason = line.seasonNumber !== undefined;
+        const columns =
+          hasSubject && hasSeason
+            ? 'grid-cols-[1fr_auto_auto]'
+            : line.text
+              ? 'grid-cols-[auto_1fr]'
+              : 'grid-cols-[1fr_auto]';
         return (
-          <li key={line.key} className={`${columns} ${row}`}>
-            {line.game && (
+          <li key={line.key} className={`${columns} ${styles.line}`}>
+            {line.game ? (
               <Link
                 href={`/sesong/${line.game.seasonSlug}/${line.game.gameSlug}`}
-                className={link}
+                className={styles.title}
               >
                 {line.game.gameTitle}
               </Link>
+            ) : (
+              line.label !== undefined && (
+                <span className={styles.title}>{line.label}</span>
+              )
             )}
-            <span className='text-text-muted font-mono tabular-nums'>
-              <span className='sr-only'>sesong </span>
-              <span aria-hidden='true'>S</span>
-              {line.seasonNumber}
-            </span>
+            {hasSeason && (
+              <span className={styles.meta}>
+                <span className='sr-only'>sesong </span>
+                <span aria-hidden='true'>S</span>
+                {line.seasonNumber}
+              </span>
+            )}
             {line.text ? (
               <span>{line.text}</span>
             ) : (
               <span
-                className={`font-mono tabular-nums ${
-                  line.accent ? 'text-accent font-bold' : ''
-                }`}
+                className={`${styles.value} ${line.accent ? styles.win : ''}`}
               >
                 {line.value}
               </span>

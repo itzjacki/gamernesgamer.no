@@ -615,3 +615,154 @@ export interface RecordsView {
    */
   tagCrownsWithoutOwnPicks: TagCrown[];
 }
+
+/* -------------------------------------------------------------------------- */
+/* Pair (two players, head to head)                                           */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Pair view-models: the /vs page. Where the records compare ALL players, these
+ * describe ONE pair, and every figure is over what the two shared — games both
+ * played, seasons both finished, matches against each other — never over
+ * either player's whole career. The two sides are `a` and `b` in the order the
+ * caller asked for them (the URL order); nothing here ranks one over the other.
+ */
+
+export type PairSide = 'a' | 'b';
+
+/** One game both played, with both final placements. */
+export interface PairGame {
+  seasonNumber: number;
+  seasonSlug: string;
+  gameSlug: string;
+  gameTitle: string;
+  /** Play order within the season (game.ordinal). */
+  ordinal: number;
+  /** Each side's final placement in the game. */
+  a: number;
+  b: number;
+  tags: Tag[];
+  /** Which of the two chose the game; null when someone else did. */
+  pickedBy: PairSide | null;
+}
+
+/**
+ * Who finished ahead over a set of shared games: `a` and `b` count the games
+ * each finished ahead of the other, `level` those where they placed the same.
+ */
+export interface PairTally {
+  a: number;
+  b: number;
+  level: number;
+  /** The games behind the tally, in play order. */
+  games: PairGame[];
+}
+
+/** One head-to-head match between the two. */
+export interface PairMatch {
+  seasonNumber: number;
+  seasonSlug: string;
+  gameSlug: string;
+  gameTitle: string;
+  /** The series length as a number: 1, 3 or 5. */
+  bestOf: number;
+  /** Game rows each side won in the match. */
+  a: number;
+  b: number;
+  winner: PairSide;
+  /** Bracket position (`F`, `GF`, `SF1`, …); null in a round-robin. */
+  slotId: string | null;
+}
+
+/** Match wins each way over a set of the pair's matches, in play order. */
+export interface PairMatchTally {
+  a: number;
+  b: number;
+  matches: PairMatch[];
+}
+
+/** One season both finished. */
+export interface PairSeason {
+  season: RecordSeason;
+  a: { placement: number; totalPoints: number };
+  b: { placement: number; totalPoints: number };
+  /** Who got the better final placement; null if the two are equal. */
+  ahead: PairSide | null;
+  /** Who finished ahead, game by game, that season. */
+  tally: PairTally;
+}
+
+/** One category (tag) over the games the two shared under it. */
+export interface PairCategory {
+  tag: Tag;
+  tally: PairTally;
+}
+
+/** The pure pair derivation's output: DB facts plus the joined game rows. */
+export interface PairStats {
+  a: RecordPlayer;
+  b: RecordPlayer;
+  /** Every shared season, ascending. */
+  seasons: PairSeason[];
+  /** Seasons each finished ahead of the other in. */
+  seasonsAhead: { a: number; b: number };
+  /** Who finished ahead over every shared game. */
+  finishedAhead: PairTally;
+  /** Their matches against each other, with one sub-tally per series length. */
+  matches: PairMatchTally & {
+    byBestOf: ({ bestOf: number } & PairMatchTally)[];
+  };
+  /** Runs of consecutive match wins over the other. */
+  matchRuns: {
+    /** The run standing after their latest match; null when they never met. */
+    current: { side: PairSide; matches: PairMatch[] } | null;
+    /** Each side's longest (the later one when two are equally long). */
+    longest: { a: PairMatch[]; b: PairMatch[] };
+  };
+  /** Runs of consecutive shared games finishing ahead of the other. */
+  gameRuns: {
+    /**
+     * The run standing after their latest shared game; null when they placed
+     * level in it (a level game breaks a run).
+     */
+    current: { side: PairSide; games: PairGame[] } | null;
+    /** Each side's longest (the later one when two are equally long). */
+    longest: { a: PairGame[]; b: PairGame[] };
+  };
+  /** Who finished ahead, split by whose pick the game was. */
+  picks: { a: PairTally; b: PairTally; others: PairTally };
+  /** One entry per tag, the most level first. Unfiltered (no minimum sample). */
+  categories: PairCategory[];
+  moments: {
+    /** Each side's best season against the other, by points margin; null if none. */
+    bestSeason: { a: PairSeason | null; b: PairSeason | null };
+  };
+}
+
+/** One side of the /vs masthead. */
+export interface PairPlayerView extends RecordPlayer {
+  /** Latest season's nickname. */
+  nickname: string;
+  /** The dedicated hero portrait when one exists, else the latest card art. */
+  imagePath: string;
+  /** Everyone else this player has shared a game with (the pair switcher). */
+  opponents: RecordPlayer[];
+}
+
+/** Everything the /vs page renders from. */
+export interface PairView extends Omit<PairStats, 'a' | 'b'> {
+  a: PairPlayerView;
+  b: PairPlayerView;
+}
+
+/** One opponent's line in the career page's head-to-head list. */
+export interface PairSummary {
+  opponent: RecordPlayer;
+  /** Shared games this player finished ahead in, behind in, and level in. */
+  ahead: number;
+  behind: number;
+  level: number;
+  /** Matches against the opponent won and lost. */
+  matchWins: number;
+  matchLosses: number;
+}

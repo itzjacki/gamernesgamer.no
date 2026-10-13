@@ -338,9 +338,13 @@ export default async function RecordsPage() {
               scope={allSeasons}
               entries={records.opponentStreak}
               figure={count}
-              unit={(e) => `H2H-seiere på rad mot ${e.opponent?.name}`}
+              unit={() => 'H2H-seiere på rad'}
               detailLabel='Vis matchene'
               detail={matchList}
+              pairLink={(e) => ({
+                text: `${e.player.name} mot ${e.opponent?.name}`,
+                href: `/vs/${e.player.slug}/${e.opponent?.slug}`,
+              })}
             />
             <RecordPlate
               id='jevneste-rivaleri'
@@ -351,6 +355,10 @@ export default async function RecordsPage() {
               unit={() => 'innbyrdes score i spill'}
               detailLabel='Vis per sesong'
               detail={rivalryLines}
+              pairLink={(e) => ({
+                text: `${e.player.name} – ${e.partner?.name}`,
+                href: `/vs/${e.player.slug}/${e.partner?.slug}`,
+              })}
             />
             <RecordPlate
               id='tiebreaker-spill'
