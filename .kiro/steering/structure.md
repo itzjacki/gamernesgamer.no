@@ -54,9 +54,13 @@ Each file has one job; keep the boundaries.
   imports no static data, so `derive/career/tags.ts` (`deriveTagStats`) takes
   rows whose tags the caller has already resolved. `derive/records/` compares
   all players (`deriveRecords`: the career board and every record on
-  `/records`), on the same terms: its game rows arrive with title, tags and
-  own-pick flag already joined. Every record is a best-first list with shared
-  ranks — a tie stays a tie. `derive/matches.ts` decides each head-to-head
+  `/records`), on the same terms: its game and match rows arrive with title,
+  tags and own-pick flag already joined. Every record is a best-first list of
+  `RecordEntry` with shared ranks — a tie stays a tie. One file per family:
+  `index.ts` (placement- and season-based records, and the assembly),
+  `match-records.ts` (head-to-head matches), `rivalries.ts` (the pair record),
+  over shared `helpers.ts`, `rank.ts` and `streaks.ts`. A new record is a
+  function there, a field on `RecordsView`, and a `RecordPlate` on the page. `derive/matches.ts` decides each head-to-head
   match from its game rows (the outcome is never stored) and puts the decided
   ones on `GameSummary.matches`; careers and the match records read from there.
 - `compose.ts` — pure. The one seam that joins DB view-models to static

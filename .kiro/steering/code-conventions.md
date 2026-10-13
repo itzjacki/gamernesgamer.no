@@ -11,6 +11,10 @@ Prefer readable duplication over configurable generics. Avoid clever code.
 
 - Server Components by default. `'use client'` only for browser APIs, state or
   effects.
+- Reach for the platform before client JS: the Popover API (`popovertarget`)
+  for detail on demand, `<details>` for disclosure, and an uncontrolled
+  checkbox with `:has(input:checked)` to switch between two prerendered
+  variants. All the stats pages are interactive this way with no client code.
 - Reuse the shared primitives (`Panel`, `Button`, `Checkbox`,
   `StatList`/`StatRow`, `SectionLabel`, `Heading`) instead of re-inlining surface, button or eyebrow
   markup. Add a new primitive only when a real second use appears.
