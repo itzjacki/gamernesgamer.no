@@ -216,6 +216,8 @@ export interface CareerGameRow {
   placement: number;
   /** Net power-up points this game gave or cost the player (0 if none). */
   powerUpDelta: number;
+  /** Play order within the season (game.ordinal). */
+  ordinal: number;
 }
 
 /** One head-to-head match the player played, from their side. */
@@ -404,6 +406,8 @@ export interface RecordGameRow extends TagGameResult {
   tags: Tag[];
   /** Net power-up points this game gave or cost the player (0 if none). */
   powerUpDelta: number;
+  /** Play order within the season (game.ordinal). */
+  ordinal: number;
 }
 
 /** A game behind a record's figure. */
@@ -477,6 +481,20 @@ export interface RecordEntry {
   opponent?: RecordPlayer;
   /** Average placement in own picks and in everyone else's (home advantage). */
   split?: { own: number; others: number };
+  /** The other half of a pair record (closest rivalry); `player` is the first. */
+  partner?: RecordPlayer;
+  /**
+   * A pair's head-to-head finishing record (closest rivalry): games `player`
+   * finished ahead of `partner` and the reverse, plus how often the two took
+   * first and second between them and how those split.
+   */
+  pair?: {
+    ahead: number;
+    behind: number;
+    oneTwo: number;
+    oneTwoFirst: number;
+    seasons: { season: RecordSeason; ahead: number; behind: number }[];
+  };
   /** The games behind the figure, in play order. Empty when not game-based. */
   games: RecordEntryGame[];
 }
@@ -569,6 +587,19 @@ export interface RecordsView {
   homeAdvantage: RecordEntry[];
   /** Average placement in the last game of each season; `outOf` is seasons. */
   seasonCloser: RecordEntry[];
+  /** Average placement in the FIRST game of each season; `outOf` is seasons. */
+  seasonOpener: RecordEntry[];
+  /**
+   * Games as all-time wins leader: after each game in the archive, who has the
+   * most game wins. `value` counts the games a player led or shared the lead
+   * after, `outOf` those they led alone.
+   */
+  winsLeader: RecordEntry[];
+  /**
+   * Closest rivalry: one entry per PAIR (`player` + `partner`), most level
+   * first. `value` is the gap between the two (0 = level); `pair` has the rest.
+   */
+  rivalries: RecordEntry[];
   /** Raw season points summed over the career; `outOf` is seasons played. */
   totalPoints: RecordEntry[];
   /**

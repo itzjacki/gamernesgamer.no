@@ -324,7 +324,7 @@ the _genre_ stats (not the rest of any page).
     marker only. The strip drops out on narrow screens. (The average
     game placement column was removed; the average is still the board's last
     ordering tiebreak.)
-  - **Record wall (`RecordPlate`, nineteen plates in four groups)** — _Seire:_
+  - **Record wall (`RecordPlate`, twenty-two plates in four groups)** — _Seire:_
     most game wins, title specialist (a title played at least twice), home
     turf (wins in own picks), away wins (wins in others' picks), home advantage
     (average placement in others' picks minus in own; min. 4 own picks). _Rekker og
@@ -351,7 +351,17 @@ the _genre_ stats (not the rest of any page).
     and left off: share of individual rounds won (needs round data, one
     player sweeps it), seasons led without winning (near-roast), season-
     deciding power-ups (better on the season page), biggest comeback to a
-    title (declined by Jakob). An odd last plate spans the row. Each plate: holder
+    title (left out by Jakob). A second committee round the same day added
+    three more: the opener (average placement in each season's first game),
+    longest as all-time wins leader
+    (games after which a player led or shared the career game-wins tally),
+    and closest rivalry (a PAIR as holder: games each finished ahead of the
+    other, most level pair first; `RecordEntry.partner`). A fourth, "closest to a title" (title chance if the rest of a
+    season were a coin flip), was built and then removed by Jakob: it made
+    the page slow in dev and said little, since games usually favour one
+    player clearly. Left off from that round: round thief and "alone against everyone" (both need round-level
+    data fetched), fastest to five wins, the in-game fade pattern, the H2H
+    rock-paper-scissors cycle, card stats vs. results. An odd last plate spans the row. Each plate: holder
     name at the top (sentence case, regular weight; tied holders on one line,
     comma-separated), and a modest mono number with its unit running on from
     it on the same line, pinned to the bottom just over the runners-up; then
@@ -368,6 +378,9 @@ the _genre_ stats (not the rest of any page).
     with `TagRecord`), and a footer checkbox ("Uten egne spillvalg", the same
     CSS-only toggle as `TagRecord`) swaps in the crowns computed without each
     player's own picks (`tagCrownsWithoutOwnPicks`). Tied holders share a line.
+    Each category name opens the holder's games under it (`GameListPopover`,
+    the same component `TagRecord` uses; one group per player on a shared
+    crown).
     Data layer: `assembleAllCareers` (derive/career), the pure
     `derive/records/` (`deriveRecords`, unit-tested against the S1+S2 oracle),
     `composeRecordsView`, `getRecordsView`. Decided against: roast / "worst at"

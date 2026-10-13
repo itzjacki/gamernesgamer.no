@@ -351,6 +351,7 @@ export function composeRecordsView(careers: CareerStats[]): RecordsView {
           titleName: titles[game.titleId].name,
           tags: gameTags(game),
           powerUpDelta: row.powerUpDelta,
+          ordinal: row.ordinal,
         };
       }),
       matches: stats.matches.map((row) => ({

@@ -157,6 +157,7 @@ describe('streaks', () => {
       titleName: 'T',
       tags: [],
       powerUpDelta: 0,
+      ordinal: 0,
     });
     const players: RecordsPlayerInput[] = [
       {
@@ -230,6 +231,7 @@ describe('points records', () => {
       titleName: slug,
       tags: [],
       powerUpDelta,
+      ordinal: 0,
     });
     const player = (name: string, games: RecordGameRow[]) => ({
       player: { slug: name, name },
@@ -584,6 +586,7 @@ describe('home advantage and the closer', () => {
     titleName: 'T',
     tags: [],
     powerUpDelta: 0,
+    ordinal: 0,
   });
   const player = (name: string, games: RecordGameRow[]) => ({
     player: { slug: name, name },
@@ -648,6 +651,107 @@ describe('home advantage and the closer', () => {
   });
 });
 
+describe('opener, wins leader and rivalries', () => {
+  const game = (
+    seasonNumber: number,
+    ordinal: number,
+    placement: number,
+  ): RecordGameRow => ({
+    seasonNumber,
+    seasonSlug: String(seasonNumber).padStart(2, '0'),
+    gameSlug: `g${ordinal}`,
+    gameTitle: 'G',
+    placement,
+    ownPick: false,
+    titleId: 't',
+    titleName: 'T',
+    tags: [],
+    powerUpDelta: 0,
+    ordinal,
+  });
+  const player = (name: string, games: RecordGameRow[]) => ({
+    player: { slug: name, name },
+    seasons: [],
+    games,
+    matches: [],
+  });
+
+  it('averages the first game of each season for the opener', () => {
+    const { seasonOpener, seasonCloser } = deriveRecords([
+      player('a', [
+        game(1, 1, 1),
+        game(1, 2, 4),
+        game(2, 1, 2),
+        game(2, 2, 4),
+        game(3, 1, 3),
+        game(3, 2, 4),
+      ]),
+    ]);
+    expect(seasonOpener[0]).toMatchObject({ value: 2, outOf: 3 });
+    expect(seasonCloser[0]).toMatchObject({ value: 4, outOf: 3 });
+  });
+
+  it('tracks who leads the all-time wins tally after each game', () => {
+    // Winners in order: a, b, b, a, a  →  tallies a1 | a1 b1 | b2 | a2 b2 | a3.
+    const winners = ['a', 'b', 'b', 'a', 'a'];
+    const games = (name: string) =>
+      winners.map((w, i) => game(1, i + 1, w === name ? 1 : 2));
+    const { winsLeader } = deriveRecords([
+      player('a', games('a')),
+      player('b', games('b')),
+      player('c', games('c')),
+    ]);
+    expect(
+      winsLeader.map((e) => [e.player.slug, e.rank, e.value, e.outOf]),
+    ).toEqual([
+      // a: led after games 1, 2 (shared), 4 (shared), 5 — two of them alone.
+      ['a', 1, 4, 2],
+      // b: games 2 (shared), 3, 4 (shared) — one alone.
+      ['b', 2, 3, 1],
+    ]);
+  });
+
+  it('ranks pairs by how level they are, leading with whoever is ahead', () => {
+    // Placements per game:   a  b  c
+    const rows = [
+      [1, 2, 3],
+      [2, 1, 3],
+      [1, 3, 2],
+      [3, 1, 2],
+    ];
+    const games = (col: number) => rows.map((r, i) => game(1, i + 1, r[col]));
+    const { rivalries } = deriveRecords([
+      player('a', games(0)),
+      player('b', games(1)),
+      player('c', games(2)),
+    ]);
+    expect(
+      rivalries.map((e) => [
+        e.player.slug,
+        e.partner?.slug,
+        e.rank,
+        e.pair?.ahead,
+        e.pair?.behind,
+      ]),
+    ).toEqual([
+      ['a', 'b', 1, 2, 2],
+      ['a', 'c', 2, 3, 1],
+      ['b', 'c', 2, 3, 1],
+    ]);
+    // a and b took first and second together twice, one win each.
+    expect(rivalries[0].pair).toMatchObject({ oneTwo: 2, oneTwoFirst: 1 });
+  });
+
+  it('finds Jakob and Jørgen level-ish across the S1 + S2 oracle', () => {
+    expect(view.rivalries).toHaveLength(6);
+    for (const entry of view.rivalries) {
+      expect(entry.pair!.ahead).toBeGreaterThanOrEqual(entry.pair!.behind);
+      expect(entry.outOf).toBe(16);
+      expect(entry.value).toBe(entry.pair!.ahead - entry.pair!.behind);
+    }
+  });
+});
+
 describe('title specialist', () => {
   it('needs a title played at least twice (none is, across S1 + S2)', () => {
     expect(view.titleSpecialist).toEqual([]);
@@ -669,6 +773,7 @@ describe('title specialist', () => {
       titleName: titleId.toUpperCase(),
       tags: [],
       powerUpDelta: 0,
+      ordinal: 0,
     });
     const players: RecordsPlayerInput[] = [
       {

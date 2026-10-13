@@ -36,8 +36,8 @@ const MIN_FINALS = 3;
 const MIN_FLAWLESS_MATCHES = 3;
 /** Own picks before a home advantage means anything. */
 const MIN_OWN_PICKS = 4;
-/** Seasons played before a closing-game average means anything. */
-const MIN_CLOSER_SEASONS = 3;
+/** Seasons played before a first- or last-game average means anything. */
+const MIN_EDGE_SEASONS = 3;
 /** Final slots, least to most decisive: a reset grand final settles the game. */
 const FINAL_SLOTS = ['F', 'GF', 'GF2'];
 
@@ -354,18 +354,27 @@ function homeAdvantage(players: RecordsPlayerInput[]): RecordEntry[] {
 }
 
 /**
- * The closer: average placement in the LAST game of each season played. Needs
- * MIN_CLOSER_SEASONS seasons. Compared at two decimals, then on more wins.
+ * The closer and the opener: average placement in the LAST (or FIRST) game of
+ * each season played. Needs MIN_EDGE_SEASONS seasons. Compared at two decimals,
+ * then on more wins.
  */
-function seasonCloser(players: RecordsPlayerInput[]): RecordEntry[] {
+function seasonEdge(
+  players: RecordsPlayerInput[],
+  edge: 'first' | 'last',
+): RecordEntry[] {
   const entries = players.flatMap(({ player, games }) => {
-    // Games are in play order, so the last row seen per season is its closer.
-    const lastBySeason = new Map<number, RecordGameRow>();
-    for (const game of games) lastBySeason.set(game.seasonNumber, game);
-    const closers = [...lastBySeason.values()];
-    if (closers.length < MIN_CLOSER_SEASONS) return [];
+    // Games are in play order: keep the first row seen per season, or let
+    // each later one overwrite it.
+    const bySeason = new Map<number, RecordGameRow>();
+    for (const game of games) {
+      if (edge === 'last' || !bySeason.has(game.seasonNumber)) {
+        bySeason.set(game.seasonNumber, game);
+      }
+    }
+    const picked = [...bySeason.values()];
+    if (picked.length < MIN_EDGE_SEASONS) return [];
     return [
-      { player, value: mean(closers), outOf: closers.length, games: closers },
+      { player, value: mean(picked), outOf: picked.length, games: picked },
     ];
   });
   return rankEntries(
@@ -373,6 +382,131 @@ function seasonCloser(players: RecordsPlayerInput[]): RecordEntry[] {
     (a, b) =>
       shown(a.value, 2) - shown(b.value, 2) || wins(b.games) - wins(a.games),
   );
+}
+
+/**
+ * Games as all-time wins leader. Walks every game of the archive in play order
+ * with a running tally of game wins; after each game the player(s) with the
+ * most wins lead. `value` counts the games a player led or shared the lead
+ * after, `outOf` those they led alone. Ranked on the count, then the sole
+ * count. `games` are the player's own rows for the games they led after.
+ */
+function winsLeader(players: RecordsPlayerInput[]): RecordEntry[] {
+  const keyOf = (g: RecordGameRow) => g.seasonNumber * 1000 + g.ordinal;
+  const timeline = [
+    ...new Set(players.flatMap((p) => p.games.map(keyOf))),
+  ].sort((a, b) => a - b);
+
+  const tally = new Map(players.map((p) => [p.player.slug, 0]));
+  const led = new Map(
+    players.map((p) => [
+      p.player.slug,
+      { games: [] as RecordGameRow[], sole: 0 },
+    ]),
+  );
+
+  for (const key of timeline) {
+    const rows = players.map((p) => ({
+      slug: p.player.slug,
+      game: p.games.find((g) => keyOf(g) === key),
+    }));
+    for (const { slug, game } of rows) {
+      if (game && isWin(game)) tally.set(slug, (tally.get(slug) ?? 0) + 1);
+    }
+    const most = Math.max(...tally.values());
+    if (most === 0) continue;
+    const leaders = rows.filter(({ slug }) => tally.get(slug) === most);
+    for (const { slug, game } of leaders) {
+      const entry = led.get(slug)!;
+      if (game) entry.games.push(game);
+      if (leaders.length === 1) entry.sole += 1;
+    }
+  }
+
+  const entries = players.map(({ player }) => {
+    const { games, sole } = led.get(player.slug)!;
+    return { player, value: games.length, outOf: sole, games };
+  });
+  return rankEntries(
+    withoutZeros(entries),
+    (a, b) => b.value - a.value || (b.outOf ?? 0) - (a.outOf ?? 0),
+  );
+}
+
+/**
+ * Closest rivalry: for every pair, the games one finished ahead of the other
+ * and the reverse, over the games both played. One entry per pair, the most
+ * level first; pairs with the same gap share a rank. `player` is whoever is
+ * ahead (the first by name when level).
+ */
+function rivalries(players: RecordsPlayerInput[]): RecordEntry[] {
+  const keyOf = (g: RecordGameRow) => `${g.seasonSlug}/${g.gameSlug}`;
+  const entries: UnrankedEntry[] = [];
+
+  players.forEach((a, i) => {
+    for (const b of players.slice(i + 1)) {
+      const theirs = new Map(b.games.map((g) => [keyOf(g), g]));
+      const seasons = new Map<
+        number,
+        { season: RecordSeason; first: number; second: number }
+      >();
+      let first = 0;
+      let second = 0;
+      let oneTwo = 0;
+      let oneTwoFirst = 0;
+
+      for (const mine of a.games) {
+        const other = theirs.get(keyOf(mine));
+        if (!other || mine.placement === other.placement) continue;
+        const line = seasons.get(mine.seasonNumber) ?? {
+          season: {
+            seasonNumber: mine.seasonNumber,
+            seasonSlug: mine.seasonSlug,
+          },
+          first: 0,
+          second: 0,
+        };
+        if (mine.placement < other.placement) {
+          first += 1;
+          line.first += 1;
+        } else {
+          second += 1;
+          line.second += 1;
+        }
+        seasons.set(mine.seasonNumber, line);
+        if (Math.max(mine.placement, other.placement) === 2) {
+          oneTwo += 1;
+          if (mine.placement === 1) oneTwoFirst += 1;
+        }
+      }
+      if (first + second === 0) continue;
+
+      // Lead with whoever is ahead; `a` precedes `b` by name when level.
+      const flip =
+        second > first ||
+        (second === first && b.player.name.localeCompare(a.player.name) < 0);
+      entries.push({
+        player: flip ? b.player : a.player,
+        partner: flip ? a.player : b.player,
+        value: Math.abs(first - second),
+        outOf: first + second,
+        pair: {
+          ahead: flip ? second : first,
+          behind: flip ? first : second,
+          oneTwo,
+          oneTwoFirst: flip ? oneTwo - oneTwoFirst : oneTwoFirst,
+          seasons: [...seasons.values()].map((line) => ({
+            season: line.season,
+            ahead: flip ? line.second : line.first,
+            behind: flip ? line.first : line.second,
+          })),
+        },
+        games: [],
+      });
+    }
+  });
+
+  return rankEntries(entries, (x, y) => x.value - y.value);
 }
 
 /**
@@ -509,7 +643,10 @@ export function deriveRecords(players: RecordsPlayerInput[]): RecordsView {
     flawlessGames: flawlessGames(players),
     opponentStreak: opponentStreak(players),
     homeAdvantage: homeAdvantage(players),
-    seasonCloser: seasonCloser(players),
+    seasonCloser: seasonEdge(players, 'last'),
+    seasonOpener: seasonEdge(players, 'first'),
+    winsLeader: winsLeader(players),
+    rivalries: rivalries(players),
     totalPoints: totalPoints(players),
     powerUpPoints: powerUpPoints(players),
     tagCrowns: tagCrowns(players),
