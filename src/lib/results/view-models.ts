@@ -78,6 +78,24 @@ export interface GamePlacementRow {
   note: string | null;
 }
 
+/**
+ * One decided head-to-head match inside a game. The outcome is derived from
+ * the match's game rows (who won more of them); undecided matches are absent.
+ * A game's matches are ordered by stage, then leg — so two meetings of the
+ * same pair always appear in the order they were played.
+ */
+export interface GameMatch {
+  playerA: PlayerRef;
+  playerB: PlayerRef;
+  /** The series length as a number: 1, 3 or 5. */
+  bestOf: number;
+  /** Game rows won by each side. Never equal. */
+  winsA: number;
+  winsB: number;
+  /** Bracket position (`F`, `GF`, `BR`, `SF1`, …); null in a round-robin. */
+  slotId: string | null;
+}
+
 /** A game's row in the season overview: identity + its final placement table. */
 export interface GameSummary {
   /** game.slug — matches static data key and route segment. */
@@ -86,6 +104,8 @@ export interface GameSummary {
   ordinal: number;
   /** Final placement + points per player, ordered by placement. */
   results: GamePlacementRow[];
+  /** Decided head-to-head matches in this game. Empty when it has none. */
+  matches: GameMatch[];
 }
 
 /** One point on a player's cumulative-points line: their running total after a game. */
@@ -194,6 +214,27 @@ export interface CareerGameRow {
   gameSlug: string;
   /** Authoritative final placement in this game (from game_result). */
   placement: number;
+  /** Net power-up points this game gave or cost the player (0 if none). */
+  powerUpDelta: number;
+}
+
+/** One head-to-head match the player played, from their side. */
+export interface CareerMatchRow {
+  seasonNumber: number;
+  seasonSlug: string;
+  /** game.slug of the game the match was part of. */
+  gameSlug: string;
+  /** The series length as a number: 1, 3 or 5. */
+  bestOf: number;
+  /** Game rows the player won and lost in the match. */
+  gamesWon: number;
+  gamesLost: number;
+  /** True when the player won the match. */
+  won: boolean;
+  /** Who it was against. */
+  opponent: { slug: string; name: string };
+  /** Bracket position (`F`, `GF`, `BR`, `SF1`, …); null in a round-robin. */
+  slotId: string | null;
 }
 
 /** One game behind a tag stat: which game, and where the player finished. */
@@ -268,6 +309,8 @@ export interface CareerStats {
   trophies: CareerTrophy[];
   /** Every game the player played, ascending by season, then game ordinal. */
   games: CareerGameRow[];
+  /** Every decided head-to-head match the player played, same ordering. */
+  matches: CareerMatchRow[];
 }
 
 /* -------- composed (static content joined) -------- */
@@ -330,7 +373,9 @@ export interface CareerView {
 /**
  * Records view-models. Where a career view is ONE player across seasons, these
  * compare ALL players. Everything normalizes off placement, never raw points
- * (ladders differ per season). Each record is a best-first list of
+ * (ladders differ per season) — except the two points records (`totalPoints`,
+ * `powerUpPoints`), which add up raw season points on purpose and so favour
+ * the seasons with the larger ladders. Each record is a best-first list of
  * `RecordEntry` with shared ranks: a tie is two rank-1 entries, never a hidden
  * tiebreak.
  */
@@ -357,6 +402,35 @@ export interface RecordGameRow extends TagGameResult {
   titleId: string;
   titleName: string;
   tags: Tag[];
+  /** Net power-up points this game gave or cost the player (0 if none). */
+  powerUpDelta: number;
+}
+
+/** A game behind a record's figure. */
+export interface RecordEntryGame extends TagGameResult {
+  /** Net power-up points in this game. Absent on tag-crown entries. */
+  powerUpDelta?: number;
+}
+
+/** One season's points total behind a career points figure. */
+export interface RecordSeasonPoints {
+  season: RecordSeason;
+  points: number;
+}
+
+/** A match row with its game's title joined, as the records read it. */
+export interface RecordMatchRow extends CareerMatchRow {
+  gameTitle: string;
+}
+
+/** One game's share of a match record: `count` of its `outOf` matches. */
+export interface RecordMatchLine {
+  seasonNumber: number;
+  seasonSlug: string;
+  gameSlug: string;
+  gameTitle: string;
+  count: number;
+  outOf: number;
 }
 
 /** One player's input to the records derivation. */
@@ -366,6 +440,8 @@ export interface RecordsPlayerInput {
   seasons: CareerSeasonRow[];
   /** Every game played, ascending by season, then game ordinal (play order). */
   games: RecordGameRow[];
+  /** Every decided head-to-head match played, same ordering. */
+  matches: RecordMatchRow[];
 }
 
 /** One season where two players tied on points and placement split them. */
@@ -391,8 +467,18 @@ export interface RecordEntry {
   title?: { id: string; name: string };
   /** The seasons behind the entry (tiebreak record), ascending. */
   tiebreaks?: RecordTiebreak[];
+  /** The per-season totals behind the entry (total points record), ascending. */
+  seasonPoints?: RecordSeasonPoints[];
+  /** The per-game breakdown behind the entry (match records), in play order. */
+  matchLines?: RecordMatchLine[];
+  /** The individual matches behind the entry (opponent streak), in play order. */
+  matches?: RecordMatchRow[];
+  /** The opponent the entry is about (opponent streak). */
+  opponent?: RecordPlayer;
+  /** Average placement in own picks and in everyone else's (home advantage). */
+  split?: { own: number; others: number };
   /** The games behind the figure, in play order. Empty when not game-based. */
-  games: TagGameResult[];
+  games: RecordEntryGame[];
 }
 
 /** Who is best at one tag: every player's average under it, best first. */
@@ -432,14 +518,69 @@ export interface RecordsView {
   longestWinStreak: RecordEntry[];
   /** Consecutive games finishing first or second, same ordering. */
   longestTopTwoStreak: RecordEntry[];
+  /** Consecutive games finishing in the top three, same ordering. */
+  longestTopThreeStreak: RecordEntry[];
   /** Wins in games the player chose; `outOf` is how many they chose. */
   homeTurf: RecordEntry[];
   /** Wins in games someone else chose; `outOf` is how many of those they played. */
   awayWins: RecordEntry[];
   /** Most wins at one title the player has played at least twice. */
   titleSpecialist: RecordEntry[];
-  /** Points ties won; `outOf` is how many the player was part of. */
+  /**
+   * Points ties: `value` is how many the player won, `outOf` how many they were
+   * part of. Ranked on the win RATE (value / outOf), then the larger sample.
+   */
   tiebreaks: RecordEntry[];
+  /**
+   * Head-to-head matches: `value` is how many the player won, `outOf` how many
+   * they played. Ranked on the win rate, then the larger sample.
+   */
+  matchWins: RecordEntry[];
+  /**
+   * Sweeps: among matches longer than one game (bo3/bo5, `outOf`), `value` is
+   * how many the player won without losing a game. Ranked on that rate.
+   */
+  matchSweeps: RecordEntry[];
+  /**
+   * Deciders: series that went the full distance (2–1, 3–2). `value` won of
+   * `outOf` played, ranked on the rate. Needs a minimum number of deciders.
+   */
+  matchDeciders: RecordEntry[];
+  /**
+   * Finals: `value` won of `outOf` reached, one per game (a grand-final reset
+   * counts as one final, decided by its last match). Ranked on the rate.
+   */
+  finals: RecordEntry[];
+  /**
+   * Flawless tournaments: head-to-head games in which the player won every
+   * match they played (a minimum number of matches applies).
+   */
+  flawlessGames: RecordEntry[];
+  /**
+   * Longest run of consecutive match wins over ONE opponent, across seasons.
+   * Each player enters with their best; `opponent` names who it was against.
+   */
+  opponentStreak: RecordEntry[];
+  /**
+   * Home advantage: average placement in others' picks minus in own picks
+   * (higher = a bigger boost at home). `split` carries both averages, `outOf`
+   * the number of own picks, `games` the own picks.
+   */
+  homeAdvantage: RecordEntry[];
+  /** Average placement in the last game of each season; `outOf` is seasons. */
+  seasonCloser: RecordEntry[];
+  /** Raw season points summed over the career; `outOf` is seasons played. */
+  totalPoints: RecordEntry[];
+  /**
+   * Net power-up points over the career (can be negative); `outOf` is the games
+   * where power-ups moved the player's score. Players never affected are left out.
+   */
+  powerUpPoints: RecordEntry[];
   /** One crown per tag, unfiltered — the consumer applies any minimum sample. */
   tagCrowns: TagCrown[];
+  /**
+   * The same crowns with every player's own game picks left out — people pick
+   * what they are good at, which skews the full list.
+   */
+  tagCrownsWithoutOwnPicks: TagCrown[];
 }

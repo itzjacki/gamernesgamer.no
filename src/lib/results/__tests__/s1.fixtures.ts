@@ -247,7 +247,11 @@ export const s1Bundle: SeasonBundle = {
       created_at: TS,
       updated_at: TS,
     },
-  ],
+  ], // No head-to-head rows in the fixtures: the match records are tested
+  // against rows built in the test itself.
+  stages: [],
+  matches: [],
+  matchGames: [],
 };
 
 /** Expected per-game points matrix from game-placements.md (verified). */

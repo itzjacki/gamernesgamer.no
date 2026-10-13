@@ -350,8 +350,16 @@ export function composeRecordsView(careers: CareerStats[]): RecordsView {
           titleId: game.titleId,
           titleName: titles[game.titleId].name,
           tags: gameTags(game),
+          powerUpDelta: row.powerUpDelta,
         };
       }),
+      matches: stats.matches.map((row) => ({
+        ...row,
+        gameTitle: requireGame(
+          gameBySlug(seasonContent(row.seasonSlug).games),
+          row.gameSlug,
+        ).title,
+      })),
     })),
   );
 }

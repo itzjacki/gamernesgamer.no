@@ -4,6 +4,7 @@ import type {
   CareerStats,
   CareerSeasonRow,
   CareerGameRow,
+  CareerMatchRow,
 } from '../../view-models';
 import { assembleSeasonView } from '../index';
 import { deriveLedger } from './ledger';
@@ -61,6 +62,7 @@ function careerFromViews(
   // (player points / field-max points) used only as the best/worst tiebreak.
   const seasons: CareerSeasonRow[] = [];
   const games: CareerGameRow[] = [];
+  const matches: CareerMatchRow[] = [];
   const closenessBySeason = new Map<number, number>();
   let name: string | null = null;
 
@@ -79,6 +81,26 @@ function careerFromViews(
 
     // Games are already ordinal-ordered by the assembler.
     for (const g of view.games) {
+      for (const m of g.matches) {
+        const isA = m.playerA.slug === slug;
+        if (!isA && m.playerB.slug !== slug) continue;
+        const gamesWon = isA ? m.winsA : m.winsB;
+        const gamesLost = isA ? m.winsB : m.winsA;
+        matches.push({
+          seasonNumber: view.seasonNumber,
+          seasonSlug: view.seasonSlug,
+          gameSlug: g.slug,
+          bestOf: m.bestOf,
+          gamesWon,
+          gamesLost,
+          won: gamesWon > gamesLost,
+          opponent: isA
+            ? { slug: m.playerB.slug, name: m.playerB.name }
+            : { slug: m.playerA.slug, name: m.playerA.name },
+          slotId: m.slotId,
+        });
+      }
+
       const result = g.results.find((r) => r.player.slug === slug);
       if (!result) continue;
       games.push({
@@ -86,6 +108,7 @@ function careerFromViews(
         seasonSlug: view.seasonSlug,
         gameSlug: g.slug,
         placement: result.placement,
+        powerUpDelta: result.powerUpDelta,
       });
     }
 
@@ -105,5 +128,6 @@ function careerFromViews(
     seasons,
     trophies: deriveTrophies(slug, views),
     games,
+    matches,
   };
 }

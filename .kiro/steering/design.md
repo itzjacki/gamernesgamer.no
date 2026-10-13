@@ -30,8 +30,10 @@ borders double up.
 | `--color-border`        | Structural borders             |
 | `--color-border-accent` | Red-tinted border              |
 
-**Accent at rest:** leaderboard rank 1, champion callouts, the gamer-card
-diagonal. Everything else earns accent on interaction.
+**Accent at rest:** leaderboard rank 1, champion callouts, record-holder
+figures on /records, the gamer-card diagonal. Everything else earns accent on
+interaction. Rank-1 data may take it freely; it doesn't need rationing to one
+mark per page.
 
 **Type:** Neue Montreal (self-hosted) for display (800) and body (400); Martian
 Mono (400) for metadata.

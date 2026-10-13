@@ -126,6 +126,7 @@ describe('compose — fail-loud on missing static content', () => {
           slug: 'nonexistent-game',
           ordinal: 1,
           results: [],
+          matches: [],
         },
       ],
     };

@@ -53,7 +53,7 @@ function Stat({
 
   return (
     <div
-      className={`bg-bg flex flex-col gap-3 p-5 ${wide ? 'col-span-2' : ''}`}
+      className={`bg-bg flex flex-col justify-between gap-3 p-5 ${wide ? 'col-span-2' : ''}`}
     >
       <SectionLabel>{label}</SectionLabel>
       <span className={`text-text ${valueClass}`}>{value}</span>
@@ -71,9 +71,8 @@ export default function CareerLedger({ ledger, tagStats }: Props) {
     // borders), and the outer border closes the frame — aligned to the 40px
     // blueprint grid, VERKSTED surface language, no radius/shadow.
     <div className='border-border bg-border grid grid-cols-2 gap-px border sm:grid-cols-4'>
-      {/* TODO(copy): "Snittplassering i spill" + "Beste kategori" are best-effort. */}
       <Stat
-        label='Gjennomsnittlig plassering'
+        label='Snittplassering (per hele sesong)'
         value={ledger.averagePlacement.toFixed(1)}
         big
         wide
@@ -99,7 +98,7 @@ export default function CareerLedger({ ledger, tagStats }: Props) {
         word
       />
       <Stat
-        label='Snittplassering i spill'
+        label='Snittplassering (per spill)'
         value={ledger.averageGamePlacement.toFixed(1)}
       />
     </div>

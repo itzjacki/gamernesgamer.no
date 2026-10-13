@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { getRecordsView } from '@/lib/results/queries';
 import type { RecordEntry } from '@/lib/results/view-models';
 import Heading from '@/components/Heading';
@@ -6,12 +7,6 @@ import SectionLabel from '@/components/SectionLabel';
 import CareerBoard from '@/components/CareerBoard';
 import RecordPlate from '@/components/RecordPlate';
 import TagCrowns from '@/components/TagCrowns';
-
-/*
- * TODO(copy): every label on this page is best-effort placeholder Norwegian —
- * the title, the section eyebrows, each record's name, unit line and
- * disclosure label. Needs Jakob's pass.
- */
 
 export const metadata: Metadata = {
   title: 'Rekorder',
@@ -27,16 +22,90 @@ function seasonSpan(numbers: number[]) {
 const wall =
   'border-border bg-border grid grid-cols-1 gap-px border sm:grid-cols-2';
 const count = (entry: RecordEntry) => String(entry.value);
+/** A points delta with its sign, using a real minus (U+2212). */
+const signed = (n: number) =>
+  n > 0 ? `+${n}` : n < 0 ? `\u2212${Math.abs(n)}` : '0';
+/** `value` as a share of `outOf`, as a whole percentage. */
+const rate = (entry: RecordEntry) =>
+  `${Math.round((entry.value / (entry.outOf || 1)) * 100)}%`;
+
+const detailRow =
+  'border-border grid items-baseline gap-4 border-t py-2 text-sm first:border-t-0';
+const detailLink =
+  'hover:text-accent focus-visible:outline-accent underline underline-offset-2 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2';
+
+/** Detail for the match records: per game, how many of its matches counted. */
+function matchLines(entry: RecordEntry) {
+  return (
+    <ul className='flex flex-col'>
+      {entry.matchLines?.map((line) => (
+        <li
+          key={`${line.seasonSlug}-${line.gameSlug}`}
+          className={`grid-cols-[1fr_auto_auto] ${detailRow}`}
+        >
+          <Link
+            href={`/sesong/${line.seasonSlug}/${line.gameSlug}`}
+            className={detailLink}
+          >
+            {line.gameTitle}
+          </Link>
+          <SeasonTag number={line.seasonNumber} />
+          <span className='font-mono tabular-nums'>
+            {line.count}
+            <span aria-hidden='true'>/</span>
+            <span className='sr-only'> av </span>
+            {line.outOf}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** Detail for the opponent streak: each match in the run, with its score. */
+function matchList(entry: RecordEntry) {
+  return (
+    <ul className='flex flex-col'>
+      {entry.matches?.map((match, index) => (
+        <li
+          key={`${match.seasonSlug}-${match.gameSlug}-${index}`}
+          className={`grid-cols-[1fr_auto_auto] ${detailRow}`}
+        >
+          <Link
+            href={`/sesong/${match.seasonSlug}/${match.gameSlug}`}
+            className={detailLink}
+          >
+            {match.gameTitle}
+          </Link>
+          <SeasonTag number={match.seasonNumber} />
+          <span className='font-mono tabular-nums'>
+            {match.gamesWon}–{match.gamesLost}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function SeasonTag({ number }: { number: number }) {
+  return (
+    <span className='text-text-muted font-mono tabular-nums'>
+      <span className='sr-only'>sesong </span>
+      <span aria-hidden='true'>S</span>
+      {number}
+    </span>
+  );
+}
 
 export default async function RecordsPage() {
   const records = await getRecordsView();
 
-  const allSeasons = `GG · ${seasonSpan(records.seasons.map((s) => s.seasonNumber))}`;
+  const allSeasons = `${seasonSpan(records.seasons.map((s) => s.seasonNumber))}`;
   /** The scope stamp for a record that is about particular games. */
   const gameScope = (entries: RecordEntry[]) => {
     const holder = entries.find((e) => e.rank === 1);
     return holder && holder.games.length > 0
-      ? `GG · ${seasonSpan(holder.games.map((g) => g.seasonNumber))}`
+      ? `${seasonSpan(holder.games.map((g) => g.seasonNumber))}`
       : allSeasons;
   };
 
@@ -50,7 +119,7 @@ export default async function RecordsPage() {
 
       {records.board.length > 0 && (
         <section id='sammenlagt' className='flex flex-col gap-6'>
-          <SectionLabel>Sammenlagt</SectionLabel>
+          <SectionLabel>Sammenlagtscore</SectionLabel>
           <CareerBoard rows={records.board} seasons={records.seasons} />
         </section>
       )}
@@ -69,8 +138,8 @@ export default async function RecordsPage() {
               detailLabel='Vis spillene'
             />
             <RecordPlate
-              id='spillspesialist'
-              label='Spillspesialist'
+              id='serie-ett-spill'
+              label='Flest seire i ett spill'
               scope={allSeasons}
               entries={records.titleSpecialist}
               figure={count}
@@ -78,32 +147,43 @@ export default async function RecordsPage() {
               detailLabel='Vis spillene'
             />
             <RecordPlate
-              id='hjemmebane'
-              label='Hjemmebane'
+              id='seire-eget-spill'
+              label='Flest seire i eget spill'
               scope={allSeasons}
               entries={records.homeTurf}
               figure={count}
-              unit={(e) => `seire i ${e.outOf} egne spillvalg`}
+              unit={(e) => `seire av ${e.outOf} egne spill`}
               detailLabel='Vis spillene'
             />
             <RecordPlate
-              id='bortebane'
-              label='Bortebane'
+              id='upsets'
+              label='Flest upsets'
               scope={allSeasons}
               entries={records.awayWins}
               figure={count}
-              unit={(e) => `seire i ${e.outOf} av andres spillvalg`}
+              unit={(e) => `seire av ${e.outOf} i andres spill`}
               detailLabel='Vis spillene'
+            />
+            <RecordPlate
+              id='hjemmebanefordel'
+              label='Hjemmebanefordel'
+              scope={allSeasons}
+              entries={records.homeAdvantage}
+              figure={(e) => signed(Number(e.value.toFixed(2)))}
+              unit={(e) =>
+                `plasser bedre i egne spillvalg · ${e.split?.own.toFixed(2)} vs ${e.split?.others.toFixed(2)}`
+              }
+              detailLabel='Vis egne spillvalg'
             />
           </ul>
         </div>
 
         <div className='flex flex-col gap-6'>
-          <SectionLabel>Rekker og sesonger</SectionLabel>
+          <SectionLabel>Sesonger og streaks</SectionLabel>
           <ul className={wall}>
             <RecordPlate
-              id='seiersrekke'
-              label='Lengste seiersrekke'
+              id='win-streak'
+              label='Lengste win streak'
               scope={gameScope(records.longestWinStreak)}
               entries={records.longestWinStreak}
               figure={count}
@@ -112,11 +192,20 @@ export default async function RecordsPage() {
             />
             <RecordPlate
               id='topp-to-rekke'
-              label='Lengste topp to-rekke'
+              label='Lengste topp 2-streak'
               scope={gameScope(records.longestTopTwoStreak)}
               entries={records.longestTopTwoStreak}
               figure={count}
-              unit={() => 'spill på rad som nummer én eller to'}
+              unit={() => 'spill på rad i topp 2'}
+              detailLabel='Vis spillene'
+            />
+            <RecordPlate
+              id='topp-tre-rekke'
+              label='Lengste topp 3-streak'
+              scope={gameScope(records.longestTopThreeStreak)}
+              entries={records.longestTopThreeStreak}
+              figure={count}
+              unit={() => 'spill på rad i topp 3'}
               detailLabel='Vis spillene'
             />
             <RecordPlate
@@ -129,27 +218,166 @@ export default async function RecordsPage() {
               detailLabel='Vis spillene'
             />
             <RecordPlate
-              id='poenglikhet'
-              label='Vunnet på poenglikhet'
+              id='finisheren'
+              label='Best finisher'
+              scope={allSeasons}
+              entries={records.seasonCloser}
+              figure={(e) => e.value.toFixed(2)}
+              unit={(e) =>
+                `snitt i sesongens siste spill · ${e.outOf} sesonger`
+              }
+              detailLabel='Vis spillene'
+            />
+          </ul>
+        </div>
+
+        <div className='flex flex-col gap-6'>
+          <SectionLabel>Poeng</SectionLabel>
+          <ul className={wall}>
+            <RecordPlate
+              id='flest-poeng'
+              label='Flest poeng'
+              scope={allSeasons}
+              entries={records.totalPoints}
+              figure={count}
+              unit={(e) => `poeng over ${e.outOf} sesonger`}
+              detailLabel='Vis sesongene'
+              detail={(holder) => (
+                <ul className='flex flex-col'>
+                  {holder.seasonPoints?.map((line) => (
+                    <li
+                      key={line.season.seasonSlug}
+                      className={`grid-cols-[1fr_auto] ${detailRow}`}
+                    >
+                      <SeasonTag number={line.season.seasonNumber} />
+                      <span className='font-mono tabular-nums'>
+                        {line.points}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            />
+            <RecordPlate
+              id='power-up-poeng'
+              label='Flest power-up-poeng'
+              scope={gameScope(records.powerUpPoints)}
+              entries={records.powerUpPoints}
+              figure={(e) => signed(e.value)}
+              unit={(e) =>
+                `poeng fått direkte fra power-ups · ${e.outOf} spill`
+              }
+              detailLabel='Vis spillene'
+              detail={(holder) => (
+                <ul className='flex flex-col'>
+                  {holder.games.map((game) => (
+                    <li
+                      key={`${game.seasonSlug}-${game.gameSlug}`}
+                      className={`grid-cols-[1fr_auto_auto] ${detailRow}`}
+                    >
+                      <Link
+                        href={`/sesong/${game.seasonSlug}/${game.gameSlug}`}
+                        className={detailLink}
+                      >
+                        {game.gameTitle}
+                      </Link>
+                      <SeasonTag number={game.seasonNumber} />
+                      <span className='font-mono tabular-nums'>
+                        {signed(game.powerUpDelta ?? 0)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            />
+          </ul>
+        </div>
+
+        <div className='flex flex-col gap-6'>
+          <SectionLabel>Matcher</SectionLabel>
+          <ul className={wall}>
+            <RecordPlate
+              id='h2h-seire'
+              label='Best i H2H-matcher'
+              scope={allSeasons}
+              entries={records.matchWins}
+              figure={rate}
+              unit={(e) => `av matcher vunnet · ${e.value} av ${e.outOf}`}
+              detailLabel='Vis matchene per spill'
+              detail={matchLines}
+            />
+            <RecordPlate
+              id='series-sweeps'
+              label='Flest series sweepa'
+              scope={allSeasons}
+              entries={records.matchSweeps}
+              figure={rate}
+              unit={(e) => `av bo3s/bo5s sweepa · ${e.value} av ${e.outOf}`}
+              detailLabel='Vis matchene per spill'
+              detail={matchLines}
+            />
+            <RecordPlate
+              id='series-clutches'
+              label='Flest series clutcha'
+              scope={allSeasons}
+              entries={records.matchDeciders}
+              figure={rate}
+              unit={(e) =>
+                `av bo3/bo5 deciders vunnet · ${e.value} av ${e.outOf}`
+              }
+              detailLabel='Vis matchene per spill'
+              detail={matchLines}
+            />
+            <RecordPlate
+              id='finaler'
+              label='Flest finaler vunnet'
+              scope={allSeasons}
+              entries={records.finals}
+              figure={rate}
+              unit={(e) => `av finaler vunnet · ${e.value} av ${e.outOf}`}
+              detailLabel='Vis finalene'
+              detail={matchLines}
+            />
+            <RecordPlate
+              id='perfekte-brackets'
+              label='Perfekte brackets'
+              scope={allSeasons}
+              entries={records.flawlessGames}
+              figure={count}
+              unit={() => 'H2H-spill vunnet uten å tape en match'}
+              detailLabel='Vis spillene'
+              detail={matchLines}
+            />
+            <RecordPlate
+              id='tak-pa-motstander'
+              label='Lengste tak på motstander'
+              scope={allSeasons}
+              entries={records.opponentStreak}
+              figure={count}
+              unit={(e) => `H2H-seiere på rad mot ${e.opponent?.name}`}
+              detailLabel='Vis matchene'
+              detail={matchList}
+            />
+            <RecordPlate
+              id='tiebreaker-spill'
+              label='Best i tiebreaker-spill'
               scope={allSeasons}
               entries={records.tiebreaks}
-              figure={(e) => `${e.value}–${(e.outOf ?? 0) - e.value}`}
-              unit={() => 'sesonger avgjort på plassering'}
+              figure={rate}
+              unit={(e) =>
+                `av tiebreaker-spill vunnet · ${e.value} av ${e.outOf}`
+              }
               detailLabel='Vis sesongene'
               detail={(holder) => (
                 <ul className='flex flex-col'>
                   {holder.tiebreaks?.map((t) => (
                     <li
                       key={`${t.season.seasonSlug}-${t.opponent.slug}`}
-                      className='border-border grid grid-cols-[auto_1fr] items-baseline gap-4 border-t py-2 text-sm first:border-t-0'
+                      className={`grid-cols-[auto_1fr] ${detailRow}`}
                     >
-                      <span className='text-text-muted font-mono tabular-nums'>
-                        <span className='sr-only'>sesong </span>
-                        <span aria-hidden='true'>S</span>
-                        {t.season.seasonNumber}
-                      </span>
+                      <SeasonTag number={t.season.seasonNumber} />
                       <span>
-                        {t.won ? 'foran' : 'bak'} {t.opponent.name}
+                        {t.won ? 'Vant mot' : 'Tapte mot'} {t.opponent.name}
                       </span>
                     </li>
                   ))}
@@ -161,8 +389,11 @@ export default async function RecordsPage() {
       </section>
 
       <section id='kategorier' className='flex flex-col gap-6'>
-        <SectionLabel>Best per kategori</SectionLabel>
-        <TagCrowns crowns={records.tagCrowns} />
+        <SectionLabel>Best per spillkategori</SectionLabel>
+        <TagCrowns
+          crowns={records.tagCrowns}
+          crownsWithoutOwnPicks={records.tagCrownsWithoutOwnPicks}
+        />
       </section>
     </>
   );
