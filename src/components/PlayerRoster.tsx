@@ -1,8 +1,9 @@
 import Link from 'next/link';
+import TrophyIcon from './TrophyIcon';
 
 /**
- * One entrant on the roster sheet. The subset of RosterPlayer the row needs,
- * kept local so the primitive doesn't depend on the players lib's types (same
+ * One entrant on the roster. The subset of RosterPlayer the plate needs, kept
+ * local so the primitive doesn't depend on the players lib's types (same
  * pattern as StandingsRow vs. the results layer).
  */
 export interface RosterEntry {
@@ -12,8 +13,19 @@ export interface RosterEntry {
   name: string;
   /** Latest-season nickname (already quoted in the data, e.g. '"The Professor"'). */
   nickname: string;
-  /** Latest-season portrait. */
+  /** The dedicated hero portrait when one exists, else the latest card art. */
   imagePath: string;
+  /** Career figures. Absent for a player with no finished season yet. */
+  career?: {
+    /** 1-based all-time rank by average placement; shared when tied. */
+    rank: number;
+    /** Seasons won. */
+    championships: number;
+    /** Mean of final season placements, raw. Displayed to one decimal. */
+    averagePlacement: number;
+    /** True for the winner of the latest decided season. */
+    reigningChampion: boolean;
+  };
 }
 
 interface Props {
@@ -21,78 +33,156 @@ interface Props {
 }
 
 /**
- * The VERKSTED player index: a motorsport entry sheet. One row per player, a
- * Martian Mono header strip that titles the run-order index, hairline rules
- * throughout, no radius, no shadow, a solid `bg-bg` surface that masks the
- * blueprint grid. Accent (#E8334A) is spent only on hover/focus of a row —
- * nothing is accented at rest.
+ * The VERKSTED player index: a stack of nameplates, one per player, each a
+ * six-cell-tall band linking to the career page. A plate is ruled like the
+ * rest of the site's instruments — a mono header strip (rank mark, and the
+ * reigning champion's trophy), the name, and a footer of hairline-divided
+ * figure cells (mono eyebrow + mono figure, as in CareerLedger) — with the
+ * portrait on the right behind a single diagonal hairline that echoes the
+ * gamer-card diagonal. The plate stays `bg-bg` throughout: the diagonal is a
+ * rule, not a lifted surface.
+ *
+ * The plates arrive ranked by average season placement, but this is a player
+ * list, not a scoreboard — the rank is a small mark and the figures are a
+ * footer.
+ *
+ * Portraits are desaturated at rest so photos from different seasons and
+ * sources read as one set; a plate gets its colour back (and the accent on
+ * its border, diagonal and name) on hover/focus. Accent at rest is the
+ * leader's rank mark only, as on CareerBoard.
  *
  * Rendered as a Server Component: no client JS.
  */
 export default function PlayerRoster({ entries }: Props) {
   return (
-    <div className='border-border bg-bg border'>
-      {/* Header strip — the timing-sheet legend. */}
-      <div className='border-border text-text-muted flex items-center gap-4 border-b px-4 py-3 font-mono text-xs tracking-widest uppercase'>
-        <span className='w-6 text-center'>#</span>
-        <span className='flex-1'>Spiller</span>
-      </div>
-
-      <ul>
-        {entries.map((entry, i) => (
-          <li key={entry.slug}>
-            <PlayerRosterRow
-              entry={entry}
-              index={i}
-              isLast={i === entries.length - 1}
-            />
-          </li>
-        ))}
-      </ul>
-    </div>
+    <ul className='flex flex-col'>
+      {entries.map((entry) => (
+        // Plates share their hairlines (-mt-px); the hovered one is lifted so
+        // its accent border is not covered by the next plate's.
+        <li
+          key={entry.slug}
+          className='relative -mt-px first:mt-0 focus-within:z-10 hover:z-10'
+        >
+          <PlayerPlate entry={entry} />
+        </li>
+      ))}
+    </ul>
   );
 }
 
 /* -------------------------------------------------------------------------- */
 
-function PlayerRosterRow({
-  entry,
-  index,
-  isLast,
-}: {
-  entry: RosterEntry;
-  index: number;
-  isLast: boolean;
-}) {
+const eyebrow =
+  'text-text-muted font-mono text-xs tracking-wide uppercase sm:tracking-widest';
+/** The portrait's width; the text side keeps clear of it with the same value. */
+const portraitWidth = 'w-32 sm:w-60';
+const clearOfPortrait = 'pr-32 sm:pr-60';
+/** The diagonal: the portrait's clip and the hairline drawn along it. */
+const DIAGONAL_INSET = 22;
+
+function Figure({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    // The cell centres its content vertically; inside, label and figure share
+    // a baseline on one line (phones) or stack (sm and up).
+    <span className='border-border flex items-center border-r px-3 first:pl-4 sm:px-8 sm:first:pl-8'>
+      <span className='flex items-baseline gap-2 sm:flex-col sm:gap-1'>
+        <span className={eyebrow}>{label}</span>
+        <span className='text-text font-mono text-sm tabular-nums sm:text-2xl'>
+          {value}
+        </span>
+      </span>
+    </span>
+  );
+}
+
+function PlayerPlate({ entry }: { entry: RosterEntry }) {
+  const { career } = entry;
+
   return (
     <Link
       href={`/spillere/${entry.slug}`}
-      className={`group grid grid-cols-[48px_1fr] items-center gap-4 px-4 py-3 ${
-        isLast ? '' : 'border-border border-b'
-      } focus-visible:outline-accent focus-visible:outline-2 focus-visible:outline-offset-[-2px]`}
+      className='group border-border bg-bg hover:border-accent focus-visible:border-accent focus-visible:outline-accent relative flex h-44 flex-col overflow-hidden border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 sm:h-60'
     >
-      {/* Run-order index + portrait plate. */}
-      <span className='relative block h-12 w-12'>
+      {/* Header strip: rank mark, and the reigning champion's trophy. */}
+      <span
+        className={`border-border flex h-8 shrink-0 items-center gap-3 border-b px-4 sm:h-10 sm:px-8 ${clearOfPortrait}`}
+      >
+        {career && (
+          <span
+            className={`font-mono text-xs tracking-widest tabular-nums ${
+              career.rank === 1 ? 'text-accent' : 'text-text-muted'
+            }`}
+          >
+            <span className='sr-only'>Plass </span>
+            {String(career.rank).padStart(2, '0')}
+          </span>
+        )}
+        {career?.reigningChampion && (
+          // The plate is one link, so the mark can't be a popover trigger (no
+          // button inside an <a>): its label is CSS-only, fading in beside it
+          // in the strip on hover. Transparent rather than hidden at rest, so
+          // it is still read out.
+          <span className='group/trophy relative flex'>
+            <TrophyIcon kind='season-gold' muted />
+            <span className='text-text-muted pointer-events-none absolute top-1/2 left-full ml-3 -translate-y-1/2 font-mono text-xs tracking-wide whitespace-nowrap uppercase opacity-0 transition-opacity group-hover/trophy:opacity-100 motion-reduce:transition-none sm:tracking-widest'>
+              Regjerende mester
+            </span>
+          </span>
+        )}
+      </span>
+
+      {/* Name (identity) + nickname (latest season). */}
+      <span
+        className={`flex min-w-0 flex-1 flex-col justify-center gap-1 pl-4 sm:gap-2 sm:pl-8 ${clearOfPortrait}`}
+      >
+        <span className='group-hover:text-accent group-focus-visible:text-accent truncate text-3xl font-extrabold tracking-tight uppercase transition-colors sm:text-6xl'>
+          {entry.name}
+        </span>
+        <span className='text-text-muted truncate font-mono text-xs tracking-wide sm:tracking-widest sm:uppercase'>
+          {entry.nickname}
+        </span>
+      </span>
+
+      {/* Footer: the career figures as ruled instrument cells. */}
+      <span className='border-border flex h-10 shrink-0 border-t sm:h-20'>
+        <Figure label='Titler' value={career ? career.championships : '–'} />
+        <Figure
+          label='Snitt'
+          value={career ? career.averagePlacement.toFixed(1) : '–'}
+        />
+      </span>
+
+      {/* Portrait, laid over the plate's right end so the strips' rules run
+          up to the diagonal. `bg-bg` masks them behind the figure. */}
+      <span
+        className={`bg-bg absolute inset-y-0 right-0 ${portraitWidth}`}
+        style={{
+          clipPath: `polygon(${DIAGONAL_INSET}% 0, 100% 0, 100% 100%, 0 100%)`,
+        }}
+      >
         <img
           src={entry.imagePath}
           alt=''
           aria-hidden='true'
-          className='border-border group-hover:border-accent group-focus-visible:border-accent h-12 w-12 border object-cover object-top transition-colors'
+          className='h-full w-full object-cover object-top brightness-90 contrast-125 grayscale transition duration-300 group-hover:brightness-100 group-hover:contrast-100 group-hover:grayscale-0 group-focus-visible:brightness-100 group-focus-visible:contrast-100 group-focus-visible:grayscale-0 motion-reduce:transition-none'
         />
       </span>
-
-      {/* Name (identity) + nickname (latest season). */}
-      <span className='flex min-w-0 flex-col sm:flex-row sm:items-baseline sm:gap-3'>
-        <span className='group-hover:text-accent group-focus-visible:text-accent truncate font-sans font-extrabold tracking-tight uppercase transition-colors'>
-          <span className='text-text-muted mr-2 hidden font-mono text-xs tracking-widest tabular-nums sm:inline'>
-            {String(index + 1).padStart(2, '0')}
-          </span>
-          {entry.name}
-        </span>
-        <span className='text-text-muted truncate font-mono text-xs tracking-wide'>
-          {entry.nickname}
-        </span>
-      </span>
+      <svg
+        viewBox='0 0 100 100'
+        preserveAspectRatio='none'
+        aria-hidden='true'
+        className={`text-border group-hover:text-accent group-focus-visible:text-accent pointer-events-none absolute inset-y-0 right-0 h-full transition-colors ${portraitWidth}`}
+      >
+        <line
+          x1={DIAGONAL_INSET}
+          y1='0'
+          x2='0'
+          y2='100'
+          stroke='currentColor'
+          strokeWidth='1'
+          vectorEffect='non-scaling-stroke'
+        />
+      </svg>
     </Link>
   );
 }
