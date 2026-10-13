@@ -145,8 +145,8 @@ slug)` in `src/lib/results/queries.ts`, backed by `read.ts` (publishable
 
 Started. Phase 3 data is live and the shared UI primitives (`Panel`, `Button`,
 `StatList`/`StatRow`) are in place to build on. Season pages, player career
-pages, the title/genre layer and `/records` are built. Next: the
-player-index follow-ups, then `/vs`.
+pages, the player index, the title/genre layer and `/records` are built.
+Next: `/vs`.
 
 ### Build order (post-planning 2026-10-07)
 
@@ -201,9 +201,7 @@ the _genre_ stats (not the rest of any page).
         with its signed delta (real U+2212 minus, no colour-coding — accent
         stays reserved for rank-1). This replaced an earlier superscript idea
         that made totals look inflated. Reusable later on player/records pages.
-        **Public copy is placeholder** (heading "Poeng per spill", the help
-        line, totals label "Totalt", the Grunnpoeng line, the trigger
-        aria-label) — flagged in-file, needs human Norwegian review. Positioning
+        Public copy reviewed by Jakob. Positioning
         uses CSS Anchor Positioning with the browser's centered-popover default
         as a graceful fallback for older browsers.
   - [x] **Power-ups surfaced on the finished view (results-integrated).** Chose
@@ -243,8 +241,8 @@ the _genre_ stats (not the rest of any page).
       age. Data layer: `derive/career` (pure, 15 oracle-backed tests inc. trophy
       ordering), `composeCareerView`, `getCareerView`/`getAllPlayerSlugs`; hero
       portrait resolves a dedicated `public/images/heroes/<slug>.png` when present,
-      else falls back to the latest card art. All public copy is `TODO(copy)`
-      placeholder for human Norwegian (incl. the "Alle spillere" back-link label).
+      else falls back to the latest card art. All public copy is reviewed by
+      Jakob.
       Remaining (all deferred/blocked, do NOT block /records):
   - [ ] **Dedicated hero portraits** (Jakob) — `public/images/heroes/<slug>.png`;
         falls back to card art until then. Deferred by decision.
@@ -271,43 +269,60 @@ the _genre_ stats (not the rest of any page).
         toggled in CSS alone (`:has(input:checked)`, no JS). Accent only on
         game wins inside the popover (rank-1 data) and on the checked checkbox;
         nothing else takes it at rest. Display labels live in
-        `src/data/tag-labels.ts`. **All copy is best-effort Norwegian marked
-        `TODO(copy)`** (tag labels, "Best i" / "Svakest i" eyebrows, "Kategori"
-        and the other column heads, disclosure labels, explainer caption, the
-        own-picks filter label) —
-        needs Jakob's pass. Builds and prerenders with the full S1–S4 data; the
+        `src/data/tag-labels.ts`. All copy is reviewed by Jakob. Builds and prerenders with the full S1–S4 data; the
         visual result has not been reviewed in a browser yet.
   - [x] **Rivaler section — CUT until /vs lands.** Was a raw `Placeholder` panel;
         removed entirely rather than shipping a stub. Revisit as a compact H2H
         teaser once `/vs/[a]/[b]` exists (see the H2H-widget strong idea).
-- [~] **Player index (/spillere):** BUILT (first pass). All players across all
-  seasons as a VERKSTED "entrant sheet" — one row per player (portrait plate +
-  name + latest-season nickname), whole row links to the career page, accent
-  earned on hover/focus, plus a mono `#` run-order rail and a header strip.
-  Static sheet — an on-load "arming" animation was prototyped and removed (see
-  the ambient-polish section after Phase 5). Pure static data
-  (`src/lib/players/roster.ts`: `allPlayers()` + `playerSlug()`, slug verified
-  against `seed.sql`) — no results layer, so no career stats yet. Follow-up
-  (all UNBLOCKED — the career derivation they were gated on, `derive/career`,
-  now exists):
-  - [ ] **Career-stats columns.** The seasons-appeared column was removed (it said
-        nothing while everyone has played every season). When career stats land,
-        add the first real right-hand mono column(s) — championships / total career
-        points / win rate — back into `PlayerRoster`. `allPlayers()` already carries
-        each player's `seasons` list for reuse. This is also when accent-at-rest
-        finally earns its place (champion callouts).
-  - [ ] **Visual rework (AFTER the career-stats columns land).** The first pass is
-        deliberately basic — a plain hairline sheet. Once the rows actually carry
-        content, give it a proper visual pass: taller rows (~2–3× current height) to
-        make room for a larger player image and less trivial geometry, and a small,
-        intentional touch of accent. Deferred on purpose — hard to judge the right
-        treatment before the rows are filled out, so don't design it against today's
-        near-empty row.
-  - [ ] **Sort by average placement.** The row index number next to each name
-        currently implies a ranking it doesn't have (players are sorted
-        most-tenured, then alphabetically). Once career placements are derivable,
-        sort the sheet by **average placement** (best first) so the `#` rail
-        becomes a real all-time ranking rather than a cosmetic counter.
+- [~] **Player index (/spillere):** BUILT. All players across all seasons as a
+  stack of VERKSTED nameplates (`PlayerRoster`) — one six-cell-tall band per
+  player, the whole band linking to the career page. Identity and nickname
+  come from static data (`src/lib/players/roster.ts`: `allPlayers()` +
+  `playerSlug()`, slug verified against `seed.sql`); the ranking and the
+  career figures come from the /records career board
+  (`getRecordsView().board`), joined by slug in the page. An on-load "arming"
+  animation was prototyped and removed (see the ambient-polish section after
+  Phase 5).
+  - [x] **Career figures.** Two footer cells: "Titler" (seasons won, as a
+        number) and "Snitt" (average final season placement, one decimal — the
+        career page's headline stat). Kept to these two by decision
+        (2026-10-13): it is a player list, not a second leaderboard — career
+        points, game wins and win rate stay on /records and the career page.
+        Both labels reuse copy already on /records.
+  - [x] **Reigning-champion mark.** The winner of the latest decided season
+        gets a small muted (grey, on-token) GG trophy next to the rank mark —
+        `TrophyIcon`'s `muted` variant. Hovering the trophy fades in the label
+        "Regjerende mester" beside it in the header strip (CSS only: the plate
+        is one link, so the mark cannot be a popover trigger; the label is
+        transparent at rest, so screen readers still get it). No hover on
+        touch screens. **The label is best-effort Norwegian marked
+        `TODO(copy)`** — needs Jakob's pass. Replaced an earlier pass that
+        drew one gold trophy per title.
+  - [x] **Sort by average placement.** Ordered by average season placement,
+        best first; the small mono rank mark on each plate is a real all-time
+        ranking. Equal averages keep the /records board order
+        (placement-points, then titles, then average game placement), so the
+        two pages cannot disagree; plates equal on all of it share a rank. A
+        player with no finished season yet sorts last with no rank mark and
+        "–" for the average. Accent at rest is the leader's rank mark only, as
+        on `CareerBoard`.
+  - [x] **Visual rework.** Built and approved by Jakob (2026-10-13). Each plate is ruled like the site's other instruments: a
+        mono header strip (rank mark, champion mark), the name (Neue Montreal 800) over the mono nickname, and a footer of hairline-divided figure
+        cells (mono eyebrow + mono figure, as in `CareerLedger`). The portrait
+        sits at the right end behind ONE diagonal hairline that echoes the
+        gamer-card diagonal; the plate stays `bg-bg` throughout (an earlier
+        pass lifted the portrait onto a slanted `bg-surface` panel, which read
+        as a different design language). Portraits are greyscale at rest so
+        photos from different seasons read as one set; hover/focus brings back
+        the colour and turns the border, the diagonal and the name accent. The
+        portrait is the dedicated hero image (`public/images/heroes/<slug>.png`,
+        via `findHeroImage` in `queries.ts`, shared with the career hero) when
+        one exists, else the latest card art, cropped from the top. Ideas not tried: an accent duotone instead of greyscale, the figure
+        breaking out of the plate's top edge.
+  - [ ] **Real portraits** (Jakob). No dedicated hero image exists yet, so
+        every plate shows card art as a placeholder — the same manual step as
+        the career page's "Dedicated hero portraits". Revisit the top crop
+        once the real images land.
 - [ ] **Front page (/):** Latest-champion hero + entry points into seasons,
       players, and /records. The live-companion surface (recency); it is NOT the
       all-time career board.
@@ -397,10 +412,9 @@ the _genre_ stats (not the rest of any page).
     the one 2v2 game is not stored).
 
   Remaining:
-  - [~] **Copy.** Jakob's pass is done on the page (2026-10-13). Still
-    best-effort and flagged `TODO(copy)`: the "Vis flere" disclosure
-    labels and its caption in `UnrankedRows` (shared with the career
-    page).
+  - [x] **Copy.** Jakob's pass is done on the page (2026-10-13), including
+        the "Vis flere" disclosure labels and caption in `UnrankedRows`
+        (shared with the career page).
   - [ ] **Phone review.** Checked at 375px for overflow only; the plates and
         popovers have not been reviewed by eye on a phone.
   - [ ] **No entry point.** Nothing links to /records yet — it arrives with

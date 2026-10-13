@@ -89,14 +89,22 @@ export async function getRecordsView(): Promise<RecordsView> {
   return composeRecordsView(assembleAllCareers(bundles));
 }
 
+/**
+ * The player's dedicated hero portrait (public/images/heroes/<slug>.png) when
+ * one exists on disk, else null. Shared by the career hero and the player
+ * index, so both pick the portrait up the moment the file is added.
+ */
+export function findHeroImage(slug: string): string | null {
+  const rel = `/images/heroes/${slug}.png`;
+  const abs = path.join(process.cwd(), 'public', rel);
+  return existsSync(abs) ? rel : null;
+}
+
 /** Prefer a dedicated hero portrait on disk; else keep the card-art fallback. */
 function resolveHeroImage(
   slug: string,
   hero: CareerView['hero'],
 ): CareerView['hero'] {
-  const rel = `/images/heroes/${slug}.png`;
-  const abs = path.join(process.cwd(), 'public', rel);
-  return existsSync(abs)
-    ? { ...hero, imagePath: rel, heroImageIsFallback: false }
-    : hero;
+  const imagePath = findHeroImage(slug);
+  return imagePath ? { ...hero, imagePath, heroImageIsFallback: false } : hero;
 }
