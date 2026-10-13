@@ -9,6 +9,7 @@ import type {
 import { ladderByPlacement, gamePoints, powerUpById } from './points';
 import { resolvePlayers, requireRef } from './players';
 import { cumulativeSeries } from './series';
+import { matchesByGame } from './matches';
 
 /**
  * PURE. Assembles view-models from a raw SeasonBundle. No IO, no async — this
@@ -28,6 +29,7 @@ function buildGameSummaries(bundle: SeasonBundle): GameSummary[] {
   const refs = resolvePlayers(bundle.roster, bundle.players);
   const ladder = ladderByPlacement(bundle.ladder);
   const powerUps = powerUpById(bundle.powerUps);
+  const matches = matchesByGame(bundle, refs);
 
   const resultsByGame = new Map<string, typeof bundle.gameResults>();
   for (const gr of bundle.gameResults) {
@@ -70,7 +72,13 @@ function buildGameSummaries(bundle: SeasonBundle): GameSummary[] {
         })
         .sort((a, b) => a.placement - b.placement);
 
-      return { slug: game.slug, ordinal: game.ordinal, results };
+      return {
+        slug: game.slug,
+        ordinal: game.ordinal,
+        results,
+        // Matches carry no `confirmed` flag; they follow the game's results.
+        matches: results.length > 0 ? (matches.get(game.id) ?? []) : [],
+      };
     });
 }
 

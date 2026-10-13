@@ -1,6 +1,8 @@
 import type {
   RecordEntry,
   RecordGameRow,
+  RecordMatchLine,
+  RecordMatchRow,
   RecordSeason,
   RecordTiebreak,
   RecordsPlayerInput,
@@ -26,6 +28,19 @@ import { longestStreak } from './streaks';
 /** A title must have been played this often before it can have a specialist. */
 const MIN_TITLE_GAMES = 2;
 
+/** Series that went the distance, before a player has a deciding-game record. */
+const MIN_DECIDERS = 3;
+/** Finals reached before a player has a finals record. */
+const MIN_FINALS = 3;
+/** Matches a player must have played in a game for it to count as flawless. */
+const MIN_FLAWLESS_MATCHES = 3;
+/** Own picks before a home advantage means anything. */
+const MIN_OWN_PICKS = 4;
+/** Seasons played before a closing-game average means anything. */
+const MIN_CLOSER_SEASONS = 3;
+/** Final slots, least to most decisive: a reset grand final settles the game. */
+const FINAL_SLOTS = ['F', 'GF', 'GF2'];
+
 const isWin = (game: { placement: number }) => game.placement === 1;
 const wins = (games: readonly { placement: number }[]) =>
   games.filter(isWin).length;
@@ -35,6 +50,11 @@ const mean = (games: readonly { placement: number }[]) =>
 /** An average at the precision it is displayed with, so what reads equal ties. */
 const shown = (average: number, decimals: number) =>
   Number(average.toFixed(decimals));
+
+/** `value` as a share of `outOf`, higher first; then the larger sample. */
+const byRateDesc = (a: UnrankedEntry, b: UnrankedEntry) =>
+  b.value / (b.outOf || 1) - a.value / (a.outOf || 1) ||
+  (b.outOf ?? 0) - (a.outOf ?? 0);
 
 const withoutZeros = (entries: UnrankedEntry[]) =>
   entries.filter((e) => e.value > 0);
@@ -136,8 +156,8 @@ function titleSpecialist(players: RecordsPlayerInput[]): RecordEntry[] {
 /**
  * Points ties that placement had to split: two players with the same season
  * total and different final placements. The better placement won the tiebreak.
- * Ranked on tiebreaks won, then fewer lost. Players never part of one are left
- * out.
+ * Ranked on the share of tiebreaks won, then on having been in more of them.
+ * Players never part of one are left out.
  */
 function tiebreaks(players: RecordsPlayerInput[]): RecordEntry[] {
   const entries = players.map(({ player, seasons }) => {
@@ -171,10 +191,229 @@ function tiebreaks(players: RecordsPlayerInput[]): RecordEntry[] {
 
   return rankEntries(
     entries.filter((e) => e.outOf > 0),
-    (a, b) =>
-      b.value - a.value ||
-      (a.outOf ?? 0) - a.value - ((b.outOf ?? 0) - b.value),
+    byRateDesc,
   );
+}
+
+/** One line per game for a set of matches: how many of them `hits`. */
+function linesPerGame(
+  pool: RecordMatchRow[],
+  hits: (match: RecordMatchRow) => boolean,
+): RecordMatchLine[] {
+  const lines = new Map<string, RecordMatchLine>();
+  for (const match of pool) {
+    const key = `${match.seasonSlug}/${match.gameSlug}`;
+    const line = lines.get(key) ?? {
+      seasonNumber: match.seasonNumber,
+      seasonSlug: match.seasonSlug,
+      gameSlug: match.gameSlug,
+      gameTitle: match.gameTitle,
+      count: 0,
+      outOf: 0,
+    };
+    line.outOf += 1;
+    if (hits(match)) line.count += 1;
+    lines.set(key, line);
+  }
+  return [...lines.values()];
+}
+
+/**
+ * A share-of-matches record: among the matches `select` picks (`outOf`), how
+ * many `hits` (`value`). Ranked on the rate, then the larger sample. Players
+ * with fewer than `minimum` selected matches are left out. `matchLines` breaks
+ * it down per game.
+ */
+function matchRate(
+  players: RecordsPlayerInput[],
+  select: (matches: RecordMatchRow[]) => RecordMatchRow[],
+  hits: (match: RecordMatchRow) => boolean,
+  minimum = 1,
+): RecordEntry[] {
+  const entries = players.flatMap(({ player, matches }) => {
+    const pool = select(matches);
+    if (pool.length < minimum) return [];
+    return [
+      {
+        player,
+        value: pool.filter(hits).length,
+        outOf: pool.length,
+        matchLines: linesPerGame(pool, hits),
+        games: [],
+      },
+    ];
+  });
+  return rankEntries(entries, byRateDesc);
+}
+
+/**
+ * The match that settled each final a player reached: one per game. A final is
+ * slot `F`; in a double elimination it is the grand final, and when that was
+ * reset (`GF2`) the reset is the match that counts.
+ */
+function decidingFinals(matches: RecordMatchRow[]): RecordMatchRow[] {
+  const byGame = new Map<string, RecordMatchRow>();
+  for (const match of matches) {
+    const weight = FINAL_SLOTS.indexOf(match.slotId ?? '');
+    if (weight < 0) continue;
+    const key = `${match.seasonSlug}/${match.gameSlug}`;
+    const current = byGame.get(key);
+    if (!current || weight > FINAL_SLOTS.indexOf(current.slotId ?? '')) {
+      byGame.set(key, match);
+    }
+  }
+  return [...byGame.values()];
+}
+
+/**
+ * Head-to-head games in which the player won every match they played, given at
+ * least MIN_FLAWLESS_MATCHES of them (a lone final is not a tournament). Ranked
+ * on the count; ties share the rank.
+ */
+function flawlessGames(players: RecordsPlayerInput[]): RecordEntry[] {
+  const entries = players.map(({ player, matches }) => {
+    const flawless = linesPerGame(matches, (m) => m.won).filter(
+      (line) => line.outOf >= MIN_FLAWLESS_MATCHES && line.count === line.outOf,
+    );
+    return {
+      player,
+      value: flawless.length,
+      matchLines: flawless,
+      games: [],
+    };
+  });
+  return rankEntries(withoutZeros(entries), byValueDesc);
+}
+
+/**
+ * Each player's longest run of consecutive match wins over one opponent.
+ * Matches arrive in play order (season, game, stage, leg), which is exactly
+ * the order one pair met in. Between two equally long runs the later one wins.
+ */
+function opponentStreak(players: RecordsPlayerInput[]): RecordEntry[] {
+  const entries = players.flatMap(({ player, matches }) => {
+    const opponents = new Map<string, RecordMatchRow[]>();
+    for (const match of matches) {
+      opponents.set(match.opponent.slug, [
+        ...(opponents.get(match.opponent.slug) ?? []),
+        match,
+      ]);
+    }
+
+    let best: RecordMatchRow[] = [];
+    for (const meetings of opponents.values()) {
+      const run = longestStreak(meetings, (m) => m.won);
+      const later =
+        run.length === best.length &&
+        run.length > 0 &&
+        run[run.length - 1].seasonNumber > best[best.length - 1].seasonNumber;
+      if (run.length > best.length || later) best = run;
+    }
+    if (best.length === 0) return [];
+
+    return [
+      {
+        player,
+        value: best.length,
+        opponent: best[0].opponent,
+        matches: best,
+        games: [],
+      },
+    ];
+  });
+  return rankEntries(entries, byValueDesc);
+}
+
+/**
+ * Home advantage: average placement in other people's picks minus the average
+ * in one's own — how many places better a player finishes at home. Needs
+ * MIN_OWN_PICKS own picks. Compared at the two decimals it is shown with, then
+ * on more wins in own picks.
+ */
+function homeAdvantage(players: RecordsPlayerInput[]): RecordEntry[] {
+  const entries = players.flatMap(({ player, games }) => {
+    const own = games.filter((g) => g.ownPick);
+    const others = games.filter((g) => !g.ownPick);
+    if (own.length < MIN_OWN_PICKS || others.length === 0) return [];
+    const split = { own: mean(own), others: mean(others) };
+    return [
+      {
+        player,
+        value: split.others - split.own,
+        outOf: own.length,
+        split,
+        games: own,
+      },
+    ];
+  });
+  return rankEntries(
+    entries,
+    (a, b) =>
+      shown(b.value, 2) - shown(a.value, 2) || wins(b.games) - wins(a.games),
+  );
+}
+
+/**
+ * The closer: average placement in the LAST game of each season played. Needs
+ * MIN_CLOSER_SEASONS seasons. Compared at two decimals, then on more wins.
+ */
+function seasonCloser(players: RecordsPlayerInput[]): RecordEntry[] {
+  const entries = players.flatMap(({ player, games }) => {
+    // Games are in play order, so the last row seen per season is its closer.
+    const lastBySeason = new Map<number, RecordGameRow>();
+    for (const game of games) lastBySeason.set(game.seasonNumber, game);
+    const closers = [...lastBySeason.values()];
+    if (closers.length < MIN_CLOSER_SEASONS) return [];
+    return [
+      { player, value: mean(closers), outOf: closers.length, games: closers },
+    ];
+  });
+  return rankEntries(
+    entries,
+    (a, b) =>
+      shown(a.value, 2) - shown(b.value, 2) || wins(b.games) - wins(a.games),
+  );
+}
+
+/**
+ * Raw season points summed over the career. The one place seasons are added
+ * up as points rather than placements: ladders differ per season, so this
+ * favours the seasons with more points on offer. Asked for as a plain total.
+ */
+function totalPoints(players: RecordsPlayerInput[]): RecordEntry[] {
+  const entries = players.map(({ player, seasons }) => ({
+    player,
+    value: seasons.reduce((sum, s) => sum + s.totalPoints, 0),
+    outOf: seasons.length,
+    seasonPoints: seasons.map((s) => ({
+      season: { seasonNumber: s.seasonNumber, seasonSlug: s.seasonSlug },
+      points: s.totalPoints,
+    })),
+    games: [],
+  }));
+  return rankEntries(withoutZeros(entries), byValueDesc);
+}
+
+/**
+ * Net power-up points over the career: the sum of every game's power-up delta
+ * on the player's OWN score, whoever played the power-up (a curse from someone
+ * else counts against them). The net can be negative, so nobody is dropped for
+ * a low figure — only players no power-up ever moved are left out.
+ */
+function powerUpPoints(players: RecordsPlayerInput[]): RecordEntry[] {
+  const entries = players.flatMap(({ player, games }) => {
+    const moved = games.filter((g) => g.powerUpDelta !== 0);
+    if (moved.length === 0) return [];
+    return [
+      {
+        player,
+        value: moved.reduce((sum, g) => sum + g.powerUpDelta, 0),
+        outOf: moved.length,
+        games: moved,
+      },
+    ];
+  });
+  return rankEntries(entries, byValueDesc);
 }
 
 /**
@@ -240,10 +479,45 @@ export function deriveRecords(players: RecordsPlayerInput[]): RecordsView {
     bestSeason: bestSeason(players),
     longestWinStreak: streak(players, isWin),
     longestTopTwoStreak: streak(players, (g) => g.placement <= 2),
+    longestTopThreeStreak: streak(players, (g) => g.placement <= 3),
     homeTurf: winCount(players, (g) => g.ownPick),
     awayWins: winCount(players, (g) => !g.ownPick),
     titleSpecialist: titleSpecialist(players),
     tiebreaks: tiebreaks(players),
+    matchWins: matchRate(
+      players,
+      (matches) => matches,
+      (m) => m.won,
+    ),
+    // A sweep needs a series: a bo1 win is always "to nil".
+    matchSweeps: matchRate(
+      players,
+      (matches) => matches.filter((m) => m.bestOf > 1),
+      (m) => m.won && m.gamesLost === 0,
+    ),
+    // A decider is a series that used every game it could: 2–1 or 3–2.
+    matchDeciders: matchRate(
+      players,
+      (matches) =>
+        matches.filter(
+          (m) => m.bestOf > 1 && m.gamesWon + m.gamesLost === m.bestOf,
+        ),
+      (m) => m.won,
+      MIN_DECIDERS,
+    ),
+    finals: matchRate(players, decidingFinals, (m) => m.won, MIN_FINALS),
+    flawlessGames: flawlessGames(players),
+    opponentStreak: opponentStreak(players),
+    homeAdvantage: homeAdvantage(players),
+    seasonCloser: seasonCloser(players),
+    totalPoints: totalPoints(players),
+    powerUpPoints: powerUpPoints(players),
     tagCrowns: tagCrowns(players),
+    tagCrownsWithoutOwnPicks: tagCrowns(
+      players.map((p) => ({
+        ...p,
+        games: p.games.filter((g) => !g.ownPick),
+      })),
+    ),
   };
 }

@@ -319,21 +319,55 @@ the _genre_ stats (not the rest of any page).
   Scope and design came out of a product + design pass (2026-10-12) and
   Jakob's decisions on it. Three parts:
   - **Career board (`CareerBoard`)** — every player, ordered by summed season
-    placement-points (4/3/2/1), with a per-season placement strip, titles,
-    game wins and average game placement. The only accent at rest on the page
-    is the leader's position marker. The strip and the average drop out on
-    narrow screens.
-  - **Record wall (`RecordPlate`, eight plates in two groups)** — most game
-    wins, title specialist (a title played at least twice), home turf (wins
-    in own picks), away wins (wins in others' picks), longest win streak,
-    longest top-two streak (both run across season boundaries), best single
-    season (average game placement) and points ties won. Each plate: holder
-    name, the number, a scope stamp (`GG · S1–S4`), up to two runners-up, and
-    a native `<details>` with the games behind the number. Ties share the
-    plate (rank 1, 1, 3) — no hidden tiebreaks. No accent at rest, no
+    placement-points (4/3/2/1), with a per-season placement strip, titles
+    and game wins. Accent at rest on the board is the leader's position
+    marker only. The strip drops out on narrow screens. (The average
+    game placement column was removed; the average is still the board's last
+    ordering tiebreak.)
+  - **Record wall (`RecordPlate`, nineteen plates in four groups)** — _Seire:_
+    most game wins, title specialist (a title played at least twice), home
+    turf (wins in own picks), away wins (wins in others' picks), home advantage
+    (average placement in others' picks minus in own; min. 4 own picks). _Rekker og
+    sesonger:_ longest win streak, longest top-two streak, longest top-three
+    streak (all run across season boundaries), best single season (average
+    game placement), the closer (average placement in the last game
+    of each season; min. 3 seasons). _Poeng:_ most points in total (raw season points summed;
+    the one record not normalised off placement), most points from power-ups
+    (net power-up effect on the player's own score, whoever played them).
+    _Kamper:_ head-to-head match win rate (a match goes to whoever won more
+    of its `match_game` rows; undecided matches are skipped), sweep rate
+    (share of bo3/bo5 matches won without losing a game; bo1 excluded),
+    deciding games (win rate in series that went the full distance; min. 3),
+    finals (finals won of finals reached, one per game, a grand-final reset
+    counting once; min. 3), flawless tournaments (H2H games won without
+    losing a match; min. 3 matches), longest hold over one opponent
+    (consecutive match wins against one player, across seasons), and
+    points-tie win rate (share of points ties won; season ties only, by
+    decision — game-level tiebreaks are not counted). The match records read
+    the `stage`/`match`/`match_game` tables, now part of the season bundle.
+    Series are stored two ways (one row per game, or one row holding the
+    series score); `derive/matches.ts` reads both. The six newest records
+    came out of a subagent "committee" round (2026-10-13); ideas considered
+    and left off: share of individual rounds won (needs round data, one
+    player sweeps it), seasons led without winning (near-roast), season-
+    deciding power-ups (better on the season page), biggest comeback to a
+    title (declined by Jakob). An odd last plate spans the row. Each plate: holder
+    name at the top (sentence case, regular weight; tied holders on one line,
+    comma-separated), and a modest mono number with its unit running on from
+    it on the same line, pinned to the bottom just over the runners-up; then
+    a scope stamp (`GG · S1–S4`), up to three runners-up, so all four players appear (no rank numerals, one
+    rule above them). The number is a native-popover trigger (dotted
+    underline, same no-JS pattern as `GamePointsMatrix`/`TagRecord`) listing
+    the games behind it; each runner-up's figure opens the same list for that player; this replaced a `<details>` at the foot, which read
+    as more of the runners-up list. An empty footer row, ruled edge to edge, closes
+    each plate so stacked plates stay distinct. Ties share the plate — no hidden tiebreaks. Accent at rest on the holder's number (the record itself); name and runners-up stay neutral. No
     portraits. Each plate has a fragment id (`/records#beste-sesong`).
-  - **Category crowns (`TagCrowns`)** — one table, best player per tag (genre
-    and format together, `MIN_RANKED_GAMES` applied in the component).
+  - **Category crowns (`TagCrowns`)** — best player per tag (genre and format
+    together, `MIN_RANKED_GAMES` applied in the component). Tags under the
+    cutoff are folded into a "Vis flere" disclosure (`UnrankedRows`, shared
+    with `TagRecord`), and a footer checkbox ("Uten egne spillvalg", the same
+    CSS-only toggle as `TagRecord`) swaps in the crowns computed without each
+    player's own picks (`tagCrownsWithoutOwnPicks`). Tied holders share a line.
     Data layer: `assembleAllCareers` (derive/career), the pure
     `derive/records/` (`deriveRecords`, unit-tested against the S1+S2 oracle),
     `composeRecordsView`, `getRecordsView`. Decided against: roast / "worst at"
@@ -343,15 +377,14 @@ the _genre_ stats (not the rest of any page).
     "away" for everyone. Remaining:
   - [ ] **Copy.** Every label on the page is best-effort placeholder Norwegian
         marked `TODO(copy)` (page title, section eyebrows, record names, unit
-        lines, disclosure labels, column heads) — needs Jakob's pass.
+        lines, column heads) — needs Jakob's pass.
   - [ ] **Visual review.** Checked in a browser for layout only (no overflow
         at 375px or desktop, fonts load); not reviewed by eye for the
-        plate treatment or the flat no-accent wall.
+        plate treatment.
   - [ ] **No entry point.** Nothing links to /records yet — it arrives with
         the front-page rework.
   - [ ] **Deferred records:** biggest season-over-season climb (has happened
-        once), power-up impact (belongs with season superlatives), a
-        runner-up column on the crowns table.
+        once), a runner-up column on the crowns table.
 - [ ] **/vs/[a]/[b] (Head-to-head pages):** Relational stats (H2H W/L record, genre
       comparison, most-similar/most-different), NOT a per-game dump. Normalization
       RESOLVED; needs a product-owner refinement pass on the stat set first. See

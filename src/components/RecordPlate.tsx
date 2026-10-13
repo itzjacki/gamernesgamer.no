@@ -1,25 +1,35 @@
 import Link from 'next/link';
+import { Fragment } from 'react';
 import type { RecordEntry } from '@/lib/results/view-models';
+import styles from './RecordPlate.module.css';
 
 /**
- * One record on the /records wall: who holds it, the number, and the two
- * players behind them. Built like a CareerLedger cell (mono eyebrow over a
- * large figure, `bg-bg` inside a `bg-border` + `gap-px` hairline wall) with the
- * roles flipped — the holder's NAME is the display-face value and the number is
- * the big mono figure.
+ * One record on the /records wall: who holds it, the number, and the three
+ * players behind them (the whole field of four). The holder's name sits at the top (sentence case,
+ * regular weight, a step larger than the rest); the mono figure, with its unit running on
+ * from it on the same line, sits along the bottom of the upper area, directly
+ * over the runners-up. Neither is large: the name leads, the figure is a
+ * modest readout. `bg-bg` inside a `bg-border` + `gap-px` hairline wall, like a
+ * CareerLedger cell.
  *
  * A plate is written to stand alone when cropped into the group chat: its own
  * label, a scope stamp saying which seasons it covers, and the runners-up that
  * give the number its meaning.
  *
- * - Ties: every rank-1 entry is a holder, stacked, under one shared figure. No
+ * - Ties: every rank-1 entry is a holder, on one line, over one shared figure. No
  *   tiebreak is applied here that the reader can't see.
- * - No accent at rest. Every plate names a winner by construction, so spending
- *   accent here would turn the whole page red; it stays on the career board's
- *   leader. Names earn it on hover, game wins in the opened list keep it.
+ * - The holder's FIGURE carries the accent at rest: it is the record, the
+ *   rank-1 datum of the plate. (An earlier pass kept the wall accent-free, on
+ *   the grounds that every plate names a winner; the page read too flat.) The
+ *   name and the runners-up stay neutral and earn accent on hover; game wins
+ *   in the opened list keep it.
  * - No portraits: one player on several plates would repeat the same face.
- * - The games behind the number sit in a native <details> (no JS, stays a
- *   Server Component).
+ * - The figure is a native-popover trigger (`<button popovertarget>` +
+ *   `[popover]`, no JS, stays a Server Component — the same pattern as
+ *   GamePointsMatrix and TagRecord), marked with a dotted underline. The panel
+ *   lists the games behind the number; each runner-up's figure opens the same
+ *   list for that player. It replaced a <details> at the foot of
+ *   the plate, which read as a continuation of the runners-up list.
  */
 
 interface Props {
@@ -34,15 +44,24 @@ interface Props {
   figure: (entry: RecordEntry) => string;
   /** The line under the holder's figure: unit and any qualifier. */
   unit: (holder: RecordEntry) => string;
-  /** Label on the disclosure that opens the detail. */
+  /** Screen-reader label for the figure button that opens the detail. */
   detailLabel: string;
-  /** What is behind one holder's figure. Defaults to the list of their games. */
-  detail?: (holder: RecordEntry) => React.ReactNode;
+  /**
+   * What is behind one entry's figure (the holder's or a runner-up's).
+   * Defaults to the list of their games.
+   */
+  detail?: (entry: RecordEntry) => React.ReactNode;
 }
 
-const MAX_RUNNERS_UP = 2;
+/**
+ * Rows under the holder. Three, not the conventional two: with four players a
+ * plate then shows the whole field, so nobody is the one left off.
+ */
+const MAX_RUNNERS_UP = 3;
 
 const eyebrow = 'text-text-muted font-mono text-xs tracking-widest uppercase';
+const nameLink =
+  'hover:text-accent focus-visible:outline-accent underline-offset-2 transition-colors duration-150 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2';
 const link =
   'hover:text-accent focus-visible:outline-accent underline underline-offset-2 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2';
 
@@ -96,90 +115,138 @@ export default function RecordPlate({
   const runnersUp = entries.filter((e) => e.rank > 1).slice(0, MAX_RUNNERS_UP);
   const shared = holders.length > 1;
 
+  const popoverId = `record-${id}`;
+  // A unique dashed-ident anchor name per trigger, bridged to the CSS module
+  // via an inline custom property on both the trigger and its popover.
+  const anchorFor = (name: string) =>
+    ({ '--anchor': `--${name}` }) as React.CSSProperties;
+  const anchorStyle = anchorFor(popoverId);
+
   return (
-    <li className='bg-bg'>
-      <article id={id} className='flex h-full scroll-mt-8 flex-col gap-4 p-5'>
+    // An odd plate left alone on the last row spans it, so the wall has no hole.
+    <li className='bg-bg sm:last:odd:col-span-2'>
+      <article
+        id={id}
+        className='flex h-full scroll-mt-8 flex-col gap-4 p-5 pb-0'
+      >
         <header className='flex items-baseline justify-between gap-4'>
           <h3 className={eyebrow}>{label}</h3>
           <span className={`shrink-0 ${eyebrow}`}>{scope}</span>
         </header>
 
-        <div className='flex flex-col gap-2'>
-          <p
-            className={`text-text flex flex-col font-extrabold tracking-tight uppercase ${
-              shared ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl'
-            }`}
-          >
-            {holders.map((holder) => (
+        {/* Tied holders share one line, comma-separated. */}
+        <p className='text-text text-xl'>
+          {holders.map((holder, i) => (
+            <Fragment key={holder.player.slug}>
+              {i > 0 && ', '}
               <Link
-                key={holder.player.slug}
                 href={`/spillere/${holder.player.slug}`}
-                className={`self-start ${link}`}
+                className={nameLink}
               >
                 {holder.player.name}
               </Link>
-            ))}
-          </p>
-          <p className='text-text font-mono text-5xl tabular-nums sm:text-6xl'>
-            {figure(holders[0])}
-          </p>
-          <p className='text-text-muted font-mono text-xs'>
-            {unit(holders[0])}
-          </p>
-        </div>
+            </Fragment>
+          ))}
+        </p>
 
-        {/* Pushed to the foot so the rows line up across a grid row. */}
+        {/* Pushed to the foot, figure line included, so the figures and the
+            runners-up each line up across a grid row whatever the name above
+            them does. */}
         <div className='mt-auto flex flex-col'>
-          {runnersUp.length > 0 && (
-            <ol className='border-border border-t'>
-              {runnersUp.map((entry) => (
-                <li
-                  key={entry.player.slug}
-                  className='border-border grid grid-cols-[1.5rem_1fr_auto] items-baseline gap-2 border-b py-2'
-                >
-                  <span className='text-text-muted font-mono text-sm tabular-nums'>
-                    <span className='sr-only'>plass </span>
-                    {entry.rank}
-                  </span>
-                  <Link
-                    href={`/spillere/${entry.player.slug}`}
-                    className='text-text justify-self-start text-sm underline-offset-2 hover:underline'
-                  >
-                    {entry.player.name}
-                  </Link>
-                  <span className='text-text font-mono text-sm tabular-nums'>
-                    {figure(entry)}
-                  </span>
-                </li>
-              ))}
-            </ol>
-          )}
-
-          <details className='group'>
-            <summary
-              className={`hover:text-accent focus-visible:outline-accent flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 [&::-webkit-details-marker]:hidden ${eyebrow}`}
+          {/* The figure and its unit as ONE line: the unit reads on from the
+              number at its baseline. A long unit wraps inside its own column
+              and grows UPWARD (last-baseline alignment), so its final line
+              always sits on the figure's baseline. */}
+          <p className='flex items-baseline-last gap-2 pb-4'>
+            <button
+              type='button'
+              popoverTarget={popoverId}
+              className={`text-accent shrink-0 font-mono text-3xl leading-none tabular-nums ${styles.trigger}`}
+              style={anchorStyle}
             >
-              {detailLabel}
-              <svg
-                aria-hidden='true'
-                viewBox='0 0 12 12'
-                className='size-3 transition-transform duration-150 group-open:rotate-180 motion-reduce:transition-none'
-                fill='none'
-                stroke='currentColor'
-                strokeWidth='1.5'
-              >
-                <path d='M2 4l4 4 4-4' />
-              </svg>
-            </summary>
-            <div className='border-border flex flex-col gap-4 border-t pt-2'>
+              {figure(holders[0])}
+              <span className='sr-only'>. {detailLabel}</span>
+            </button>
+            <span className='text-text-muted font-mono text-xs'>
+              {unit(holders[0])}
+            </span>
+          </p>
+          <div
+            id={popoverId}
+            popover='auto'
+            className={styles.popover}
+            style={anchorStyle}
+          >
+            <p className={styles.heading}>{label}</p>
+            <div className={`flex flex-col gap-4 ${styles.body}`}>
               {holders.map((holder) => (
                 <div key={holder.player.slug} className='flex flex-col'>
-                  {shared && <p className={eyebrow}>{holder.player.name}</p>}
+                  {shared && (
+                    <p className={`pt-3 ${eyebrow}`}>{holder.player.name}</p>
+                  )}
                   {detail(holder)}
                 </div>
               ))}
             </div>
-          </details>
+          </div>
+
+          {runnersUp.length > 0 && (
+            <ol className='border-border border-t py-2'>
+              {runnersUp.map((entry) => (
+                <li
+                  key={entry.player.slug}
+                  className='flex items-baseline justify-between gap-4 py-1'
+                >
+                  <span className='sr-only'>plass {entry.rank}: </span>
+                  <Link
+                    href={`/spillere/${entry.player.slug}`}
+                    className={`text-text mr-auto text-sm ${nameLink}`}
+                  >
+                    {entry.player.name}
+                  </Link>
+                  {/* The same detail as the holder's, for this player. */}
+                  <button
+                    type='button'
+                    popoverTarget={`${popoverId}-${entry.player.slug}`}
+                    className={`text-text-muted font-mono text-sm tabular-nums ${styles.trigger} ${styles.quiet}`}
+                    style={anchorFor(`${popoverId}-${entry.player.slug}`)}
+                  >
+                    {figure(entry)}
+                    <span className='sr-only'>. {detailLabel}</span>
+                  </button>
+                  <div
+                    id={`${popoverId}-${entry.player.slug}`}
+                    popover='auto'
+                    className={styles.popover}
+                    style={anchorFor(`${popoverId}-${entry.player.slug}`)}
+                  >
+                    <p className={styles.heading}>
+                      {label} · {entry.player.name}
+                    </p>
+                    <div className={styles.body}>{detail(entry)}</div>
+                  </div>
+                </li>
+              ))}
+              {/* Empty rows keep the list the same height on every plate, so
+                  a record with one runner-up doesn't sit lower than its
+                  neighbour. */}
+              {Array.from({ length: MAX_RUNNERS_UP - runnersUp.length }).map(
+                (_, i) => (
+                  <li key={i} aria-hidden='true' className='py-1 text-sm'>
+                    &nbsp;
+                  </li>
+                ),
+              )}
+            </ol>
+          )}
+
+          {/* An empty ruled footer row: it closes the plate, so stacked
+              plates don't run into the one below. Its rule runs edge to edge
+              (out through the plate's padding), meeting the wall's hairlines. */}
+          <div
+            aria-hidden='true'
+            className='border-border -mx-5 h-8 border-t'
+          />
         </div>
       </article>
     </li>

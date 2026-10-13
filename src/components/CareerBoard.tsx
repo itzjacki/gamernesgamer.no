@@ -7,16 +7,16 @@ import type { CareerBoardRow, RecordSeason } from '@/lib/results/view-models';
  *
  * Shares StandingsTable's timing-sheet grammar (Martian Mono, hairline rules,
  * no row hover, solid bg masking the grid) but is its own table: what sets it
- * apart is the per-season strip showing how each total was built, plus titles,
- * game wins and average game placement. No portraits — identity is the roster's
+ * apart is the per-season strip showing how each total was built, plus titles
+ * and game wins. No portraits — identity is the roster's
  * and the hero's job.
  *
- * This is the one place on /records where accent sits at rest: the leader's
- * position marker. The season strip stays neutral even for a season win, so the
- * sheet carries a single highlighted datum.
+ * Accent at rest is the leader's position marker only (the record plates below
+ * spend theirs on each holder's figure). The season strip stays neutral even
+ * for a season win, so the sheet carries a single highlighted datum.
  *
- * On narrow screens the season strip and the average drop out; position, name,
- * titles, wins and points remain.
+ * On narrow screens the season strip drops out; position, name, titles, wins
+ * and points remain.
  */
 
 interface Props {
@@ -31,11 +31,10 @@ const numberCell = 'px-2 py-3 font-mono text-sm tabular-nums sm:px-3';
 export default function CareerBoard({ rows, seasons }: Props) {
   return (
     <table className='border-border bg-bg w-full border-collapse border text-left'>
-      {/* TODO(copy): caption + column heads — best-effort. */}
-      <caption className='sr-only'>Sammenlagt, alle sesonger</caption>
+      <caption className='sr-only'>Sammenlagtscore, alle sesonger</caption>
       <thead>
-        <tr className='border-border text-text-muted border-b font-mono text-xs tracking-widest uppercase'>
-          <th scope='col' className={`w-12 text-center sm:w-16 ${headCell}`}>
+        <tr className='border-border text-text-muted border-b font-mono text-xs tracking-wide uppercase sm:tracking-widest'>
+          <th scope='col' className={`w-10 text-center sm:w-16 ${headCell}`}>
             POS
           </th>
           <th scope='col' className={headCell}>
@@ -61,13 +60,7 @@ export default function CareerBoard({ rows, seasons }: Props) {
             Titler
           </th>
           <th scope='col' className={`text-right ${headCell}`}>
-            Seire
-          </th>
-          <th
-            scope='col'
-            className={`hidden text-right sm:table-cell ${headCell}`}
-          >
-            Snitt
+            Spillseire
           </th>
           <th scope='col' className={`text-right ${headCell}`}>
             Poeng
@@ -111,11 +104,6 @@ export default function CareerBoard({ rows, seasons }: Props) {
             </td>
             <td className={`text-text-muted text-right ${numberCell}`}>
               {row.gameWins}
-            </td>
-            <td
-              className={`text-text-muted hidden text-right sm:table-cell ${numberCell}`}
-            >
-              {row.averageGamePlacement.toFixed(2)}
             </td>
             <td className={`text-text text-right ${numberCell}`}>
               {row.placementPoints}

@@ -44,6 +44,7 @@ export async function fetchSeasonBundle(
     powerUps,
     powerUpUses,
     seasonResults,
+    stages,
   ] = await Promise.all([
     supabase.from('season_player').select('*').eq('season_id', seasonId),
     supabase.from('season_ladder').select('*').eq('season_id', seasonId),
@@ -64,6 +65,10 @@ export async function fetchSeasonBundle(
       .select('*')
       .eq('season_id', seasonId)
       .eq('confirmed', true),
+    supabase
+      .from('stage')
+      .select('*, game!inner(season_id)')
+      .eq('game.season_id', seasonId),
   ]);
 
   for (const res of [
@@ -74,9 +79,24 @@ export async function fetchSeasonBundle(
     powerUps,
     powerUpUses,
     seasonResults,
+    stages,
   ]) {
     if (res.error) throw res.error;
   }
+
+  // Head-to-head matches hang off stages, their game rows off matches. Neither
+  // has a `confirmed` flag of its own — derivation only reads the matches of
+  // games that have (confirmed) results.
+  const stageIds = (stages.data ?? []).map((s) => s.id);
+  const [matches, matchGames] = await Promise.all([
+    supabase.from('match').select('*').in('stage_id', stageIds),
+    supabase
+      .from('match_game')
+      .select('*, match!inner(stage_id)')
+      .in('match.stage_id', stageIds),
+  ]);
+  if (matches.error) throw matches.error;
+  if (matchGames.error) throw matchGames.error;
 
   // Resolve the roster's player identities in one follow-up query.
   const playerIds = (roster.data ?? []).map((r) => r.player_id);
@@ -104,6 +124,11 @@ export async function fetchSeasonBundle(
       powerUpUses.data ?? [],
     ) as SeasonBundle['powerUpUses'],
     seasonResults: seasonResults.data ?? [],
+    stages: stripJoin(stages.data ?? []) as SeasonBundle['stages'],
+    matches: matches.data ?? [],
+    matchGames: (matchGames.data ?? []).map(
+      ({ match: _match, ...rest }) => rest,
+    ) as SeasonBundle['matchGames'],
   };
 }
 

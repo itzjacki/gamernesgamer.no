@@ -44,7 +44,10 @@ Each file has one job; keep the boundaries.
   `getRecordsView()`. Returns `null` for not-found; throws on error. Also
   resolves hero portraits off the filesystem so `compose` stays pure.
 - `fetch.ts` — the IO boundary. `fetchSeasonBundle` and `fetchAllSeasonBundles`.
-  Filters `confirmed = true`. Imports no derivation.
+  Filters `confirmed = true`. Imports no derivation. The bundle also carries
+  the head-to-head tables (`stage`, `match`, `match_game`); they have no
+  `confirmed` flag, so derivation only reads the matches of games that have
+  results. The rounds tables are not fetched yet.
 - `derive/` — pure, synchronous, no IO. Unit-tested. `derive/career/` is the
   cross-season derivation shared by player pages and `/records`; it reads the
   per-season assembler's output and never re-derives placements. `derive/`
@@ -53,7 +56,9 @@ Each file has one job; keep the boundaries.
   all players (`deriveRecords`: the career board and every record on
   `/records`), on the same terms: its game rows arrive with title, tags and
   own-pick flag already joined. Every record is a best-first list with shared
-  ranks — a tie stays a tie.
+  ranks — a tie stays a tie. `derive/matches.ts` decides each head-to-head
+  match from its game rows (the outcome is never stored) and puts the decided
+  ones on `GameSummary.matches`; careers and the match records read from there.
 - `compose.ts` — pure. The one seam that joins DB view-models to static
   `src/data` content (game by slug, player by name, season by padded slug, title
   by `titleId`). It resolves each game's tags (`gameTags`) and calls

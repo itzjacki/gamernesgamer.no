@@ -2,9 +2,10 @@ import Link from 'next/link';
 import Checkbox from './Checkbox';
 import SectionLabel from './SectionLabel';
 import styles from './TagRecord.module.css';
+import UnrankedRows, { unrankedCaption } from './UnrankedRows';
 import { tagLabels } from '@/data/tag-labels';
 import type { TagStat } from '@/lib/results/view-models';
-import { MIN_RANKED_GAMES, splitRanked } from '@/lib/tag-ranking';
+import { splitRanked } from '@/lib/tag-ranking';
 import type { Tag } from '@/types/tag';
 
 /**
@@ -17,8 +18,9 @@ import type { Tag } from '@/types/tag';
  * The stats arrive unfiltered and sorted best first. The ranking cutoff is
  * applied here, on the consuming side (owner call — not the data layer's job):
  * a tag needs MIN_RANKED_GAMES games (`@/lib/tag-ranking`, shared with
- * CareerLedger) to be named best or worst. Tags below it are collapsed by default in a
- * native <details>, under a caption that states why they are not ranked.
+ * CareerLedger) to be named best or worst. Tags below it are collapsed by default
+ * (`UnrankedRows`, shared with TagCrowns), under a caption that states why they
+ * are not ranked.
  *
  * Each tag name is a native-popover trigger (`<button popovertarget>` +
  * `[popover]` — no JS, stays a Server Component) listing the games behind the
@@ -88,8 +90,7 @@ function TagBody({
           {tagLabels[stat.tag]}
         </span>
         <span className='text-text-muted mt-auto font-mono text-xs tabular-nums'>
-          {/* TODO(copy): "spill" unit — best-effort. */}
-          {average(stat)} · {stat.games} spill
+          {average(stat)} i snitt · {stat.games} spill
         </span>
       </dd>
     </div>
@@ -105,7 +106,6 @@ function TagBody({
     </colgroup>
   );
 
-  /* TODO(copy): column heads (incl. "Kategori") — best-effort. */
   const headRow = (
     <tr className={`border-border border-b ${eyebrowRow}`}>
       <th scope='col' className='px-3 py-3 font-normal sm:px-4'>
@@ -197,15 +197,14 @@ function TagBody({
 
   return (
     <div className={`grid-cols-2 gap-px ${className}`}>
-      {/* TODO(copy): headline eyebrows + sr-only caption — best-effort. */}
       {best && (
         <dl className='col-span-2 grid grid-cols-2 gap-px'>
           {ranked.length === 1 ? (
             headline('Kategori', best, true)
           ) : (
             <>
-              {headline('Best i', best)}
-              {headline('Svakest i', worst)}
+              {headline('Beste kategori', best)}
+              {headline('Dårligste kategori', worst)}
             </>
           )}
         </dl>
@@ -221,38 +220,18 @@ function TagBody({
       )}
 
       {unranked.length > 0 && (
-        <details className='group bg-bg col-span-2'>
-          <summary
-            className={`hover:text-accent focus-visible:outline-accent flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 px-3 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 sm:px-4 [&::-webkit-details-marker]:hidden ${eyebrowRow}`}
-          >
-            {/* TODO(copy): disclosure labels — best-effort. */}
-            <span className='group-open:hidden'>
-              Vis flere ({unranked.length})
-            </span>
-            <span className='hidden group-open:inline'>Vis færre</span>
-            <svg
-              aria-hidden='true'
-              viewBox='0 0 12 12'
-              className='size-3 transition-transform duration-150 group-open:rotate-180'
-              fill='none'
-              stroke='currentColor'
-              strokeWidth='1.5'
-            >
-              <path d='M2 4l4 4 4-4' />
-            </svg>
-          </summary>
+        <UnrankedRows count={unranked.length} className='bg-bg col-span-2'>
           <table className='border-border w-full table-fixed border-collapse border-t text-left'>
             <caption
               className={`border-border border-b px-3 py-3 text-left sm:px-4 ${eyebrowRow}`}
             >
-              {/* TODO(copy): explainer — best-effort. */}
-              Under {MIN_RANKED_GAMES} spill · ikke rangert
+              {unrankedCaption}
             </caption>
             {columns}
             <thead className='sr-only'>{headRow}</thead>
             <tbody>{unranked.map((s) => row(s, false))}</tbody>
           </table>
-        </details>
+        </UnrankedRows>
       )}
     </div>
   );
@@ -282,8 +261,7 @@ export default function TagRecord({ stats, statsWithoutOwnPicks }: Props) {
         className='hidden group-has-[input:checked]/own:grid'
       />
       <div className='bg-bg px-3 sm:px-4'>
-        {/* TODO(copy): filter label — best-effort. */}
-        <Checkbox>Uten egne spillvalg</Checkbox>
+        <Checkbox>Ekskluder egne spill</Checkbox>
       </div>
     </div>
   );
