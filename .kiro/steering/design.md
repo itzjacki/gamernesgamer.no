@@ -24,6 +24,7 @@ borders double up.
 | ----------------------- | ------------------------------ |
 | `--color-bg`            | Page background                |
 | `--color-surface`       | Single-step surface lift       |
+| `--color-display`       | The header's recessed display  |
 | `--color-accent`        | Pinkish-red. The single accent |
 | `--color-text`          | Body text                      |
 | `--color-text-muted`    | Metadata, labels               |
@@ -63,6 +64,32 @@ Mono (400) for metadata.
 - Surfaces use `bg-bg` — they mask the grid rather than float above it.
 - Grid lines continue through dividers at the same weight.
 - No shadows. No border radius on grid-aligned components.
+
+## Site header ("Tangenter")
+
+`SiteHeader` / `SiteHeaderBar`, in the root layout. Teenage Engineering
+instrument grammar on the VERKSTED tokens:
+
+- **Keys, not tabs.** Each nav item is a key: a mono function number (`01`),
+  the label, and a 6px square status LED. The LED replaces the underline: it is
+  `border-border-accent` when off, solid accent when on (current section), and
+  blinks while that key's chooser is open.
+- **One display, one thing at a time.** The row under the keys is a recessed
+  screen (`bg-display`) of label-over-value parameters, in the normal mono type
+  (no pixel texture: it was unreadable and clashed with the rest of the text).
+  Accent on the display follows the usual rule: rank-1 data only (a champion,
+  a titles count). On /vs pages the pair picker itself is the readout.
+- **Solid rail.** The key rail is `bg-bg`, so the grid does not show through
+  the header.
+- **Choosers vs. links.** A key with nothing to navigate to (Sesonger) or a
+  choice to make (VS) takes over the display; keys with a destination are plain
+  links. Never make a destination key a chooser: the common paths stay one
+  click.
+- **Dot-matrix mark.** The logo (`DotMatrixLogo`) is the branding logo sampled
+  into a 20-column grid of square dots, sized so each dot lands on whole
+  pixels (2px pitch on phones, 3px on desktop). It reads as a tiny screen and
+  can carry the tournament state (pulse while upcoming, blink while live). It
+  is the only dot-matrix element in the UI.
 
 ## Interaction states
 
