@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import '@/styles/global.css';
-import SeasonHeader from '@/components/SeasonHeader';
+import SiteHeader from '@/components/SiteHeader';
 
 export const metadata: Metadata = {
   title: {
@@ -39,6 +39,7 @@ export default function RootLayout({ children }: Props) {
         <div className='relative min-h-screen'>
           <div
             aria-hidden='true'
+            data-site-grid
             className='pointer-events-none absolute inset-0'
             style={{
               backgroundImage:
@@ -48,7 +49,7 @@ export default function RootLayout({ children }: Props) {
             }}
           />
           <div className='relative mx-auto w-full max-w-220 px-4 sm:px-6 lg:px-10'>
-            <SeasonHeader />
+            <SiteHeader />
             <main className='flex flex-col gap-20 pb-20 sm:gap-28'>
               {children}
             </main>

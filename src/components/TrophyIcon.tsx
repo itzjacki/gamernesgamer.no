@@ -3,7 +3,7 @@ import type { TrophyKind } from '@/lib/results/view-models';
 /**
  * Trophy artwork, split by tier:
  *  - GG SEASON (gold/silver/bronze): the specific GG trophy (source:
- *    public/images/trophy.svg), inlined here so a single `fill` on the <svg>
+ *    public/images/branding/trophy.svg), inlined here so a single `fill` on the <svg>
  *    can tint it by metal. Inlining — rather than an <img> of the file — is
  *    what lets the fill recolour the whole mark; an <img> can't be recoloured
  *    by CSS. The path data is large, which is exactly why it lives in its own

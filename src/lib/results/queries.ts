@@ -12,6 +12,7 @@ import {
   composeRecordsView,
 } from './compose';
 import type {
+  PlayerRef,
   SeasonView,
   GameView,
   CareerView,
@@ -94,6 +95,30 @@ export async function getCareerView(slug: string): Promise<CareerView | null> {
 export async function getRecordsView(): Promise<RecordsView> {
   const bundles = await fetchAllSeasonBundles();
   return composeRecordsView(assembleAllCareers(bundles));
+}
+
+/** One season's champion, for the site header. Null until results exist. */
+export interface SeasonChampion {
+  seasonNumber: number;
+  seasonSlug: string;
+  champion: PlayerRef | null;
+}
+
+/**
+ * The site header's read API: each season with results and its champion
+ * (authoritative placement 1, from season_result). Seasons without results
+ * are simply absent. Throws on a real fetch error.
+ */
+export async function getSeasonChampions(): Promise<SeasonChampion[]> {
+  const bundles = await fetchAllSeasonBundles();
+  return bundles.map((bundle) => {
+    const view = assembleSeasonView(bundle);
+    return {
+      seasonNumber: view.seasonNumber,
+      seasonSlug: view.seasonSlug,
+      champion: view.standings.find((row) => row.isChampion)?.player ?? null,
+    };
+  });
 }
 
 /**

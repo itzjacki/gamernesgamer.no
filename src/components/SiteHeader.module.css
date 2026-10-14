@@ -1,0 +1,44 @@
+/*
+ * SiteHeader — only what Tailwind utilities can't express: the LED blink and
+ * the dot-matrix logo's states.
+ */
+
+/* ---------- Status LED on a key ---------- */
+/* Lit LED: chooser open (blinks) vs. current section (steady). */
+.ledBlink {
+  animation: blink 1s steps(1) infinite;
+}
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ---------- Dot-matrix logo ---------- */
+.logo {
+  display: block;
+  fill: currentColor;
+  shape-rendering: crispEdges;
+}
+.logoFallback {
+  display: block;
+  filter: invert(0.9);
+}
+.upcoming {
+  animation: pulse 2.4s ease-in-out infinite;
+}
+.live {
+  animation: blink 1.2s steps(1) infinite;
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ledBlink,
+  .upcoming,
+  .live {
+    animation: none;
+  }
+}
