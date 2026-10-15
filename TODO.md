@@ -178,17 +178,13 @@ the _genre_ stats (not the rest of any page).
    crowns. See the must-have item below for what is left.
 6. **/vs/[a]/[b]** — BUILT and reviewed, with its entry points on the career
    page and /records. See the must-have item below.
-7. **Site navigation** — BUILT (2026-10-14): `SiteHeader`, the "Tangenter"
-   header (see the must-have item below). **Front page** rework — IN
-   REFINEMENT: throwaway prototype routes under `src/app/proto/` on the real
-   data (`/proto` in dev). /vs routing decided (`vs/[[...a]]` for `/vs` +
-   `/vs/<a>`, `vs/[a]/[b]` separate; verified in Next 16) but the /vs index
-   page is not built yet. The hero is the light-breaking trophy (Lysbrudd)
-   over three.js, reworked into the design language with the names laser-cut
-   through the plaque. Next: workshop the page's content and structure. Jakob
-   has the physical trophy and can scan it. Synthesis, open questions and the
-   recommendation: `working-docs/front-page-and-nav.md`. Prerequisite for a
-   lifecycle-aware `/`: structured `start`/`end` dates on `SeasonMeta`.
+7. **Site navigation** — BUILT (2026-10-14/15): `SiteHeader`, the
+   "Tangenter" header (see the must-have item below). **Front page** — IN
+   REFINEMENT: the hero direction is chosen (Lysbrudd, Lag + Støv; a
+   prototype at `/proto/lysbrudd`); the page's content and structure are
+   next, as a workshop. Everything is consolidated in
+   `working-docs/front-page-and-nav.md`. Prerequisite for a lifecycle-aware
+   `/`: structured `start`/`end` dates on `SeasonMeta`.
 8. **Season-page feature expansion** — end of Phase 4, after the other stats/content
    pages (see must-have item below).
 
@@ -342,51 +338,69 @@ the _genre_ stats (not the rest of any page).
         every plate shows card art as a placeholder — the same manual step as
         the career page's "Dedicated hero portraits". Revisit the top crop
         once the real images land.
-- [x] **Site navigation:** BUILT (2026-10-14), replacing `SeasonHeader`.
+- [x] **Site navigation:** BUILT (2026-10-14/15), replacing `SeasonHeader`.
       `SiteHeader` (server: data) + `SiteHeaderBar` (client), in the root
-      layout. The "Tangenter" header, two tiers:
-  - **Rail of keys:** a dot-matrix logo (`DotMatrixLogo`, sampled from
-    `public/images/branding/logo.svg`, links to `/`), then Sesonger,
-    Spillere, Rekorder, VS. Each key shows a function number, its label and a
-    status LED; the LED is steady on the current section. A model stamp
-    (`GG–S04`) sits at the right on desktop.
+      layout: the "Tangenter" header, two tiers. Design rules in design.md
+      ("Site header"); the history in `working-docs/front-page-and-nav.md`.
+  - **Rail of keys:** the pixel logo (links to `/`), then Sesonger,
+    Spillere, VS, Rekorder. Each key shows a function number, its label and
+    a status LED, steady on the current section. A model stamp (`GG–S04`)
+    sits at the right on desktop.
+  - **Pixel logo:** Jakob's 32 × 32 `public/images/branding/logo-pixel.png`,
+    decoded on the server (`src/lib/pixel-logo.ts`) and drawn as SVG squares
+    (`PixelLogo`), always 1:1. It has a faint bloom and a glitch burst on
+    hover.
   - **Display row:** shows one thing at a time. At rest it is the page's
-    readout, label over value: season / date / games / champion on season
-    pages, player / seasons / titles on career pages, and the latest champion
-    elsewhere. On a pair page the VS picker itself is the readout
-    (pre-filled, with BYTT and GÅ).
-  - **Choosers:** Sesonger and VS are choosers, not links. They take over
-    the display (season keys; a quick pair picker) while their LED blinks.
-    Escape, a click outside, the key again or navigating closes them.
-    Spillere and Rekorder are plain links.
+    readout, label over value:
+    - season / date / games / champion on season pages;
+    - player / seasons / titles on career pages;
+    - the pair picker itself on a pair page;
+    - the latest champion elsewhere.
+  - **Choosers:** Sesonger, Spillere and VS are choosers; their key's LED
+    blinks while they show. Rekorder is a plain link.
+    - Sesonger shows season keys.
+    - Spillere shows player keys, then "Alle" in its own cell behind a
+      hairline.
+    - VS shows two selects with a swap-sides button between them, then GÅ.
+  - **Glitch-in transition:** every change glitches in over what the display
+    shows (~220ms of torn slices nudged 1–3px, the old frame showing through
+    and a faint white tear line; stepped frames). Switching choosers glitches
+    the new one in over the old; closing glitches the readout back. The old
+    frame is dropped once the new one has settled (with a 500ms fallback).
+    Reduced motion: instant.
+  - **Logo states:** pulses while the current season is `upcoming` and
+    blinks while `live` (from `SeasonMeta.status`).
   - **Copy:** all labels are best-effort, flagged `TODO(copy)` in
     `SiteHeaderBar.tsx`.
   - [ ] **/vs index page:** decided as two dropdowns + go, pre-filled by path:
         `vs/[[...a]]` serves `/vs` and `/vs/<a>`, while `vs/[a]/[b]` stays
-        separate (pattern verified in `src/app/proto/vs/`). The header's VS
-        chooser covers quick picks meanwhile. Rework the picker component when
-        building it.
+        separate (pattern verified in Next 16 during prototyping). The
+        header's VS chooser covers quick picks meanwhile. Rework the picker
+        component when building it.
   - [ ] **Redundant pair switcher:** the /vs page's own pair switcher now
-        duplicates the header's VS chooser and BYTT. Decide whether it stays.
-  - [ ] **Logo states:** the dot-matrix logo pulses while the current season
-        is `upcoming` and blinks while `live` (from `SeasonMeta.status`). A
-        "just crowned" state waits on structured season dates.
+        duplicates the header's VS chooser and its swap button. Decide whether
+        it stays.
+  - [ ] **"Just crowned" logo state:** waits on structured season dates.
 
 - [ ] **"Just finished" scene:** a special front-page scene for the days
       after a final, where the new champion's name is engraved into the
       trophy (Jakob, 2026-10-14). Probably a completely different trophy
       style from the everyday hero, just for that scene. The engraving did not
-      work inside the Lysbrudd hero and was removed there; the prototypes'
-      laser-cut and 3D engraving experiments are in git history and the
-      working doc. Needs structured season dates to know when it applies.
-- [ ] **Front page (/):** IN REFINEMENT — everything about it is open again
-      (Jakob, 2026-10-14). The top fold must be visually striking: the trophy
-      backlit with light breaking through it (Lysbrudd, chosen over 3D in
-      round 2), the winners' names laser-cut through the plaque. The rest of
-      the page's content and structure is to be workshopped; the PO's
-      candidate list for that workshop is in
-      `working-docs/front-page-candidates.md`. Synthesis,
-      prototypes and ranked open questions: `working-docs/front-page-and-nav.md`.
+      work inside the Lysbrudd hero and was removed there. Candidate material
+      from the prototypes (git `ae9e801`, summarised in the working doc): the
+      3D trophy with a camera move to the plaque, laser engraving and a spark
+      burst; and the 3D trophy rendered only as a raster on the grid (dots,
+      engraving lines, LED). Needs structured season dates to know when it
+      applies.
+- [ ] **Front page (/):** IN REFINEMENT. The top fold is the trophy as
+      **Lysbrudd (Lag + Støv)**: backlit, light breaking through it into a
+      fog, the site grid as stacked glass sheets, dust in the beams. It is
+      chosen over 3D and every other 2D style tried. The prototype is
+      `src/app/proto/_components/Lysbrudd.tsx`, previewed at `/proto/lysbrudd`
+      and to be refined into a production component. Next: workshop the
+      page's content and structure from the PO's candidate list
+      (`working-docs/front-page-candidates.md`). Findings, decisions and what
+      was tried: `working-docs/front-page-and-nav.md`.
 - [x] ~~**The Hall (/):**~~ **DROPPED** — absorbed into /records (the all-time
       career leaderboard becomes the headline board there) + the front page
       (champion hero). In a world with front page + player pages + /records, a

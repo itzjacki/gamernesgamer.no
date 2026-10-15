@@ -1,6 +1,6 @@
 /*
- * SiteHeader — only what Tailwind utilities can't express: the LED blink and
- * the dot-matrix logo's states.
+ * SiteHeader — only what Tailwind utilities can't express: the LED blink, the
+ * logo's states and hover glitch, and the display's glitch-in transition.
  */
 
 /* ---------- Status LED on a key ---------- */
@@ -14,15 +14,11 @@
   }
 }
 
-/* ---------- Dot-matrix logo ---------- */
+/* ---------- Pixel logo ---------- */
 .logo {
   display: block;
   fill: currentColor;
   shape-rendering: crispEdges;
-}
-.logoFallback {
-  display: block;
-  filter: invert(0.9);
 }
 .upcoming {
   animation: pulse 2.4s ease-in-out infinite;
@@ -35,10 +31,133 @@
     opacity: 0.35;
   }
 }
+
+/* ---------- Logo glitch (hover only) ---------- */
+/* Four thin bands of rows jolt 1–2px in stepped frames, staggered, with a
+   dropout at the crux — a 260ms burst, only on hover. The mark is otherwise
+   still. The turn to accent is timed to land on that crux (a short delay and
+   a tiny fade on the way in; straight back on the way out). */
+.logoLink {
+  transition: color 0s;
+}
+.logoLink:hover {
+  transition: color 60ms linear 110ms;
+}
+.logoLink:hover .glitch1,
+.logoLink:hover .glitch2,
+.logoLink:hover .glitch3,
+.logoLink:hover .glitch4 {
+  animation: glitch-burst 260ms steps(1, end) 1;
+}
+.logoLink:hover .glitch2 {
+  animation-delay: 40ms;
+}
+.logoLink:hover .glitch3 {
+  animation-delay: 80ms;
+}
+.logoLink:hover .glitch4 {
+  animation-delay: 20ms;
+}
+@keyframes glitch-burst {
+  0% {
+    transform: translateX(2px);
+  }
+  20% {
+    transform: translateX(-1px);
+  }
+  40% {
+    transform: none;
+    opacity: 0;
+  }
+  60% {
+    transform: translateX(1px);
+    opacity: 1;
+  }
+  80%,
+  100% {
+    transform: none;
+  }
+}
+
+/* ---------- Display: each change glitches in over the last ---------- */
+/* Like a signal switching: for ~220ms the new frame arrives in torn
+   horizontal slices of the 40px row, each nudged a pixel or three sideways,
+   with the old frame showing through the gaps; a faint 1px translucent white
+   tear jumps between rows. Hard stepped frames, never eased. Then the new
+   frame settles and the one underneath is dropped. Kept deliberately small. */
+.glitchIn {
+  animation: signal 220ms steps(1, end) both;
+}
+.glitchIn::after {
+  content: '';
+  position: absolute;
+  height: 1px;
+  background: color-mix(in srgb, var(--color-text) 55%, transparent);
+  pointer-events: none;
+  animation: tear 220ms steps(1, end) both;
+}
+@keyframes signal {
+  0% {
+    clip-path: inset(0 0 35% 0);
+    transform: translateX(-3px);
+  }
+  14% {
+    clip-path: inset(22% 0 8% 0);
+    transform: translateX(2px);
+  }
+  28% {
+    clip-path: inset(5% 0 20% 0);
+    transform: translateX(-1px);
+  }
+  42% {
+    clip-path: inset(0 0 12% 0);
+    transform: translateX(1px);
+  }
+  56% {
+    clip-path: inset(30% 0 0 0);
+    transform: translateX(-2px);
+  }
+  70%,
+  100% {
+    clip-path: inset(0);
+    transform: none;
+  }
+}
+@keyframes tear {
+  0% {
+    top: 11px;
+    left: 12%;
+    right: 48%;
+    opacity: 0.7;
+  }
+  14% {
+    top: 27px;
+    left: 34%;
+    right: 20%;
+  }
+  28% {
+    top: 17px;
+    left: 4%;
+    right: 66%;
+  }
+  42%,
+  100% {
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ledBlink,
   .upcoming,
-  .live {
-    animation: none;
+  .live,
+  .glitchIn,
+  .glitch1,
+  .glitch2,
+  .glitch3,
+  .glitch4 {
+    animation: none !important;
+  }
+  .glitchIn::after {
+    display: none;
   }
 }

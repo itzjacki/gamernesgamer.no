@@ -67,29 +67,58 @@ Mono (400) for metadata.
 
 ## Site header ("Tangenter")
 
-`SiteHeader` / `SiteHeaderBar`, in the root layout. Teenage Engineering
-instrument grammar on the VERKSTED tokens:
+`SiteHeader` (server: data) / `SiteHeaderBar` (client), in the root layout.
+Teenage Engineering instrument grammar on the VERKSTED tokens.
 
 - **Keys, not tabs.** Each nav item is a key: a mono function number (`01`),
   the label, and a 6px square status LED. The LED replaces the underline: it is
-  `border-border-accent` when off, solid accent when on (current section), and
-  blinks while that key's chooser is open.
+  `border-border-accent` when off, solid accent on the current section, and
+  blinks while that key's chooser is open. The rail is solid `bg-bg`, so the
+  grid does not show through.
 - **One display, one thing at a time.** The row under the keys is a recessed
-  screen (`bg-display`) of label-over-value parameters, in the normal mono type
-  (no pixel texture: it was unreadable and clashed with the rest of the text).
-  Accent on the display follows the usual rule: rank-1 data only (a champion,
-  a titles count). On /vs pages the pair picker itself is the readout.
-- **Solid rail.** The key rail is `bg-bg`, so the grid does not show through
-  the header.
-- **Choosers vs. links.** A key with nothing to navigate to (Sesonger) or a
-  choice to make (VS) takes over the display; keys with a destination are plain
-  links. Never make a destination key a chooser: the common paths stay one
-  click.
-- **Dot-matrix mark.** The logo (`DotMatrixLogo`) is the branding logo sampled
-  into a 20-column grid of square dots, sized so each dot lands on whole
-  pixels (2px pitch on phones, 3px on desktop). It reads as a tiny screen and
-  can carry the tournament state (pulse while upcoming, blink while live). It
-  is the only dot-matrix element in the UI.
+  screen (`bg-display`). At rest it is the page's readout: label-over-value
+  parameters in the normal mono type. A pixel texture was tried and was
+  unreadable. Accent on the display follows the usual rule: rank-1 data only
+  (a champion, a titles count).
+- **Choosers vs. links.** A key with nothing to navigate to (Sesonger), a set
+  to choose from (Spillere) or a choice to make (VS) takes over the display;
+  Rekorder, with nothing to choose, is a plain link.
+  - **Sesonger:** season keys.
+  - **Spillere:** player keys, then "Alle" (the index) in its own cell behind
+    a full-height hairline.
+  - **VS:** two selects with a swap-sides button between them (a two-way
+    arrow icon, like a flight search's from/to; no animation), then GÅ. On /vs
+    pages this picker is itself the readout.
+- **The display glitches, it doesn't slide.** Every change glitches in over
+  what the display shows, like a signal switching:
+  - **The frames:** for ~220ms the new frame arrives in torn horizontal
+    slices, each nudged 1–3px sideways, with the old frame showing through the
+    gaps and a faint 1px translucent white tear jumping between rows. Hard
+    stepped frames, never eased, and kept deliberately small.
+  - **Switching and closing:** switching choosers glitches the new one in over
+    the old, and closing glitches the readout back.
+  - **Reduced motion:** instant.
+  - **History:** a soft eased reveal was tried first and was too smooth to
+    notice.
+- **Pixel mark.** The logo is Jakob's 32 × 32 pixel drawing
+  (`public/images/branding/logo-pixel.png`), drawn as SVG squares in
+  `currentColor` (`PixelLogo`), always 1:1 (32px) at every breakpoint. It is
+  treated as a tiny screen:
+  - **Bloom:** a faint bloom of the mark's own colour (an SVG blur under the
+    sharp pixels, never a coloured glow).
+  - **Rest:** still, with no idle flicker.
+  - **Hover:** a 260ms signal-glitch burst (thin row bands jolting 1–2px).
+    The turn to accent is delayed ~110ms with a 60ms fade so it lands on the
+    burst's crux.
+  - **Tournament state:** it can carry it (a pulse while upcoming, a blink
+    while live).
+  - **Don't generate it:** sampled and hand-traced pixel or dot-matrix
+    versions of the trophy were unrecognisable.
+- **Sizes.** The rail is 56px on phones and 64px from `sm` (640px) up. Key
+  labels are large (12px, widest tracking) from `sm` up and shrink only below
+  it. The display goes the other way: its values, keys, selects and padding
+  are a step smaller on phones (12px values, 24px keys, 112px selects), so a
+  readout or the VS picker fits a 375px screen, and full size from `sm` up.
 
 ## Interaction states
 

@@ -5,6 +5,7 @@ import {
   getSeasonChampions,
   type SeasonChampion,
 } from '@/lib/results/queries';
+import { readPixelLogo } from '@/lib/pixel-logo';
 import SiteHeaderBar, { type HeaderData } from './SiteHeaderBar';
 
 /**
@@ -36,6 +37,7 @@ export default async function SiteHeader() {
   const slugs = (Object.keys(seasonData) as Season[]).sort();
   const data: HeaderData = {
     currentSeason,
+    logo: readPixelLogo().rows,
     seasons: slugs.map((slug) => {
       const { meta, games } = seasonData[slug];
       const champion = championOf(slug);
