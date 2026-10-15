@@ -1,12 +1,18 @@
 # Front page — candidate inventory for the content workshop
 
 Status: **input for the workshop (prepared 2026-10-14), nothing decided.**
-Companion to `working-docs/front-page-and-nav.md` ("Content and structure:
-assumptions to workshop"). Jakob sorts every candidate into **must / maybe /
-no** and orders the musts; prototyping comes after that.
+Companion to `working-docs/front-page-and-nav.md`. Jakob sorts every
+candidate into **must / maybe / no** and orders the musts; prototyping comes
+after that.
 
-Settled going in: the top fold is the trophy (Lysbrudd, light breaking through,
-names laser-cut through the plaque; still being designed). The site header
+> **Update 2026-10-15:** the hero no longer names anyone. The engraved names
+> were removed from the plaque, and the engraving moved to a separate "just
+> finished" scene (TODO.md). Wherever an entry below counts "the plaque" as
+> one of the places that already names the champion (B1, C3, X4 and others),
+> that overlap no longer exists. The hero is Lysbrudd: Lag + Støv.
+
+Settled going in: the top fold is the trophy (Lysbrudd, light breaking through
+it; still being refined). The site header
 (`SiteHeaderBar`) already carries all navigation and a per-page readout (on `/`
 today: latest season, champion, date), so `/` does not need to be a menu.
 Everything below the fold — and whether the page follows the tournament

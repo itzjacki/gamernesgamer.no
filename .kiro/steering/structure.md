@@ -15,9 +15,9 @@ src/
     admin/              login/ is ungated. Everything under (protected)/ sits
                         behind the allowlist gate in its layout.tsx.
     auth/callback/      OAuth code-exchange. Deliberately outside /admin.
-    proto/              TEMPORARY front-page/nav prototypes (noindex, unlinked).
-                        Delete when the real front page lands; see
-                        working-docs/front-page-and-nav.md.
+    proto/lysbrudd/     TEMPORARY: the chosen front-page hero prototype
+                        (noindex, unlinked). Becomes a real component when the
+                        front page is built; see working-docs/front-page-and-nav.md.
   components/           Shared components and the UI primitives.
   data/sesong/<NN>/     Static season content: gamers.ts, games.ts, power-ups.ts.
     index.ts            Season registry + `currentSeason`.
@@ -33,7 +33,8 @@ src/
   proxy.ts              Next.js Proxy (formerly middleware).
 public/images/          gamers/<NN>/, game-thumbnails/<NN>/, power-ups/,
                         champions/<NN>.png, heroes/<slug>.png, branding/
-                        (trophy.svg with plinth; logo.svg, the trophy without).
+                        (trophy.svg with plinth; logo.svg, the trophy without;
+                        logo-pixel.png, the 32 × 32 pixel mark in the header).
 supabase/
   migrations/           Source of truth for the schema.
   schema.sql            GENERATED snapshot. Never hand-edit.
