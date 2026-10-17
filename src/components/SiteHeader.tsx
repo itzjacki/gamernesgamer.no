@@ -6,6 +6,7 @@ import {
   type SeasonChampion,
 } from '@/lib/results/queries';
 import { readPixelLogo } from '@/lib/pixel-logo';
+import { formatDay } from '@/lib/season-dates';
 import SiteHeaderBar, { type HeaderData } from './SiteHeaderBar';
 
 /**
@@ -15,12 +16,6 @@ import SiteHeaderBar, { type HeaderData } from './SiteHeaderBar';
  * bar itself is a client component because it reads the pathname and runs
  * the choosers.
  */
-
-/** "13/12/2025 – 14/12/2025" → "13.12.2025" (the first day). */
-function firstDay(raw: string) {
-  const m = raw.match(/(\d{2})\/(\d{2})\/(\d{4})/);
-  return m ? `${m[1]}.${m[2]}.${m[3]}` : raw;
-}
 
 export default async function SiteHeader() {
   // The header must never take the site down: without results it simply
@@ -44,7 +39,7 @@ export default async function SiteHeader() {
       return {
         slug,
         number: Number(slug),
-        date: firstDay(meta.date),
+        date: formatDay(meta.start),
         games: games.length,
         status: meta.status,
         champion: champion

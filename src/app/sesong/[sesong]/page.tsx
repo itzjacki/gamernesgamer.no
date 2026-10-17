@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { seasonData, isSeason } from '@/data/sesong';
+import { formatSeasonDates } from '@/lib/season-dates';
 import type { PowerUp } from '@/types/power-up';
 import { getSeasonView } from '@/lib/results/queries';
 import { composeSeasonView } from '@/lib/results/compose';
@@ -350,7 +351,7 @@ function UpcomingSeason({
         <Heading
           as='h1'
           aboveLine={`GG — Sesong ${seasonNumber}`}
-          belowLine={meta.date}
+          belowLine={formatSeasonDates(meta)}
         >
           Sesong {seasonNumber}
         </Heading>

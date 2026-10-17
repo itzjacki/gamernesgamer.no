@@ -288,7 +288,17 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
     }
     if (route.section === 'sesonger') {
       const s = data.seasons.find((x) => x.slug === route.season);
-      if (!s) return null;
+      if (!s) {
+        // The index: how many seasons, and the latest champion.
+        return (
+          <>
+            <Param label='Sesonger' value={data.seasons.length} />
+            {latestDone && (
+              <Param label='Mester' value={latestDone.champion!.name} accent />
+            )}
+          </>
+        );
+      }
       return (
         <>
           <Param label='Sesong' value={pad(s.number)} />
@@ -348,25 +358,39 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
 
   const chooserContent = (c: Chooser) => {
     if (c === 'seasons') {
+      const onIndex = route.section === 'sesonger' && !route.season;
       return (
-        <div className='flex items-center gap-1 px-2 sm:gap-1.5 sm:px-3'>
-          <span className={`${LABEL} mr-1.5 shrink-0`}>Sesong</span>
-          {data.seasons.map((s) => {
-            const here =
-              route.section === 'sesonger' && route.season === s.slug;
-            return (
-              <Link
-                key={s.slug}
-                href={`/sesong/${s.slug}`}
-                data-autofocus={here || undefined}
-                aria-current={here ? 'page' : undefined}
-                aria-label={`Sesong ${s.number}`}
-                className={`${SMALL_KEY} ${here ? SMALL_KEY_ON : SMALL_KEY_OFF}`}
-              >
-                {s.number}
-              </Link>
-            );
-          })}
+        <div className='flex items-stretch'>
+          <div className='border-border flex items-center gap-1 border-r px-2 sm:gap-1.5 sm:px-3'>
+            <span className={`${LABEL} mr-1.5 shrink-0`}>Sesong</span>
+            {data.seasons.map((s) => {
+              const here =
+                route.section === 'sesonger' && route.season === s.slug;
+              return (
+                <Link
+                  key={s.slug}
+                  href={`/sesong/${s.slug}`}
+                  data-autofocus={here || undefined}
+                  aria-current={here ? 'page' : undefined}
+                  aria-label={`Sesong ${s.number}`}
+                  className={`${SMALL_KEY} ${here ? SMALL_KEY_ON : SMALL_KEY_OFF}`}
+                >
+                  {s.number}
+                </Link>
+              );
+            })}
+          </div>
+          {/* "Alle" is the index, so it gets its own cell, as under Spillere. */}
+          <div className='flex items-center px-2 sm:px-3'>
+            <Link
+              href='/sesong'
+              data-autofocus={onIndex || undefined}
+              aria-current={onIndex ? 'page' : undefined}
+              className={`${SMALL_KEY} ${onIndex ? SMALL_KEY_ON : SMALL_KEY_OFF}`}
+            >
+              Alle
+            </Link>
+          </div>
         </div>
       );
     }

@@ -1,7 +1,8 @@
 # Front page + site navigation
 
-Status (2026-10-15): **the header is built; the hero direction is chosen;
-the page's content and structure are next** (a workshop, see below).
+Status (2026-10-17): **the header is built; the hero direction is chosen;
+structured season dates exist; the page's content and structure are next**
+(a workshop: start at "Next" at the end of this doc).
 
 This doc is the consolidated record of the refinement rounds of 2026-10-14/15
 (a PO pass and a design pass, then five rounds of prototypes with Jakob). The
@@ -15,13 +16,13 @@ hero (see "Hero").
 - **Navigation lives in the header**, so no page has to be reached via `/`.
 - **Header: the "Tangenter" two-tier header**, built as `SiteHeader` (see
   "Header").
-- **The /vs index:** two dropdowns + a "go" button (not a matrix). Pre-fill by
-  path, not query: `vs/[[...a]]` serves both `/vs` and `/vs/<a>` (side A
-  pre-filled), and `vs/[a]/[b]` stays a separate route with two mandatory
-  slugs. Verified in Next 16: the two coexist, `/vs/a/b` resolves to the
-  two-slug route, and an unknown or extra segment 404s. Not built yet; the
-  header's VS chooser covers quick picks meanwhile. The picker component will
-  be reworked when built.
+- **No /vs index** (Jakob, 2026-10-17). The header's VS chooser is the one
+  pair picker on the site; a second one on a page (an index, or the /vs
+  masthead as a picker) would solve the same thing two ways. (Had it been
+  built: `vs/[[...a]]` for `/vs` and `/vs/<a>` coexists with `vs/[a]/[b]` in
+  Next 16.)
+- **Season index at `/sesong`** (2026-10-17), completing the season pages'
+  path the way `/spillere` does; reached from the Sesonger chooser's "Alle".
 - **Hero: the trophy, as "Lysbrudd" (Lag + Støv)**, a backlit trophy with light
   breaking through it into a fog, the grid as physical layers (see "Hero").
   Chosen over 3D (three.js) and over every other 2D style tried.
@@ -151,8 +152,8 @@ General lessons:
    decisions X1–X11 and example sorts).
 2. **Refine Lysbrudd** into a production hero component (see "Open for
    refinement" above).
-3. **Build the /vs index** (`vs/[[...a]]`).
-4. **Structured season dates** (`start`/`end` on `SeasonMeta`): a prerequisite
-   for a lifecycle-aware `/`, the logo states, a countdown, "days as champion"
-   and the "just finished" scene.
-5. **The "just finished" scene** (TODO.md).
+3. **The "just finished" scene** (TODO.md).
+
+Done: **structured season dates** (2026-10-17), `start`/`end` on
+`SeasonMeta`, the prerequisite for a lifecycle-aware `/`, the logo states, a
+countdown, "days as champion" and the "just finished" scene.

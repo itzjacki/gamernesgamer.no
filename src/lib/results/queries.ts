@@ -180,6 +180,18 @@ export function findHeroImage(slug: string): string | null {
   return existsSync(abs) ? rel : null;
 }
 
+/**
+ * The season's dedicated landscape photo (public/images/seasons/<NN>.jpg, or
+ * .png/.webp) when one exists on disk, else null. Used by the season index.
+ */
+export function findSeasonImage(seasonSlug: string): string | null {
+  for (const ext of ['jpg', 'png', 'webp']) {
+    const rel = `/images/seasons/${seasonSlug}.${ext}`;
+    if (existsSync(path.join(process.cwd(), 'public', rel))) return rel;
+  }
+  return null;
+}
+
 /** Prefer a dedicated hero portrait on disk; else keep the card-art fallback. */
 function resolveHeroImage(
   slug: string,

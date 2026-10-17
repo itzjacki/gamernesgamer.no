@@ -11,6 +11,10 @@ after that.
 > one of the places that already names the champion (B1, C3, X4 and others),
 > that overlap no longer exists. The hero is Lysbrudd: Lag + Støv.
 
+> **Update 2026-10-17:** structured dates exist. `SeasonMeta` has `start` and
+> `end` (calendar dates, no time of day) in place of the free-text `date`, so
+> every "needs structured dates" below is met; X11's first half is settled.
+
 Settled going in: the top fold is the trophy (Lysbrudd, light breaking through
 it; still being refined). The site header
 (`SiteHeaderBar`) already carries all navigation and a per-page readout (on `/`
@@ -73,8 +77,8 @@ standings (points race, game N of M); the trophy shrinks to a corner.
 
 - Job: anticipation; "is it soon?" is the most-asked question between events.
 - States: C (could start at announcement, so it may cover months).
-- Data: ✍️ needs structured dates on `SeasonMeta` (today `date` is free text)
-  and Jakob entering the next season's date when it is set.
+- Data: ✍️ structured dates exist (`start`/`end` on `SeasonMeta`, no time of
+  day); needs Jakob entering the next season's dates when they are set.
 - Cost: S once dates exist. Dependency: structured dates.
 - Risks: overlaps the header's tier-2 readout, which design B reserved for
   tournament status on `/` — decide whether it lives in the header, the page,

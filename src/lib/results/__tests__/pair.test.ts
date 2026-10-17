@@ -130,14 +130,6 @@ describe('composePairView', () => {
     expect(mirrored.gameRuns.current?.side).toBe('b');
     expect(mirrored.gameRuns.current?.games).toHaveLength(1);
   });
-
-  it('lists each side’s other opponents for the switcher', () => {
-    expect(pair.a.opponents.map((o) => o.slug)).toEqual([
-      'jakob',
-      'jorgen',
-      'william',
-    ]);
-  });
 });
 
 describe('composePairSummaries', () => {

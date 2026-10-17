@@ -61,14 +61,11 @@ interface Props {
  */
 export default function PlayerRoster({ entries }: Props) {
   return (
-    <ul className='flex flex-col'>
+    // A narrow gap between plates, so each reads as its own instrument
+    // rather than a row in one sheet.
+    <ul className='flex flex-col gap-3'>
       {entries.map((entry) => (
-        // Plates share their hairlines (-mt-px); the hovered one is lifted so
-        // its accent border is not covered by the next plate's.
-        <li
-          key={entry.slug}
-          className='relative -mt-px first:mt-0 focus-within:z-10 hover:z-10'
-        >
+        <li key={entry.slug}>
           <PlayerPlate entry={entry} />
         </li>
       ))}
