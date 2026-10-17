@@ -754,8 +754,6 @@ export interface PairPlayerView extends RecordPlayer {
   nickname: string;
   /** The dedicated hero portrait when one exists, else the latest card art. */
   imagePath: string;
-  /** Everyone else this player has shared a game with (the pair switcher). */
-  opponents: RecordPlayer[];
 }
 
 /** Everything the /vs page renders from. */

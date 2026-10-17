@@ -11,9 +11,22 @@
  */
 export type SeasonStatus = 'upcoming' | 'live' | 'finished';
 
+/**
+ * A calendar date as `YYYY-MM-DD` (the day in Norway — no time, no zone).
+ * ISO order, so plain string comparison orders dates correctly.
+ */
+export type IsoDate = `${number}-${number}-${number}`;
+
 export interface SeasonMeta {
+  /**
+   * Set by hand, never derived from the dates: a season is `finished` once its
+   * results are in, which the calendar can't know.
+   */
   status: SeasonStatus;
-  date: string;
+  /** The tournament's first day. */
+  start: IsoDate;
+  /** Its last day; the same as `start` for a one-day season. */
+  end: IsoDate;
   videoEmbedUrl?: string;
   /**
    * Fine-grained reveal flags — only meaningful while `status === 'upcoming'`,

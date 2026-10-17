@@ -7,7 +7,8 @@ directory for the current files. What is built vs planned lives in `TODO.md`.
 src/
   app/                  App Router. Route segments are Norwegian.
     page.tsx            Redirects to the current season.
-    sesong/[sesong]/    Season page; [game]/ is the game page.
+    sesong/             Season index; [sesong]/ is the season page and
+                        [sesong]/[game]/ the game page.
     spillere/           Player index; [spiller]/ is the career page.
     records/            All-time career board, record wall, category crowns.
     vs/[a]/[b]/         Head-to-head page for one ORDERED pair of players: the
@@ -19,20 +20,23 @@ src/
                         (noindex, unlinked). Becomes a real component when the
                         front page is built; see working-docs/front-page-and-nav.md.
   components/           Shared components and the UI primitives.
-  data/sesong/<NN>/     Static season content: gamers.ts, games.ts, power-ups.ts.
+  data/sesong/<NN>/     Static season content: meta.ts, gamers.ts, games.ts,
+                        power-ups.ts.
     index.ts            Season registry + `currentSeason`.
   data/titles.ts        Cross-season title registry (see "Titles and tags").
   data/tag-labels.ts    Norwegian display labels for every tag.
   lib/
     players/roster.ts   Static cross-season roster and playerSlug().
     tag-ranking.ts      Presentation rule: which tags have enough games to rank.
+    season-dates.ts     Display formatting for a season's start/end dates.
     supabase/           Clients, proxy session helper, generated database.types.ts.
     results/            Results read + derivation layer (see below).
   types/                Shared types.
   styles/global.css     Tailwind import + @theme tokens.
   proxy.ts              Next.js Proxy (formerly middleware).
 public/images/          gamers/<NN>/, game-thumbnails/<NN>/, power-ups/,
-                        champions/<NN>.png, heroes/<slug>.png, branding/
+                        champions/<NN>.png, heroes/<slug>.png,
+                        seasons/<NN>.jpg (season index photos), branding/
                         (trophy.svg with plinth; logo.svg, the trophy without;
                         logo-pixel.png, the 32 × 32 pixel mark in the header).
 supabase/
@@ -138,8 +142,9 @@ component, not to the derivation or compose. It lives in `src/lib/tag-ranking.ts
 
 ## Adding a new season
 
-1. Create `src/data/sesong/<NN>/` with `gamers.ts` and `games.ts` (plus
-   `power-ups.ts` if used). Each gamer carries a `stats` block for the card.
+1. Create `src/data/sesong/<NN>/` with `meta.ts`, `gamers.ts` and `games.ts`
+   (plus `power-ups.ts` if used). `meta.ts` holds the status, the reveal flags
+   and the `start`/`end` dates (`YYYY-MM-DD`; equal for a one-day season). Each gamer carries a `stats` block for the card.
    Each game needs a `titleId` (add a new title to `src/data/titles.ts` if the
    game has not appeared before) and `formatTags`.
 2. Add images under `public/images/gamers/<NN>/` and
@@ -149,4 +154,6 @@ component, not to the derivation or compose. It lives in `src/lib/tag-ranking.ts
 4. Seed the results into Supabase (the `seed-a-season` skill).
 5. Optional, by hand: a background-removed champion cutout at
    `public/images/champions/<NN>.png` and hero portraits at
-   `public/images/heroes/<slug>.png`. Pages fall back to card art without them.
+   `public/images/heroes/<slug>.png`, and a landscape season photo at
+   `public/images/seasons/<NN>.jpg` for the season index. Pages fall back to
+   card art without them.

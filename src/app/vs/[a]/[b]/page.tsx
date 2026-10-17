@@ -46,8 +46,6 @@ function seasonSpan(numbers: number[]) {
 const wall = 'border-border bg-border grid grid-cols-1 gap-px border';
 const eyebrow =
   'text-text-muted font-mono text-xs tracking-wide uppercase sm:tracking-widest';
-const navLink =
-  'hover:text-accent focus-visible:outline-accent inline-flex min-h-11 items-center underline underline-offset-2 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2';
 
 export default async function PairPage({ params }: Props) {
   const { a: slugA, b: slugB } = await params;
@@ -175,12 +173,6 @@ export default async function PairPage({ params }: Props) {
   return (
     <>
       <section className='flex flex-col gap-6 pt-8'>
-        <Link
-          href='/spillere'
-          className='text-text-muted hover:text-accent focus-visible:outline-accent font-mono text-xs tracking-widest uppercase underline transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2'
-        >
-          &larr; Spillere
-        </Link>
         <h1 className='sr-only'>
           {a.name} mot {b.name}
         </h1>
@@ -450,35 +442,6 @@ export default async function PairPage({ params }: Props) {
           </div>
         </section>
       )}
-
-      <nav
-        aria-label='Andre oppgjør'
-        className='border-border bg-bg flex flex-col border'
-      >
-        {sides.map((side) => {
-          const opponents = player(side).opponents.filter(
-            (o) => o.slug !== other(side).slug,
-          );
-          if (opponents.length === 0) return null;
-          return (
-            <p
-              key={side}
-              className={`border-border flex flex-wrap items-center gap-x-6 border-b px-4 last:border-b-0 sm:px-8 ${eyebrow}`}
-            >
-              <span>{player(side).name} mot</span>
-              {opponents.map((opponent) => (
-                <Link
-                  key={opponent.slug}
-                  href={`/vs/${player(side).slug}/${opponent.slug}`}
-                  className={`text-text ${navLink}`}
-                >
-                  {opponent.name}
-                </Link>
-              ))}
-            </p>
-          );
-        })}
-      </nav>
     </>
   );
 }

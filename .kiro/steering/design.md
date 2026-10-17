@@ -80,15 +80,16 @@ Teenage Engineering instrument grammar on the VERKSTED tokens.
   parameters in the normal mono type. A pixel texture was tried and was
   unreadable. Accent on the display follows the usual rule: rank-1 data only
   (a champion, a titles count).
-- **Choosers vs. links.** A key with nothing to navigate to (Sesonger), a set
-  to choose from (Spillere) or a choice to make (VS) takes over the display;
-  Rekorder, with nothing to choose, is a plain link.
-  - **Sesonger:** season keys.
-  - **Spillere:** player keys, then "Alle" (the index) in its own cell behind
+- **Choosers vs. links.** A key with a set to choose from (Sesonger,
+  Spillere) or a choice to make (VS) takes over the display; Rekorder, with
+  nothing to choose, is a plain link.
+  - **Sesonger:** season keys, then "Alle" (the index) in its own cell behind
     a full-height hairline.
+  - **Spillere:** player keys, then "Alle" in the same way.
   - **VS:** two selects with a swap-sides button between them (a two-way
     arrow icon, like a flight search's from/to; no animation), then GÅ. On /vs
-    pages this picker is itself the readout.
+    pages this picker is itself the readout. It is the site's ONE pair
+    picker: there is no /vs index, and pages do not grow their own pickers.
 - **The display glitches, it doesn't slide.** Every change glitches in over
   what the display shows, like a signal switching:
   - **The frames:** for ~220ms the new frame arrives in torn horizontal
@@ -123,6 +124,9 @@ Teenage Engineering instrument grammar on the VERKSTED tokens.
 ## Interaction states
 
 - Card hover: border turns accent.
+- Stacked plates (the season and player indexes) do not share hairlines:
+  they sit 12px apart so each reads as its own plate. (Corner registration
+  marks on top were tried and dropped.)
 - Link: underlined at rest, accent on hover.
 - Focus: 2px solid accent outline, 2px offset.
 - Table rows: no hover state.

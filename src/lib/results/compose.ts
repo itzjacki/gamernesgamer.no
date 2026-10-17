@@ -385,17 +385,11 @@ export function composeRecordsView(careers: CareerStats[]): RecordsView {
 /* Pair (two players, head to head)                                           */
 /* -------------------------------------------------------------------------- */
 
-/** True when the two have at least one game in common. */
-function shareAGame(a: RecordsPlayerInput, b: RecordsPlayerInput): boolean {
-  const theirs = new Set(b.games.map((g) => `${g.seasonSlug}/${g.gameSlug}`));
-  return a.games.some((g) => theirs.has(`${g.seasonSlug}/${g.gameSlug}`));
-}
-
 /**
  * The /vs view for `slugA` against `slugB`, in that order (the first is side
  * `a`). Joins the pair derivation to each player's latest nickname and card
  * art (the dedicated hero portrait, if any, is resolved in queries.ts — compose
- * stays IO-free) and to who else each has played, for the pair switcher.
+ * stays IO-free).
  *
  * Null when either slug is unknown, the two are the same player, or they have
  * never shared a game.
@@ -424,9 +418,6 @@ export function composePairView(
       ...input.player,
       nickname: gamer.nickname,
       imagePath: gamer.imagePath,
-      opponents: inputs
-        .filter((other) => other !== input && shareAGame(input, other))
-        .map((other) => other.player),
     };
   };
 

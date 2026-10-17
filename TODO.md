@@ -146,17 +146,24 @@ slug)` in `src/lib/results/queries.ts`, backed by `read.ts` (publishable
 
 Started. Phase 3 data is live and the shared UI primitives (`Panel`, `Button`,
 `StatList`/`StatRow`) are in place to build on. Season pages, player career
-pages, the player index, the title/genre layer, `/records` and `/vs` are
-built, with their copy reviewed. Next: the front page and site navigation —
-in refinement, see `working-docs/front-page-and-nav.md`.
+pages, the season and player indexes, the title/genre layer, `/records`, `/vs`,
+the site header and structured season dates are built. Copy is reviewed
+everywhere except the season index and the header (both flagged
+`TODO(copy)`).
+
+**Where we left off (2026-10-17): the front page is next.** Start with the
+content workshop — Jakob sorts the candidates in
+`working-docs/front-page-candidates.md` (33 candidates, forced decisions
+X1–X11) into must / maybe / no — then refine the Lysbrudd prototype into the
+production hero. Everything about it is consolidated in
+`working-docs/front-page-and-nav.md`.
 
 ### Build order (post-planning 2026-10-07)
 
-Dependency-driven, not top-to-bottom. Of the three sharp dependencies, two are
-now built: the **multi-season fetch** (`fetchAllSeasonBundles()`) and the **career
+Dependency-driven, not top-to-bottom. All three sharp dependencies are
+built: the **multi-season fetch** (`fetchAllSeasonBundles()`), the **career
 placement-points derivation** (`derive/career`, 4/3/2/1 sum, shared by player
-pages + /records). The one left is the **title/genre layer**, which blocks only
-the _genre_ stats (not the rest of any page).
+pages + /records) and the **title/genre layer**.
 
 1. **Season pages** — functionally done; remaining work is Jakob's manual visual
    polish (champion-hero cutouts), which does NOT block anything below. Feature
@@ -164,7 +171,7 @@ the _genre_ stats (not the rest of any page).
 2. **Player career pages + index** — index BUILT; career pages BUILT (see
    must-have below). The shared career derivation (`derive/career`: placement-points
    / avg-placement / trophies, pure + unit-tested against the S1+S2 oracle) now
-   exists. Best/worst-genre stat still deferred (waits on the title layer).
+   exists. The best/worst-category stat is built too (`TagRecord`).
 3. **Title/genre abstraction + S1–S4 tags** — data layer BUILT
    (`src/data/titles.ts`, `titleId`/`formatTags` on every instance), vocabularies
    and the tagging of all 34 games agreed with Jakob. Per-player tag stats are
@@ -179,12 +186,12 @@ the _genre_ stats (not the rest of any page).
 6. **/vs/[a]/[b]** — BUILT and reviewed, with its entry points on the career
    page and /records. See the must-have item below.
 7. **Site navigation** — BUILT (2026-10-14/15): `SiteHeader`, the
-   "Tangenter" header (see the must-have item below). **Front page** — IN
-   REFINEMENT: the hero direction is chosen (Lysbrudd, Lag + Støv; a
+   "Tangenter" header (see the must-have item below), plus the season index
+   (2026-10-17). **Front page** — NEXT, IN REFINEMENT: the hero direction is chosen (Lysbrudd, Lag + Støv; a
    prototype at `/proto/lysbrudd`); the page's content and structure are
    next, as a workshop. Everything is consolidated in
-   `working-docs/front-page-and-nav.md`. Prerequisite for a lifecycle-aware
-   `/`: structured `start`/`end` dates on `SeasonMeta`.
+   `working-docs/front-page-and-nav.md`. Its prerequisite, structured
+   `start`/`end` dates on `SeasonMeta`, is done (2026-10-17).
 8. **Season-page feature expansion** — end of Phase 4, after the other stats/content
    pages (see must-have item below).
 
@@ -286,6 +293,40 @@ the _genre_ stats (not the rest of any page).
         ahead each way, the /vs gauge and the match record, the whole row
         linking to that pair with this player on the left. Copy reviewed by
         Jakob (2026-10-14).
+- [x] **Season index (/sesong):** BUILT (2026-10-17), `src/app/sesong/page.tsx`
+      with `SeasonRoster`. Newest season first, one large plate per season in the
+      player index's style with its own proportions: the dates in the header
+      strip (plus a status stamp while not finished), the season number as the
+      big figure with the champion's name beside it (accent: a champion
+      callout), and a footer of games, players (hidden on phones) and the
+      champion's points. Type is on the player index's scale. The right end is
+      a wide landscape picture window (about half the plate from `sm` up;
+      below the header strip on phones) behind a diagonal leaning the other
+      way to the player index's; greyscale at rest, colour on hover. It shows
+      a season photo (`findSeasonImage`: `public/images/seasons/<NN>.jpg`,
+      `.png` or `.webp`, centred) when one exists, else the champion's card
+      art from that season (top-cropped). Reached from the Sesonger chooser's
+      "Alle"; the header readout there shows the season count and the latest
+      champion.
+  - [ ] **Season photos** (Jakob, manual): one landscape photo per season at
+        `public/images/seasons/<NN>.jpg` (about 2:1 wide fits the window
+        best). The plate picks it up on the next build; card art until then.
+  - [ ] **Copy:** the heading lines, the status stamps and the plate labels
+        are best-effort, flagged `TODO(copy)`.
+  - [ ] **Visual review** by Jakob.
+- [x] **Separated index plates** (2026-10-17): both index lists had plates
+      sharing one hairline, so they read as one sheet. Now a 12px gap on both
+      `/sesong` and `/spillere`. Corner registration marks were tried on top
+      and removed by Jakob the same day; the gap alone is enough.
+- [x] **Structured season dates** (2026-10-17). `SeasonMeta.date` (free
+      text) is replaced by `start` and `end`, calendar dates as
+      `YYYY-MM-DD` (`IsoDate`; `end` equals `start` for a one-day season).
+      All display goes through `src/lib/season-dates.ts` (`formatDay`,
+      `formatSeasonDates`, "13.12.2025 – 14.12.2025"). `status` stays a
+      manual flag, not derived from the dates. Unblocks the countdown, "days
+      as champion", the "just crowned" logo state and the "just finished"
+      scene. Not stored: a start TIME — a countdown to the hour would need
+      one added.
 - [~] **Player index (/spillere):** BUILT. All players across all seasons as a
   stack of VERKSTED nameplates (`PlayerRoster`) — one six-cell-tall band per
   player, the whole band linking to the career page. Identity and nickname
@@ -358,9 +399,9 @@ the _genre_ stats (not the rest of any page).
     - the latest champion elsewhere.
   - **Choosers:** Sesonger, Spillere and VS are choosers; their key's LED
     blinks while they show. Rekorder is a plain link.
-    - Sesonger shows season keys.
-    - Spillere shows player keys, then "Alle" in its own cell behind a
-      hairline.
+    - Sesonger shows season keys, then "Alle" (the season index) in its own
+      cell behind a hairline.
+    - Spillere shows player keys, then "Alle" in the same way.
     - VS shows two selects with a swap-sides button between them, then GÅ.
   - **Glitch-in transition:** every change glitches in over what the display
     shows (~220ms of torn slices nudged 1–3px, the old frame showing through
@@ -372,15 +413,17 @@ the _genre_ stats (not the rest of any page).
     blinks while `live` (from `SeasonMeta.status`).
   - **Copy:** all labels are best-effort, flagged `TODO(copy)` in
     `SiteHeaderBar.tsx`.
-  - [ ] **/vs index page:** decided as two dropdowns + go, pre-filled by path:
-        `vs/[[...a]]` serves `/vs` and `/vs/<a>`, while `vs/[a]/[b]` stays
-        separate (pattern verified in Next 16 during prototyping). The
-        header's VS chooser covers quick picks meanwhile. Rework the picker
-        component when building it.
-  - [ ] **Redundant pair switcher:** the /vs page's own pair switcher now
-        duplicates the header's VS chooser and its swap button. Decide whether
-        it stays.
-  - [ ] **"Just crowned" logo state:** waits on structured season dates.
+  - [x] ~~**/vs index page**~~ — **DROPPED** (Jakob, 2026-10-17): the
+        header's VS chooser is the site's one pair picker, and pairs are not
+        solved two ways. Also tried on paper and dropped the same day: the /vs
+        masthead as a picker. The /vs page's "← Spillere" back link was removed
+        too, since /vs does not sit under /spillere.
+  - [x] **Redundant pair switcher — removed** (Jakob, 2026-10-17). The /vs
+        page's "Andre oppgjør" links at the foot duplicated the header's VS
+        chooser; gone, together with `PairPlayerView.opponents`, which only
+        fed it.
+  - [ ] **"Just crowned" logo state:** the season dates now exist; needs a
+        decided window length after `end`.
 
 - [ ] **"Just finished" scene:** a special front-page scene for the days
       after a final, where the new champion's name is engraved into the
@@ -390,8 +433,8 @@ the _genre_ stats (not the rest of any page).
       from the prototypes (git `ae9e801`, summarised in the working doc): the
       3D trophy with a camera move to the plaque, laser engraving and a spark
       burst; and the 3D trophy rendered only as a raster on the grid (dots,
-      engraving lines, LED). Needs structured season dates to know when it
-      applies.
+      engraving lines, LED). Can tell when it applies from the season's
+      `end` date; the window length is still to decide.
 - [ ] **Front page (/):** IN REFINEMENT. The top fold is the trophy as
       **Lysbrudd (Lag + Støv)**: backlit, light breaking through it into a
       fog, the site grid as stacked glass sheets, dust in the beams. It is
@@ -570,7 +613,8 @@ the _genre_ stats (not the rest of any page).
   - **No separate "moments" section** (removed by Jakob, 2026-10-14). It
     held the best-season plates, now in the Seasons group, and two "longest
     run ahead" plates, cut because they repeated the Games group's run row.
-  - **Pair switcher** — plain links to each side's other pairs.
+  - **No pair switcher on the page** — the header's VS chooser does that job
+    (a footer of links to each side's other pairs was removed, 2026-10-17).
 
   **The comparison grammar:** one reading on a shared axis, never two columns.
   Both figures share a colour and weight; a needle on a hairline gauge leans
@@ -591,8 +635,8 @@ the _genre_ stats (not the rest of any page).
   section); the two pair plates on /records ("Lengste tak på motstander",
   "Jevneste rivaleri"), whose names are one link to the pair ("Jørgen på
   William", "Jakob – Tobias" — `RecordPlate`'s `pairLink`, for the holder and
-  the runners-up alike) instead of a link per player; and the switcher. No /vs
-  index yet. (A "Se oppgjøret" link in the plates' footer row came first and
+  the runners-up alike) instead of a link per player; and the header's VS
+  chooser. No /vs index, by decision. (A "Se oppgjøret" link in the plates' footer row came first and
   was removed by Jakob, 2026-10-14.)
 
   **Data layer:** `derive/pair.ts` (`derivePair`, pure, reads the same joined
@@ -628,8 +672,8 @@ the _genre_ stats (not the rest of any page).
   - [ ] **Diagonal portrait.** `PairHero` and `PlayerRoster` each draw the
         clipped greyscale portrait and its diagonal hairline; extract a shared
         primitive if a third use appears.
-  - [ ] **Later:** a /vs index (a small matrix of all pairs), per-match
-        scorelines, an OG image. Cut by decision: finals/deciders between the
+  - [ ] **Later:** per-match scorelines, an OG image. Cut by decision: a /vs
+        index (2026-10-17, see Site navigation), finals/deciders between the
         two (samples of one to three), round-level stats, power-up stats,
         percentages, "nemesis"-style labels.
   - [x] The temporary working docs `records-vs-hall-directions.md` and
@@ -694,9 +738,30 @@ complete, and only if they can be made to feel intentional rather than decorativ
       fit VERKSTED: must stay monochrome-or-single-accent, honor reduced-motion, and
       read as purposeful (e.g. one accent light on a champion row) rather than
       ambient sparkle. Scope it as a site-wide motion language, not a one-off.
-- [ ] Do a review of spacing on the page. Currently, we have large amounts of spacing
-      between almost all sections, this should probably be changed, so spacing is used
-      more intentionally. This will also help reinforce VERKSTED.
+
+---
+
+## Review passes (after the main phases)
+
+Site-wide passes once the phases above are done.
+
+- [ ] **Instant navigation.** Find out whether moving between pages feels
+      instant on the real (deployed) site, not just in dev. If it doesn't,
+      take steps until it does: check that links prefetch, that the pages
+      really are static, and how much each route loads on the client (the
+      header's client half, images).
+- [ ] **Design audit.** Go through the whole site with two questions: does
+      it follow VERKSTED clearly, and does VERKSTED itself (as written in
+      `design.md`, "indie high performance") still express what we want the
+      site to be (`product.md`: a permanent monument to the tournament)? Where the
+      second answer is no, change the design language, not just the pages.
+      Two known leads:
+  - **The dark display colour.** `--color-display` (the header's recessed
+    screen) works well; try using it beyond the header to make the pages
+    more interesting, e.g. for readouts or key figures.
+  - **Spacing.** Almost every section has a large gap around it. Use
+    spacing more deliberately, which will also make the pages read more
+    like VERKSTED.
 
 ---
 
