@@ -773,3 +773,88 @@ export interface PairSummary {
   matchWins: number;
   matchLosses: number;
 }
+
+/* -------------------------------------------------------------------------- */
+/* Archive totals (front page)                                                */
+/* -------------------------------------------------------------------------- */
+
+/** The archive's running counts, for the front page's totals row. */
+export interface ArchiveTotals {
+  /** Seasons with a crowned champion (confirmed season_result placement 1). */
+  seasons: number;
+  /** Games with at least one confirmed result. */
+  games: number;
+  /** Decided head-to-head matches in those games. */
+  matches: number;
+  /** Power-up and curse uses (incl. zero-delta ones) in those games. */
+  powerUpsFired: number;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Season changes (front page, just crowned)                                  */
+/* -------------------------------------------------------------------------- */
+
+/** The fields of `RecordsView` that are one record (a ranked entry list). */
+export type RecordKey = {
+  [K in keyof RecordsView]: RecordsView[K] extends RecordEntry[] ? K : never;
+}[keyof RecordsView];
+
+/**
+ * How a record's or a crown's holders changed between two views. Holders are
+ * the rank-1 entries (a tie is several):
+ *
+ * - `new` — nobody held it before (the record or crown did not exist yet).
+ * - `taken` — someone who did not hold it before holds it now, and someone
+ *   who held it before no longer does.
+ * - `tied` — every old holder still holds it, joined by someone new.
+ * - `untied` — it was shared, and fewer of the same holders share it now.
+ * - `improved` — the same holders, with a better figure (records only).
+ */
+export type HolderChangeKind = 'new' | 'taken' | 'tied' | 'untied' | 'improved';
+
+/** One record whose holders or figure changed. */
+export interface RecordChange {
+  /** The `RecordsView` field; the consumer maps it to a label and a plate id. */
+  key: RecordKey;
+  kind: HolderChangeKind;
+  /** Rank-1 entries before (empty for `new`) and after. */
+  before: RecordEntry[];
+  after: RecordEntry[];
+  /**
+   * The new figure beats the old one. Not implied by `taken`: a rate record
+   * changes hands when its holder's rate drops below someone else's.
+   */
+  better: boolean;
+}
+
+/** One player whose position on the all-time career board changed. */
+export interface BoardMove {
+  player: RecordPlayer;
+  /** Rank before; null when the player was not on the board yet. */
+  before: number | null;
+  after: number;
+}
+
+/** One category crown whose holders changed. */
+export interface CrownChange {
+  tag: Tag;
+  kind: Exclude<HolderChangeKind, 'improved'>;
+  /** Rank-1 entries before (empty for `new`) and after. */
+  before: RecordEntry[];
+  after: RecordEntry[];
+}
+
+/** What one season changed in the all-time picture. All lists may be empty. */
+export interface RecordsDiff {
+  /** In `RecordsView` field order. */
+  records: RecordChange[];
+  /** Best `after` rank first. */
+  board: BoardMove[];
+  /** In the after view's crown order (largest sample first). */
+  crowns: CrownChange[];
+}
+
+/** The front page's just-crowned block: the latest finished season's diff. */
+export interface SeasonChanges extends RecordsDiff {
+  season: RecordSeason;
+}

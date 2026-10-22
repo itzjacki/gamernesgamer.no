@@ -27,7 +27,7 @@ borders double up.
 | `--color-display`       | The header's recessed display  |
 | `--color-accent`        | Pinkish-red. The single accent |
 | `--color-text`          | Body text                      |
-| `--color-text-muted`    | Metadata, labels               |
+| `--color-text-muted`    | Metadata, labels (AA on `bg`)  |
 | `--color-border`        | Structural borders             |
 | `--color-border-accent` | Red-tinted border              |
 
@@ -50,10 +50,17 @@ popovers).
 **Type:** Neue Montreal (self-hosted) for display (800) and body (400); Martian
 Mono (400) for metadata.
 
+**Type floor:** no text below 10px. Labels are `SectionLabel` (mono, xs,
+widest tracking, muted), placed above a block's frame with `gap-6`, never
+inside it; on a page whose blocks are its sections, render it `as='h2'`.
+
 ## Grid
 
-- 40px cells, `rgba(232,216,216,0.04)`, centred with
-  `background-position: calc(50% + 20px) calc(50% + 20px)`.
+- 40px cells, `rgba(232,216,216,0.04)`, centred horizontally and anchored to
+  the top: `background-position: calc(50% + 20px) 8px`, so the header's
+  bottom edge (168px on desktop) is a grid line and every page has the same
+  rows whatever its height. Vertical sizes and gaps below the header come in
+  whole cells (40px; the front page stacks its blocks 120px apart).
 - Container `max-w-220` (880px = 22 cells) with `lg:px-10`, giving an 800px
   content width (20 cells).
 - The grid scrolls with the page. Alignment is a desktop feature: on mobile the
@@ -64,6 +71,26 @@ Mono (400) for metadata.
 - Surfaces use `bg-bg` — they mask the grid rather than float above it.
 - Grid lines continue through dividers at the same weight.
 - No shadows. No border radius on grid-aligned components.
+
+## On the hero
+
+What sits on the trophy hero (`GgIntro`, `LiveSideBlock`, `ChampionSideBlock`,
+`SeasonCountdown`, `SeasonReveals`) is either bold type straight on the scene or
+an ordinary bordered element. No scrims, halos, masks or faded edges: they were
+tried and looked bad.
+
+- **Type on the scene:** only large bold white display type (the dormant
+  "Gamernes Gamer" h1, the countdown's numerals) and its `text-text` mono
+  labels. Never `text-text-muted` directly on the scene: it fails AA against
+  the lit fog.
+- **Bordered elements:** solid `bg-bg` with `border`, like the site's panels
+  (live block, reveals row, the champion's footer). Muted labels are fine
+  inside them. Whole-block links take the accent on their border on hover.
+- **Champion:** their picture is the block, unframed and unmasked, with a
+  solid footer (name, season, points, titles); with no picture the footer
+  stands alone.
+- **Static:** the scene does not follow the pointer. It keeps the light's
+  on-load rise, its slow sideways drift and the dust.
 
 ## Site header
 

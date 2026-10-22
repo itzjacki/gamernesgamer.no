@@ -35,7 +35,7 @@ import RecordLines from './RecordLines';
  *   list for that player.
  */
 
-interface Props {
+export interface Props {
   /** Fragment id, so a link can go with a screenshot (`/records#<id>`). */
   id: string;
   label: string;
@@ -60,6 +60,12 @@ interface Props {
    * pair's /vs page. `text` is also what the popover headings call the entry.
    */
   pairLink?: (entry: RecordEntry) => { text: string; href: string };
+  /**
+   * The empty ruled row that closes the plate on the wall. A plate that
+   * stands alone over a cell of its own (the front page's record of the day)
+   * leaves it out, so there is no dead strip above that cell.
+   */
+  footerRow?: boolean;
 }
 
 /**
@@ -150,6 +156,7 @@ export default function RecordPlate({
   detailLabel,
   detail = gameLines,
   pairLink,
+  footerRow = true,
 }: Props) {
   const holders = entries.filter((e) => e.rank === 1);
   if (holders.length === 0) return null;
@@ -255,10 +262,12 @@ export default function RecordPlate({
           {/* An empty ruled footer row: it closes the plate, so stacked
               plates don't run into the one below. Its rule runs edge to edge
               (out through the plate's padding), meeting the wall's hairlines. */}
-          <div
-            aria-hidden='true'
-            className='border-border -mx-5 h-8 border-t'
-          />
+          {footerRow && (
+            <div
+              aria-hidden='true'
+              className='border-border -mx-5 h-8 border-t'
+            />
+          )}
         </div>
       </article>
     </li>

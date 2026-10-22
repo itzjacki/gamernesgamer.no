@@ -1,0 +1,196 @@
+import type {
+  BoardMove,
+  CrownChange,
+  HolderChangeKind,
+  RecordChange,
+  RecordEntry,
+  RecordKey,
+  RecordsDiff,
+  RecordsView,
+} from '../../view-models';
+import { shown } from './helpers';
+
+/**
+ * PURE. What changed between two records views — in practice the archive
+ * without its latest season (`before`) and with it (`after`), which is what
+ * the front page's just-crowned block shows. Nothing here re-derives a record:
+ * it reads the two views `deriveRecords` already ranked.
+ *
+ * A record's or crown's HOLDERS are its rank-1 entries, so a tie is several
+ * holders and a change in who shares it is a change (see `HolderChangeKind`).
+ * Cumulative records (career totals) count only when their holders change —
+ * see `CUMULATIVE`. A quiet season gives three empty lists.
+ */
+
+/**
+ * Which way a record's figure is better, for the `improved` check:
+ * `higher`/`lower` compare `value`; `rate` compares `value / outOf`, because
+ * those records rank on the share and `value` is only the numerator.
+ *
+ * Listed in `RecordsView` field order, which is the order changes come out in.
+ * `satisfies` makes a new record field fail the build until it is listed here.
+ */
+const MEASURES = {
+  mostGameWins: 'higher',
+  bestSeason: 'lower',
+  longestWinStreak: 'higher',
+  longestTopTwoStreak: 'higher',
+  longestTopThreeStreak: 'higher',
+  homeTurf: 'higher',
+  awayWins: 'higher',
+  titleSpecialist: 'higher',
+  tiebreaks: 'rate',
+  matchWins: 'rate',
+  matchSweeps: 'rate',
+  matchDeciders: 'rate',
+  finals: 'rate',
+  flawlessGames: 'higher',
+  opponentStreak: 'higher',
+  homeAdvantage: 'higher',
+  seasonCloser: 'lower',
+  seasonOpener: 'lower',
+  winsLeader: 'higher',
+  rivalries: 'lower',
+  totalPoints: 'higher',
+  powerUpPoints: 'higher',
+} as const satisfies Record<RecordKey, 'higher' | 'lower' | 'rate'>;
+
+type Measure = (typeof MEASURES)[RecordKey];
+
+/**
+ * CUMULATIVE records: career running totals that grow for whoever holds them
+ * almost every season they play, so a bigger figure from the same holder is
+ * no news. They are reported only when their HOLDERS change (taken, tied,
+ * untied, new), never as `improved`.
+ *
+ * Counts of a specific feat (flawless tournaments, wins at one title) and
+ * streaks, averages and rates are not here: a better figure there is an event.
+ */
+const CUMULATIVE: ReadonlySet<RecordKey> = new Set<RecordKey>([
+  'mostGameWins',
+  'homeTurf',
+  'awayWins',
+  'winsLeader',
+  'totalPoints',
+  'powerUpPoints',
+]);
+
+/**
+ * Who an entry is about. The pair record (closest rivalry) is held by a PAIR,
+ * whichever of the two happens to lead it.
+ */
+function holderKey(entry: RecordEntry): string {
+  if (!entry.partner) return entry.player.slug;
+  return [entry.player.slug, entry.partner.slug].sort().join('+');
+}
+
+const holdersOf = (entries: RecordEntry[]) =>
+  entries.filter((e) => e.rank === 1);
+
+/** How the holder set moved, or null when it is the same set (or empty after). */
+function holderChange(
+  before: RecordEntry[],
+  after: RecordEntry[],
+): Exclude<HolderChangeKind, 'improved'> | null {
+  if (after.length === 0) return null;
+  if (before.length === 0) return 'new';
+
+  const was = new Set(before.map(holderKey));
+  const is = new Set(after.map(holderKey));
+  const gained = [...is].some((key) => !was.has(key));
+  const lost = [...was].some((key) => !is.has(key));
+
+  if (gained && lost) return 'taken';
+  if (gained) return 'tied';
+  if (lost) return 'untied';
+  return null;
+}
+
+/**
+ * The figure a record compares, at the precision /records shows it (two
+ * decimals; a whole percentage for rates), so an `improved` is always visible.
+ */
+function figure(entry: RecordEntry, measure: Measure): number {
+  if (measure === 'rate') {
+    return Math.round((entry.value / (entry.outOf || 1)) * 100);
+  }
+  return shown(entry.value, 2);
+}
+
+function isBetter(after: RecordEntry, before: RecordEntry, measure: Measure) {
+  const a = figure(after, measure);
+  const b = figure(before, measure);
+  return measure === 'lower' ? a < b : a > b;
+}
+
+function recordChanges(before: RecordsView, after: RecordsView) {
+  const changes: RecordChange[] = [];
+  for (const key of Object.keys(MEASURES) as RecordKey[]) {
+    const was = holdersOf(before[key]);
+    const is = holdersOf(after[key]);
+    const kind =
+      holderChange(was, is) ??
+      (is.length > 0 &&
+      !CUMULATIVE.has(key) &&
+      isBetter(is[0], was[0], MEASURES[key])
+        ? 'improved'
+        : null);
+    const better =
+      was.length > 0 && is.length > 0 && isBetter(is[0], was[0], MEASURES[key]);
+    if (kind) changes.push({ key, kind, before: was, after: is, better });
+  }
+  return changes;
+}
+
+/** Every player whose board rank differs, including newcomers to the board. */
+function boardMoves(before: RecordsView, after: RecordsView): BoardMove[] {
+  const rankBefore = new Map(before.board.map((r) => [r.player.slug, r.rank]));
+  return after.board
+    .map((row) => ({
+      player: row.player,
+      before: rankBefore.get(row.player.slug) ?? null,
+      after: row.rank,
+    }))
+    .filter((move) => move.before !== move.after);
+}
+
+/**
+ * Crowns whose holders changed. A crown only counts once its holder has played
+ * `minCrownGames` games under the tag (the consumer's ranking minimum, the same
+ * rule TagCrowns applies), so a crown that was unranked before is `new`.
+ */
+function crownChanges(
+  before: RecordsView,
+  after: RecordsView,
+  minCrownGames: number,
+): CrownChange[] {
+  const rankedHolders = (entries: RecordEntry[] | undefined) => {
+    const holders = holdersOf(entries ?? []);
+    return (holders[0]?.outOf ?? 0) >= minCrownGames ? holders : [];
+  };
+  const crownBefore = new Map(before.tagCrowns.map((c) => [c.tag, c.entries]));
+
+  return after.tagCrowns.flatMap((crown) => {
+    const was = rankedHolders(crownBefore.get(crown.tag));
+    const is = rankedHolders(crown.entries);
+    const kind = holderChange(was, is);
+    return kind ? [{ tag: crown.tag, kind, before: was, after: is }] : [];
+  });
+}
+
+export interface DiffOptions {
+  /** Games under a tag before its crown counts (the consumer's minimum). */
+  minCrownGames: number;
+}
+
+export function diffRecords(
+  before: RecordsView,
+  after: RecordsView,
+  { minCrownGames }: DiffOptions,
+): RecordsDiff {
+  return {
+    records: recordChanges(before, after),
+    board: boardMoves(before, after),
+    crowns: crownChanges(before, after, minCrownGames),
+  };
+}

@@ -1,11 +1,13 @@
 interface Props {
   children: React.ReactNode;
+  /** The element to render; a section's label can be its heading. */
+  as?: 'p' | 'h2' | 'h3';
 }
 
-export default function SectionLabel({ children }: Props) {
+export default function SectionLabel({ children, as: Tag = 'p' }: Props) {
   return (
-    <p className='text-text-muted font-mono text-xs tracking-widest uppercase'>
+    <Tag className='text-text-muted font-mono text-xs tracking-widest uppercase'>
       {children}
-    </p>
+    </Tag>
   );
 }

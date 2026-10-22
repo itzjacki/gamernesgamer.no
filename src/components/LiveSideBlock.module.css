@@ -1,0 +1,18 @@
+/*
+ * LiveSideBlock — only the LED blink, which utilities can't express. Same
+ * grammar as the header's live logo: a hard 1.2s on/off, never eased.
+ */
+.blink {
+  animation: blink 1.2s steps(1) infinite;
+}
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blink {
+    animation: none;
+  }
+}

@@ -11,8 +11,8 @@ import { useEffect, useRef } from 'react';
  * room: above the trophy's foot it is the page grid itself, a back wall in
  * register with the rest of the page; at the foot it folds into a floor that
  * runs toward the viewer in perspective, lit where the light spills onto it.
- * The vanishing point drifts with the pointer. Optional dust motes drift
- * through the scene and show only where they cross a beam, so the light
+ * The scene is static: nothing follows the pointer. Optional dust motes
+ * drift through the scene and show only where they cross a beam, so the light
  * reads as a volume.
  *
  * One fragment shader, raw WebGL, no library. The trophy silhouette comes from
@@ -37,7 +37,7 @@ const FS = `#extension GL_OES_standard_derivatives : enable
   varying vec2 uv;
   uniform sampler2D mask; uniform vec2 res; uniform float dpr; uniform vec2 origin;
   uniform vec2 light; uniform float power; uniform vec3 tint; uniform float t;
-  uniform float dust; uniform vec2 pointer;
+  uniform float dust;
   uniform vec2 centre; // css px: the trophy's centre, the floor's vanishing point
   uniform float fold;  // css px: where the wall folds into the floor (the trophy's foot)
   uniform float bottom; // css px: the canvas's bottom edge
@@ -100,7 +100,7 @@ const FS = `#extension GL_OES_standard_derivatives : enable
       // The floor: the wall's grid folded toward the viewer. s is 1 at the
       // fold and falls toward the bottom; columns spread from the vanishing
       // point, rows open up as they come closer.
-      vec2 vp = vec2(centre.x + pointer.x * 30.0, centre.y);
+      vec2 vp = centre;
       float s = (fold - vp.y) / (css.y - vp.y);
       float fx = vp.x + (css.x - vp.x) * s;
       float fz = (fold - vp.y) * (1.0 - s);
@@ -243,7 +243,7 @@ export default function TrophyHero({
       const g = grid.getBoundingClientRect();
       originCss = {
         x: r.left - g.left - (g.width / 2 + 20) + 40000,
-        y: r.top - g.top - (g.height / 2 + 20) + 40000,
+        y: r.top - g.top - 8 + 40000,
       };
       gl!.uniform2f(U('origin'), originCss.x, originCss.y);
       layout();
@@ -256,13 +256,6 @@ export default function TrophyHero({
     };
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
-
-    const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
-    const onPointer = (e: PointerEvent) => {
-      pointer.tx = (e.clientX / innerWidth) * 2 - 1;
-      pointer.ty = (e.clientY / innerHeight) * 2 - 1;
-    };
-    addEventListener('pointermove', onPointer);
 
     const t0 = performance.now();
     const ease = (x: number) =>
@@ -277,10 +270,6 @@ export default function TrophyHero({
       // On load the light rises into place behind the trophy, then drifts.
       const rise = reduce ? 1 : ease(sec / 3);
       const ph = reduce ? 0.6 : sec * 0.12;
-      if (!reduce) {
-        pointer.x += (pointer.tx - pointer.x) * 0.05;
-        pointer.y += (pointer.ty - pointer.y) * 0.05;
-      }
       const cx = (box.x + box.w / 2) / canvas.width;
       const cy = 1 - (box.y + box.h * 0.42) / canvas.height;
       const power =
@@ -296,14 +285,12 @@ export default function TrophyHero({
       gl.uniform3f(U('tint'), tint[0], tint[1], tint[2]);
       gl.uniform1f(U('t'), reduce ? 0 : sec);
       gl.uniform1f(U('dust'), du ? 1 : 0);
-      gl.uniform2f(U('pointer'), pointer.x, pointer.y);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     };
     raf = requestAnimationFrame(frame);
     return () => {
       cancelAnimationFrame(raf);
       ro.disconnect();
-      removeEventListener('pointermove', onPointer);
     };
   }, []);
 

@@ -31,8 +31,8 @@ export function todayInNorway(): IsoDate {
 }
 
 /** Whole days from `from` to `to`; both are calendar dates, so no zone applies. */
-function daysBetween(from: IsoDate, to: IsoDate): number {
-  return (Date.parse(to) - Date.parse(from)) / 86_400_000;
+export function daysBetween(from: IsoDate, to: IsoDate): number {
+  return Math.round((Date.parse(to) - Date.parse(from)) / 86_400_000);
 }
 
 export function deriveSiteState(
