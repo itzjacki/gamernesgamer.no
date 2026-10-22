@@ -3,29 +3,31 @@
 import { useEffect, useRef } from 'react';
 
 /*
- * PROTOTYPE — "Lysbrudd" (Lag + Støv), the front-page hero direction chosen in
- * the refinement round (see working-docs/front-page-and-nav.md). Kept as the
- * starting point for refinement; not yet production code.
+ * PROTOTYPE — the front page's trophy hero (see working-docs/front-page-and-nav.md).
+ * Kept as the starting point for refinement; not yet production code.
  *
  * The trophy is backlit: a light hidden behind it breaks through its
- * cut-outs into a fog. The site grid is a PHYSICAL part of that scene, as
- * stacked sheets of glass:
- * - a fine sheet far behind, lit by the light where the beams reach it;
- * - the page grid itself in the middle (in register with the rest of the page);
- * - a coarse sheet in front, its bars reading dark against the fog.
- * The sheets drift apart with the pointer (parallax). Dust motes drift
- * through the scene and show only where they cross a beam, so the light reads
- * as a volume.
+ * cut-outs into a fog. The site grid is a PHYSICAL part of that scene, as a
+ * room: above the trophy's foot it is the page grid itself, a back wall in
+ * register with the rest of the page; at the foot it folds into a floor that
+ * runs toward the viewer in perspective, lit where the light spills onto it.
+ * The vanishing point drifts with the pointer. Optional dust motes drift
+ * through the scene and show only where they cross a beam, so the light
+ * reads as a volume.
  *
  * One fragment shader, raw WebGL, no library. The trophy silhouette comes from
  * `public/images/branding/trophy.svg`, rasterised into a mask texture.
  */
 
 /** Lifecycle states the scene reacts to: dimmed while counting down, accent-red when a champion is crowned. */
-export type LysbruddMode = 'idle' | 'countdown' | 'crowned';
+export type TrophyHeroMode = 'idle' | 'countdown' | 'crowned';
+
+/** Where the trophy stands on desktop; phones always centre it. */
+export type TrophyHeroAlign = 'right' | 'centre';
 
 interface Props {
-  mode?: LysbruddMode;
+  mode?: TrophyHeroMode;
+  align?: TrophyHeroAlign;
   dust?: boolean;
 }
 
@@ -36,7 +38,9 @@ const FS = `#extension GL_OES_standard_derivatives : enable
   uniform sampler2D mask; uniform vec2 res; uniform float dpr; uniform vec2 origin;
   uniform vec2 light; uniform float power; uniform vec3 tint; uniform float t;
   uniform float dust; uniform vec2 pointer;
-  uniform vec2 centre; // css px: the trophy's centre, the sheets' parallax origin
+  uniform vec2 centre; // css px: the trophy's centre, the floor's vanishing point
+  uniform float fold;  // css px: where the wall folds into the floor (the trophy's foot)
+  uniform float bottom; // css px: the canvas's bottom edge
 
   const vec3 BG = vec3(23., 24., 26.) / 255.;
   const vec3 GRIDC = vec3(232., 216., 216.) / 255.;
@@ -88,22 +92,32 @@ const FS = `#extension GL_OES_standard_derivatives : enable
     float rim = clamp(inside - m(uv + normalize(light - uv) * px * 2.0), 0.0, 1.0);
     float haze = min(rays, 1.2);
 
-    // Back sheet: finer (far away), lit by the light; parallax away from the pointer.
-    vec2 back = (css - centre) / 0.55 + centre - pointer * 14.0;
-    float bl = max(gridLine(back.x + 4000.0, 1.0), gridLine(back.y + 4000.0, 1.0));
     vec3 col = BG + tint * haze * 0.06;
-    col = mix(col, mix(GRIDC, tint, 0.4), bl * clamp(rays * rays * 0.12, 0.0, 0.26));
-    // Middle sheet: the page grid itself.
-    col = mix(col, GRIDC, onGrid * clamp(0.04 + rays * 0.12, 0.0, 0.12));
+    if (css.y < fold) {
+      // The back wall: the page grid itself, lit where the beams reach it.
+      col = mix(col, GRIDC, onGrid * clamp(0.04 + rays * 0.14, 0.0, 0.16));
+    } else {
+      // The floor: the wall's grid folded toward the viewer. s is 1 at the
+      // fold and falls toward the bottom; columns spread from the vanishing
+      // point, rows open up as they come closer.
+      vec2 vp = vec2(centre.x + pointer.x * 30.0, centre.y);
+      float s = (fold - vp.y) / (css.y - vp.y);
+      float fx = vp.x + (css.x - vp.x) * s;
+      float fz = (fold - vp.y) * (1.0 - s);
+      float fl = max(gridLine(fx + 40000.0, 1.0), gridLine(fz + 40000.0, 1.0));
+      // Light pools on the floor around the trophy's foot and fades with
+      // distance; the floor hands back to the flat page grid at the edge.
+      float pool = exp(-length(vec2(fx - centre.x, fz * 2.2)) / 260.0);
+      float edge = 1.0 - smoothstep(0.55, 1.0, (css.y - fold) / max(bottom - fold, 1.0));
+      vec3 lit = mix(GRIDC, tint, 0.35);
+      col += tint * pool * edge * power * 0.05;
+      col = mix(col, lit, fl * edge * clamp(0.05 + pool * power * 0.4, 0.0, 0.42));
+      col = mix(col, GRIDC, onGrid * (1.0 - edge) * 0.04);
+    }
 
     // The trophy: a dark surface with a rim where the light grazes it.
     col = mix(col, vec3(0.055, 0.058, 0.062), inside);
     col += tint * rim * (0.08 + power * 0.45);
-
-    // Front sheet: coarse bars in front of everything, dark against the fog.
-    vec2 front = (css - centre) / 1.7 + centre + pointer * 26.0;
-    float bars = max(gridLine(front.x + 4000.0, 3.0), gridLine(front.y + 4000.0, 3.0));
-    col = mix(col, BG * 0.7, bars * smoothstep(0.25, 0.9, rays));
 
     if (dust > 0.5 && inside < 0.5) {
       float lit = clamp(rays * rays * 0.5, 0.0, 1.0);
@@ -117,12 +131,16 @@ const FS = `#extension GL_OES_standard_derivatives : enable
     gl_FragColor = vec4(col, 1.0);
   }`;
 
-export default function Lysbrudd({ mode = 'idle', dust = true }: Props) {
+export default function TrophyHero({
+  mode = 'idle',
+  align = 'right',
+  dust = true,
+}: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const live = useRef({ mode, dust });
+  const live = useRef({ mode, align, dust });
   useEffect(() => {
-    live.current = { mode, dust };
-  }, [mode, dust]);
+    live.current = { mode, align, dust };
+  }, [mode, align, dust]);
 
   useEffect(() => {
     const canvas = canvasRef.current!;
@@ -168,15 +186,20 @@ export default function Lysbrudd({ mode = 'idle', dust = true }: Props) {
       const w = canvas.width;
       const h = canvas.height;
       const mobile = innerWidth <= 700;
-      const th = h * (mobile ? 0.66 : 0.74);
+      // The trophy stands three quarters down, leaving the floor room to run.
+      const th = h * (mobile ? 0.56 : 0.62);
       const tw = th * (935 / 1080);
-      const cx = mobile ? w / 2 : w * 0.66;
-      box = { x: cx - tw / 2, y: h * 0.88 - th, w: tw, h: th };
+      const cx = mobile || live.current.align === 'centre' ? w / 2 : w * 0.66;
+      box = { x: cx - tw / 2, y: h * 0.74 - th, w: tw, h: th };
       gl!.uniform2f(
         U('centre'),
         cx / dpr + originCss.x,
         (box.y + th * 0.45) / dpr + originCss.y,
       );
+      // The fold snaps to a grid row so the wall's last line meets the floor.
+      const foot = (box.y + th) / dpr + originCss.y;
+      gl!.uniform1f(U('fold'), Math.round(foot / 40) * 40);
+      gl!.uniform1f(U('bottom'), h / dpr + originCss.y);
     }
 
     function drawMask() {
@@ -202,7 +225,10 @@ export default function Lysbrudd({ mode = 'idle', dust = true }: Props) {
       gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_WRAP_T, gl!.CLAMP_TO_EDGE);
     }
 
+    let laidOutAlign = live.current.align;
+
     function resize() {
+      laidOutAlign = live.current.align;
       dpr = Math.min(devicePixelRatio, 1.5);
       const r = canvas.getBoundingClientRect();
       canvas.width = Math.max(1, r.width * dpr);
@@ -245,7 +271,8 @@ export default function Lysbrudd({ mode = 'idle', dust = true }: Props) {
     const frame = (now: number) => {
       raf = requestAnimationFrame(frame);
       if (!ready) return;
-      const { mode: m, dust: du } = live.current;
+      const { mode: m, align: al, dust: du } = live.current;
+      if (al !== laidOutAlign) resize();
       const sec = (now - t0) / 1000;
       // On load the light rises into place behind the trophy, then drifts.
       const rise = reduce ? 1 : ease(sec / 3);

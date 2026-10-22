@@ -151,12 +151,10 @@ the site header and structured season dates are built. Copy is reviewed
 everywhere except the season index and the header (both flagged
 `TODO(copy)`).
 
-**Where we left off (2026-10-17): the front page is next.** Start with the
-content workshop — Jakob sorts the candidates in
-`working-docs/front-page-candidates.md` (33 candidates, forced decisions
-X1–X11) into must / maybe / no — then refine the Lysbrudd prototype into the
-production hero. Everything about it is consolidated in
-`working-docs/front-page-and-nav.md`.
+**Where we left off (2026-10-22): the front page's content and structure are
+decided, and a wireframe is live at `/`** for Jakob's review. Next: build the
+blocks; the trophy hero's refinement is deferred until after. Everything
+about it is in `working-docs/front-page-and-nav.md`.
 
 ### Build order (post-planning 2026-10-07)
 
@@ -186,12 +184,10 @@ pages + /records) and the **title/genre layer**.
 6. **/vs/[a]/[b]** — BUILT and reviewed, with its entry points on the career
    page and /records. See the must-have item below.
 7. **Site navigation** — BUILT (2026-10-14/15): `SiteHeader`, the
-   "Tangenter" header (see the must-have item below), plus the season index
-   (2026-10-17). **Front page** — NEXT, IN REFINEMENT: the hero direction is chosen (Lysbrudd, Lag + Støv; a
-   prototype at `/proto/lysbrudd`); the page's content and structure are
-   next, as a workshop. Everything is consolidated in
-   `working-docs/front-page-and-nav.md`. Its prerequisite, structured
-   `start`/`end` dates on `SeasonMeta`, is done (2026-10-17).
+   two-tier header (see the must-have item below), plus the season index
+   (2026-10-17). **Front page** — NEXT: content and structure decided and wireframed
+   at `/` (2026-10-22); the blocks are next. See
+   `working-docs/front-page-and-nav.md`.
 8. **Season-page feature expansion** — end of Phase 4, after the other stats/content
    pages (see must-have item below).
 
@@ -324,7 +320,7 @@ pages + /records) and the **title/genre layer**.
       All display goes through `src/lib/season-dates.ts` (`formatDay`,
       `formatSeasonDates`, "13.12.2025 – 14.12.2025"). `status` stays a
       manual flag, not derived from the dates. Unblocks the countdown, "days
-      as champion", the "just crowned" logo state and the "just finished"
+      as champion", the "just crowned" logo state and the engraving
       scene. Not stored: a start TIME — a countdown to the hour would need
       one added.
 - [~] **Player index (/spillere):** BUILT. All players across all seasons as a
@@ -381,7 +377,7 @@ pages + /records) and the **title/genre layer**.
         once the real images land.
 - [x] **Site navigation:** BUILT (2026-10-14/15), replacing `SeasonHeader`.
       `SiteHeader` (server: data) + `SiteHeaderBar` (client), in the root
-      layout: the "Tangenter" header, two tiers. Design rules in design.md
+      layout: a two-tier header. Design rules in design.md
       ("Site header"); the history in `working-docs/front-page-and-nav.md`.
   - **Rail of keys:** the pixel logo (links to `/`), then Sesonger,
     Spillere, VS, Rekorder. Each key shows a function number, its label and
@@ -422,28 +418,42 @@ pages + /records) and the **title/genre layer**.
         page's "Andre oppgjør" links at the foot duplicated the header's VS
         chooser; gone, together with `PairPlayerView.opponents`, which only
         fed it.
-  - [ ] **"Just crowned" logo state:** the season dates now exist; needs a
-        decided window length after `end`.
+  - [ ] **"Just crowned" logo state:** the season dates now exist. Window:
+        6 weeks after `end` for now, shared with the front page's "just
+        crowned" state; later configurable in the admin panel.
 
-- [ ] **"Just finished" scene:** a special front-page scene for the days
-      after a final, where the new champion's name is engraved into the
-      trophy (Jakob, 2026-10-14). Probably a completely different trophy
-      style from the everyday hero, just for that scene. The engraving did not
-      work inside the Lysbrudd hero and was removed there. Candidate material
-      from the prototypes (git `ae9e801`, summarised in the working doc): the
-      3D trophy with a camera move to the plaque, laser engraving and a spark
-      burst; and the 3D trophy rendered only as a raster on the grid (dots,
-      engraving lines, LED). Can tell when it applies from the season's
-      `end` date; the window length is still to decide.
-- [ ] **Front page (/):** IN REFINEMENT. The top fold is the trophy as
-      **Lysbrudd (Lag + Støv)**: backlit, light breaking through it into a
-      fog, the site grid as stacked glass sheets, dust in the beams. It is
-      chosen over 3D and every other 2D style tried. The prototype is
-      `src/app/proto/_components/Lysbrudd.tsx`, previewed at `/proto/lysbrudd`
-      and to be refined into a production component. Next: workshop the
-      page's content and structure from the PO's candidate list
-      (`working-docs/front-page-candidates.md`). Findings, decisions and what
-      was tried: `working-docs/front-page-and-nav.md`.
+- [ ] **Engraving scene (part of "just crowned"):** a front-page scene for
+      the days after a final, where the new champion's name is engraved into
+      the trophy (Jakob, 2026-10-14). Probably a different trophy treatment
+      from the everyday hero. Tabled until the rest of `/` is built.
+- [ ] **Front page (/):** decided and wireframed; see
+      `working-docs/front-page-and-nav.md`.
+  - [x] **Content and structure decided** (2026-10-22): four mutually
+        exclusive site states (upcoming / live / just crowned / dormant), each
+        setting the fold and one state slot (upcoming: what is on the line;
+        just crowned: what last season changed); under it the record of the
+        day, a roll of honour and one row of archive totals. The fold: trophy
+        right with a side block in dormant (what GG is), live (link, later a
+        live table) and just crowned (the champion, unless the engraving
+        scene takes the width); trophy centred with a countdown across it in
+        upcoming.
+  - [ ] **Copy: "what GG is"** (Jakob), the dormant fold's side block.
+  - [~] **Wireframe** at `/` (2026-10-22), for Jakob's approval: labelled
+    placeholder blocks over the prototype hero, with a state switcher
+    (`?tilstand=`). The site state itself is real: `src/lib/site-state.ts`
+    (`deriveSiteState`: live > upcoming > just crowned, 42 days from the
+    last `end` > dormant). `/` no longer redirects to the current season.
+  - [ ] **Build**, in order: roll of honour + totals → record of the day →
+        the countdown base → what changed and what is on the line together.
+  - [ ] **Trophy hero — DEFERRED, a fair amount of work:** the prototype
+        (`src/app/proto/_components/TrophyHero.tsx`, at `/proto/trofe`) is a
+        backlit trophy in fog with the page grid as a room (back wall
+        folding into a perspective floor). To do: how it shows the four
+        states (Jakob leans toward red all the time, varying intensity),
+        layout and phone size, performance, a reduced-motion/no-WebGL
+        poster, dust on or off. The list is in the working doc.
+  - [ ] **"Just crowned" window in the admin panel** (later; 6 weeks
+        hard-coded until then).
 - [x] ~~**The Hall (/):**~~ **DROPPED** — absorbed into /records (the all-time
       career leaderboard becomes the headline board there) + the front page
       (champion hero). In a world with front page + player pages + /records, a

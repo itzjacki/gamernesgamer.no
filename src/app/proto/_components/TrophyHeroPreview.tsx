@@ -1,14 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import Lysbrudd, { type LysbruddMode } from './Lysbrudd';
+import TrophyHero, { type TrophyHeroMode } from './TrophyHero';
 
 /*
- * PROTOTYPE — a preview stage for the Lysbrudd hero: full-bleed at hero size,
+ * PROTOTYPE — a preview stage for the trophy hero: full-bleed at hero size,
  * with a small panel to switch the lifecycle state and the dust.
  */
 
-const MODES: [LysbruddMode, string][] = [
+const MODES: [TrophyHeroMode, string][] = [
   ['idle', 'Hvile'],
   ['countdown', 'Nedtelling'],
   ['crowned', 'Kronet'],
@@ -17,8 +17,8 @@ const MODES: [LysbruddMode, string][] = [
 const BUTTON =
   'border-border-accent text-text-muted aria-pressed:border-accent aria-pressed:text-text cursor-pointer border px-1.5 py-1';
 
-export default function LysbruddPreview() {
-  const [mode, setMode] = useState<LysbruddMode>('idle');
+export default function TrophyHeroPreview() {
+  const [mode, setMode] = useState<TrophyHeroMode>('idle');
   const [dust, setDust] = useState(true);
 
   return (
@@ -26,12 +26,12 @@ export default function LysbruddPreview() {
       <section className='relative h-[min(calc(100svh-180px),760px)] min-h-[520px]'>
         {/* The stage bleeds to the viewport edges. */}
         <div className='absolute inset-y-0 right-[calc((100%-100vw)/2)] left-[calc((100%-100vw)/2)]'>
-          <Lysbrudd mode={mode} dust={dust} />
+          <TrophyHero mode={mode} dust={dust} />
         </div>
       </section>
       <div className='border-border bg-bg fixed right-3 bottom-3 z-50 grid gap-1.5 border p-2.5 font-mono text-[10px]'>
         <b className='text-text-muted font-normal uppercase'>
-          Prototype · Lysbrudd
+          Prototype · Trofé
         </b>
         <div className='flex gap-1'>
           {MODES.map(([m, label]) => (
