@@ -34,7 +34,8 @@ export default function RootLayout({ children }: Props) {
         />
       </head>
       <body className='bg-bg text-text font-sans'>
-        {/* Blueprint grid — scrolls with page, centered on viewport.
+        {/* Blueprint grid — scrolls with the page, centred horizontally and
+            anchored to the top so the header's bottom (168px) is a grid line.
             Container: 880px = 22 × 40px. Content: 800px = 20 × 40px. */}
         <div className='relative min-h-screen'>
           <div
@@ -45,7 +46,7 @@ export default function RootLayout({ children }: Props) {
               backgroundImage:
                 'linear-gradient(rgba(232,216,216,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(232,216,216,0.04) 1px, transparent 1px)',
               backgroundSize: '40px 40px',
-              backgroundPosition: 'calc(50% + 20px) calc(50% + 20px)',
+              backgroundPosition: 'calc(50% + 20px) 8px',
             }}
           />
           <div className='relative mx-auto w-full max-w-220 px-4 sm:px-6 lg:px-10'>

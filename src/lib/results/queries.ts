@@ -21,6 +21,11 @@ import type {
   PairSummary,
 } from './view-models';
 import { allPlayers } from '../players/roster';
+import { deriveArchiveTotals } from './derive/totals';
+import type { ArchiveTotals } from './view-models';
+import { diffRecords } from './derive/records/changes';
+import type { SeasonChanges } from './view-models';
+import { seasonData } from '@/data/sesong';
 
 /**
  * Public read API. Pages call these and nothing else in the module.
@@ -119,6 +124,53 @@ export async function getSeasonChampions(): Promise<SeasonChampion[]> {
       champion: view.standings.find((row) => row.isChampion)?.player ?? null,
     };
   });
+}
+
+/**
+ * The front page's archive totals: crowned seasons, games with confirmed
+ * results, decided head-to-head matches and power-up/curse uses, across every
+ * season. Never null — all zeros without results. Throws on a real fetch error.
+ */
+export async function getArchiveTotals(): Promise<ArchiveTotals> {
+  const bundles = await fetchAllSeasonBundles();
+  return deriveArchiveTotals(bundles.map(assembleSeasonView));
+}
+
+/**
+ * The front page's just-crowned block: what the latest finished season (by
+ * `meta.status`) changed in the all-time records. Derives the records twice,
+ * over every season before it and over every season up to it, and diffs them.
+ *
+ * `minCrownGames` is the consumer's ranking minimum for category crowns
+ * (`MIN_RANKED_GAMES`); it is passed in so the rule stays on the consuming side.
+ *
+ * Null when no season is finished, or when the finished one has no earlier
+ * season with results to compare against. Throws on a real fetch error.
+ */
+export async function getSeasonChanges({
+  minCrownGames,
+}: {
+  minCrownGames: number;
+}): Promise<SeasonChanges | null> {
+  const bundles = await fetchAllSeasonBundles();
+  const finished = Object.entries(seasonData)
+    .filter(([, season]) => season.meta.status === 'finished')
+    .map(([slug]) => Number(slug))
+    .filter((n) => bundles.some((b) => b.season.number === n));
+  if (finished.length === 0) return null;
+
+  const latest = Math.max(...finished);
+  const upTo = (last: number) =>
+    composeRecordsView(
+      assembleAllCareers(bundles.filter((b) => b.season.number <= last)),
+    );
+
+  const before = upTo(latest - 1);
+  const after = upTo(latest);
+  const season = after.seasons.find((s) => s.seasonNumber === latest);
+  if (!season || before.seasons.length === 0) return null;
+
+  return { season, ...diffRecords(before, after, { minCrownGames }) };
 }
 
 /**

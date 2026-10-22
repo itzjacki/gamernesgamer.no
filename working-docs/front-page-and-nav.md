@@ -1,9 +1,9 @@
 # Front page + site navigation
 
-Status (2026-10-22): **the header is built; the front page's content and
-structure are decided; a wireframe is live at `/`** for Jakob's review (see
-"Next"). Earlier explorations and the full candidate list are in git history
-(`ae9e801`, and this doc and `front-page-candidates.md` before 2026-10-22).
+Status (2026-10-23): **the header is built; the front page is built except
+"what is on the line"** and is in review at `/` (see "Next"). Earlier
+explorations and the full candidate list are in git history (`ae9e801`, and
+this doc and `front-page-candidates.md` before 2026-10-22).
 
 ## Decisions
 
@@ -35,12 +35,12 @@ the trophy stands and what sits beside or on it) and one **state slot**
 under the fold; the rest of the page is fixed. No other timelines or
 per-block windows.
 
-| State        | Trophy (desktop)                                 | Beside / on the trophy                                                                                                                   | State slot               |
-| ------------ | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
-| Dormant      | right                                            | left: what GG is (standing content, Jakob's copy)                                                                                        | empty (no filler)        |
-| Live         | right                                            | left: a link to the live season page; later (Phase 5) a live table                                                                       | empty                    |
-| Upcoming     | centred                                          | a countdown across the trophy (ideally in the scene, at least in front); under it the reveal counts, linking to the upcoming season page | what is on the line      |
-| Just crowned | the engraving scene, full width; or trophy right | if not full width, left: the champion (their season card art + content about the win)                                                    | what last season changed |
+| State        | Trophy (desktop)                                 | Beside / on the trophy                                                                                                                  | State slot               |
+| ------------ | ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| Dormant      | right                                            | left: "Gamernes Gamer" in big bold type, nothing else (the page's h1)                                                                   | empty (no filler)        |
+| Live         | right                                            | left: a bordered block linking to the live season page; later (Phase 5) a live table                                                    | empty                    |
+| Upcoming     | centred                                          | the countdown straight on the trophy (bold white numerals, no box); under it a bordered row of reveal counts linking to the season page | what is on the line      |
+| Just crowned | the engraving scene, full width; or trophy right | if not full width, left: the champion's image with a solid footer (name, season, points, titles); one link to their career page         | what last season changed |
 
 On phones the trophy is always centred and the side block follows it.
 
@@ -57,26 +57,28 @@ Derived by `deriveSiteState` in `src/lib/site-state.ts`.
 ## The page, top to bottom
 
 1. **The fold:** the trophy hero with its side block or countdown (see the
-   table). Outside just crowned, the champion is not named in the fold; the
-   header readout already does that.
-2. **The state slot.** Its top edge peeks about one grid cell above the fold.
-   A one-row minimum when it has little to say.
+   table). UI on the hero follows design.md, "On the hero" (no faded edges;
+   bold type straight on the scene, or ordinary bordered elements). Outside
+   just crowned the champion is not named in the fold; the header readout
+   does that.
+2. **The state slot.** Its top edge peeks above the fold.
    - _What is on the line_ (upcoming): active streaks held by players on the
      coming roster, records within reach, title counts that could tie. Needs a
      current-streak derivation and Jakob's rules for "within reach".
-   - _What last season changed_ (just crowned): records broken or newly tied,
-     movement on the all-time board, new category crowns. Diffs
-     `deriveRecords` over all seasons but the last against all of them.
-3. **Record of the day:** one record plate, the same for everyone that day,
-   in its own frame with a date stamp and the door to `/records#<id>` beside
-   it. The only rotating block; if it goes stale, widen its pool rather than
-   add a block.
-4. **Roll of honour:** season number + champion, newest first, set like an
-   engraving, not like navigation (no thumbnails, dates, LEDs or key
-   styling; no row for an upcoming season). The only place on `/` that says
-   who has won the trophy.
-5. **Archive totals:** one small mono row closing the roll (seasons, games,
-   matches, power-ups fired).
+   - _What last season changed_ (just crowned): only records the season beat
+     (the figure got better, not just changed hands) or improved; career
+     totals only when they change hands. Diffs `deriveRecords` over all
+     seasons but the last against all of them.
+3. **The same in every state**, at the bottom, each row its own section:
+   - **Record of the day | Content of the day.** One record plate, the same
+     for everyone that day, with the door to `/records#<id>`; the only
+     rotating record. Content of the day is a placeholder for a rotating
+     piece of tournament content (an image or clip with a caption).
+   - **Players | Seasons.** Small versions of the two index lists: a small
+     picture and the name (players) or season number + champion (seasons),
+     one link per row, and a link to the index. No other stats.
+   - **Stats row:** seasons, games, matches, power-ups fired, on one line
+     (2×2 on phones).
 
 Design notes:
 
@@ -140,8 +142,12 @@ Lessons that still apply:
 
 ## Next
 
-1. **Jakob reviews the wireframe at `/`** (`?tilstand=` previews each state).
-2. **Build the blocks**, in order: roll of honour + totals → record of the
-   day → the countdown base → what changed and what is on the line together
-   (they share the records work).
-3. **The trophy hero** (the deferred work above), then the engraving scene.
+1. **Jakob reviews `/`** in all four states (`?tilstand=` previews each).
+2. **What is on the line:** Jakob's "within reach" rules (proposal in
+   TODO.md, "Where we left off"), then build it.
+3. **Content of the day:** decide what it rotates and its source.
+4. **Open design points:** the champion photo crop; accent text contrast
+   (site-wide).
+5. **Copy** for every bracketed placeholder (Jakob).
+6. **Remove the wireframe switcher** and `?tilstand=`.
+7. **The trophy hero** (the deferred work above), then the engraving scene.

@@ -151,10 +151,27 @@ the site header and structured season dates are built. Copy is reviewed
 everywhere except the season index and the header (both flagged
 `TODO(copy)`).
 
-**Where we left off (2026-10-22): the front page's content and structure are
-decided, and a wireframe is live at `/`** for Jakob's review. Next: build the
-blocks; the trophy hero's refinement is deferred until after. Everything
-about it is in `working-docs/front-page-and-nav.md`.
+**Where we left off (2026-10-23): the front page is built except one block,
+awaiting Jakob's review at `/`** (`?tilstand=upcoming|live|justCrowned|dormant`
+previews each state). Immediate next steps:
+
+1. **Jakob reviews `/`** in all four states, desktop and phone.
+2. **What is on the line** (the upcoming state's slot): Jakob decides the
+   "within reach" rules, then build it (needs a current-streak derivation).
+   Proposal: an active streak by a player on the coming roster counts if it
+   is at least half the record or within 3 of it; count records (game wins,
+   titles) if someone is within 2 of the holder or one win from tying a
+   title count; rates and averages left out.
+3. **Content of the day:** decide what it rotates and where the content
+   comes from.
+4. **Open design points:** the champion photo crop (the footer cuts it at
+   the chin); accent text contrast (`--color-accent` is 4.23:1 on `bg`, so
+   small red figures miss AA site-wide).
+5. **Copy:** every front-page label is a bracketed `TODO(copy)` placeholder.
+6. Then remove the wireframe switcher and `?tilstand=`, and later the trophy
+   hero work (deferred; list in the working doc).
+
+Everything about the front page is in `working-docs/front-page-and-nav.md`.
 
 ### Build order (post-planning 2026-10-07)
 
@@ -185,8 +202,8 @@ pages + /records) and the **title/genre layer**.
    page and /records. See the must-have item below.
 7. **Site navigation** — BUILT (2026-10-14/15): `SiteHeader`, the
    two-tier header (see the must-have item below), plus the season index
-   (2026-10-17). **Front page** — NEXT: content and structure decided and wireframed
-   at `/` (2026-10-22); the blocks are next. See
+   (2026-10-17). **Front page** — NEXT: built except "what is on the line"
+   (2026-10-23); in review. See
    `working-docs/front-page-and-nav.md`.
 8. **Season-page feature expansion** — end of Phase 4, after the other stats/content
    pages (see must-have item below).
@@ -426,25 +443,33 @@ pages + /records) and the **title/genre layer**.
       the days after a final, where the new champion's name is engraved into
       the trophy (Jakob, 2026-10-14). Probably a different trophy treatment
       from the everyday hero. Tabled until the rest of `/` is built.
-- [ ] **Front page (/):** decided and wireframed; see
-      `working-docs/front-page-and-nav.md`.
-  - [x] **Content and structure decided** (2026-10-22): four mutually
-        exclusive site states (upcoming / live / just crowned / dormant), each
-        setting the fold and one state slot (upcoming: what is on the line;
-        just crowned: what last season changed); under it the record of the
-        day, a roll of honour and one row of archive totals. The fold: trophy
-        right with a side block in dormant (what GG is), live (link, later a
-        live table) and just crowned (the champion, unless the engraving
-        scene takes the width); trophy centred with a countdown across it in
-        upcoming.
-  - [ ] **Copy: "what GG is"** (Jakob), the dormant fold's side block.
-  - [~] **Wireframe** at `/` (2026-10-22), for Jakob's approval: labelled
-    placeholder blocks over the prototype hero, with a state switcher
-    (`?tilstand=`). The site state itself is real: `src/lib/site-state.ts`
-    (`deriveSiteState`: live > upcoming > just crowned, 42 days from the
-    last `end` > dormant). `/` no longer redirects to the current season.
-  - [ ] **Build**, in order: roll of honour + totals → record of the day →
-        the countdown base → what changed and what is on the line together.
+- [ ] **Front page (/):** built except one block; see
+      `working-docs/front-page-and-nav.md` (design rules in design.md, "On
+      the hero"). `/` no longer redirects to the current season.
+  - [x] **Site states** (2026-10-22): `src/lib/site-state.ts`
+        (`deriveSiteState`: live > upcoming > just crowned, 42 days from the
+        last `end` > dormant).
+  - [x] **Built (2026-10-23):** the fold per state (`GgIntro` "Gamernes
+        Gamer", `LiveSideBlock`, `ChampionSideBlock`, `SeasonCountdown` +
+        `SeasonReveals` with `src/lib/upcoming-season.ts`); what last season
+        changed (`SeasonChanges`, `getSeasonChanges`, `diffRecords` in
+        `derive/records/changes.ts`: beaten or improved records only); and,
+        in every state, `RecordOfTheDay` (from the shared plate list
+        `src/lib/record-plates.tsx`, which /records renders from too) +
+        `ContentOfTheDay` (placeholder), `PlayerList` + `SeasonList`, and
+        `ArchiveTotals` (`getArchiveTotals`, `derive/totals.ts`). The hero
+        is static (no pointer movement). The page sits on the 40px grid; the
+        site grid is anchored to the top; `--color-text-muted` is #8a847e
+        (AA). All visible labels are `TODO(copy)` placeholders.
+  - [ ] **What is on the line** (upcoming slot): waiting on Jakob's rules for
+        "within reach".
+  - [ ] **Content of the day:** decide what it rotates (clips, photos, a
+        past game…) and where that content comes from.
+  - [ ] **Remove the wireframe switcher** and `?tilstand=` once every block
+        is real (`/` is rendered per request until then).
+  - [ ] **Accent text contrast:** `--color-accent` is 4.23:1 on `bg`, so
+        small accent figures (14px) miss AA site-wide. Needs a token or size
+        decision.
   - [ ] **Trophy hero — DEFERRED, a fair amount of work:** the prototype
         (`src/app/proto/_components/TrophyHero.tsx`, at `/proto/trofe`) is a
         backlit trophy in fog with the page grid as a room (back wall

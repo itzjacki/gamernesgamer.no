@@ -6,8 +6,9 @@ directory for the current files. What is built vs planned lives in `TODO.md`.
 ```
 src/
   app/                  App Router. Route segments are Norwegian.
-    page.tsx            The front page. TEMPORARY wireframe: labelled placeholder
-                        blocks per site state (`?tilstand=` previews one).
+    page.tsx            The front page, per site state (`src/lib/site-state.ts`).
+                        TEMPORARY: one placeholder block (what is on the
+                        line) and the `?tilstand=` state preview.
     sesong/             Season index; [sesong]/ is the season page and
                         [sesong]/[game]/ the game page.
     spillere/           Player index; [spiller]/ is the career page.
@@ -33,6 +34,10 @@ src/
     season-dates.ts     Display formatting for a season's start/end dates.
     site-state.ts       The site's one state (upcoming / live / just crowned /
                         dormant), derived from season status + dates.
+    upcoming-season.ts  The upcoming season and the day countdown to it.
+    record-plates.tsx   `RECORD_PLATES`, the one list of record plates (id,
+                        label, figure…) keyed by `RecordKey`, shared by
+                        /records and the front page's blocks.
     supabase/           Clients, proxy session helper, generated database.types.ts.
     results/            Results read + derivation layer (see below).
   types/                Shared types.
@@ -57,7 +62,8 @@ Each file has one job; keep the boundaries.
 - `queries.ts` — the public API pages call: `getSeasonView(n)`,
   `getGameView(n, slug)`, `getCareerView(slug)`, `getAllPlayerSlugs()`,
   `getRecordsView()`, `getPairView(a, b)`, `getPairSummaries(slug)`,
-  `getAllPairSlugs()`. Returns `null` for not-found; throws on error. Also
+  `getAllPairSlugs()`, and for the front page `getSeasonChampions()`,
+  `getArchiveTotals()` and `getSeasonChanges()`. Returns `null` for not-found; throws on error. Also
   resolves hero portraits off the filesystem so `compose` stays pure.
 - `fetch.ts` — the IO boundary. `fetchSeasonBundle` and `fetchAllSeasonBundles`.
   Filters `confirmed = true`. Imports no derivation. The bundle also carries
@@ -76,7 +82,12 @@ Each file has one job; keep the boundaries.
   `index.ts` (placement- and season-based records, and the assembly),
   `match-records.ts` (head-to-head matches), `rivalries.ts` (the pair record),
   over shared `helpers.ts`, `rank.ts` and `streaks.ts`. A new record is a
-  function there, a field on `RecordsView`, and a `RecordPlate` on the page.
+  function there, a field on `RecordsView`, and an entry in
+  `RECORD_PLATES` (`src/lib/record-plates.tsx`; TypeScript errors until it
+  has one). `derive/records/changes.ts` (`diffRecords`)
+  compares two `RecordsView`s (all seasons but the last vs all of them) for
+  the front page's "what last season changed". `derive/totals.ts` counts the
+  archive totals.
   `derive/pair.ts` (`derivePair`) describes ONE pair for `/vs` from those same
   joined rows: every figure is over what the two shared (games both played,
   seasons both finished, matches against each other), never over a whole
