@@ -65,7 +65,7 @@ Mono (400) for metadata.
 - Grid lines continue through dividers at the same weight.
 - No shadows. No border radius on grid-aligned components.
 
-## Site header ("Tangenter")
+## Site header
 
 `SiteHeader` (server: data) / `SiteHeaderBar` (client), in the root layout.
 Teenage Engineering instrument grammar on the VERKSTED tokens.

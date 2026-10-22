@@ -10,7 +10,7 @@ import { formatDay } from '@/lib/season-dates';
 import SiteHeaderBar, { type HeaderData } from './SiteHeaderBar';
 
 /**
- * The site header ("Tangenter"): a rail of keys (site nav) over a display row
+ * The site header: a rail of keys (site nav) over a display row
  * that each page's context fills. Server half: assembles the small, static-ish
  * data bundle the bar needs (seasons, champions, players, valid pairs). The
  * bar itself is a client component because it reads the pathname and runs

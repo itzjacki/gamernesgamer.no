@@ -6,7 +6,8 @@ directory for the current files. What is built vs planned lives in `TODO.md`.
 ```
 src/
   app/                  App Router. Route segments are Norwegian.
-    page.tsx            Redirects to the current season.
+    page.tsx            The front page. TEMPORARY wireframe: labelled placeholder
+                        blocks per site state (`?tilstand=` previews one).
     sesong/             Season index; [sesong]/ is the season page and
                         [sesong]/[game]/ the game page.
     spillere/           Player index; [spiller]/ is the career page.
@@ -16,9 +17,10 @@ src/
     admin/              login/ is ungated. Everything under (protected)/ sits
                         behind the allowlist gate in its layout.tsx.
     auth/callback/      OAuth code-exchange. Deliberately outside /admin.
-    proto/lysbrudd/     TEMPORARY: the chosen front-page hero prototype
-                        (noindex, unlinked). Becomes a real component when the
-                        front page is built; see working-docs/front-page-and-nav.md.
+    proto/trofe/        TEMPORARY: the front page's trophy hero prototype
+                        (noindex, unlinked; the wireframe `/` borrows it).
+                        Becomes a real component when the front page is
+                        built; see working-docs/front-page-and-nav.md.
   components/           Shared components and the UI primitives.
   data/sesong/<NN>/     Static season content: meta.ts, gamers.ts, games.ts,
                         power-ups.ts.
@@ -29,6 +31,8 @@ src/
     players/roster.ts   Static cross-season roster and playerSlug().
     tag-ranking.ts      Presentation rule: which tags have enough games to rank.
     season-dates.ts     Display formatting for a season's start/end dates.
+    site-state.ts       The site's one state (upcoming / live / just crowned /
+                        dormant), derived from season status + dates.
     supabase/           Clients, proxy session helper, generated database.types.ts.
     results/            Results read + derivation layer (see below).
   types/                Shared types.
