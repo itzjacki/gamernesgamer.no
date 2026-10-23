@@ -27,10 +27,9 @@ import { MIN_RANKED_GAMES } from '@/lib/tag-ranking';
  * compare against; a quiet season gets one row saying so.
  */
 
-// TODO(copy): placeholder kind labels — Jakob writes these.
 const KIND: Partial<Record<HolderChangeKind, string>> = {
-  taken: '[slått]',
-  improved: '[forbedret]',
+  taken: 'Slått',
+  improved: 'Forbedret',
 };
 
 /** The kinds shown, in row order; within a kind, the diff's order holds. */
@@ -59,10 +58,9 @@ const mono = 'font-mono text-sm tabular-nums';
 function Head() {
   return (
     <li className={`${row} ${eyebrow}`}>
-      {/* TODO(copy): placeholder column labels. */}
-      <span className={`${cell} col-span-2`}>[Rekord]</span>
-      <span className={`${cell} hidden sm:block`}>[Før]</span>
-      <span className={`${cell} hidden sm:block`}>[Etter]</span>
+      <span className={`${cell} col-span-2`}>Rekord</span>
+      <span className={`${cell} hidden sm:block`}>Før</span>
+      <span className={`${cell} hidden sm:block`}>Etter</span>
     </li>
   );
 }
@@ -127,15 +125,13 @@ export default async function SeasonChanges() {
 
   return (
     <section className='flex flex-col gap-6'>
-      {/* TODO(copy): placeholder heading. */}
-      <SectionLabel as='h2'>{`[Hva S${season.seasonNumber} endret]`}</SectionLabel>
+      <SectionLabel as='h2'>{`Rekorder slått i sesong ${season.seasonNumber}`}</SectionLabel>
 
       <ul className='border-border bg-bg divide-border divide-y border'>
         {quiet && (
           <li className={`${row} ${eyebrow} normal-case`}>
-            {/* TODO(copy): placeholder for a season that changed nothing. */}
             <span className={`${cell} col-span-2 sm:col-span-4`}>
-              [Ingen rekorder endret]
+              Ingen rekorder slått
             </span>
           </li>
         )}

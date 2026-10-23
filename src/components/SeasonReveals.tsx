@@ -28,18 +28,17 @@ const LABEL =
 export default function SeasonReveals({ season, data }: Props) {
   const { meta } = data;
 
-  // TODO(copy): the cell labels and the link cue — placeholders.
   const cells = [
     {
-      label: '[Spillere]',
+      label: 'Spillere',
       revealed: meta.revealGamerCards,
       count: data.gamers.length,
     },
-    { label: '[Spill]', revealed: meta.revealGames, count: data.games.length },
+    { label: 'Spill', revealed: meta.revealGames, count: data.games.length },
     ...(data.powerUps
       ? [
           {
-            label: '[Power-ups]',
+            label: 'Power-ups',
             revealed: meta.revealPowerups,
             count: data.powerUps.length,
           },
@@ -57,7 +56,7 @@ export default function SeasonReveals({ season, data }: Props) {
   const cell = (label: string, value: React.ReactNode) => (
     <span
       key={label}
-      className='border-border group-hover:border-accent flex min-w-0 flex-col justify-center gap-1.5 border-r px-2 py-2 transition-colors duration-150 nth-last-2:border-r-0 min-[701px]:gap-1 min-[701px]:px-4 min-[701px]:py-0 min-[701px]:nth-last-2:border-r'
+      className='border-border group-hover:border-accent flex min-w-0 flex-col justify-center gap-1.5 border-l px-2 py-2 transition-colors duration-150 nth-last-2:border-l-0 min-[701px]:gap-1 min-[701px]:px-4 min-[701px]:py-0 min-[701px]:nth-last-2:border-l'
     >
       <span className={LABEL}>{label}</span>
       <span className='font-mono text-xs leading-none font-medium sm:text-sm'>
@@ -71,12 +70,12 @@ export default function SeasonReveals({ season, data }: Props) {
       href={`/sesong/${season}`}
       className={`group border-border bg-bg text-text hover:border-accent focus-visible:outline-accent grid w-full border transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 min-[701px]:h-10 ${columns}`}
     >
+      <span className='group-hover:text-accent border-border group-hover:border-accent col-span-full flex min-h-11 items-center justify-center border-t px-3 font-mono text-[10px] tracking-[0.2em] whitespace-nowrap uppercase transition-colors duration-150 min-[701px]:col-span-1 min-[701px]:min-h-0 min-[701px]:justify-start min-[701px]:border-t-0 min-[701px]:px-4 min-[701px]:text-xs'>
+        Sesong {season}
+      </span>
       {cells.map(({ label, revealed, count }) =>
         cell(label, revealed ? count : '?'),
       )}
-      <span className='group-hover:text-accent border-border group-hover:border-accent col-span-full flex min-h-11 items-center justify-center border-t px-3 font-mono text-[10px] tracking-[0.2em] whitespace-nowrap uppercase transition-colors duration-150 min-[701px]:col-span-1 min-[701px]:min-h-0 min-[701px]:justify-start min-[701px]:border-t-0 min-[701px]:px-4 min-[701px]:text-xs'>
-        [Sesong {season}]
-      </span>
     </Link>
   );
 }

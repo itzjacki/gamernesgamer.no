@@ -6,7 +6,6 @@ import Heading from '@/components/Heading';
 import SeasonRoster from '@/components/SeasonRoster';
 import type { SeasonEntry } from '@/components/SeasonRoster';
 
-// TODO(copy): page title and heading lines.
 export const metadata: Metadata = {
   title: 'Sesonger',
 };
@@ -47,7 +46,11 @@ export default async function SeasonsIndexPage() {
   return (
     <>
       <section className='flex flex-col gap-4 pt-8'>
-        <Heading as='h1' aboveLine='GG - Alle sesonger' belowLine='Sesonger'>
+        <Heading
+          as='h1'
+          aboveLine='GG - Alle sesonger'
+          belowLine={`S${entries.at(-1)?.number}-S${entries[0].number}`}
+        >
           Sesonger
         </Heading>
       </section>

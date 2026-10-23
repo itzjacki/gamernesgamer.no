@@ -15,19 +15,17 @@ import SectionLabel from './SectionLabel';
 export default async function ArchiveTotals() {
   const totals = await getArchiveTotals();
 
-  // TODO(copy): all four labels — placeholders.
   const cells = [
-    { label: '[Sesonger]', value: totals.seasons },
-    { label: '[Spill]', value: totals.games },
-    { label: '[Kamper]', value: totals.matches },
-    { label: '[Power-ups]', value: totals.powerUpsFired },
+    { label: 'Sesonger', value: totals.seasons },
+    { label: 'Spill', value: totals.games },
+    { label: 'Matcher spilt', value: totals.matches },
+    { label: 'Power-ups brukt', value: totals.powerUpsFired },
   ];
 
   return (
     <section aria-labelledby='i-tall' className='flex flex-col gap-6'>
       <SectionLabel as='h2'>
-        {/* TODO(copy): the row's heading. */}
-        <span id='i-tall'>[I tall]</span>
+        <span id='i-tall'>Gjennom tidene</span>
       </SectionLabel>
 
       {/* The frame's border closes the outer edges; each cell draws only the

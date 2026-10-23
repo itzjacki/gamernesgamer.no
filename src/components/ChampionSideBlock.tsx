@@ -66,7 +66,6 @@ async function findCrowned(season?: Season) {
   return null;
 }
 
-// TODO(copy): the eyebrow and the figure labels — placeholders.
 export default async function ChampionSideBlock({ season }: Props) {
   const crowned = await findCrowned(season);
   if (!crowned) return null;
@@ -98,7 +97,7 @@ export default async function ChampionSideBlock({ season }: Props) {
   return (
     <Link
       href={`/spillere/${champion.player.slug}`}
-      className='group border-border bg-bg hover:border-accent focus-visible:outline-accent flex w-full flex-col border transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2'
+      className='group border-border bg-bg hover:border-accent focus-visible:outline-accent flex w-full max-w-2xs flex-col border transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2'
     >
       {image && (
         <img
@@ -112,8 +111,7 @@ export default async function ChampionSideBlock({ season }: Props) {
         className={`border-border group-hover:border-accent flex flex-col gap-4 px-4 py-4 transition-colors duration-150 sm:px-6 ${image ? 'border-t' : ''}`}
       >
         <p className={`${MONO} text-text-muted flex items-center gap-2`}>
-          <span aria-hidden className='bg-accent size-1.5' />
-          [Ny mester] · [Sesong {slug}]
+          Vinner · Sesong {slug}
         </p>
         <div className='flex items-end justify-between gap-4'>
           <div className='min-w-0'>
@@ -122,8 +120,7 @@ export default async function ChampionSideBlock({ season }: Props) {
             </Heading>
           </div>
           <dl className='flex shrink-0 gap-5'>
-            {figure('[Poeng]', champion.totalPoints)}
-            {figure('[Titler]', titles)}
+            {figure('Poeng', champion.totalPoints)}
           </dl>
         </div>
       </div>

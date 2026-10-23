@@ -146,9 +146,7 @@ export default async function HomePage({ searchParams }: Props) {
     // The home page keeps its own stack, three grid cells between blocks,
     // so the layout's <main> gap never applies here.
     <div className='flex flex-col gap-20 min-[701px]:gap-30'>
-      {/* TODO(copy): the page heading — placeholder. Dormant's GgIntro is
-          the visible h1 instead. */}
-      {state !== 'dormant' && <h1 className='sr-only'>[Gamernes Gamer]</h1>}
+      {state !== 'dormant' && <h1 className='sr-only'>Gamernes Gamer</h1>}
 
       {/* The hero's breakpoint is 700px: above it the trophy stands right
           (or centred in upcoming) and the side block sits to its left;

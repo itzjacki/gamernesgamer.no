@@ -65,8 +65,7 @@ export default async function SeasonList() {
       className='flex flex-col gap-6 sm:row-span-2 sm:grid sm:grid-rows-subgrid'
     >
       <SectionLabel as='h2'>
-        {/* TODO(copy): the list's heading. */}
-        <span id='sesonger'>[Sesonger]</span>
+        <span id='sesonger'>Sesonger</span>
       </SectionLabel>
 
       <div
@@ -94,13 +93,7 @@ export default async function SeasonList() {
                   )}
                 </span>
                 <span className='text-text-muted group-hover:text-text font-mono text-sm tabular-nums transition-colors duration-150'>
-                  <span className='sr-only'>Sesong </span>
-                  {slug}
-                </span>
-                <span
-                  className={`${champion ? 'text-accent' : 'text-text-muted'} min-w-0 truncate text-base underline-offset-2 group-hover:underline`}
-                >
-                  {champion ?? '–'}
+                  Sesong {slug}
                 </span>
               </Link>
             </li>
@@ -112,8 +105,7 @@ export default async function SeasonList() {
           className='group focus-visible:outline-accent flex h-12 shrink-0 items-center px-5 font-mono text-xs tracking-widest uppercase focus-visible:outline-2 focus-visible:-outline-offset-2'
         >
           <span className='text-text group-hover:text-accent underline underline-offset-4 transition-colors duration-150'>
-            {/* TODO(copy): the door's text. */}
-            [Alle sesonger]
+            Alle sesonger
           </span>
         </Link>
       </div>

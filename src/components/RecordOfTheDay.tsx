@@ -41,8 +41,7 @@ export default async function RecordOfTheDay() {
       className='flex flex-col gap-6 sm:row-span-2 sm:grid sm:grid-rows-subgrid'
     >
       <SectionLabel as='h2'>
-        {/* TODO(copy): the block's label. */}
-        <span id='dagens-rekord'>[Dagens rekord]</span>
+        <span id='dagens-rekord'>Dagens rekord</span>
       </SectionLabel>
 
       <div className='border-border bg-bg grid grid-rows-[1fr_auto] border sm:min-h-80'>
@@ -56,8 +55,7 @@ export default async function RecordOfTheDay() {
           className='group border-border focus-visible:outline-accent flex h-12 items-center border-t px-5 font-mono text-xs tracking-widest uppercase focus-visible:outline-2 focus-visible:-outline-offset-2'
         >
           <span className='text-text group-hover:text-accent underline underline-offset-4 transition-colors duration-150'>
-            {/* TODO(copy): the door's text. */}
-            [Til rekorden]
+            Gå til rekord
           </span>
         </Link>
       </div>
