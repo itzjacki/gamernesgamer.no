@@ -25,30 +25,12 @@ import { deriveRecords } from './derive/records';
 import { derivePair } from './derive/pair';
 
 /**
- * PURE. No IO, no async, no React. Joins the DB-derived view-models
- * (slugs/names/placements/points) to the STATIC season content in
- * src/data/sesong (game title/thumbnail/chosenBy, gamer nickname/image).
- *
- * Why a separate step (not in derive/, not in fetch): derive/ is unit-tested
- * against DB fixtures and must not import the static TS data; fetch/ is IO.
- * compose is the one seam where the two halves meet — DB results on one side,
- * git-reviewed static content on the other — joined by the shared slug (games)
- * and name (players). Pages call this when they need both; a page that only
- * needs raw results can still use the plain view-models.
- *
- * Join keys:
- *  - game:   view-model `slug` === static Game.slug (the seed uses the static
- *            slug as game.slug by construction, so these always correspond).
- *  - player: PlayerRef.name === static Gamer.name (the static Gamer type has no
- *            slug; name is its identity within a season roster).
- *  - season: view-model `seasonSlug` (zero-padded, e.g. "02") === seasonData key.
- *
- * A missing static match is a real bug (every seeded game/player must have
- * static content), so the resolvers throw rather than silently drop — the same
- * fail-loud stance as derive/players.requireRef.
+ * PURE. The one seam where DB results meet static src/data/sesong content;
+ * derive/ must not import static data. Join keys: game slug, player NAME (the
+ * static Gamer has no slug), and seasonSlug === seasonData key. A missing
+ * static match is a bug, so the resolvers throw rather than drop.
  */
 
-/** A season standing row enriched with the player's static gamer content. */
 export interface ComposedStandingRow {
   player: PlayerRef;
   gamer: Gamer;
@@ -58,30 +40,20 @@ export interface ComposedStandingRow {
   note: string | null;
 }
 
-/** A game summary enriched with its static game content. */
 export interface ComposedGameSummary {
   game: Game;
   ordinal: number;
-  /** Placement/points rows, each with power-up uses joined to static content. */
   results: ComposedGamePlacementRow[];
 }
 
-/**
- * A single power-up use with its static display content joined in by slug.
- * `name`/`description` come from src/data/sesong/<NN>/power-ups.ts; the rest is
- * carried through from the view-model's PowerUpUseEntry.
- */
 export interface ComposedPowerUpUse {
   slug: string;
   isCurse: boolean;
   pointsDelta: number;
-  /** Display name from static content (e.g. "Double Up"). */
   name: string;
-  /** Static description — available for a richer popover/tooltip if wanted. */
   description: string;
 }
 
-/** A game-placement row with its power-up uses joined to static content. */
 export interface ComposedGamePlacementRow {
   player: PlayerRef;
   placement: number;
@@ -92,7 +64,6 @@ export interface ComposedGamePlacementRow {
   note: string | null;
 }
 
-/** SeasonView joined to static content: gamer cards + game cards resolvable. */
 export interface ComposedSeasonView {
   seasonNumber: number;
   seasonSlug: string;
@@ -100,7 +71,6 @@ export interface ComposedSeasonView {
   games: ComposedGameSummary[];
 }
 
-/** GameView joined to its static game content. */
 export interface ComposedGameView {
   seasonNumber: number;
   seasonSlug: string;
@@ -109,7 +79,6 @@ export interface ComposedGameView {
   results: ComposedGamePlacementRow[];
 }
 
-/** Resolve a season's static content block or throw (unknown season = bug). */
 function seasonContent(seasonSlug: string) {
   if (!isSeason(seasonSlug)) {
     throw new Error(
@@ -119,14 +88,12 @@ function seasonContent(seasonSlug: string) {
   return seasonData[seasonSlug];
 }
 
-/** Build a slug→Game map for one season's static games. */
 function gameBySlug(games: readonly Game[]): Map<string, Game> {
   const map = new Map<string, Game>();
   for (const g of games) map.set(g.slug, g);
   return map;
 }
 
-/** Build a name→Gamer map for one season's static gamers. */
 function gamerByName(gamers: readonly Gamer[]): Map<string, Gamer> {
   const map = new Map<string, Gamer>();
   for (const g of gamers) map.set(g.name, g);
@@ -143,10 +110,7 @@ function requireGame(map: Map<string, Game>, slug: string): Game {
   return game;
 }
 
-/**
- * Every tag a game instance carries: its title's genre tags (or the instance's
- * own, when it overrides them) plus the instance's format tags.
- */
+/** The instance's genre tags override its title's; format tags are added. */
 function gameTags(game: Game): Tag[] {
   return [
     ...(game.genreTags ?? titles[game.titleId].genreTags),
@@ -164,12 +128,7 @@ function requireGamer(map: Map<string, Gamer>, name: string): Gamer {
   return gamer;
 }
 
-/**
- * Build a slug→PowerUp map for one season's static power-ups AND curses merged
- * (both are `power_up` rows in the DB). Slugs are unique within a season (DB
- * enforces `UNIQUE (season_id, slug)`). A season with no power-ups file (S1)
- * yields an empty map, which is fine — such a season has no uses to resolve.
- */
+/** Power-ups AND curses merged — both are `power_up` rows in the DB. */
 function powerUpBySlug(content: SeasonData): Map<string, PowerUp> {
   const map = new Map<string, PowerUp>();
   for (const pu of content.powerUps ?? []) map.set(pu.slug, pu);
@@ -187,7 +146,6 @@ function requirePowerUp(map: Map<string, PowerUp>, slug: string): PowerUp {
   return powerUp;
 }
 
-/** Join a view-model game-placement row's power-up uses to static content. */
 function composeResults(
   results: GamePlacementRow[],
   powerUps: Map<string, PowerUp>,
@@ -212,7 +170,6 @@ function composeResults(
   }));
 }
 
-/** Join a full SeasonView to its static season content. */
 export function composeSeasonView(view: SeasonView): ComposedSeasonView {
   const content = seasonContent(view.seasonSlug);
   const games = gameBySlug(content.games);
@@ -238,7 +195,6 @@ export function composeSeasonView(view: SeasonView): ComposedSeasonView {
   };
 }
 
-/** Join a single GameView to its static game content. */
 export function composeGameView(view: GameView): ComposedGameView {
   const content = seasonContent(view.seasonSlug);
   const game = requireGame(gameBySlug(content.games), view.slug);
@@ -258,18 +214,10 @@ export function composeGameView(view: GameView): ComposedGameView {
 /* -------------------------------------------------------------------------- */
 
 /**
- * Join a CareerStats (pure, DB-derived) to static src/data/sesong content:
- *  - the FIFA-card gallery: each season's gamer nickname/image/stats (per-season),
- *  - the hero nameplate: the LATEST season's nickname + card art (the dedicated
- *    hero portrait, if any, is resolved separately in queries.ts via the
- *    filesystem — compose stays pure/IO-free and sets the card-art fallback),
- *  - game-gold trophy labels: the static game title per game slug.
- *
- * Fail-loud on any missing static match, same stance as the season composer:
- * every seeded season/game must have static content.
+ * The hero uses the latest season's card art; a dedicated portrait, if any,
+ * is swapped in by queries.ts so compose stays IO-free.
  */
 export function composeCareerView(stats: CareerStats): CareerView {
-  // One card per season played, ascending — resolve each season's gamer by name.
   const cards: CareerCard[] = stats.seasons.map((row) => {
     const content = seasonContent(row.seasonSlug);
     const gamer = requireGamer(gamerByName(content.gamers), stats.name);
@@ -282,7 +230,6 @@ export function composeCareerView(stats: CareerStats): CareerView {
     };
   });
 
-  // Hero = latest season (cards are season-ascending, so the last one).
   const latest = cards[cards.length - 1];
 
   const trophies: CareerTrophyView[] = stats.trophies.map((t) => {
@@ -331,15 +278,8 @@ export function composeCareerView(stats: CareerStats): CareerView {
 /* Records (all players, cross-season)                                        */
 /* -------------------------------------------------------------------------- */
 
-/**
- * Join every player's CareerStats to the static facts the records need — game
- * title, the cross-season title it belongs to, its tags, and who chose it.
- * Shared by the records and the pair views, so both read the same rows. Same
- * fail-loud stance as the other composers.
- */
+/** Shared by the records and the pair views, so both read the same rows. */
 function recordsInputs(careers: CareerStats[]): RecordsPlayerInput[] {
-  // One game index per season, built on first use — every game and match row
-  // of every player looks its game up here.
   const indexes = new Map<string, Map<string, Game>>();
   const gameOf = (row: { seasonSlug: string; gameSlug: string }) => {
     let index = indexes.get(row.seasonSlug);
@@ -376,7 +316,6 @@ function recordsInputs(careers: CareerStats[]): RecordsPlayerInput[] {
   }));
 }
 
-/** Join every player's career to static content, then derive the records. */
 export function composeRecordsView(careers: CareerStats[]): RecordsView {
   return deriveRecords(recordsInputs(careers));
 }
@@ -386,13 +325,9 @@ export function composeRecordsView(careers: CareerStats[]): RecordsView {
 /* -------------------------------------------------------------------------- */
 
 /**
- * The /vs view for `slugA` against `slugB`, in that order (the first is side
- * `a`). Joins the pair derivation to each player's latest nickname and card
- * art (the dedicated hero portrait, if any, is resolved in queries.ts — compose
- * stays IO-free).
- *
- * Null when either slug is unknown, the two are the same player, or they have
- * never shared a game.
+ * `slugA` is side `a`. Uses the latest card art; queries.ts swaps in a hero
+ * portrait. Null when either slug is unknown, they are the same player, or
+ * they never shared a game.
  */
 export function composePairView(
   careers: CareerStats[],
@@ -408,7 +343,6 @@ export function composePairView(
   if (!stats) return null;
 
   const side = (input: RecordsPlayerInput) => {
-    // Latest season played (rows are season-ascending, so the last one).
     const latest = input.seasons[input.seasons.length - 1];
     const gamer = requireGamer(
       gamerByName(seasonContent(latest.seasonSlug).gamers),
@@ -424,12 +358,7 @@ export function composePairView(
   return { ...stats, a: side(a), b: side(b) };
 }
 
-/**
- * One line per opponent for a player's career page: who finished ahead over
- * their shared games, and their match record. Ordered by opponent name; an
- * opponent the player never shared a game with is left out. Empty when the
- * slug is unknown.
- */
+/** Opponents never shared a game with are left out. Empty for an unknown slug. */
 export function composePairSummaries(
   careers: CareerStats[],
   slug: string,

@@ -17,7 +17,8 @@ timing sheets (monospace data, hairline rules, density without noise).
 ## Tokens
 
 Values live in `src/styles/global.css` under `@theme`. Use the tokens, never raw
-hex. All colours are solid — no transparency, because overlapping translucent
+hex (one exception: the season trophies' real gold, silver and bronze). All
+colours are solid — no transparency, because overlapping translucent
 borders double up.
 
 | Token                   | Role                           |
@@ -34,18 +35,51 @@ borders double up.
 **Accent at rest:** leaderboard rank 1, champion callouts, record-holder
 figures on /records, the gamer-card diagonal. Everything else earns accent on
 interaction. Rank-1 data may take it freely; it doesn't need rationing to one
-mark per page.
-
-On a two-player page (/vs) "ahead of the other" is not rank-1 data: never
-accent the leader of a stat, or a one-sided pairing paints one side red. The
-relation is shown by position (a needle on a gauge) or by weight (the
-placement that finished ahead in plain text colour, the other muted).
+mark per page. (A /records wall without accent was tried and read flat.) A
+category's best is a maximum, not rank-1 data: the category tables carry no
+accent at rest.
 
 Rule of thumb for any page: every screenful should carry some accent. Where
 there is no rank-1 datum to spend it on, put it on the instrument rather than
-on a person — on /vs that is the masthead diagonal and every gauge needle,
-alongside the real rank-1 data (season wins, moment figures, game wins in the
-popovers).
+on a person.
+
+On the player index the accent at rest is the rank mark on EVERY plate, a
+consistent rhythm rather than a prize. (Tried and dropped: accent only on the
+leader's mark, which left almost no red; on title counts above zero; on the
+diagonal.)
+
+## Two-player pages (/vs)
+
+"Ahead of the other" is not rank-1 data: never accent the leader of a stat, or
+a one-sided pairing paints one side red.
+
+- **One reading on a shared axis, never two columns.** Both figures share a
+  colour and weight; a needle on a hairline gauge leans toward whoever has
+  more (centre when level). Every gauge shows its needle whatever the sample:
+  a bare axis reads as a bug. Counts, never percentages.
+- **Weight, not colour, for who finished ahead:** that placement in plain
+  text colour, the other muted; level games leave both muted. A game win is
+  not told apart from any other game finished ahead.
+- **Accent goes on the instrument:** the masthead diagonal, every gauge
+  needle, season wins in the seasons table, the best-season figures (tried
+  neutral: the page read too flat). Never a red "1" in the /vs popovers.
+- Both best-season plates always show; a side with none gets a muted dash.
+- Tried and dropped: per-game ticks above/below a line with height for the
+  placement gap (hard to read).
+
+## Portraits
+
+Greyscale at rest so photos from different seasons read as one set; hover or
+focus brings back the photo's own colour. (An accent duotone on hover was
+tried on /vs and dropped.) No portraits on the /records boards and plates:
+one player holding several plates would repeat the same face, and identity is
+the roster's and the hero's job.
+
+## Career page
+
+The ledger is an instrument panel with large mono figures. A plain
+label-left/value-right `StatList` was tried and read flat next to the trophy
+shelf and cards.
 
 **Type:** Neue Montreal (self-hosted) for display (800) and body (400); Martian
 Mono (400) for metadata.
@@ -117,36 +151,20 @@ Teenage Engineering instrument grammar on the VERKSTED tokens.
     arrow icon, like a flight search's from/to; no animation), then GÅ. On /vs
     pages this picker is itself the readout. It is the site's ONE pair
     picker: there is no /vs index, and pages do not grow their own pickers.
-- **The display glitches, it doesn't slide.** Every change glitches in over
-  what the display shows, like a signal switching:
-  - **The frames:** for ~220ms the new frame arrives in torn horizontal
-    slices, each nudged 1–3px sideways, with the old frame showing through the
-    gaps and a faint 1px translucent white tear jumping between rows. Hard
-    stepped frames, never eased, and kept deliberately small.
-  - **Switching and closing:** switching choosers glitches the new one in over
-    the old, and closing glitches the readout back.
-  - **Reduced motion:** instant.
-  - **History:** a soft eased reveal was tried first and was too smooth to
-    notice.
+- **The display glitches, it doesn't slide.** Every change (switching
+  choosers, closing back to the readout) glitches in over what the display
+  shows, like a signal switching: brief torn horizontal slices, hard stepped
+  frames, never eased, kept deliberately small. Reduced motion: instant. (A
+  soft eased reveal was tried first and was too smooth to notice.)
 - **Pixel mark.** The logo is Jakob's 32 × 32 pixel drawing
-  (`public/images/branding/logo-pixel.png`), drawn as SVG squares in
-  `currentColor` (`PixelLogo`), always 1:1 (32px) at every breakpoint. It is
-  treated as a tiny screen:
-  - **Bloom:** a faint bloom of the mark's own colour (an SVG blur under the
-    sharp pixels, never a coloured glow).
-  - **Rest:** still, with no idle flicker.
-  - **Hover:** a 260ms signal-glitch burst (thin row bands jolting 1–2px).
-    The turn to accent is delayed ~110ms with a 60ms fade so it lands on the
-    burst's crux.
-  - **Tournament state:** it can carry it (a pulse while upcoming, a blink
-    while live).
-  - **Don't generate it:** sampled and hand-traced pixel or dot-matrix
-    versions of the trophy were unrecognisable.
-- **Sizes.** The rail is 56px on phones and 64px from `sm` (640px) up. Key
-  labels are large (12px, widest tracking) from `sm` up and shrink only below
-  it. The display goes the other way: its values, keys, selects and padding
-  are a step smaller on phones (12px values, 24px keys, 112px selects), so a
-  readout or the VS picker fits a 375px screen, and full size from `sm` up.
+  (`public/images/branding/logo-pixel.png`), drawn as SVG squares
+  (`PixelLogo`), always 1:1. It is treated as a tiny screen: a faint bloom of
+  its own colour (never a coloured glow), still at rest, a short
+  signal-glitch burst on hover, and a pulse while upcoming / blink while
+  live. Don't generate it: sampled and hand-traced pixel or dot-matrix
+  versions of the trophy were unrecognisable.
+- **Phones:** the display is a step smaller so a readout or the VS picker
+  fits a 375px screen; key labels shrink only below `sm`.
 
 ## Interaction states
 
@@ -157,6 +175,7 @@ Teenage Engineering instrument grammar on the VERKSTED tokens.
 - Link: underlined at rest, accent on hover.
 - Focus: 2px solid accent outline, 2px offset.
 - Table rows: no hover state.
+- No spinners on actions that navigate away (e.g. Google sign-in).
 - Detail on demand: a number or word with more behind it is a native-popover
   trigger marked with a dotted underline. There is ONE popover on the site,
   the `Popover` primitive, and one list inside it, `RecordLines`; both are
@@ -165,6 +184,15 @@ Teenage Engineering instrument grammar on the VERKSTED tokens.
   stylesheet — give `Popover` a new `tone` if a trigger needs a new look.
   Prefer a popover to a `<details>` row when the detail is supplementary; keep
   `<details>` for folding away more of the same list (`UnrankedRows`).
+
+## Admin
+
+A timing sheet, not a KPI dashboard: label left, mono figure right, hairlines
+between, no accent on figures. Dates as plain `YYYY-MM-DD`. The dashboard owns
+the page's one heading; panels take a mono eyebrow. The bordered `Button` is
+for forward actions; a destructive one is a muted mono text button that turns
+accent on hover/focus, and accent elsewhere is reserved for stop signals
+("Ingen tilgang").
 
 ## Anti-slop rules
 

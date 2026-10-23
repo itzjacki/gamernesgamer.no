@@ -14,15 +14,8 @@ import { gameKey, groupBy, seasonRef } from './records/helpers';
 import { longestStreak } from './records/streaks';
 
 /**
- * PURE. Everything /vs says about one pair, from the same per-player rows the
- * records read (game and match rows with title, tags and own-pick flag already
- * joined in compose). Every figure is over what the two shared: games both
- * played, seasons both finished, matches against each other.
- *
- * Nothing is normalised across seasons: the counts are of placements (who
- * finished ahead), and the only points figure is a margin WITHIN one season.
- *
- * Returns null when the two never shared a game (or are the same player).
+ * PURE. Nothing is normalised across seasons: the counts are of placements,
+ * and the only points figure is a margin WITHIN one season.
  */
 export function derivePair(
   a: RecordsPlayerInput,
@@ -80,7 +73,7 @@ export function derivePair(
   };
 }
 
-/** Every game both played, in the first player's play order. */
+/** In the first player's play order. */
 function sharedGames(a: RecordsPlayerInput, b: RecordsPlayerInput): PairGame[] {
   const theirs = new Map(b.games.map((g) => [gameKey(g), g]));
   return a.games.flatMap((mine): PairGame[] => {
@@ -102,7 +95,6 @@ function sharedGames(a: RecordsPlayerInput, b: RecordsPlayerInput): PairGame[] {
   });
 }
 
-/** Who finished ahead over `games`; equal placements count as level. */
 function tally(games: PairGame[]): PairTally {
   return {
     a: games.filter((g) => g.a < g.b).length,
@@ -112,7 +104,6 @@ function tally(games: PairGame[]): PairTally {
   };
 }
 
-/** One row per season both have a final standing in, ascending. */
 function sharedSeasons(
   a: RecordsPlayerInput,
   b: RecordsPlayerInput,
@@ -141,7 +132,6 @@ function sharedSeasons(
   });
 }
 
-/** The two players' matches against each other, in play order. */
 function pairMatches(
   a: RecordsPlayerInput,
   b: RecordsPlayerInput,
@@ -170,14 +160,10 @@ function matchTally(matches: PairMatch[]): PairMatchTally {
   };
 }
 
-/** Who finished ahead in a shared game; null when the two placed level. */
 const aheadIn = (game: PairGame): PairSide | null =>
   game.a === game.b ? null : game.a < game.b ? 'a' : 'b';
 
-/**
- * The unbroken run that ends with the last item: who it belongs to and the
- * items in it. Null when the list is empty or its last item has no side.
- */
+/** The unbroken run ending with the last item; null if that item has no side. */
 function trailingRun<T>(
   items: T[],
   sideOf: (item: T) => PairSide | null,
@@ -190,7 +176,6 @@ function trailingRun<T>(
   return { side, run: items.slice(start) };
 }
 
-/** The unbroken run of match wins that ends with their latest match. */
 function currentMatchRun(
   matches: PairMatch[],
 ): { side: PairSide; matches: PairMatch[] } | null {
@@ -198,7 +183,6 @@ function currentMatchRun(
   return trailing && { side: trailing.side, matches: trailing.run };
 }
 
-/** The unbroken run of games finished ahead that ends with their latest. */
 function currentGameRun(
   games: PairGame[],
 ): { side: PairSide; games: PairGame[] } | null {
@@ -206,10 +190,7 @@ function currentGameRun(
   return trailing && { side: trailing.side, games: trailing.run };
 }
 
-/**
- * One tally per tag over the shared games carrying it, the most level first
- * (smallest gap), then the larger sample, then the tag name for determinism.
- */
+/** Most level first, then the larger sample, then tag name for determinism. */
 function categories(games: PairGame[]): PairCategory[] {
   const byTag = new Map<Tag, PairGame[]>();
   for (const game of games) {
@@ -227,11 +208,7 @@ function categories(games: PairGame[]): PairCategory[] {
     );
 }
 
-/**
- * The season `side` finished ahead in with the largest points margin over the
- * other (the later season when two margins are equal). Null when `side` never
- * finished a season ahead.
- */
+/** Largest points margin among seasons `side` finished ahead in; later wins ties. */
 function bestSeason(seasons: PairSeason[], side: PairSide): PairSeason | null {
   const other: PairSide = side === 'a' ? 'b' : 'a';
   const margin = (s: PairSeason) => s[side].totalPoints - s[other].totalPoints;

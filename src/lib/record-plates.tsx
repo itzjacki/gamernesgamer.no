@@ -6,17 +6,13 @@ import type {
 import type { Props as RecordPlateProps } from '@/components/RecordPlate';
 import RecordLines from '@/components/RecordLines';
 
-/**
- * Every record plate on the /records wall, as data: the groups in page order,
- * each with its plates in order. /records renders all of them; the front
- * page's record of the day picks one. A new record is a plate here.
- */
+/** A new record is a plate here; /records and the front page both read it. */
 export interface RecordPlateGroup {
   label: string;
   plates: RecordPlateProps[];
 }
 
-/** "S1–S4" for a run of seasons, or just "S3" when it is one. */
+/** "S1–S4", or "S3" for a single season. */
 function seasonSpan(numbers: number[]) {
   const first = Math.min(...numbers);
   const last = Math.max(...numbers);
@@ -24,19 +20,15 @@ function seasonSpan(numbers: number[]) {
 }
 
 const count = (entry: RecordEntry) => String(entry.value);
-/** A points delta with its sign, using a real minus (U+2212). */
+/** Uses a real minus (U+2212). */
 const signed = (n: number) =>
   n > 0 ? `+${n}` : n < 0 ? `−${Math.abs(n)}` : '0';
-/** `value` as a share of `outOf`, as a whole percentage. */
 const rate = (entry: RecordEntry) =>
   `${Math.round((entry.value / (entry.outOf || 1)) * 100)}%`;
 
-/*
- * What sits behind each record's number, as rows for the plate's popover.
- * (Records about plain games use RecordPlate's default list.)
- */
+// Popover rows behind each record's number. Records about plain games use
+// RecordPlate's default list.
 
-/** Match records: per game, how many of its matches counted. */
 const matchLines = (entry: RecordEntry) => (
   <RecordLines
     lines={(entry.matchLines ?? []).map((line) => ({
@@ -55,7 +47,6 @@ const matchLines = (entry: RecordEntry) => (
   />
 );
 
-/** Opponent streak: each match in the run, with its score. */
 const matchList = (entry: RecordEntry) => (
   <RecordLines
     lines={(entry.matches ?? []).map((match, index) => ({
@@ -67,7 +58,6 @@ const matchList = (entry: RecordEntry) => (
   />
 );
 
-/** Total points: the total per season. */
 const seasonPointLines = (entry: RecordEntry) => (
   <RecordLines
     lines={(entry.seasonPoints ?? []).map((line) => ({
@@ -78,7 +68,6 @@ const seasonPointLines = (entry: RecordEntry) => (
   />
 );
 
-/** Power-up points: the signed delta per game. */
 const powerUpLines = (entry: RecordEntry) => (
   <RecordLines
     lines={entry.games.map((game) => ({
@@ -90,7 +79,6 @@ const powerUpLines = (entry: RecordEntry) => (
   />
 );
 
-/** Closest rivalry: the pair's split per season. */
 const rivalryLines = (entry: RecordEntry) => (
   <RecordLines
     lines={(entry.pair?.seasons ?? []).map((line) => ({
@@ -101,7 +89,6 @@ const rivalryLines = (entry: RecordEntry) => (
   />
 );
 
-/** Tiebreaker games: each one, won or lost, against whom. */
 const tiebreakLines = (entry: RecordEntry) => (
   <RecordLines
     lines={(entry.tiebreaks ?? []).map((t) => ({
@@ -112,11 +99,7 @@ const tiebreakLines = (entry: RecordEntry) => (
   />
 );
 
-/**
- * What a plate is apart from the data: everything but its entries and its
- * scope stamp. `group` is the wall section it sits in; `scope` says whether
- * the stamp covers all seasons or only the holder's games.
- */
+/** `scope`: whether the stamp covers all seasons or only the holder's games. */
 export interface RecordPlateDefinition extends Omit<
   RecordPlateProps,
   'scope' | 'entries'
@@ -126,10 +109,8 @@ export interface RecordPlateDefinition extends Omit<
 }
 
 /**
- * Every record's plate, keyed by its `RecordsView` field, in wall order (the
- * groups follow the order they first appear in). Typed against `RecordKey`, so
- * a record without a plate is a type error. The front page's season changes
- * read ids, labels and figures from here too.
+ * In wall order; groups follow the order they first appear in. Typed against
+ * `RecordKey`, so a record without a plate is a type error.
  */
 export const RECORD_PLATES: Record<RecordKey, RecordPlateDefinition> = {
   mostGameWins: {
@@ -353,7 +334,6 @@ export const RECORD_PLATES: Record<RecordKey, RecordPlateDefinition> = {
 
 export function recordPlateGroups(records: RecordsView): RecordPlateGroup[] {
   const allSeasons = seasonSpan(records.seasons.map((s) => s.seasonNumber));
-  /** The scope stamp for a record that is about particular games. */
   const gameScope = (entries: RecordEntry[]) => {
     const holder = entries.find((e) => e.rank === 1);
     return holder && holder.games.length > 0

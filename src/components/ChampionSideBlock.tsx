@@ -6,32 +6,18 @@ import { seasonData, type Season } from '@/data/sesong';
 import { getCareerView, getSeasonView } from '@/lib/results/queries';
 import Heading from './Heading';
 
-/**
- * Beside the trophy in the just-crowned state (under it on phones): the new
- * champion of the latest finished season. The block is their picture (their
- * season card art) with a solid footer under it (design.md, "On the hero"):
- * `bg-bg` with `border`, holding a mono eyebrow with a steady LED and the
- * season, their name, and the two figures that matter — season points and
- * titles now held, both rank-1 data so accent. Nothing else. The whole block
- * is ONE link to their career page; the border takes the accent on hover.
- *
- * With no picture (S1 has no art of its own) the footer stands alone.
- *
- * Self-contained: fetches its own data. Renders nothing until a finished
- * season has a champion.
- */
+/** Renders nothing until a finished season has a champion. */
 
 interface Props {
   /**
-   * The season to show. Defaults to the latest finished season with a
-   * champion; the page may pass a stand-in to preview.
+   * Defaults to the latest finished season with a champion; the page may pass
+   * a stand-in to preview.
    */
   season?: Season;
 }
 
 const MONO = 'font-mono text-[10px] tracking-[0.2em] uppercase sm:text-xs';
 
-/** Finished seasons, newest first. */
 function finishedSeasons(): Season[] {
   return (Object.keys(seasonData) as Season[])
     .filter((slug) => seasonData[slug].meta.status === 'finished')
@@ -40,11 +26,8 @@ function finishedSeasons(): Season[] {
 }
 
 /**
- * The champion's picture for that season: a dedicated cutout at
- * public/images/champions/<NN>.png when present, else their card art from
- * that season. Card art for season N lives under /images/gamers/<N>/; a
- * season whose gamers point elsewhere (S1 reuses S2's art) has none of its
- * own, so it gets no picture.
+ * A dedicated cutout when present, else that season's own card art. A season
+ * whose gamers point at another season's art (S1 reuses S2's) gets no picture.
  */
 function findChampionImage(season: Season, cardPath?: string): string | null {
   const exists = (rel: string) =>
@@ -84,7 +67,7 @@ export default async function ChampionSideBlock({ season }: Props) {
   );
   const image = findChampionImage(slug, card?.imagePath);
 
-  // Label over value, the figure in accent: both are rank-1 data.
+  // Accent: rank-1 data.
   const figure = (label: string, value: number) => (
     <div className='flex flex-col items-end gap-1'>
       <dt className={`${MONO} text-text-muted whitespace-nowrap`}>{label}</dt>

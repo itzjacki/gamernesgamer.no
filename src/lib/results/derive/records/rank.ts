@@ -1,13 +1,11 @@
 import type { RecordEntry } from '../../view-models';
 
-/** A record line before it has been ranked against the others. */
 export type UnrankedEntry = Omit<RecordEntry, 'rank'>;
 
 /**
- * PURE. Sorts best first by `compare` and assigns 1-based ranks. Entries that
- * `compare` calls equal SHARE a rank (1, 1, 3) — a tie stays a tie rather than
- * being settled by a key the reader can't see. Within a tie the order is by
- * player name, only so the output is deterministic.
+ * Entries `compare` calls equal SHARE a rank (1, 1, 3) — a tie is never settled
+ * by a key the reader can't see. Name order within a tie is only for
+ * determinism.
  */
 export function rankEntries(
   entries: UnrankedEntry[],
@@ -26,15 +24,13 @@ export function rankEntries(
   return ranked;
 }
 
-/** Higher `value` first — the ordering of every plain count record. */
 export const byValueDesc = (a: UnrankedEntry, b: UnrankedEntry) =>
   b.value - a.value;
 
-/** `value` as a share of `outOf`, higher first; then the larger sample. */
+/** Rate (`value` / `outOf`), then the larger sample. */
 export const byRateDesc = (a: UnrankedEntry, b: UnrankedEntry) =>
   b.value / (b.outOf || 1) - a.value / (a.outOf || 1) ||
   (b.outOf ?? 0) - (a.outOf ?? 0);
 
-/** Count records name who did something, not who didn't: drop the zeros. */
 export const withoutZeros = (entries: UnrankedEntry[]) =>
   entries.filter((e) => e.value > 0);

@@ -7,10 +7,8 @@ import { gameKey, seasonRef } from './helpers';
 import { rankEntries, type UnrankedEntry } from './rank';
 
 /**
- * PURE. Closest rivalry: for every pair, the games one finished ahead of the other
- * and the reverse, over the games both played. One entry per pair, the most
- * level first; pairs with the same gap share a rank. `player` is whoever is
- * ahead (the first by name when level).
+ * PURE. Closest rivalry, one entry per pair over the games both played.
+ * `player` is whoever is ahead (the first by name when level).
  */
 export function rivalries(players: RecordsPlayerInput[]): RecordEntry[] {
   const entries: UnrankedEntry[] = [];
@@ -50,7 +48,6 @@ export function rivalries(players: RecordsPlayerInput[]): RecordEntry[] {
       }
       if (first + second === 0) continue;
 
-      // Lead with whoever is ahead; `a` precedes `b` by name when level.
       const flip =
         second > first ||
         (second === first && b.player.name.localeCompare(a.player.name) < 0);

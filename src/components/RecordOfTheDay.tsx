@@ -6,22 +6,8 @@ import RecordPlate from './RecordPlate';
 import SectionLabel from './SectionLabel';
 
 /**
- * The front page's record of the day: one plate from the /records wall, the
- * same for everyone on a given Norwegian calendar day. The days step through
- * the plates in wall order and wrap, so every record gets its day; a record
- * nobody holds yet is left out of the rotation. The day itself is not shown.
- *
- * Opens with its label over the frame, like a /records section. On the front
- * page it shares a row with ContentOfTheDay from `sm` up, each taking half
- * the width, so the plate stands at its /records wall width. Inside the
- * frame: the plate, then the door to the plate on /records as one full-width
- * 48px cell, level with the caption cell beside it.
- *
- * From `sm` up the frame is at least eight grid cells tall; the plate
- * stretches to fill it (its figure and runners-up sit at its foot), and the
- * parent grid equalises it with the content of the day's frame.
- *
- * Picked on the server per request, so there is nothing to hydrate.
+ * One /records plate per Norwegian calendar day, the same for everyone. The
+ * days step through the held records in wall order and wrap.
  */
 
 export default async function RecordOfTheDay() {

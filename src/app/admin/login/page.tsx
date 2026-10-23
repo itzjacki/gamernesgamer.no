@@ -8,7 +8,6 @@ export const metadata: Metadata = {
 };
 
 interface Props {
-  // Next 16: searchParams is a Promise and must be awaited.
   searchParams: Promise<{ error?: string }>;
 }
 

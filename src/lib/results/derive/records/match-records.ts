@@ -9,23 +9,15 @@ import { gameKey, groupBy } from './helpers';
 import { byRateDesc, byValueDesc, rankEntries, withoutZeros } from './rank';
 import { longestStreak } from './streaks';
 
-/**
- * PURE. The records built on head-to-head MATCHES (as opposed to a game's final
- * placements): win rate, sweeps, deciders, finals, flawless tournaments and the
- * longest run over one opponent. Matches arrive decided and in play order (see
- * `derive/matches.ts`), with the game's title already joined.
- */
+/* PURE. Matches arrive decided and in play order (see `derive/matches.ts`). */
 
-/** Series that went the distance, before a player has a deciding-game record. */
 const MIN_DECIDERS = 3;
-/** Finals reached before a player has a finals record. */
 const MIN_FINALS = 3;
-/** Matches a player must have played in a game for it to count as flawless. */
+/** A lone final is not a tournament. */
 const MIN_FLAWLESS_MATCHES = 3;
 /** Final slots, least to most decisive: a reset grand final settles the game. */
 const FINAL_SLOTS = ['F', 'GF', 'GF2'];
 
-/** One line per game for a set of matches: how many of them `hits`. */
 function linesPerGame(
   pool: RecordMatchRow[],
   hits: (match: RecordMatchRow) => boolean,
@@ -40,12 +32,7 @@ function linesPerGame(
   }));
 }
 
-/**
- * A share-of-matches record: among the matches `select` picks (`outOf`), how
- * many `hits` (`value`). Ranked on the rate, then the larger sample. Players
- * with fewer than `minimum` selected matches are left out. `matchLines` breaks
- * it down per game.
- */
+/** Among the matches `select` picks (`outOf`), how many `hits` (`value`). */
 function matchRate(
   players: RecordsPlayerInput[],
   select: (matches: RecordMatchRow[]) => RecordMatchRow[],
@@ -69,9 +56,8 @@ function matchRate(
 }
 
 /**
- * The match that settled each final a player reached: one per game. A final is
- * slot `F`; in a double elimination it is the grand final, and when that was
- * reset (`GF2`) the reset is the match that counts.
+ * One per game. In a double elimination the final is the grand final, and when
+ * that was reset (`GF2`) the reset is the match that counts.
  */
 function decidingFinals(matches: RecordMatchRow[]): RecordMatchRow[] {
   const byGame = new Map<string, RecordMatchRow>();
@@ -87,11 +73,6 @@ function decidingFinals(matches: RecordMatchRow[]): RecordMatchRow[] {
   return [...byGame.values()];
 }
 
-/**
- * Head-to-head games in which the player won every match they played, given at
- * least MIN_FLAWLESS_MATCHES of them (a lone final is not a tournament). Ranked
- * on the count; ties share the rank.
- */
 function flawlessGames(players: RecordsPlayerInput[]): RecordEntry[] {
   const entries = players.map(({ player, matches }) => {
     const flawless = linesPerGame(matches, (m) => m.won).filter(
@@ -107,11 +88,7 @@ function flawlessGames(players: RecordsPlayerInput[]): RecordEntry[] {
   return rankEntries(withoutZeros(entries), byValueDesc);
 }
 
-/**
- * Each player's longest run of consecutive match wins over one opponent.
- * Matches arrive in play order (season, game, stage, leg), which is exactly
- * the order one pair met in. Between two equally long runs the later one wins.
- */
+/** Between two equally long runs the later one wins. */
 function opponentStreak(players: RecordsPlayerInput[]): RecordEntry[] {
   const entries = players.flatMap(({ player, matches }) => {
     const opponents = groupBy(matches, (m) => m.opponent.slug);

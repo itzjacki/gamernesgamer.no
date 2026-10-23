@@ -3,23 +3,13 @@
 import { useEffect, useRef } from 'react';
 
 /*
- * PROTOTYPE — the front page's trophy hero (see working-docs/front-page-and-nav.md).
- * Kept as the starting point for refinement; not yet production code.
- *
- * The trophy is backlit: a light hidden behind it breaks through its
- * cut-outs into a fog. The site grid is a PHYSICAL part of that scene, as a
- * room: above the trophy's foot it is the page grid itself, a back wall in
- * register with the rest of the page; at the foot it folds into a floor that
- * runs toward the viewer in perspective, lit where the light spills onto it.
- * The scene is static: nothing follows the pointer. Optional dust motes
- * drift through the scene and show only where they cross a beam, so the light
- * reads as a volume.
- *
- * One fragment shader, raw WebGL, no library. The trophy silhouette comes from
- * `public/images/branding/trophy.svg`, rasterised into a mask texture.
+ * PROTOTYPE — not yet production code (working-docs/front-page-and-nav.md).
+ * A backlit trophy in raw WebGL. Above the trophy's foot the shader draws the
+ * page grid in register with the site grid; below it the grid folds into a
+ * perspective floor.
  */
 
-/** Lifecycle states the scene reacts to: dimmed while counting down, accent-red when a champion is crowned. */
+/** Dimmed while counting down, accent-red when crowned. */
 export type TrophyHeroMode = 'idle' | 'countdown' | 'crowned';
 
 /** Where the trophy stands on desktop; phones always centre it. */
@@ -48,8 +38,7 @@ const FS = `#extension GL_OES_standard_derivatives : enable
   float m(vec2 q){ return texture2D(mask, q).r; }
   float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 
-  // God rays: march from this pixel toward the light; open samples near the
-  // source add light. Fades toward the canvas edges so it never ends in a seam.
+  // God rays. Fades toward the canvas edges so it never ends in a seam.
   float march(){
     vec2 d = light - uv;
     float acc = 0.0, w = 1.0;
@@ -70,7 +59,6 @@ const FS = `#extension GL_OES_standard_derivatives : enable
     return mod(v, 40.0) < max(fwidth(v), 1e-4) * px ? 1.0 : 0.0;
   }
 
-  // Dust motes: one per random cell, drifting up with a slow wobble.
   float motes(vec2 css, float cell, float speed, float seed){
     vec2 q = css + vec2(sin(t * 0.25 + seed) * 6.0, t * speed);
     vec2 id = floor(q / cell);
@@ -94,19 +82,15 @@ const FS = `#extension GL_OES_standard_derivatives : enable
 
     vec3 col = BG + tint * haze * 0.06;
     if (css.y < fold) {
-      // The back wall: the page grid itself, lit where the beams reach it.
       col = mix(col, GRIDC, onGrid * clamp(0.04 + rays * 0.14, 0.0, 0.16));
     } else {
-      // The floor: the wall's grid folded toward the viewer. s is 1 at the
-      // fold and falls toward the bottom; columns spread from the vanishing
-      // point, rows open up as they come closer.
+      // Floor: s is 1 at the fold and falls toward the bottom.
       vec2 vp = centre;
       float s = (fold - vp.y) / (css.y - vp.y);
       float fx = vp.x + (css.x - vp.x) * s;
       float fz = (fold - vp.y) * (1.0 - s);
       float fl = max(gridLine(fx + 40000.0, 1.0), gridLine(fz + 40000.0, 1.0));
-      // Light pools on the floor around the trophy's foot and fades with
-      // distance; the floor hands back to the flat page grid at the edge.
+      // The floor hands back to the flat page grid at the bottom edge.
       float pool = exp(-length(vec2(fx - centre.x, fz * 2.2)) / 260.0);
       float edge = 1.0 - smoothstep(0.55, 1.0, (css.y - fold) / max(bottom - fold, 1.0));
       vec3 lit = mix(GRIDC, tint, 0.35);
@@ -115,7 +99,6 @@ const FS = `#extension GL_OES_standard_derivatives : enable
       col = mix(col, GRIDC, onGrid * (1.0 - edge) * 0.04);
     }
 
-    // The trophy: a dark surface with a rim where the light grazes it.
     col = mix(col, vec3(0.055, 0.058, 0.062), inside);
     col += tint * rim * (0.08 + power * 0.45);
 
@@ -126,7 +109,6 @@ const FS = `#extension GL_OES_standard_derivatives : enable
       col += tint * (d1 * 0.35 + d2 * 0.5) * lit;
     }
 
-    // A whisper of grain.
     col += (fract(sin(dot(gl_FragCoord.xy + t, vec2(12.9898, 78.233))) * 43758.5453) - 0.5) * 0.014;
     gl_FragColor = vec4(col, 1.0);
   }`;
@@ -179,14 +161,13 @@ export default function TrophyHero({
     let ready = false;
     let dpr = 1;
     let originCss = { x: 0, y: 0 };
-    // Trophy box in canvas px.
+    // Canvas px.
     let box = { x: 0, y: 0, w: 1, h: 1 };
 
     function layout() {
       const w = canvas.width;
       const h = canvas.height;
       const mobile = innerWidth <= 700;
-      // The trophy stands three quarters down, leaving the floor room to run.
       const th = h * (mobile ? 0.56 : 0.62);
       const tw = th * (935 / 1080);
       const cx = mobile || live.current.align === 'centre' ? w / 2 : w * 0.66;
@@ -267,7 +248,6 @@ export default function TrophyHero({
       const { mode: m, align: al, dust: du } = live.current;
       if (al !== laidOutAlign) resize();
       const sec = (now - t0) / 1000;
-      // On load the light rises into place behind the trophy, then drifts.
       const rise = reduce ? 1 : ease(sec / 3);
       const ph = reduce ? 0.6 : sec * 0.12;
       const cx = (box.x + box.w / 2) / canvas.width;

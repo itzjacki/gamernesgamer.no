@@ -1,39 +1,20 @@
 import Link from 'next/link';
 
-/**
- * One row of the standings table. Structurally this is the subset of
- * ComposedStandingRow the table needs, kept local so the primitive doesn't
- * depend on the results layer's types (it's reused on player/records pages,
- * which assemble rows differently).
- */
+/** Kept local so the primitive doesn't depend on the results layer's types. */
 export interface StandingsRow {
-  /** Final placement (1 = champion). */
   placement: number;
-  /** Display name. */
   name: string;
-  /** Player slug for the /spillere link (omit the link if undefined). */
+  /** Without it the name is not a link. */
   slug?: string;
-  /** Derived total points. */
   totalPoints: number;
-  /** True for the champion row — earns the single accent. */
   isChampion: boolean;
 }
 
 interface Props {
   rows: StandingsRow[];
-  /** mono column header for the points column (e.g. "POENG"). */
   pointsLabel?: string;
 }
 
-/**
- * The VERKSTED standings table: a motorsport timing sheet. Martian Mono for all
- * numeric/metadata cells, hairline rules between rows, no row hover, no radius,
- * no shadow — a solid `bg-bg` surface that masks the blueprint grid. The single
- * accent (#E8334A) is spent ONLY on the champion's position marker, so P1 reads
- * as the one highlighted datum on the sheet.
- *
- * Reusable: season final standings, and later player-page / records tables.
- */
 export default function StandingsTable({ rows, pointsLabel = 'POENG' }: Props) {
   return (
     <table className='border-border bg-bg w-full border-collapse border text-left'>

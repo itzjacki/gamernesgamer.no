@@ -22,28 +22,17 @@ import {
 import { rivalries } from './rivalries';
 import { longestStreak } from './streaks';
 
-/**
- * PURE. Every record on /records, from all players' careers. No IO, and no
- * static data: each game row arrives with its title, tags and own-pick flag
- * already joined (compose does that), the same arrangement as `deriveTagStats`.
- *
- * Placements are read, never re-derived. Every record is a best-first list
- * with shared ranks (see `rankEntries`). Count records drop players whose count
- * is zero — a record names who did something, not who didn't.
- *
- * This file holds the records built on game placements and season totals, and
- * assembles the view. The match records live in `match-records.ts`, the pair
- * record in `rivalries.ts`.
+/*
+ * PURE. Static facts arrive already joined by compose. Count records drop
+ * players whose count is zero — a record names who did something, not who
+ * didn't.
  */
 
-/** A title must have been played this often before it can have a specialist. */
 const MIN_TITLE_GAMES = 2;
-
-/** Own picks before a home advantage means anything. */
 const MIN_OWN_PICKS = 4;
-/** Seasons played before a first- or last-game average means anything. */
 const MIN_EDGE_SEASONS = 3;
-/** Wins among the games `counts` selects; `outOf` is how many it selected. */
+
+/** `outOf` is how many games `counts` selected. */
 function winCount(
   players: RecordsPlayerInput[],
   counts: (game: RecordGameRow) => boolean,
@@ -68,9 +57,8 @@ function streak(
 }
 
 /**
- * Each player's best single season: the lowest average game placement (compared
- * at the two decimals it is shown with), then more game wins, then the earlier
- * season. Players are then ranked against each other on the same two keys.
+ * Lowest average game placement (compared at the two decimals it is shown
+ * with), then more game wins, then the earlier season.
  */
 function bestSeason(players: RecordsPlayerInput[]): RecordEntry[] {
   const compare = (a: UnrankedEntry, b: UnrankedEntry) =>
@@ -102,9 +90,8 @@ function bestSeason(players: RecordsPlayerInput[]): RecordEntry[] {
 }
 
 /**
- * Most wins at one title, counting every instance of it (CS:GO and CS2 are one
- * title). Each player enters with their best title: more wins, then fewer games
- * (the better rate), then title name. Ranked on wins, then rate.
+ * Counts every instance of a title (CS:GO and CS2 are one). Each player enters
+ * with their best title: more wins, then fewer games, then title name.
  */
 function titleSpecialist(players: RecordsPlayerInput[]): RecordEntry[] {
   const compare = (a: UnrankedEntry, b: UnrankedEntry) =>
@@ -132,10 +119,8 @@ function titleSpecialist(players: RecordsPlayerInput[]): RecordEntry[] {
 }
 
 /**
- * Points ties that placement had to split: two players with the same season
- * total and different final placements. The better placement won the tiebreak.
- * Ranked on the share of tiebreaks won, then on having been in more of them.
- * Players never part of one are left out.
+ * Two players with the same season total and different final placements: the
+ * better placement won the tiebreak.
  */
 function tiebreaks(players: RecordsPlayerInput[]): RecordEntry[] {
   const entries = players.map(({ player, seasons }) => {
@@ -170,12 +155,7 @@ function tiebreaks(players: RecordsPlayerInput[]): RecordEntry[] {
   );
 }
 
-/**
- * Home advantage: average placement in other people's picks minus the average
- * in one's own — how many places better a player finishes at home. Needs
- * MIN_OWN_PICKS own picks. Compared at the two decimals it is shown with, then
- * on more wins in own picks.
- */
+/** Compared at the two decimals it is shown with, then on more own-pick wins. */
 function homeAdvantage(players: RecordsPlayerInput[]): RecordEntry[] {
   const entries = players.flatMap(({ player, games }) => {
     const own = games.filter((g) => g.ownPick);
@@ -199,18 +179,13 @@ function homeAdvantage(players: RecordsPlayerInput[]): RecordEntry[] {
   );
 }
 
-/**
- * The closer and the opener: average placement in the LAST (or FIRST) game of
- * each season played. Needs MIN_EDGE_SEASONS seasons. Compared at two decimals,
- * then on more wins.
- */
+/** Compared at the two decimals it is shown with, then on more wins. */
 function seasonEdge(
   players: RecordsPlayerInput[],
   edge: 'first' | 'last',
 ): RecordEntry[] {
   const entries = players.flatMap(({ player, games }) => {
-    // Games are in play order: keep the first row seen per season, or let
-    // each later one overwrite it.
+    // Games are in play order: keep the first row per season, or the last.
     const bySeason = new Map<number, RecordGameRow>();
     for (const game of games) {
       if (edge === 'last' || !bySeason.has(game.seasonNumber)) {
@@ -231,14 +206,10 @@ function seasonEdge(
 }
 
 /**
- * Games as all-time wins leader. Walks every game of the archive in play order
- * with a running tally of game wins; after each game the player(s) with the
- * most wins lead. `value` counts the games a player led or shared the lead
- * after, `outOf` those they led alone. Ranked on the count, then the sole
- * count. `games` are the player's own rows for the games they led after.
+ * Walks the whole archive in play order with a running tally of game wins.
+ * `games` are the player's own rows for the games they led after.
  */
 function winsLeader(players: RecordsPlayerInput[]): RecordEntry[] {
-  // Play order across the whole archive: season first, then game ordinal.
   const keyOf = (g: RecordGameRow) => g.seasonNumber * 1000 + g.ordinal;
   const gamesBy = players.map(
     (p) => new Map(p.games.map((g) => [keyOf(g), g])),
@@ -284,9 +255,8 @@ function winsLeader(players: RecordsPlayerInput[]): RecordEntry[] {
 }
 
 /**
- * Raw season points summed over the career. The one place seasons are added
- * up as points rather than placements: ladders differ per season, so this
- * favours the seasons with more points on offer. Asked for as a plain total.
+ * Deliberately raw points, not placements — so it favours the seasons with
+ * larger ladders.
  */
 function totalPoints(players: RecordsPlayerInput[]): RecordEntry[] {
   const entries = players.map(({ player, seasons }) => ({
@@ -303,10 +273,9 @@ function totalPoints(players: RecordsPlayerInput[]): RecordEntry[] {
 }
 
 /**
- * Net power-up points over the career: the sum of every game's power-up delta
- * on the player's OWN score, whoever played the power-up (a curse from someone
- * else counts against them). The net can be negative, so nobody is dropped for
- * a low figure — only players no power-up ever moved are left out.
+ * The delta on the player's OWN score, whoever played the power-up (a curse
+ * from someone else counts against them). Can be negative, so only players no
+ * power-up ever moved are left out.
  */
 function powerUpPoints(players: RecordsPlayerInput[]): RecordEntry[] {
   const entries = players.flatMap(({ player, games }) => {
@@ -325,10 +294,8 @@ function powerUpPoints(players: RecordsPlayerInput[]): RecordEntry[] {
 }
 
 /**
- * One crown per tag: every player's average placement under it, best first.
- * Averages are compared at one decimal (as `deriveTagStats` does), then on more
- * wins. Unfiltered — a tag with a single game is still listed; the consumer
- * decides what is enough to rank. Crowns are ordered by sample size, then tag.
+ * Averages compared at one decimal (as `deriveTagStats` does), then on more
+ * wins. Crowns are ordered by sample size, then tag.
  */
 function tagCrowns(players: RecordsPlayerInput[]): TagCrown[] {
   const byTag = new Map<Tag, UnrankedEntry[]>();

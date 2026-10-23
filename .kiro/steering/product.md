@@ -28,4 +28,4 @@ them for points, and crown a winner.
 - The roster changes between seasons. Never assume a fixed set of players.
 - Power-ups and curses vary per season. Model them per season, not globally.
 
-What is built, planned and cut lives in `TODO.md`.
+What is planned and what was cut lives in `TODO.md`.

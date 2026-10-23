@@ -2,26 +2,13 @@ import Link from 'next/link';
 import type { CareerBoardRow, RecordSeason } from '@/lib/results/view-models';
 
 /**
- * The all-time classification: every player across every season, ordered by
- * summed season placement-points (1st = 4 … 4th = 1). The headline of /records.
- *
- * Shares StandingsTable's timing-sheet grammar (Martian Mono, hairline rules,
- * no row hover, solid bg masking the grid) but is its own table: what sets it
- * apart is the per-season strip showing how each total was built, plus titles
- * and game wins. No portraits — identity is the roster's
- * and the hero's job.
- *
- * Accent at rest is the leader's position marker only (the record plates below
- * spend theirs on each holder's figure). The season strip stays neutral even
- * for a season win, so the sheet carries a single highlighted datum.
- *
- * On narrow screens the season strip drops out; position, name, titles, wins
- * and points remain.
+ * Accent at rest is the leader's position marker only: the season strip stays
+ * neutral even for a season win, so the sheet carries one highlighted datum.
  */
 
 interface Props {
   rows: CareerBoardRow[];
-  /** The seasons the strip covers, aligned with each row's `placements`. */
+  /** Aligned with each row's `placements`. */
   seasons: RecordSeason[];
 }
 

@@ -1,6 +1,6 @@
 interface Props {
   children: React.ReactNode;
-  /** The element to render; a section's label can be its heading. */
+  /** A section's label can be its heading. */
   as?: 'p' | 'h2' | 'h3';
 }
 

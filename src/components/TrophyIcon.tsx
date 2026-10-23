@@ -1,19 +1,10 @@
 import type { TrophyKind } from '@/lib/results/view-models';
 
 /**
- * Trophy artwork, split by tier:
- *  - GG SEASON (gold/silver/bronze): the specific GG trophy (source:
- *    public/images/branding/trophy.svg), inlined here so a single `fill` on the <svg>
- *    can tint it by metal. Inlining — rather than an <img> of the file — is
- *    what lets the fill recolour the whole mark; an <img> can't be recoloured
- *    by CSS. The path data is large, which is exactly why it lives in its own
- *    component instead of cluttering TrophyShelf.
- *  - game-gold: a smaller, simple cup kept on-token (muted) so it stays
- *    visually subordinate to the detailed season trophy.
- *
- * Colour: the GG SEASON trophies deliberately depart from the VERKSTED token
- * palette and use real metallic gold/silver/bronze — a sanctioned exception,
- * because a medal reads as itself only in its own metal.
+ * Season trophies inline public/images/branding/trophy.svg so one `fill` can
+ * tint it; an <img> can't be recoloured. Their metals are a sanctioned
+ * exception to the token palette: a medal reads as itself only in its own
+ * metal.
  */
 const SEASON_METAL: Record<string, string> = {
   'season-gold': '#d9a441',
@@ -23,19 +14,14 @@ const SEASON_METAL: Record<string, string> = {
 
 interface Props {
   kind: TrophyKind;
-  /**
-   * Season trophies only: draw the GG trophy on-token (muted) instead of in
-   * its metal, at a smaller size — a quiet mark rather than a medal (the
-   * reigning-champion mark on the player index).
-   */
+  /** Season trophies only: a smaller on-token mark instead of the metal. */
   muted?: boolean;
 }
 
 export default function TrophyIcon({ kind, muted = false }: Props) {
   const metal = SEASON_METAL[kind];
 
-  // Game-gold: the smaller, simple cup, on-token (muted) so it stays visually
-  // subordinate to the detailed GG season trophy.
+  // Game-gold: muted, so it stays subordinate to the season trophy.
   if (!metal) {
     return (
       <svg
@@ -46,7 +32,6 @@ export default function TrophyIcon({ kind, muted = false }: Props) {
         aria-hidden='true'
         className='text-text-muted'
       >
-        {/* Simple cup: bowl, stem, base. */}
         <path d='M5 3h14v4a7 7 0 0 1-14 0V3Z' />
         <rect x='10.5' y='11' width='3' height='5' />
         <rect x='7' y='16' width='10' height='2.5' />
@@ -54,8 +39,6 @@ export default function TrophyIcon({ kind, muted = false }: Props) {
     );
   }
 
-  // Season trophies: the real GG trophy art, metal-tinted (off-palette,
-  // intentional).
   return (
     <svg
       width={muted ? 20 : 28}

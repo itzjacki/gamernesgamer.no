@@ -1,10 +1,5 @@
-/*
- * SiteHeader — only what Tailwind utilities can't express: the LED blink, the
- * logo's states and hover glitch, and the display's glitch-in transition.
- */
+/* Only what Tailwind utilities can't express. Motion specs: design.md. */
 
-/* ---------- Status LED on a key ---------- */
-/* Lit LED: chooser open (blinks) vs. current section (steady). */
 .ledBlink {
   animation: blink 1s steps(1) infinite;
 }
@@ -14,7 +9,6 @@
   }
 }
 
-/* ---------- Pixel logo ---------- */
 .logo {
   display: block;
   fill: currentColor;
@@ -32,11 +26,8 @@
   }
 }
 
-/* ---------- Logo glitch (hover only) ---------- */
-/* Four thin bands of rows jolt 1–2px in stepped frames, staggered, with a
-   dropout at the crux — a 260ms burst, only on hover. The mark is otherwise
-   still. The turn to accent is timed to land on that crux (a short delay and
-   a tiny fade on the way in; straight back on the way out). */
+/* The turn to accent lands on the burst's crux on the way in, and is instant
+   on the way out. */
 .logoLink {
   transition: color 0s;
 }
@@ -79,12 +70,6 @@
   }
 }
 
-/* ---------- Display: each change glitches in over the last ---------- */
-/* Like a signal switching: for ~220ms the new frame arrives in torn
-   horizontal slices of the 40px row, each nudged a pixel or three sideways,
-   with the old frame showing through the gaps; a faint 1px translucent white
-   tear jumps between rows. Hard stepped frames, never eased. Then the new
-   frame settles and the one underneath is dropped. Kept deliberately small. */
 .glitchIn {
   animation: signal 220ms steps(1, end) both;
 }

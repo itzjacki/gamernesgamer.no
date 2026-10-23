@@ -11,20 +11,15 @@ import { resolvePlayers, requireRef } from './players';
 import { cumulativeSeries } from './series';
 import { matchesByGame } from './matches';
 
-/**
- * PURE. Assembles view-models from a raw SeasonBundle. No IO, no async — this
- * is the function the unit tests exercise against S1 fixtures.
- *
- * First slice: season standings + per-game points matrix. The season placement
- * comes from season_result (authoritative — tiebreakers can override point
- * order); points are derived and display-only.
+/*
+ * PURE. Season placement comes from season_result (authoritative — tiebreakers
+ * can override point order); points are derived and display-only.
  */
 
 function seasonSlug(seasonNumber: number): string {
   return String(seasonNumber).padStart(2, '0');
 }
 
-/** Per-game placement rows (ordered by placement), computed once and reused. */
 function buildGameSummaries(bundle: SeasonBundle): GameSummary[] {
   const refs = resolvePlayers(bundle.roster, bundle.players);
   const ladder = ladderByPlacement(bundle.ladder);
@@ -86,7 +81,6 @@ export function assembleSeasonView(bundle: SeasonBundle): SeasonView {
   const refs = resolvePlayers(bundle.roster, bundle.players);
   const games = buildGameSummaries(bundle);
 
-  // Total season points per player = sum of per-game derived points.
   const totalBySp = new Map<string, number>();
   for (const game of games) {
     for (const row of game.results) {

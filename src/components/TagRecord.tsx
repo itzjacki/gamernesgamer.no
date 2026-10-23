@@ -8,37 +8,14 @@ import { splitRanked } from '@/lib/tag-ranking';
 import type { Tag } from '@/types/tag';
 
 /**
- * What a player is good and bad at: a best/worst headline over the full
- * per-tag breakdown it summarises, in one hairline frame. Genre and format tags
- * are one list here — the split between them is a data-entry detail (which tags
- * follow the title, which follow one season's instance), not something a reader
- * needs.
- *
- * The stats arrive unfiltered and sorted best first. The ranking cutoff is
- * applied here, on the consuming side (owner call — not the data layer's job):
- * a tag needs MIN_RANKED_GAMES games (`@/lib/tag-ranking`, shared with
- * CareerLedger) to be named best or worst. Tags below it are collapsed by default
- * (`UnrankedRows`, shared with TagCrowns), under a caption that states why they
- * are not ranked.
- *
- * Each tag name opens the games behind the row (`GameListPopover`, shared with
- * TagCrowns): title (linking to the game page), season and placement.
- *
- * The unranked rows are a second table (a <details> can't wrap table rows), so
- * both tables use a fixed layout with the same <colgroup> to keep their columns
- * aligned.
- *
- * A checkbox in the frame's footer row leaves out the games the player chose
- * themselves (off by default): people pick what they are good at, which skews the list.
- *
- * No accent at rest: "best of my own categories" is a personal maximum, not
- * champion / rank-1 data. Shares SeasonRecord's table grammar and CareerLedger's
- * `bg-border` + `gap-px` hairline technique.
+ * The stats arrive unfiltered, best first; the ranking cutoff is applied here,
+ * not in the data layer. The checkbox leaves out the player's own game picks,
+ * since people pick what they are good at. No accent at rest: a personal
+ * maximum is not rank-1 data.
  */
 
 interface Props {
   stats: TagStat<Tag>[];
-  /** The same stats with the player's own game picks left out. */
   statsWithoutOwnPicks: TagStat<Tag>[];
 }
 
@@ -51,11 +28,7 @@ const headCell = 'px-2 py-3 text-right font-normal sm:px-3';
 const eyebrowRow =
   'text-text-muted font-mono text-xs tracking-widest uppercase';
 
-/**
- * The headline + tables for one set of stats, as cells of TagRecord's frame.
- * `idPrefix` keeps popover ids unique, since TagRecord renders two of these
- * (see below). `className` carries the show/hide toggle.
- */
+/** `idPrefix` keeps popover ids unique: TagRecord renders two of these. */
 function TagBody({
   stats,
   idPrefix,
@@ -71,11 +44,8 @@ function TagBody({
   const best = ranked[0];
   const worst = ranked[ranked.length - 1];
 
-  /**
-   * One headline cell: eyebrow, the tag as a word, then its figures. The
-   * figures are pushed to the bottom so they line up across the two cells when
-   * one tag name wraps.
-   */
+  // Figures pushed to the bottom line up across the two cells when one tag
+  // name wraps.
   const headline = (label: string, stat: TagStat<Tag>, wide = false) => (
     <div
       className={`bg-bg flex flex-col gap-3 p-5 ${wide ? 'col-span-2' : ''}`}
@@ -121,7 +91,6 @@ function TagBody({
     </tr>
   );
 
-  /** The tag name as a popover trigger, plus the games behind the row. */
   const tagCell = (stat: TagStat<Tag>) => (
     <GameListPopover
       id={`tag-games-${idPrefix}-${stat.tag}`}
@@ -193,12 +162,9 @@ function TagBody({
 }
 
 /**
- * One hairline frame: the stats, then a footer row with the own-picks filter.
- *
- * Both variants are rendered and the checkbox picks which one shows, in CSS
- * alone (`:has(input:checked)`) — no JS, so this stays a Server Component like
- * the popovers and the <details> above. The hidden variant is `display: none`,
- * so it is out of the accessibility tree too.
+ * Both variants are rendered and the checkbox picks one in CSS alone
+ * (`:has(input:checked)`). The hidden one is `display: none`, so it is out of
+ * the accessibility tree too.
  */
 export default function TagRecord({ stats, statsWithoutOwnPicks }: Props) {
   if (stats.length === 0) return null;

@@ -26,14 +26,12 @@ import TrophyHero, {
 } from '@/app/proto/_components/TrophyHero';
 
 /*
- * WIREFRAME — the front page's decided structure as labelled placeholders
- * (working-docs/front-page-and-nav.md). Every block is a stand-in; none of
- * the text is copy. `?tilstand=` previews a state; the switcher and the
- * override go when the real blocks are built.
+ * TEMPORARY wireframe (working-docs/front-page-and-nav.md): unbuilt blocks are
+ * stand-ins and none of their text is copy. The `?tilstand=` override and the
+ * state switcher go when the real blocks are built.
  */
 
 interface Props {
-  // Next 16: searchParams is a Promise and must be awaited.
   searchParams: Promise<{ tilstand?: string }>;
 }
 
@@ -65,7 +63,7 @@ const HERO_ALIGN: Record<SiteState, TrophyHeroAlign> = {
   dormant: 'right',
 };
 
-/** The state slot, the first block under the fold (just crowned's is built: `SeasonChanges`). */
+/** First block under the fold; just crowned's is `SeasonChanges`. */
 const SLOT: Record<SiteState, Block | null> = {
   upcoming: {
     name: 'What is on the line',
@@ -148,15 +146,10 @@ export default async function HomePage({ searchParams }: Props) {
     <div className='flex flex-col gap-20 min-[701px]:gap-30'>
       {state !== 'dormant' && <h1 className='sr-only'>Gamernes Gamer</h1>}
 
-      {/* The hero's breakpoint is 700px: above it the trophy stands right
-          (or centred in upcoming) and the side block sits to its left;
-          below it the trophy is centred and the side block follows it.
-
-          The stage is a whole number of 40px cells: the viewport less the
-          header (168px), one cell of gap and one cell of peek, rounded down,
-          so the first block under it shows its top cell above the fold. The
-          stage's own floor is breathing room, so on desktop the gap after it
-          is one cell, not the stack's three. */}
+      {/* The stage is a whole number of 40px cells: the viewport less the
+          header (168px), one cell of gap and one cell of peek, so the next
+          block's top cell shows above the fold. Its floor is breathing room,
+          so on desktop the gap after it is one cell, not three. */}
       <section className='relative [--stage:clamp(520px,round(down,100svh_-_248px,40px),760px)] min-[701px]:-mb-20'>
         <div className='relative h-(--stage)'>
           <div className='absolute inset-y-0 right-[calc((100%-100vw)/2)] left-[calc((100%-100vw)/2)]'>
@@ -195,12 +188,8 @@ export default async function HomePage({ searchParams }: Props) {
       )}
       {slot && <Wire zone='Slot' {...slot} cells={6} />}
 
-      {/* The archive, the same in every state: three rows, three cells
-          apart like the rest of the stack. The first two are pairs of
-          blocks, one row from `sm` up, 10 cells each: each block's label on
-          the first row, the frames on the second (each block is a subgrid),
-          so the frames line up top and bottom and meet on one shared
-          hairline. Stacked on phones, in reading order. */}
+      {/* Each pair is a two-row grid (labels, then frames) that every block
+          subgrids into, so the frames line up and share one hairline. */}
       <div className='grid gap-y-20 sm:grid-cols-2 sm:grid-rows-[auto_1fr] sm:gap-y-6 sm:*:not-first:-ml-px'>
         <Suspense>
           <RecordOfTheDay />

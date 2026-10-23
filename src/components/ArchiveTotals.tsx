@@ -1,16 +1,7 @@
 import { getArchiveTotals } from '@/lib/results/queries';
 import SectionLabel from './SectionLabel';
 
-/**
- * The archive totals: the front page's last row. Four hairline cells, each a
- * readout line like the season index's footer figures: the label in mono on
- * the left, the count on the right, at body size — the countdown is the only
- * place on the page with big numerals. From `sm` up the four sit on one line,
- * one grid cell tall; on phones they break to two by two, 48px rows.
- *
- * Self-contained: fetches its own totals (see getArchiveTotals for what each
- * count includes).
- */
+/** Body-size counts: the countdown is the page's only big numerals. */
 
 export default async function ArchiveTotals() {
   const totals = await getArchiveTotals();
@@ -29,8 +20,7 @@ export default async function ArchiveTotals() {
       </SectionLabel>
 
       {/* The frame's border closes the outer edges; each cell draws only the
-          hairlines between cells. From `sm` up the frame is one cell (40px)
-          tall, its border included. */}
+          hairlines between cells. */}
       <dl className='border-border bg-bg grid grid-cols-2 border sm:h-10 sm:grid-cols-4'>
         {cells.map(({ label, value }, i) => (
           <div

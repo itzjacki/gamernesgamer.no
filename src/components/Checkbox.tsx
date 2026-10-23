@@ -1,19 +1,12 @@
 interface Props {
-  /** The visible label. The whole label is the click/touch target. */
   children: React.ReactNode;
-  /** Layout-only extra classes for the label. */
+  /** Layout only. */
   className?: string;
 }
 
 /**
- * The VERKSTED checkbox: a native `<input type='checkbox'>` with its system
- * look removed and redrawn as a square hairline box with a solid accent
- * indicator when on — no radius, no white system box on the dark page.
- *
- * Still a real, uncontrolled checkbox, so keyboard, form and accessibility
- * behaviour are the platform's, CSS can react to `:checked` (TagRecord toggles
- * its two variants that way) and it needs no JS — usable in Server Components.
- * Accent is earned on interaction: it only appears once the box is checked.
+ * A real, uncontrolled checkbox, restyled: CSS elsewhere reacts to `:checked`
+ * (TagRecord toggles its two variants that way).
  */
 export default function Checkbox({ children, className = '' }: Props) {
   return (

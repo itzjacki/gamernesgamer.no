@@ -1,17 +1,8 @@
 import type { SeasonBundle } from '../raw';
 
 /**
- * Season 1 raw bundle fixture — a faithful snapshot of the seeded S1 data
- * (supabase/seed.sql), used to unit-test the pure derivation without a DB.
- *
- * UUIDs match the local seed at authoring time; the derivation only cares that
- * ids are consistent across tables, so these are stable identifiers for the
- * test, not asserted values. The ASSERTED facts are the derived numbers in the
- * tests: season totals 24/20/20/16, per-game points matrix, standings order,
- * and the two tiebreak notes.
- *
- * S1 has no power-ups, so powerUpUses is empty — power-up delta handling is
- * exercised by later-season fixtures.
+ * Snapshot of the seeded S1 data (supabase/seed.sql). UUIDs only need to be
+ * consistent across tables; they are not asserted. S1 has no power-ups.
  */
 
 // season_player ids
@@ -45,7 +36,6 @@ const G = {
   flatout: '6c94cc58-71d2-45ba-91be-f378c5c67a45',
 } as const;
 
-/** Helper: build the 4 game_result rows for a game from a placement map. */
 function results(
   gameId: string,
   placements: { sp: string; placement: number; note?: string | null }[],

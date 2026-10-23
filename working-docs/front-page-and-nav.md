@@ -1,32 +1,19 @@
 # Front page + site navigation
 
-Status (2026-10-23): **the header is built; the front page is built except
-"what is on the line"** and is in review at `/` (see "Next"). Earlier
-explorations and the full candidate list are in git history (`ae9e801`, and
-this doc and `front-page-candidates.md` before 2026-10-22).
+The front page's design: the decisions, the site states and the deferred
+trophy hero. Open work and its order are in `TODO.md` ("Where we left off").
+Header rules are in design.md ("Site header"). Earlier explorations are in git
+history (`ae9e801`).
 
 ## Decisions
 
 - **Navigation lives in the header**, so no page has to be reached via `/`.
-- **No /vs index** (Jakob, 2026-10-17). The header's VS chooser is the one
-  pair picker on the site; pairs are not solved two ways.
-- **Season index at `/sesong`** (2026-10-17), reached from the Sesonger
-  chooser's "Alle".
 - **Monument first.** `/` is a short lobby that says "this matters"; the
   archive lives on the other pages. Enough that it is not boring, not so much
   that it is messy or repeats the rest of the site.
 - **Audience:** the players first, spectators second. No explaining the
   tournament to newcomers.
 - **Copy:** Jakob writes all of it later; blocks that need copy are fine.
-
-## Header (built)
-
-`SiteHeader` (server: data, the pixel logo) + `SiteHeaderBar` (client), in the
-root layout. Full behaviour is in design.md ("Site header") and TODO.md (Site
-navigation). In short: a rail of keys (logo, Sesonger, Spillere, VS,
-Rekorder), each with a function number, label and status LED; under it a
-display row that shows one thing at a time, the page's readout at rest, with
-the choosers glitching in over it.
 
 ## Site states
 
@@ -139,15 +126,3 @@ Lessons that still apply:
   front of a texture read as stickers; the grid has to be part of the space.
 - **No hard edges in motion:** soft masks, eased timing, faint light.
 - **Dot matrix is a strong accent but a poor body texture.**
-
-## Next
-
-1. **Jakob reviews `/`** in all four states (`?tilstand=` previews each).
-2. **What is on the line:** Jakob's "within reach" rules (proposal in
-   TODO.md, "Where we left off"), then build it.
-3. **Content of the day:** decide what it rotates and its source.
-4. **Open design points:** the champion photo crop; accent text contrast
-   (site-wide).
-5. **Copy** for every bracketed placeholder (Jakob).
-6. **Remove the wireframe switcher** and `?tilstand=`.
-7. **The trophy hero** (the deferred work above), then the engraving scene.

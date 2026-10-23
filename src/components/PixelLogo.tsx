@@ -2,21 +2,8 @@ import { useId } from 'react';
 import styles from './SiteHeader.module.css';
 
 /**
- * The GG mark as pixel art, drawn from Jakob's 32 × 32
- * `public/images/branding/logo-pixel.png` (decoded on the server by
- * `readPixelLogo`). Each run of opaque pixels in a row becomes one SVG rect,
- * so the mark is crisp and takes `currentColor`.
- *
- * Always drawn 1:1 (32px), and treated like a tiny screen:
- * - a faint bloom of the mark's own colour (an SVG blur merged under the
- *   sharp pixels, never a coloured glow);
- * - a signal glitch on hover: four thin bands of rows jolt sideways by a
- *   pixel or two in stepped frames, with a dropout at the crux (the link's
- *   turn to accent is timed to land there; see SiteHeader.module.css). At
- *   rest the mark is still; nothing runs under reduced motion.
- *
- * `state` lets the mark carry the tournament's status: still at rest, a slow
- * pulse while a season is upcoming, a blink while live.
+ * The hover glitch's timing is shared with the link's turn to accent in
+ * SiteHeader.module.css, which lands on the glitch's crux.
  */
 
 export type LogoState = 'rest' | 'upcoming' | 'live';
@@ -28,7 +15,7 @@ interface Props {
   className?: string;
 }
 
-/** Hover-glitch bands: [first row, last row, class]; thin, spread over the mark. */
+/** [first row, last row, class] */
 const BANDS: [number, number, string][] = [
   [4, 5, styles.glitch1],
   [11, 13, styles.glitch2],

@@ -12,11 +12,7 @@ import type {
 import { s1Bundle } from './s1.fixtures';
 import { s2Bundle } from './s2.fixtures';
 
-/**
- * What a season changed: the records view without it against the view with
- * it. The oracle is S1 → S1 + S2 (see records.test.ts for the season facts);
- * the edge cases run on hand-built views.
- */
+/** Oracle: S1 → S1 + S2 (season facts in records.test.ts). */
 
 const options = { minCrownGames: 3 };
 
@@ -28,7 +24,6 @@ const holders = (entries: RecordEntry[]) =>
   entries.map((e) => [e.player.slug, e.value]);
 const changeOf = (key: string) => diff.records.find((r) => r.key === key);
 
-/** An empty view (no players), with the given fields replaced. */
 const viewWith = (fields: Partial<RecordsView>): RecordsView => ({
   ...deriveRecords([]),
   ...fields,

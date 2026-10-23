@@ -16,23 +16,11 @@ interface Props {
   isLastAdmin: boolean;
 }
 
-/** A YYYY-MM-DD date is calm, unambiguous metadata — no localized long dates. */
 function formatDate(value: string | null): string | null {
   if (!value) return null;
   return value.slice(0, 10);
 }
 
-/**
- * Admin membership panel, rendered in-place on the dashboard. Presentational:
- * it receives the already-fetched user list (via admin_list_users()) split into
- * current admins + addable users, and renders the list plus the add/remove
- * controls. Mutations go through the add/remove Server Actions; the last-admin
- * removal guard is enforced in the DB and surfaced inline per row.
- *
- * Mirrors DbOverview's surface language: a bordered panel with a mono eyebrow
- * label instead of its own <h1>, since the dashboard owns the single page
- * heading ("Adminpanel").
- */
 export default function AdminManagement({
   admins,
   addable,
@@ -41,7 +29,6 @@ export default function AdminManagement({
 }: Props) {
   return (
     <Panel label='Administratorer'>
-      {/* Region 1: current admins */}
       <ul className='mt-4 flex flex-col'>
         {admins.map((admin) => {
           const name = admin.display_name;
@@ -96,7 +83,6 @@ export default function AdminManagement({
         })}
       </ul>
 
-      {/* Divider spanning the panel padding, then Region 2: add */}
       <div className='border-border -mx-6 mt-8 border-t sm:-mx-10' />
       <div className='mt-8'>
         <AddAdminForm users={addable} />

@@ -1,13 +1,7 @@
 import { createBrowserClient } from '@supabase/ssr';
 import type { Database } from './database.types';
 
-/**
- * Browser client for `'use client'` components (admin panel — Phase 3).
- *
- * Not used by any current code — public pages are Server Components reading via
- * ./read. createBrowserClient is a singleton internally, so calling this
- * repeatedly is safe. Uses the PUBLISHABLE key (safe in the browser, RLS-gated).
- */
+/** Unused so far. createBrowserClient is a singleton, so repeat calls are safe. */
 export function createBrowserSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_DB_SUPABASE_URL;
   const publishableKey = process.env.NEXT_PUBLIC_DB_SUPABASE_PUBLISHABLE_KEY;

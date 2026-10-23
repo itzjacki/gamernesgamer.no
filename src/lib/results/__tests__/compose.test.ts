@@ -4,12 +4,8 @@ import { composeSeasonView, composeGameView } from '../compose';
 import { s2Bundle } from './s2.fixtures';
 
 /**
- * compose.ts is the seam between DB-derived view-models and the STATIC
- * src/data/sesong content. These tests join the real S2 derivation output to
- * the real S2 static data (games.ts / gamers.ts) — so they also guard that the
- * seeded slugs/names actually line up with the static content. Unlike the
- * derive tests, importing static data here is intended: this is the one layer
- * that bridges the two.
+ * Joins the real S2 derivation to the real S2 static data, so these also guard
+ * that the seeded slugs/names line up with the static content.
  */
 
 describe('composeSeasonView — Season 2', () => {
@@ -31,7 +27,6 @@ describe('composeSeasonView — Season 2', () => {
     expect(tobias.gamer.name).toBe('Tobias');
     expect(tobias.gamer.nickname).toBe('"The Maestro"');
     expect(tobias.gamer.imagePath).toContain('/images/gamers/2/');
-    // Every standing resolves a gamer.
     for (const row of view.standings) {
       expect(row.gamer.name).toBe(row.player.name);
     }
@@ -48,7 +43,6 @@ describe('composeSeasonView — Season 2', () => {
       'total-war-empire',
       'league-of-legends-02',
     ]);
-    // Static titles come through (from games.ts).
     const hs = view.games.find((g) => g.game.slug === 'hearthstone')!;
     expect(hs.game.title).toBe('Hearthstone');
     const lol = view.games.find((g) => g.game.slug === 'league-of-legends-02')!;
@@ -142,7 +136,6 @@ describe('compose — fail-loud on missing static content', () => {
 
   it('throws when a power-up use slug has no static entry', () => {
     const view = assembleSeasonView(s2Bundle);
-    // Inject a use with a slug that exists in no S2 power-ups.ts entry.
     const broken = {
       ...view,
       games: view.games.map((g, i) =>

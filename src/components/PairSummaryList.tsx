@@ -2,21 +2,12 @@ import Link from 'next/link';
 import type { PairSummary } from '@/lib/results/view-models';
 import { PairGauge } from './PairRow';
 
-/**
- * The career page's head-to-head list: one row per opponent, the whole row a
- * link to that pair's /vs page with this player on the left. Each row is the
- * /vs headline in miniature — games this player finished ahead in, the gauge,
- * games the opponent did — plus their match record as a mono aside.
- *
- * Same neutral grammar as /vs: both figures share a colour, nothing marks a
- * leader, and a row earns the accent only on hover/focus.
- */
+/** Same neutral grammar as /vs: nothing marks a leader. */
 
 interface Props {
-  /** The player whose page this is — the left-hand side of every link. */
+  /** The left-hand side of every link. */
   player: { slug: string; name: string };
   summaries: PairSummary[];
-  /** Column heads for the strip: opponent, the games tally, the match record. */
   labels: { opponent: string; games: string; matches: string };
 }
 

@@ -8,23 +8,8 @@ import PixelLogo, { type LogoState } from './PixelLogo';
 import styles from './SiteHeader.module.css';
 
 /**
- * The header bar (see SiteHeader for the server half).
- *
- * - The RAIL is a row of keys: a function number, the label, and a status LED
- *   instead of an underline. The LED is steady on the current section.
- * - The DISPLAY below shows one thing at a time. At rest it is the current
- *   page's readout (label over value, like an instrument screen). Three keys
- *   are CHOOSERS rather than links — Sesonger (season keys; there is no season
- *   index), Spillere (player keys plus "Alle", the index) and VS (a quick pair
- *   picker). Every change GLITCHES IN over what the display shows, like a
- *   signal switching: a chooser over the readout, the next chooser over the
- *   first, the readout back over a chooser. Its key's LED blinks while it
- *   shows. Escape, a click outside, pressing the key again or navigating
- *   returns to the readout.
- * - On /vs pages the pair picker is itself the readout, so VS just focuses it.
- *   The picker is two selects with a swap-sides button between them (like a
- *   flight search's from/to) and GÅ.
- * - Rekorder is a plain link: it has nothing to choose between.
+ * Client half of the header (rules in design.md, "Site header"). A chooser
+ * closes on Escape, a click outside, its key again, or navigation.
  */
 
 export interface HeaderSeason {
@@ -46,7 +31,7 @@ export interface HeaderPlayer {
 
 export interface HeaderData {
   currentSeason: string;
-  /** The pixel logo, one string per row ('#' = pixel); see readPixelLogo. */
+  /** One string per row ('#' = pixel); see readPixelLogo. */
   logo: string[];
   seasons: HeaderSeason[];
   players: HeaderPlayer[];
@@ -57,7 +42,6 @@ export interface HeaderData {
 type Section = 'sesonger' | 'spillere' | 'vs' | 'rekorder';
 type Chooser = 'seasons' | 'players' | 'vs';
 
-/** What the current path is about, for the readout and the lit key. */
 function parsePath(pathname: string) {
   const [first, a, b] = pathname.split('/').filter(Boolean);
   if (first === 'sesong') return { section: 'sesonger' as const, season: a };
@@ -70,11 +54,9 @@ function parsePath(pathname: string) {
 const pad = (n: number) => String(n).padStart(2, '0');
 
 /**
- * The display is a stack of frames, each glitching in over the one below:
- * opening a chooser puts it over the readout, switching puts the next chooser
- * over the first, closing puts the readout back over the chooser. When the
- * top frame has settled, everything under it is dropped (and a readout frame
- * drops itself, leaving the live readout underneath).
+ * The display is a stack of frames, each glitching in over the one below.
+ * When the top frame settles, everything under it is dropped; a readout frame
+ * drops itself, leaving the live readout underneath.
  */
 type Frame = {
   id: number;
@@ -116,10 +98,8 @@ const SELECT =
   'bg-display text-text hover:text-accent focus-visible:outline-accent border-border h-full w-28 shrink-0 appearance-none border-r px-2 font-mono text-[11px] font-medium tracking-wide uppercase focus-visible:outline-2 focus-visible:-outline-offset-2 sm:w-36 sm:px-3 sm:text-xs sm:tracking-wider';
 const LAYER =
   'absolute inset-0 flex items-stretch overflow-x-auto [scrollbar-width:none]';
-/** The small label on the display (over a value, or before a row of keys). */
 const LABEL = 'text-text-muted font-mono text-[8px] tracking-[0.2em] uppercase';
 
-/** One label-over-value cell on the display. */
 function Param({
   label,
   value,
@@ -272,7 +252,6 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
   // ---------------------------------------------------------------- display
   const readout = () => {
     if (route.section === 'vs') {
-      // The picker is the readout here (pre-filled with the pair).
       return (
         <VsChooser
           key={pathname}
@@ -286,7 +265,6 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
     if (route.section === 'sesonger') {
       const s = data.seasons.find((x) => x.slug === route.season);
       if (!s) {
-        // The index: how many seasons, and the latest champion.
         return (
           <>
             <Param label='Sesonger' value={data.seasons.length} />
@@ -341,7 +319,6 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
         </>
       );
     }
-    // Anywhere else: the tournament's status line.
     return latestDone ? (
       <>
         <Param label='Sesong' value={pad(latestDone.number)} />
@@ -375,7 +352,6 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
               );
             })}
           </div>
-          {/* "Alle" is the index, so it gets its own cell, as under Spillere. */}
           <div className='flex items-center px-2 sm:px-3'>
             <Link
               href='/sesong'
@@ -410,8 +386,6 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
               );
             })}
           </div>
-          {/* "Alle" is a different kind of key (the index), so it gets its own
-              cell, split off by a full-height hairline like the readout's. */}
           <div className='flex items-center px-2 sm:px-3'>
             <Link
               href='/spillere'
@@ -448,7 +422,6 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
           aria-label='Forside'
           className={`${styles.logoLink} border-border text-text hover:text-accent focus-visible:outline-accent flex w-12 shrink-0 items-center justify-center border-r focus-visible:outline-2 focus-visible:-outline-offset-2 sm:w-16`}
         >
-          {/* 32 × 32 pixels, always drawn 1:1. */}
           <PixelLogo rows={data.logo} state={logoState} className='size-8' />
         </Link>
         {keys.map(renderKey)}
@@ -487,7 +460,7 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
   );
 }
 
-/** The quick pair picker on the display. Mounts fresh each time it opens. */
+/** Mounts fresh each time it opens. */
 function VsChooser({
   data,
   initialA = '',
@@ -536,7 +509,6 @@ function VsChooser({
         <option value=''>Spiller A</option>
         {options(b)}
       </select>
-      {/* Swap sides, like a flight search's from/to. */}
       <button
         type='button'
         aria-label='Bytt side'

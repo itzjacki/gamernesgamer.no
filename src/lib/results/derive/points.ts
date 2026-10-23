@@ -6,17 +6,12 @@ import type {
 } from '../raw';
 import type { PowerUpUseEntry } from '../view-models';
 
-/**
- * PURE. No IO, no Supabase, no async. Season-points derivation.
- *
- * Points for a (game, player) = season_ladder[placement]
+/*
+ * PURE. Points for a (game, player) = season_ladder[placement]
  *   + SUM(power_up_use.points_delta WHERE affected_season_player_id = player).
- * The ladder is season-wide. Points are season-local by construction — this
- * module never sums across seasons (cross-season normalization is a separate,
- * deferred concern).
+ * Points are season-local; this module never sums across seasons.
  */
 
-/** Map placement → ladder points for one season. */
 export function ladderByPlacement(
   ladder: SeasonLadderRow[],
 ): Map<number, number> {
@@ -27,7 +22,6 @@ export function ladderByPlacement(
   return map;
 }
 
-/** Map power_up.id → its slug + is_curse, for resolving uses to entries. */
 export function powerUpById(
   powerUps: PowerUpRow[],
 ): Map<string, { slug: string; isCurse: boolean }> {
@@ -39,20 +33,14 @@ export function powerUpById(
 }
 
 /**
- * Per-affected-player list of power-up use ENTRIES, for a single game. Each DB
- * use row becomes one entry (incl. zero-delta uses). Entries are sorted
- * deterministically — slug asc, then pointsDelta asc, then original order — so
- * React keys and snapshot tests are stable. The net delta is derived from this
- * same list by the caller, so list and net can never drift.
- *
- * Throws if a use references a power_up id with no anchor row (a dangling FK
- * would silently drop archive detail — fail loud, matching gamePoints).
+ * One entry per DB use row, incl. zero-delta uses, sorted deterministically so
+ * React keys and snapshots are stable. Throws on a dangling power_up id rather
+ * than silently dropping archive detail.
  */
 export function powerUpUsesByPlayer(
   powerUpUsesForGame: PowerUpUseRow[],
   powerUps: Map<string, { slug: string; isCurse: boolean }>,
 ): Map<string, PowerUpUseEntry[]> {
-  // Keep each entry's original DB order alongside it for a stable final sort.
   const indexed = new Map<string, { entry: PowerUpUseEntry; i: number }[]>();
 
   powerUpUsesForGame.forEach((use, i) => {
@@ -101,13 +89,9 @@ export interface GamePoints {
 }
 
 /**
- * Compute each player's points for one game from its game_result rows + the
- * ladder + that game's power-up uses (resolved against the season's power_up
- * anchors). Throws if a placement has no ladder row (a silent null here would
- * corrupt totals — fail loud instead).
- *
- * The net `powerUpDelta` is the SUM of the player's resolved use entries — the
- * single source of the summation, so the per-use list and the net cannot drift.
+ * Throws if a placement has no ladder row — a silent null would corrupt
+ * totals. `powerUpDelta` is summed from the use entries, so the per-use list
+ * and the net cannot drift.
  */
 export function gamePoints(
   gameResults: GameResultRow[],

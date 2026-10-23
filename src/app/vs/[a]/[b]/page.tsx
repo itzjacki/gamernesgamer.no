@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return pair ? { title: `${pair.a.name} mot ${pair.b.name}` } : {};
 }
 
-/** "S1–S4" for a run of seasons, or just "S3" when it is one. */
+/** "S1–S4", or "S3" for a single season. */
 function seasonSpan(numbers: number[]) {
   const first = Math.min(...numbers);
   const last = Math.max(...numbers);
@@ -61,7 +61,6 @@ export default async function PairPage({ params }: Props) {
   const other = (side: PairSide) => (side === 'a' ? b : a);
   const sides: PairSide[] = ['a', 'b'];
 
-  /** A list of shared games: title, season, and both placements (a–b). */
   const gameLines = (games: PairGame[]) => (
     <RecordLines
       lines={games.map((game) => ({
@@ -79,7 +78,6 @@ export default async function PairPage({ params }: Props) {
     />
   );
 
-  /** A list of their matches: game, season, and the series score (a–b). */
   const matchLines = (list: PairMatch[]) => (
     <RecordLines
       lines={list.map((match, index) => ({
@@ -107,10 +105,6 @@ export default async function PairPage({ params }: Props) {
   const unranked = pair.categories.filter(
     (c) => c.tally.games.length < MIN_RANKED_GAMES,
   );
-  /**
-   * Shared games as GameListPopover rows — the same panel the career page's
-   * category table opens — with both placements ("2–4").
-   */
   const versusResults = (list: PairGame[]) =>
     list.map((game) => ({
       seasonNumber: game.seasonNumber,
@@ -122,10 +116,7 @@ export default async function PairPage({ params }: Props) {
       ownPick: game.pickedBy === 'a',
     }));
 
-  /**
-   * Their matches as rows of the same panel: the two figures are the series
-   * score (games won by each), carried in the row's two placement slots.
-   */
+  // The series score (games won by each) rides in the two placement slots.
   const matchResults = (list: PairMatch[]) =>
     list.map((match) => ({
       seasonNumber: match.seasonNumber,
@@ -137,7 +128,6 @@ export default async function PairPage({ params }: Props) {
       ownPick: false,
     }));
 
-  /** One category: its name opens the games behind it. */
   const categoryLine = (
     category: (typeof pair.categories)[number],
     isRanked: boolean,
@@ -166,7 +156,6 @@ export default async function PairPage({ params }: Props) {
     { key: 'others', label: 'Valgt av andre', tally: pair.picks.others },
   ].filter((split) => split.tally.games.length > 0);
 
-  /** The points margin `side` had over the other in a season they led. */
   const margin = (season: PairSeason, side: PairSide) =>
     season[side].totalPoints - season[side === 'a' ? 'b' : 'a'].totalPoints;
 
@@ -259,7 +248,6 @@ export default async function PairPage({ params }: Props) {
       <section id='spill-balanse' className='flex flex-col gap-6'>
         <SectionLabel>Spill</SectionLabel>
         <div className={wall}>
-          {/* The masthead's reading again, here with the games behind it. */}
           <PairRow
             id='foran-spill'
             label='Innbyrdes oppgjør: Spill'
@@ -364,8 +352,7 @@ export default async function PairPage({ params }: Props) {
                       {season.season.seasonNumber}
                     </Link>
                   </th>
-                  {/* A season WON is champion data, so that placement takes
-                      the accent — as a title does everywhere else. */}
+                  {/* A season won is champion data, so it takes the accent. */}
                   {sides.map((side) => (
                     <td
                       key={side}
@@ -388,10 +375,9 @@ export default async function PairPage({ params }: Props) {
           </table>
         </div>
 
-        {/* Each side's best season against the other, in mirrored plates
-            closing the same frame (the wall drops its top border and takes
-            the table's bottom edge as its rule). Both plates always show: a
-            side that never finished a season ahead gets a dash. */}
+        {/* Closes the table's frame: no top border, the table's bottom edge
+            is its rule. Both plates always show; a side that never finished
+            ahead gets a dash. */}
         <ul className={`${wall} -mt-6 border-t-0 sm:grid-cols-2`}>
           {sides.map((side) => {
             const season = moments.bestSeason[side];

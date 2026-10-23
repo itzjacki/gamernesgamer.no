@@ -1,10 +1,8 @@
 import type { ArchiveTotals, SeasonView } from '../view-models';
 
 /**
- * PURE. The archive's running counts across every season's view. Reads only
- * what the season assembler already settled: a game counts once it has
- * confirmed results, and its matches and power-up uses come with it (both are
- * empty on a game without results), so nothing unconfirmed is counted.
+ * PURE. A game counts once it has confirmed results; its matches and power-up
+ * uses are empty without them, so nothing unconfirmed is counted.
  */
 export function deriveArchiveTotals(views: SeasonView[]): ArchiveTotals {
   const games = views.flatMap((view) =>
