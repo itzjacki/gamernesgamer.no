@@ -15,6 +15,14 @@ const config = [
       'react-hooks/rules-of-hooks': 'off',
     },
   },
+  {
+    // Off until the performance review (TODO.md, "Instant navigation"):
+    // decide on next/image there, weighing Vercel image-optimisation cost and
+    // the greyscale/clip-path/crop styling on the portraits.
+    rules: {
+      '@next/next/no-img-element': 'off',
+    },
+  },
 ];
 
 export default config;

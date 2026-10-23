@@ -7,7 +7,6 @@ import { titles } from '@/data/titles';
 import type { SeasonData } from '@/data/sesong';
 import type {
   SeasonView,
-  GameView,
   GamePlacementRow,
   PlayerRef,
   CareerStats,
@@ -69,14 +68,6 @@ export interface ComposedSeasonView {
   seasonSlug: string;
   standings: ComposedStandingRow[];
   games: ComposedGameSummary[];
-}
-
-export interface ComposedGameView {
-  seasonNumber: number;
-  seasonSlug: string;
-  game: Game;
-  ordinal: number;
-  results: ComposedGamePlacementRow[];
 }
 
 function seasonContent(seasonSlug: string) {
@@ -192,20 +183,6 @@ export function composeSeasonView(view: SeasonView): ComposedSeasonView {
       ordinal: g.ordinal,
       results: composeResults(g.results, powerUps),
     })),
-  };
-}
-
-export function composeGameView(view: GameView): ComposedGameView {
-  const content = seasonContent(view.seasonSlug);
-  const game = requireGame(gameBySlug(content.games), view.slug);
-  const powerUps = powerUpBySlug(content);
-
-  return {
-    seasonNumber: view.seasonNumber,
-    seasonSlug: view.seasonSlug,
-    game,
-    ordinal: view.ordinal,
-    results: composeResults(view.results, powerUps),
   };
 }
 

@@ -3,7 +3,7 @@ import 'server-only';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fetchSeasonBundle, fetchAllSeasonBundles } from './fetch';
-import { assembleSeasonView, assembleGameView } from './derive';
+import { assembleSeasonView } from './derive';
 import { assembleCareer, assembleAllCareers } from './derive/career';
 import {
   composeCareerView,
@@ -14,7 +14,6 @@ import {
 import type {
   PlayerRef,
   SeasonView,
-  GameView,
   CareerView,
   RecordsView,
   PairView,
@@ -38,15 +37,6 @@ export async function getSeasonView(
   const bundle = await fetchSeasonBundle(seasonNumber);
   if (!bundle) return null;
   return assembleSeasonView(bundle);
-}
-
-export async function getGameView(
-  seasonNumber: number,
-  gameSlug: string,
-): Promise<GameView | null> {
-  const bundle = await fetchSeasonBundle(seasonNumber);
-  if (!bundle) return null;
-  return assembleGameView(bundle, gameSlug);
 }
 
 /**

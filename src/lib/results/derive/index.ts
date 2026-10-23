@@ -1,7 +1,6 @@
 import type { SeasonBundle } from '../raw';
 import type {
   SeasonView,
-  GameView,
   SeasonStandingRow,
   GameSummary,
   GamePlacementRow,
@@ -109,24 +108,5 @@ export function assembleSeasonView(bundle: SeasonBundle): SeasonView {
     standings,
     games,
     series: cumulativeSeries(games, players),
-  };
-}
-
-export function assembleGameView(
-  bundle: SeasonBundle,
-  gameSlug: string,
-): GameView | null {
-  const game = bundle.games.find((g) => g.slug === gameSlug);
-  if (!game) return null;
-
-  const summary = buildGameSummaries(bundle).find((g) => g.slug === gameSlug);
-  if (!summary) return null;
-
-  return {
-    seasonNumber: bundle.season.number,
-    seasonSlug: seasonSlug(bundle.season.number),
-    slug: game.slug,
-    ordinal: game.ordinal,
-    results: summary.results,
   };
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { assembleSeasonView, assembleGameView } from '../derive';
+import { assembleSeasonView } from '../derive';
 import {
   s2Bundle,
   s2ExpectedGamePoints,
@@ -151,20 +151,5 @@ describe('assembleSeasonView — Season 2', () => {
     for (const game of view.games) {
       expect(game.results.map((r) => r.placement)).toEqual([1, 2, 3, 4]);
     }
-  });
-});
-
-describe('assembleGameView — Season 2', () => {
-  it('returns a game view with power-up deltas applied (Total War)', () => {
-    const view = assembleGameView(s2Bundle, 'total-war-empire');
-    expect(view).not.toBeNull();
-    expect(view!.ordinal).toBe(7);
-    const bySlug = Object.fromEntries(
-      view!.results.map((r) => [r.player.slug, r]),
-    );
-    // Tobias 2nd (ladder 4) + Double Up 4 = 8; William 4th (ladder 1) + Safety Net 2 = 3.
-    expect(bySlug.tobias.points).toBe(8);
-    expect(bySlug.william.points).toBe(3);
-    expect(bySlug.jakob.points).toBe(7); // 1st, no power-up
   });
 });

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { assembleSeasonView, assembleGameView } from '../derive';
+import { assembleSeasonView } from '../derive';
 import {
   s1Bundle,
   s1ExpectedGamePoints,
@@ -92,23 +92,5 @@ describe('assembleSeasonView — Season 1', () => {
         expect(row.points).toBe(row.ladderPoints);
       }
     }
-  });
-});
-
-describe('assembleGameView — Season 1', () => {
-  it('returns the game result table for a known slug', () => {
-    const view = assembleGameView(s1Bundle, 'trackmania');
-    expect(view).not.toBeNull();
-    expect(view!.ordinal).toBe(7);
-    expect(view!.results.map((r) => r.player.slug)).toEqual([
-      'tobias', // 1st
-      'jakob', // 2nd
-      'william', // 3rd
-      'jorgen', // 4th
-    ]);
-  });
-
-  it('returns null for an unknown slug (→ notFound())', () => {
-    expect(assembleGameView(s1Bundle, 'does-not-exist')).toBeNull();
   });
 });

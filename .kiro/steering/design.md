@@ -121,7 +121,7 @@ tried and looked bad.
   (live block, reveals row, the champion's footer). Muted labels are fine
   inside them. Whole-block links take the accent on their border on hover.
 - **Champion:** their picture is the block, unframed and unmasked, with a
-  solid footer (name, season, points, titles); with no picture the footer
+  solid footer (name, season, points); with no picture the footer
   stands alone.
 - **Static:** the scene does not follow the pointer. It keeps the light's
   on-load rise, its slow sideways drift and the dust.
