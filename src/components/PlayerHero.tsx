@@ -6,20 +6,8 @@ interface Props {
 }
 
 /**
- * The player-career nameplate. Structurally mirrors ChampionHero (full-width
- * VERKSTED band, solid bg, hairline border, no shadow/radius; name in Neue
- * Montreal 800, mono nickname sub-line), but with ONE deliberate difference:
- * the single accent hairline is drawn for EVERY player, not just champions.
- *
- * Rationale (owner decision): a career page shows one player with nothing to
- * compare against, so champion-gating the accent would read as unexplained
- * flatness. Here the accent is the identity treatment, not a ranking signal —
- * so it is intentionally unconditional. This is the documented exception to the
- * site-wide "accent at rest = champion/P1 only" rule.
- *
- * Image: when `heroImageIsFallback` is true we're showing square-ish card art,
- * so it sits framed (like ChampionHero's fallback) rather than bleeding to the
- * panel edge; a dedicated hero portrait (when one exists) fills the panel.
+ * The accent hairline is drawn for EVERY player, not just champions: with
+ * nothing to compare against, it is identity, not a ranking signal.
  */
 export default function PlayerHero({ hero }: Props) {
   return (

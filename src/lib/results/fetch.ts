@@ -5,20 +5,13 @@ import { seasonData } from '@/data/sesong';
 import type { SeasonBundle } from './raw';
 
 /**
- * IO boundary. The ONLY async code in the results module besides queries.ts.
- * Imports no derivation — fetch produces raw rows, nothing more.
+ * IO boundary: produces raw rows and imports no derivation. The dataset is
+ * tiny, so it fetches a whole-season bundle rather than per-view queries.
  *
- * One pass per season: resolve the season by number, then fetch its child rows
- * in parallel. The dataset is tiny, so a whole-season bundle in one Promise.all
- * is simpler and cheaper than targeted per-view queries.
+ * `confirmed = true` is filtered HERE on game_result and season_result — this
+ * is the public-read gate; unconfirmed results never reach derivation.
  *
- * `confirmed = true` is filtered HERE on game_result and season_result — the
- * eventual public-read gate. (RLS currently blocks anon reads entirely; this
- * filter means the switch to publishable-key public reads needs no query
- * change.) Unconfirmed results never reach the derivation layer.
- *
- * Returns null when the season does not exist, so callers can map it to a 404.
- * Throws on any actual query error, so callers can surface an error boundary.
+ * Returns null when the season does not exist (→ 404); throws on query errors.
  */
 export async function fetchSeasonBundle(
   seasonNumber: number,
@@ -98,7 +91,6 @@ export async function fetchSeasonBundle(
   if (matches.error) throw matches.error;
   if (matchGames.error) throw matchGames.error;
 
-  // Resolve the roster's player identities in one follow-up query.
   const playerIds = (roster.data ?? []).map((r) => r.player_id);
   const { data: players, error: playersErr } = await supabase
     .from('player')
@@ -133,17 +125,9 @@ export async function fetchSeasonBundle(
 }
 
 /**
- * Fan-out: every season's bundle, fetched in parallel. The cross-season read
- * boundary for the player career page (and later /records). Deliberately a thin
- * loop over fetchSeasonBundle rather than a bespoke cross-season query — the
- * dataset is a handful of seasons, pages are prerendered, and this reuses the
- * single confirmed-filtered IO path (no second place to keep the public-read
- * gate correct).
- *
- * Season numbers come from the static season catalog (seasonData keys), the one
- * source of truth for "how many seasons exist". A null bundle (season present
- * in static data but not yet in the DB) is dropped, so the result holds only
- * seasons with real rows.
+ * Deliberately a loop over fetchSeasonBundle, not a bespoke cross-season query,
+ * so the confirmed filter lives in one place. Season numbers come from the
+ * static catalog; seasons not yet in the DB are dropped.
  */
 export async function fetchAllSeasonBundles(): Promise<SeasonBundle[]> {
   const seasonNumbers = Object.keys(seasonData).map(Number);

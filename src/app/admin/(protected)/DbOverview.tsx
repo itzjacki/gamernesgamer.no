@@ -14,10 +14,8 @@ interface Props {
 }
 
 /**
- * A read-only "is the data intact?" readout — a motorsport timing-sheet glance,
- * not a KPI dashboard. Four labeled rows: label left, monospace figure right,
- * hairline rules between. Figures use body color, NOT accent — "the data
- * exists" is not a status, and accent is reserved for real status/interaction.
+ * A glance that the seeded data is intact. Figures stay body colour: "the data
+ * exists" is not a status, and accent is for real status.
  */
 export default function DbOverview({
   seasons,

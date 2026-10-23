@@ -35,7 +35,6 @@ export function matchesByGame(
     else rowsByMatch.set(row.match_id, [row]);
   }
 
-  /** Games won by each side, from either encoding (see above). */
   const seriesWins = (matchId: string, needed: number) => {
     const rows = rowsByMatch.get(matchId) ?? [];
     const [only] = rows;

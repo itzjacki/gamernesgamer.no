@@ -34,7 +34,6 @@ export default function GamerCard({
     ? Object.entries(stats).filter(([key]) => key !== 'overall')
     : [];
 
-  // Cancel any pending animation frame on unmount
   useEffect(() => {
     return () => {
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
@@ -63,7 +62,6 @@ export default function GamerCard({
   }
 
   function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
-    // Respect reduced motion preference
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     const card = cardRef.current;

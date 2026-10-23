@@ -1,20 +1,10 @@
 import type { Countdown } from '@/lib/upcoming-season';
 
-/**
- * The upcoming state's countdown, centred over the trophy's plinth (the page
- * positions it; this renders the content only) until the in-scene version
- * exists. Days only: seasons store no time of day. The page's only
- * display-size numerals.
- *
- * Straight on the scene (design.md, "On the hero"): no box, no rules, just a
- * mono label over big bold white numerals and the unit. The labels are
- * `text-text`, not muted: muted fails AA against the lit fog. Four grid
- * cells tall, so the page can sit it on the grid.
- */
+/** Days only: seasons store no time of day. */
 
 interface Props {
   countdown: Countdown;
-  /** The season's zero-padded slug, e.g. "05". */
+  /** Zero-padded slug, e.g. "05". */
   season: string;
 }
 

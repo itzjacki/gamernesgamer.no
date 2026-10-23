@@ -2,33 +2,20 @@ import Link from 'next/link';
 import Popover from './Popover';
 
 /**
- * One "moment" plate on /vs: something ONE of the two did against the other
- * (today: their best season against them). Built to sit in
- * the same hairline wall as /records' plates and to read like one — label and
- * scope stamp, the player's name, a mono figure with its unit running on, an
- * empty ruled footer. The figure takes the accent as a record plate's does:
- * it is the best that player has done against this opponent (an earlier pass
- * kept it neutral on the grounds that it is not a site record; the page read
- * too flat without it).
- *
- * The page lays the plates out in mirrored pairs (the same moment for each
- * side), and BOTH are always there: a player who has no such moment against
- * the other gets the same plate with a muted dash for a figure, rather than
- * a hole in the wall or a plate spanning the row.
+ * Plates come in mirrored pairs and BOTH are always there: a player with no
+ * such moment gets a muted dash, not a hole in the wall.
  */
 
 interface Props {
-  /** Unique on the page; names the detail popover. */
+  /** Unique on the page. */
   id: string;
   label: string;
   player: { slug: string; name: string };
-  /** The moment itself; leave out when the player has none. */
   moment?: {
-    /** Which season(s) it is from, e.g. "S2" or "S1–S2". */
+    /** E.g. "S2" or "S1–S2". */
     scope: string;
     figure: string;
     unit: string;
-    /** What is behind the figure (a RecordLines list). */
     detail: React.ReactNode;
   };
 }

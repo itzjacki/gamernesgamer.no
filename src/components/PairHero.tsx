@@ -2,33 +2,18 @@ import Link from 'next/link';
 import type { PairPlayerView } from '@/lib/results/view-models';
 
 /**
- * The /vs masthead. The two names sit at the outer edges and the two portraits
- * meet in the middle across ONE diagonal hairline — the same geometry as the
- * player index plates, and the page's only "vs": there is no lettering for it.
- * The pair's headline reading (a PairRow) closes the plate along its foot.
- *
- * Each side is ONE link to that player's career page, name and portrait
- * together: hovering or focusing anywhere on a side brings its portrait's
- * colour back and turns its name accent. The portrait is a child of its side's
- * link but is positioned against the whole plate, so the two can meet across
- * the diagonal; its clip-path is also its hit area, so each half of the
- * picture belongs to the right player.
- *
- * Accent at rest is the diagonal alone: an identity mark, like PlayerHero's
- * hairline, not a ranking signal — neither side is "the leader" here. Both
- * portraits are desaturated at rest so photos from different seasons read as
- * one set and neither player is dimmed relative to the other. (An accent
- * duotone on hover was tried in place of the colour and dropped.)
- *
- * On phones the names share a row above the portraits; nothing is dropped.
+ * The diagonal hairline between the portraits is the page's only "vs": there
+ * is no lettering for it. Each portrait is positioned against the whole plate
+ * so the two meet across it; its clip-path is also its hit area, so each half
+ * of the picture links to the right player.
  */
 
 interface Props {
   a: PairPlayerView;
   b: PairPlayerView;
-  /** The mono strip: which seasons and how many games the page covers. */
+  /** Which seasons and how many games the page covers. */
   scope: string;
-  /** The headline reading, set along the foot of the plate. */
+  /** The headline reading (a PairRow). */
   children: React.ReactNode;
 }
 
@@ -36,10 +21,6 @@ interface Props {
 const TOP = 58;
 const BOTTOM = 42;
 
-/**
- * The portrait box, positioned against the plate's body: a full-width band
- * under the names on phones, a seven-cell box in the middle from `sm` up.
- */
 const box =
   'absolute inset-x-0 bottom-0 h-40 sm:inset-x-auto sm:inset-y-0 sm:left-1/2 sm:h-auto sm:w-70 sm:-translate-x-1/2';
 
@@ -51,8 +32,6 @@ const clip = {
 function Side({ player, side }: { player: PairPlayerView; side: 'a' | 'b' }) {
   return (
     // Not `relative`: the portrait inside resolves against the plate's body.
-    // The padding keeps the name clear of the portrait box (below it on
-    // phones, beside it from `sm` up).
     <Link
       href={`/spillere/${player.slug}`}
       className={`group focus-visible:outline-accent flex min-w-0 flex-col gap-1 p-4 pb-44 focus-visible:outline-2 focus-visible:-outline-offset-2 sm:h-60 sm:justify-center sm:gap-2 sm:p-8 ${
@@ -92,7 +71,6 @@ export default function PairHero({ a, b, scope, children }: Props) {
         <Side player={a} side='a' />
         <Side player={b} side='b' />
 
-        {/* The portrait box's frame and the diagonal, drawn over both halves. */}
         <span
           aria-hidden='true'
           className={`border-border pointer-events-none border-t sm:border-x sm:border-t-0 ${box}`}

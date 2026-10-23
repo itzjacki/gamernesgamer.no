@@ -9,20 +9,12 @@ interface Props {
 }
 
 /**
- * The admin allowlist gate — one choke point for every /admin route.
+ * The admin allowlist gate for every protected /admin route. Any Google user
+ * can sign in; only is_admin() grants access. getClaims() repeats the proxy's
+ * check as defense-in-depth.
  *
- * Being signed in is not the same as being an admin: Google authenticates any
- * Google user, but only a row in admin_user (checked by is_admin()) grants
- * access. Two layers run here:
- *   1. getClaims() — defense-in-depth. The proxy already redirects
- *      unauthenticated visitors; this covers the gap and gives us the claims.
- *   2. is_admin() RPC — the authoritative allowlist check, kept in the DB.
- *
- * An authenticated non-admin is shown a rejection screen with a sign-out
- * button rather than being bounced or auto-signed-out — auto sign-out would
- * cause a confusing sign-in-then-eject loop, and the rejection lets them
- * switch to the right Google account. /admin/login renders its own page
- * (unauthenticated), so this layout only guards authenticated access.
+ * A signed-in non-admin gets a rejection screen rather than an auto sign-out,
+ * which would loop sign-in-then-eject and hide which account was rejected.
  */
 export default async function AdminLayout({ children }: Props) {
   const supabase = await createAuthClient();
@@ -43,9 +35,8 @@ export default async function AdminLayout({ children }: Props) {
     return (
       <section className='flex min-h-[70svh] items-center justify-center'>
         <Panel className='w-80 sm:w-100'>
-          {/* Accent eyebrow is the single "stop" signal — accent earns its
-              place on a real status. Kept as explicit markup (not Panel's
-              muted label prop) to preserve the accent color. */}
+          {/* Not Panel's label prop: that one is muted, this is the accent
+              "stop" signal. */}
           <p className='text-accent font-mono text-xs tracking-wider uppercase'>
             Ingen tilgang
           </p>
@@ -60,8 +51,6 @@ export default async function AdminLayout({ children }: Props) {
           </p>
 
           {email ? (
-            // Which Google account was rejected — helps if signed into the
-            // wrong one. Metadata register.
             <p className='text-text-muted mt-3 font-mono text-xs'>{email}</p>
           ) : null}
 

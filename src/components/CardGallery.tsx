@@ -2,20 +2,9 @@ import GamerCard from './GamerCard';
 import SectionLabel from './SectionLabel';
 import type { CareerCard } from '@/lib/results/view-models';
 
-/**
- * The FUTBIN-style card gallery: every one of a player's per-season FIFA cards
- * in a grid, each under a mono "plaque" naming its season. Reuses the existing
- * GamerCard (a 'use client' component for its tilt effect) — a Server Component
- * can render it fine. Cards are always revealed here (career archive). A season
- * whose static data has no stat block renders GamerCard's own stats-less state;
- * no guard needed since GamerCard already takes `stats?`.
- */
-
 interface Props {
   cards: CareerCard[];
-  /** The player's display name — GamerCard's identity line. */
   playerName: string;
-  /** Optional mono eyebrow rendered above the gallery grid. */
   label?: string;
 }
 

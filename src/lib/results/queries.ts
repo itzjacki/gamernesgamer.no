@@ -28,20 +28,8 @@ import type { SeasonChanges } from './view-models';
 import { seasonData } from '@/data/sesong';
 
 /**
- * Public read API. Pages call these and nothing else in the module.
- *
- * Contract (so pages can wire boundaries correctly):
- * - Returns null when the season/game does not exist → page calls notFound().
- * - Throws on a real fetch/derivation error → page's error.tsx handles it.
- *
- * One DB pass per call via fetchSeasonBundle; derivation is pure and in-memory.
- * getGameView reuses the same bundle shape, so a page rendering both the season
- * and a game does at most one fetch each (dataset is tiny; no shared cache yet).
- *
- * NOTE: these view-models are DB-derived only (slugs, names, placements,
- * points). When a view-model needs STATIC content (game title, thumbnail,
- * gamer image), a compose step joins src/data/sesong by slug — added at the
- * point of need, kept out of the pure derivation.
+ * Public read API — pages call these and nothing else in the module.
+ * Returns null → page calls notFound(); throws → page's error.tsx.
  */
 
 export async function getSeasonView(
@@ -62,26 +50,16 @@ export async function getGameView(
 }
 
 /**
- * All player slugs for generateStaticParams on /spillere/[spiller]. Pure static
- * data (the cross-season roster) — no DB, so prerender param generation needs
- * no IO. A player with a roster entry but no confirmed results yet still gets a
- * param; getCareerView then returns null → notFound() for that page.
+ * Static data only, no IO. A player with no confirmed results still gets a
+ * param; getCareerView then returns null → notFound().
  */
 export function getAllPlayerSlugs(): string[] {
   return allPlayers().map((p) => p.slug);
 }
 
 /**
- * The player career page's read API. Fetches every season bundle, derives the
- * cross-season career for `slug`, and joins static content.
- *
- * Contract (same as getSeasonView): returns null when the slug matches no
- * roster in any season (→ notFound()); throws on a real fetch error (→ error.tsx).
- *
- * The dedicated hero portrait is resolved HERE (not in compose) so compose
- * stays pure/IO-free and unit-testable: a background-removed portrait at
- * public/images/heroes/<slug>.png is used when present, otherwise the composer's
- * latest-card-art fallback stands (and heroImageIsFallback stays true).
+ * Null when the slug matches no roster in any season. The hero portrait is
+ * resolved here, not in compose, so compose stays IO-free.
  */
 export async function getCareerView(slug: string): Promise<CareerView | null> {
   const bundles = await fetchAllSeasonBundles();
@@ -92,28 +70,20 @@ export async function getCareerView(slug: string): Promise<CareerView | null> {
   return { ...view, hero: resolveHeroImage(slug, view.hero) };
 }
 
-/**
- * The /records page's read API: every season bundle, every player's career, and
- * the records derived across them. Never null — with no confirmed results the
- * board and every record are simply empty. Throws on a real fetch error.
- */
+/** Never null — with no confirmed results every record is simply empty. */
 export async function getRecordsView(): Promise<RecordsView> {
   const bundles = await fetchAllSeasonBundles();
   return composeRecordsView(assembleAllCareers(bundles));
 }
 
-/** One season's champion, for the site header. Null until results exist. */
 export interface SeasonChampion {
   seasonNumber: number;
   seasonSlug: string;
+  /** Null until results exist. */
   champion: PlayerRef | null;
 }
 
-/**
- * The site header's read API: each season with results and its champion
- * (authoritative placement 1, from season_result). Seasons without results
- * are simply absent. Throws on a real fetch error.
- */
+/** Seasons without results are absent. */
 export async function getSeasonChampions(): Promise<SeasonChampion[]> {
   const bundles = await fetchAllSeasonBundles();
   return bundles.map((bundle) => {
@@ -126,26 +96,18 @@ export async function getSeasonChampions(): Promise<SeasonChampion[]> {
   });
 }
 
-/**
- * The front page's archive totals: crowned seasons, games with confirmed
- * results, decided head-to-head matches and power-up/curse uses, across every
- * season. Never null — all zeros without results. Throws on a real fetch error.
- */
+/** Never null — all zeros without results. */
 export async function getArchiveTotals(): Promise<ArchiveTotals> {
   const bundles = await fetchAllSeasonBundles();
   return deriveArchiveTotals(bundles.map(assembleSeasonView));
 }
 
 /**
- * The front page's just-crowned block: what the latest finished season (by
- * `meta.status`) changed in the all-time records. Derives the records twice,
- * over every season before it and over every season up to it, and diffs them.
- *
- * `minCrownGames` is the consumer's ranking minimum for category crowns
- * (`MIN_RANKED_GAMES`); it is passed in so the rule stays on the consuming side.
- *
- * Null when no season is finished, or when the finished one has no earlier
- * season with results to compare against. Throws on a real fetch error.
+ * What the latest finished season (by `meta.status`) changed in the all-time
+ * records: the records up to the season before it, diffed against those up to
+ * it. `minCrownGames` is passed in so the ranking minimum stays on the
+ * consuming side. Null when no season is finished or there is nothing earlier
+ * to compare against.
  */
 export async function getSeasonChanges({
   minCrownGames,
@@ -174,11 +136,9 @@ export async function getSeasonChanges({
 }
 
 /**
- * Every ordered pair of players for generateStaticParams on /vs/[a]/[b]. Both
- * orders are listed: the first slug is the page's left-hand side, so /vs/x/y
- * and /vs/y/x are two pages. Pure static data: a pair is two players who share
- * a season roster. A pair with no confirmed results in common still gets a
- * param; getPairView then returns null → notFound().
+ * Both orders are listed: /vs/x/y and /vs/y/x are two pages. Static data only —
+ * a pair is two players who share a season roster; one with no confirmed
+ * results in common gets a param and then notFound().
  */
 export function getAllPairSlugs(): { a: string; b: string }[] {
   const players = allPlayers();
@@ -193,9 +153,8 @@ export function getAllPairSlugs(): { a: string; b: string }[] {
 }
 
 /**
- * The /vs page's read API: `a` against `b`, in that order. Null when either
- * slug is unknown, they are the same player, or the two never shared a game
- * (→ notFound()); throws on a real fetch error.
+ * Null when either slug is unknown, they are the same player, or the two never
+ * shared a game.
  */
 export async function getPairView(
   a: string,
@@ -212,30 +171,20 @@ export async function getPairView(
   return { ...view, a: withHero(view.a), b: withHero(view.b) };
 }
 
-/**
- * The career page's head-to-head list: one line per opponent the player has
- * shared a game with. Empty for an unknown slug.
- */
+/** One line per opponent the player has shared a game with. */
 export async function getPairSummaries(slug: string): Promise<PairSummary[]> {
   const bundles = await fetchAllSeasonBundles();
   return composePairSummaries(assembleAllCareers(bundles), slug);
 }
 
-/**
- * The player's dedicated hero portrait (public/images/heroes/<slug>.png) when
- * one exists on disk, else null. Shared by the career hero and the player
- * index, so both pick the portrait up the moment the file is added.
- */
+/** public/images/heroes/<slug>.png when it exists on disk. */
 export function findHeroImage(slug: string): string | null {
   const rel = `/images/heroes/${slug}.png`;
   const abs = path.join(process.cwd(), 'public', rel);
   return existsSync(abs) ? rel : null;
 }
 
-/**
- * The season's dedicated landscape photo (public/images/seasons/<NN>.jpg, or
- * .png/.webp) when one exists on disk, else null. Used by the season index.
- */
+/** public/images/seasons/<NN>.{jpg,png,webp} when it exists on disk. */
 export function findSeasonImage(seasonSlug: string): string | null {
   for (const ext of ['jpg', 'png', 'webp']) {
     const rel = `/images/seasons/${seasonSlug}.${ext}`;
@@ -244,7 +193,6 @@ export function findSeasonImage(seasonSlug: string): string | null {
   return null;
 }
 
-/** Prefer a dedicated hero portrait on disk; else keep the card-art fallback. */
 function resolveHeroImage(
   slug: string,
   hero: CareerView['hero'],

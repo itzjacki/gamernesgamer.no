@@ -6,11 +6,7 @@ import {
   s1ExpectedTotals,
 } from './s1.fixtures';
 
-/**
- * These assert the pure derivation against the fully-verified S1 numbers from
- * working-docs/game-placements.md. If the arithmetic drifts, these fail — the
- * one gate `next build` cannot provide for silently-wrong points.
- */
+/** Oracle: the verified S1 numbers in working-docs/game-placements.md. */
 
 describe('assembleSeasonView — Season 1', () => {
   const view = assembleSeasonView(s1Bundle);

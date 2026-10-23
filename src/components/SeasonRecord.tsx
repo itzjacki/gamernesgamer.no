@@ -1,21 +1,10 @@
 import Link from 'next/link';
 import type { CareerSeasonRow } from '@/lib/results/view-models';
 
-/**
- * The season-by-season record: a compact motorsport-timing-sheet readout, one
- * row per season the player competed in, each linking out to that season page.
- *
- * Deliberately a mono STEPPED READOUT, not a chart (owner call): at ~4 seasons
- * a line chart reads emptier than the numbers do, and this duplicates nothing.
- * Shares StandingsTable's grammar (Martian Mono, tabular-nums, hairline rules,
- * solid bg masking the grid, no radius/shadow). The single accent is spent only
- * on champion (P1) seasons — legitimate champion data, consistent with the
- * site-wide rule.
- */
+/** A player's season-by-season table. A readout, not a chart, by decision. */
 
 interface Props {
   seasons: CareerSeasonRow[];
-  /** Optional mono eyebrow rendered inside the table surface (as a caption). */
   label?: string;
 }
 

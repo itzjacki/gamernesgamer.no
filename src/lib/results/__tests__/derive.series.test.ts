@@ -4,10 +4,8 @@ import { cumulativeSeries } from '../derive/series';
 import { s1Bundle, s1ExpectedTotals } from './s1.fixtures';
 
 /**
- * Asserts the cumulative points-over-games series against the verified S1
- * per-game matrix (working-docs/game-placements.md). The running totals must
- * reconcile with the season totals the standings test already pins
- * (24/20/20/16), and the x-axis must be the games in ordinal order.
+ * Oracle: working-docs/game-placements.md. The running totals must reconcile
+ * with the season totals (24/20/20/16).
  *
  * S1 per-game points (verified), in ordinal order sjakk..flat-out-2:
  *   tobias  : 3 2 3 3 4 1 4 4  -> cumulative 3 5 8 11 15 16 20 24

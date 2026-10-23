@@ -6,21 +6,10 @@ import Heading from './Heading';
 
 import styles from './LiveSideBlock.module.css';
 
-/**
- * Beside the trophy in the live state (under it on phones): the door to the
- * running season's page. Phase 5 adds a live table here; for now the whole
- * block is ONE link. A normal bordered block on the scene (design.md, "On
- * the hero"): solid `bg-bg` with `border`, a mono eyebrow with a blinking
- * status LED (the header's live grammar; steady under reduced motion), a
- * rule, the season as a `Heading` with its dates, a rule and the link cue.
- * From 701px it is five grid cells tall — eyebrow, body and cue at 1, 3
- * and 1.
- *
- * Accent at rest is the LED only; the borders and the cue take it on hover.
- */
+/** Accent at rest is the LED only; the borders and the cue take it on hover. */
 
 interface Props {
-  /** The live season's zero-padded slug. The page may pass a stand-in to preview. */
+  /** The page may pass a stand-in to preview. */
   season: Season;
 }
 

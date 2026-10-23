@@ -1,24 +1,9 @@
 import type { SeasonBundle } from '../raw';
 
 /**
- * Season 2 raw bundle fixture — a faithful snapshot of the seeded S2 data
- * (supabase/seed.sql), used to unit-test the pure derivation without a DB.
- *
- * S2 is the first season with POWER-UPS, so this fixture is what exercises the
- * power-up delta path (S1 has none). The ASSERTED facts are the derived numbers
- * in the tests: season totals 32/32/39/30, the per-game points matrix (ladder +
- * power-up deltas), the season-level tie (Jakob & Jørgen both 32, resolved by
- * season_result to Jørgen 2nd / Jakob 3rd), and the per-row power-up deltas.
- *
- * Base ladder: 7/4/2/1. UUIDs match the local seed at authoring time; the
- * derivation only cares that ids are consistent across tables.
- *
- * NOTE: the derivation consumes only game_result + ladder + power_up_use +
- * season_result (+ roster/players for name resolution). match/stage/round rows
- * are intentionally NOT part of this bundle — the read layer does not derive
- * match-level standings or round sums yet, so there is nothing to fixture for
- * them. The leg-based dual-round-robin / bracket-rematch modeling is verified
- * at the DB level in the seed run, not here.
+ * Snapshot of the seeded S2 data (supabase/seed.sql) — the fixture that
+ * exercises power-ups. Base ladder 7/4/2/1. UUIDs only need to be consistent
+ * across tables; they are not asserted.
  */
 
 // season_player ids
@@ -59,7 +44,6 @@ const G = {
   lol: 'c5885910-3aa6-4745-861e-da53c533b770',
 } as const;
 
-/** Helper: build the 4 game_result rows for a game from a placement map. */
 function results(
   gameId: string,
   placements: { sp: string; placement: number; note?: string | null }[],
@@ -75,10 +59,7 @@ function results(
   }));
 }
 
-/**
- * Helper: build one power_up_use row. affected === used_by always — every S1–S4
- * power-up only adjusts the user's own points (the schema's targeting field).
- */
+/** affected === used_by: every S1–S4 power-up only adjusts the user's own points. */
 let puSeq = 0;
 function use(gameId: string, powerUpId: string, sp: string, delta: number) {
   return {
@@ -339,10 +320,7 @@ export const s2ExpectedGamePoints: Record<
   'league-of-legends-02': { jakob: 1, jorgen: 7, tobias: 4, william: 2 },
 };
 
-/**
- * Expected per-game power-up deltas (0 where none). The sum of a player's
- * deltas across all games is their total power-up contribution.
- */
+/** 0 where none. */
 export const s2ExpectedPowerUpDeltas: Record<
   string,
   { jakob: number; jorgen: number; tobias: number; william: number }
@@ -365,13 +343,7 @@ export const s2ExpectedTotals = {
   william: 30,
 } as const;
 
-/**
- * Expected per-cell power-up USE lists (slug + delta), for the new per-use
- * breakdown. Only cells with at least one use are listed; every other cell has
- * an empty list. Slugs match the static power-up content (double-up etc.).
- * Deterministic order: slug asc, then delta asc, then DB order — the one cell
- * with two uses (none in S2; all S2 cells have a single use) would follow it.
- */
+/** Only cells with at least one use are listed; every other cell is empty. */
 export const s2ExpectedUses: Record<
   string,
   Record<string, { slug: string; isCurse: boolean; pointsDelta: number }[]>

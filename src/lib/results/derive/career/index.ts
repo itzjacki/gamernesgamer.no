@@ -11,17 +11,9 @@ import { deriveLedger } from './ledger';
 import { deriveTrophies } from './trophies';
 
 /**
- * PURE. Assembles ONE player's cross-season career from the raw per-season
- * bundles. No IO, no async — the function the career unit tests exercise.
- *
- * The career layer never re-derives placements or points: it runs the existing
- * per-season assembler on each bundle and reads the authoritative SeasonView
- * (season_result placements, derived totals, per-game golds). So season and
- * career numbers agree by construction.
- *
- * A player is identified by `slug` (cross-season player identity). Only seasons
- * the player actually competed in contribute rows. Returns null when the slug
- * matches no roster in any season (caller maps to notFound()).
+ * PURE. Never re-derives placements or points: it reads the per-season
+ * assembler's SeasonViews, so season and career numbers agree by construction.
+ * Null when the slug matches no roster in any season.
  */
 export function assembleCareer(
   bundles: SeasonBundle[],
@@ -31,9 +23,8 @@ export function assembleCareer(
 }
 
 /**
- * PURE. Every player's career, for the pages that compare players (/records).
- * A player is anyone on a season roster with a final standing. Ordered by slug,
- * only so the output is deterministic — callers rank it themselves.
+ * A player is anyone with a final standing. Ordered by slug only for
+ * determinism — callers rank it themselves.
  */
 export function assembleAllCareers(bundles: SeasonBundle[]): CareerStats[] {
   const views = seasonViews(bundles);
@@ -46,20 +37,17 @@ export function assembleAllCareers(bundles: SeasonBundle[]): CareerStats[] {
     .filter((career) => career !== null);
 }
 
-/** Every season's assembled view, ascending by season number. */
 function seasonViews(bundles: SeasonBundle[]): SeasonView[] {
   return bundles
     .map(assembleSeasonView)
     .sort((a, b) => a.seasonNumber - b.seasonNumber);
 }
 
-/** One player's career from already-assembled, season-ascending views. */
 function careerFromViews(
   views: SeasonView[],
   slug: string,
 ): CareerStats | null {
-  // Per-season rows for THIS player, plus the season-internal "closeness"
-  // (player points / field-max points) used only as the best/worst tiebreak.
+  // Closeness (player points / field-max points) is only the best/worst tiebreak.
   const seasons: CareerSeasonRow[] = [];
   const games: CareerGameRow[] = [];
   const matches: CareerMatchRow[] = [];
@@ -68,7 +56,7 @@ function careerFromViews(
 
   for (const view of views) {
     const standing = view.standings.find((s) => s.player.slug === slug);
-    if (!standing) continue; // player didn't compete this season
+    if (!standing) continue;
 
     name = standing.player.name;
     seasons.push({
@@ -79,7 +67,6 @@ function careerFromViews(
       isChampion: standing.isChampion,
     });
 
-    // Games are already ordinal-ordered by the assembler.
     for (const g of view.games) {
       for (const m of g.matches) {
         const isA = m.playerA.slug === slug;

@@ -2,11 +2,7 @@
 
 import { useFormStatus } from 'react-dom';
 
-/**
- * The official multicolor Google "G" mark, used unaltered per Google's brand
- * guidelines. It is the sole spot of color on the login panel — a deliberate,
- * functional exception to the otherwise monochrome VERKSTED palette.
- */
+/** Raw hex on purpose: Google's brand guidelines require the mark unaltered. */
 function GoogleG() {
   return (
     <svg
@@ -40,12 +36,7 @@ interface Props {
   pendingLabel: string;
 }
 
-/**
- * Submit button for the Google sign-in form. Uses useFormStatus to disable
- * itself and swap to a "leaving" label while the server action redirects to
- * Google, preventing double-submits. No spinner — the motion budget is near
- * zero and the page is about to navigate away.
- */
+/** Disabled while pending to prevent double-submits during the redirect. */
 export default function GoogleSignInButton({ label, pendingLabel }: Props) {
   const { pending } = useFormStatus();
 

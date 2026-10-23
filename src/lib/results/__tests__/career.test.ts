@@ -8,9 +8,7 @@ import { s1Bundle } from './s1.fixtures';
 import { s2Bundle } from './s2.fixtures';
 
 /**
- * Career derivation over the verified S1 + S2 oracle. The career layer runs the
- * per-season assembler and reads its authoritative output, so these numbers are
- * tied by construction to the season tests:
+ * The verified S1 + S2 oracle (career numbers follow from the season tests):
  *
  *   placements   S1 & S2:   tobias 1, jorgen 2, jakob 3, william 4
  *   season totals S1:       tobias 24, jakob 20, jorgen 20, william 16
@@ -255,7 +253,6 @@ describe('composeCareerView — static content join', () => {
       wins: 3,
       averagePlacement: 1,
     });
-    // The games behind the row, chronological, with their static titles joined.
     expect(racing.results).toEqual([
       {
         seasonNumber: 1,
@@ -334,9 +331,7 @@ describe('composeCareerView — static content join', () => {
 });
 
 describe('deriveTrophies — season podium ordering', () => {
-  // Minimal SeasonView stub: deriveTrophies only reads seasonNumber,
-  // seasonSlug, standings, and games. A player holding `placement` in a season
-  // where no games are won.
+  // deriveTrophies only reads seasonNumber, seasonSlug, standings and games.
   const ref = (slug: string): PlayerRef => ({
     seasonPlayerId: `${slug}-sp`,
     slug,

@@ -14,6 +14,7 @@ These guide every decision. When in doubt, refer back here:
 - **Minimal edits only.** Touch only what's actually stale. Don't rewrite docs that are still accurate.
 - **Preserve voice.** Match the existing writing style in each file. Don't homogenize or reformat.
 - **Show your work.** Always explain what you checked and what you found — especially when the answer is "nothing needs changing."
+- **Follow "Writing for agents" in `AGENTS.md`.** One home per fact, no inventories or build narratives, and prefer deleting a stale line over expanding it.
 - **Decisions matter more than diffs.** A new dependency is obvious from a diff. A new architectural decision, a new domain, a new workflow — these are what steering docs exist to capture. Look for them actively.
 - **Ask before editing.** Summarize proposed changes and get confirmation before modifying files.
 - **Early-exit when appropriate.** If the situation doesn't call for updates (wrong repo, nothing stale, no steering files exist), don't perform empty ceremony. But early-exit means skipping pointless process steps — not withholding helpful information. If you can preview what changes would be needed in the right context, do so.

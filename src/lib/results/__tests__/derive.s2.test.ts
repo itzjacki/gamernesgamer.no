@@ -9,10 +9,9 @@ import {
 } from './s2.fixtures';
 
 /**
- * Season 2 is the first season with POWER-UPS and the first with a season-level
- * point TIE resolved by season_result (Jakob & Jørgen both 32). These assert
- * the derivation handles both — the arithmetic `next build` cannot catch.
- * Oracle numbers come from working-docs/game-placements.md + the Poeng sheet.
+ * S2 has power-ups and a season-level points tie resolved by season_result
+ * (Jakob & Jørgen both 32). Oracle: working-docs/game-placements.md + the
+ * Poeng sheet.
  */
 
 describe('assembleSeasonView — Season 2', () => {
@@ -40,7 +39,6 @@ describe('assembleSeasonView — Season 2', () => {
     expect(jakob.totalPoints).toBe(jorgen.totalPoints); // genuinely tied on points
     expect(jorgen.placement).toBe(2);
     expect(jakob.placement).toBe(3);
-    // And the standings array is ordered by placement.
     expect(view.standings.map((s) => s.player.slug)).toEqual([
       'tobias', // 1st (39)
       'jorgen', // 2nd (32, tiebreak winner)
@@ -118,11 +116,9 @@ describe('assembleSeasonView — Season 2', () => {
       const expectedUses = s2ExpectedUses[game.slug] ?? {};
       for (const row of game.results) {
         const expected = expectedUses[row.player.slug] ?? [];
-        // The resolved per-use entries match the oracle (slug/isCurse/delta).
         expect(row.powerUpUses, `${game.slug}/${row.player.slug} uses`).toEqual(
           expected,
         );
-        // Invariant: the net delta is exactly the sum of the per-use list.
         const sum = row.powerUpUses.reduce((a, u) => a + u.pointsDelta, 0);
         expect(sum, `${game.slug}/${row.player.slug} Σlist`).toBe(
           row.powerUpDelta,

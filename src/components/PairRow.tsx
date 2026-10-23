@@ -1,25 +1,9 @@
 import Popover from './Popover';
 
 /**
- * The /vs page's comparison grammar: ONE reading about a pair on a shared axis
- * between two fixed sides (a on the left, b on the right), never two figures in
- * two columns. Both figures always share a colour and weight; the relation is
- * carried by where the needle sits on the gauge, not by colouring a leader — in
- * a one-sided pairing that would paint one side top to bottom. The needle
- * itself is the accent: it marks the reading, not a player, so every row
- * carries one small red mark whoever is ahead.
- *
- * Four pieces, so the page composes them freely:
- *  - `PairRow`: a full cell (mono eyebrow + scope, then figure · gauge · figure),
- *    a `bg-bg` cell meant for a `bg-border gap-px` wall like CareerLedger's.
- *  - `PairMini`: a sub-part of a row — the same layout at a smaller size, on a
- *    shorter axis centred under the main one (matches per series length, the
- *    split by whose pick the game was). `PairMinis` lays a set of them out.
- *  - `PairLine`: the one-line list variant (label · figure · gauge · figure)
- *    for the category list, its label set like the other category tables'.
- *
- * Detail on demand (the games or matches behind a figure) is the site's shared
- * `Popover`, opened from a row's scope label.
+ * The /vs comparison grammar: ONE reading about a pair on a shared axis between
+ * two fixed sides (a left, b right), never two figures in two columns. Both
+ * figures always share a colour and weight; the gauge carries the relation.
  */
 
 const eyebrow =
@@ -28,15 +12,13 @@ const eyebrow =
 interface Sides {
   a: number;
   b: number;
-  /** The two players' names, for screen readers (the figures carry no label). */
+  /** For screen readers: the figures carry no label. */
   names: { a: string; b: string };
 }
 
 /**
- * The gauge: a hairline track with a fixed centre mark and a needle that leans
- * toward whoever has more — dead centre when level (0–0 included). Every
- * gauge has its needle, however small the sample: the figures beside it say
- * how much is behind it, and an axis without one reads as broken.
+ * Every gauge has its needle, however small the sample (0–0 sits dead centre):
+ * an axis without one reads as broken.
  */
 export function PairGauge({ a, b }: { a: number; b: number }) {
   const total = a + b;
@@ -56,13 +38,12 @@ interface RowProps extends Sides {
   /** Unique on the page; names the detail popover. */
   id: string;
   label: string;
-  /** The sample behind the figures, e.g. "34 spill". Opens `detail` if given. */
+  /** E.g. "34 spill". Opens `detail` if given. */
   scope?: string;
-  /** What is behind the figures, shown in a popover off the scope. */
   detail?: React.ReactNode;
-  /** The masthead's row prints its figures at display size. */
+  /** Display-size figures, for the masthead. */
   headline?: boolean;
-  /** Sub-parts under the gauge (a `PairMinis` set). */
+  /** A `PairMinis` set. */
   children?: React.ReactNode;
 }
 
@@ -117,10 +98,6 @@ export function PairRow({
   );
 }
 
-/**
- * A set of sub-parts: centred under the main axis, side by side from `sm` up
- * and stacked on phones. Centred whether there are one, two or three.
- */
 export function PairMinis({ children }: { children: React.ReactNode }) {
   return (
     <div className='border-border flex flex-wrap justify-center gap-x-10 gap-y-4 border-t pt-4'>
@@ -130,11 +107,9 @@ export function PairMinis({ children }: { children: React.ReactNode }) {
 }
 
 interface MiniProps extends Sides {
-  /** The part's label: plain text, or a popover for detail on demand. */
   label: React.ReactNode;
 }
 
-/** One sub-part: PairRow's layout, smaller, on a shorter centred axis. */
 export function PairMini({ label, a, b, names }: MiniProps) {
   const figure = 'text-text font-mono text-lg tabular-nums';
   return (
@@ -156,21 +131,18 @@ export function PairMini({ label, a, b, names }: MiniProps) {
 }
 
 interface LineProps extends Sides {
-  /** The line's label: plain text, or a popover trigger for detail on demand. */
   label: React.ReactNode;
-  /** An unranked line (too few games): label and figures step back to muted. */
+  /** An unranked line (too few games). */
   muted?: boolean;
 }
 
-/** The list variant: label, then figure · gauge · figure on one line. */
 export function PairLine({ label, a, b, names, muted = false }: LineProps) {
   const figure = `font-mono text-sm tabular-nums ${
     muted ? 'text-text-muted' : 'text-text'
   }`;
   return (
     // Divs, not a <p> with spans: the label may hold a popover, whose panel is
-    // a <div> and cannot sit inside phrasing content. The label is set like a
-    // row header in TagRecord/TagCrowns (text face, semibold when ranked).
+    // a <div> and cannot sit inside phrasing content.
     <div className='border-border grid min-h-11 grid-cols-[minmax(0,8.5rem)_1.5rem_1fr_1.5rem] items-center gap-3 border-t sm:grid-cols-[minmax(0,12rem)_2rem_1fr_2rem] sm:gap-4'>
       <div
         className={`truncate ${

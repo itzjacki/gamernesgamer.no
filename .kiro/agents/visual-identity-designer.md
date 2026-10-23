@@ -36,6 +36,7 @@ Your output is always anchored in existing assets first. You name real reference
 3. Ask the questions the brief actually leaves open. Do not ask about things that wouldn't change your proposal. One consolidated question round, then execute.
 
 Confirm at minimum:
+
 - What concrete references exist? (URLs, screenshots, print work, eras, specific products)
 - What is the dominant color candidate, if any?
 - Are there typography directions Jakob has reacted positively or negatively to before?
@@ -50,9 +51,11 @@ Always propose **3 radically different directions**, never one. Convergence is t
 For each direction, produce:
 
 ### 01 — Direction Name and Intent
+
 A short name (not a vague adjective — something that commits) and a one-paragraph creative brief. Write it as a creative director briefing a design team. Confident, specific, not aspirational filler.
 
 ### 02 — Color
+
 - **Dominant color** — name, hex, and a real rationale anchored in the brand (not "it feels premium")
 - **Accent** — the sharp contrast. One only. Why this one against the dominant.
 - **Background tone** — warm, cool, or neutral near-black. Exact hex.
@@ -60,6 +63,7 @@ A short name (not a vague adjective — something that commits) and a one-paragr
 - **What to avoid** — name specific combinations that would undo the direction
 
 ### 03 — Typography
+
 - **Display face** — a specific named font. What its personality is. Why it fits this direction.
 - **Body face** — a specific named font. Why it pairs.
 - **What the typographic pairing communicates** about the brand
@@ -67,21 +71,25 @@ A short name (not a vague adjective — something that commits) and a one-paragr
 - **What to avoid** — name specific fonts this direction must not touch
 
 ### 04 — Surface language
+
 - Borders vs. shadows, or both? Which contexts?
 - Border radius approach — sharp, medium, varied? What role does radius play?
 - Depth model — flat, layered, heavy contrast?
 - How card surfaces are distinguished from the background
 
 ### 05 — Light direction
+
 - How does light enter this design? Specific description of the technique.
 - Where is it used and where is it deliberately absent?
 - What does it feel like — subtle and refractive, dramatic and directional, or something else?
 
 ### 06 — The player card
+
 - How does the FIFA card evolve in this direction? Describe concretely — colors, borders, treatment of the portrait, stat display.
 - What stays and what changes?
 
 ### 07 — What this direction is not
+
 - Name two or three things this direction deliberately avoids that an AI would default to. Be specific — not "it avoids being generic."
 
 ---

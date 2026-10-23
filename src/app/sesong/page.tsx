@@ -39,7 +39,6 @@ async function toEntry(slug: Season): Promise<SeasonEntry> {
 }
 
 export default async function SeasonsIndexPage() {
-  // Newest first.
   const slugs = (Object.keys(seasonData) as Season[]).sort().reverse();
   const entries = await Promise.all(slugs.map(toEntry));
 

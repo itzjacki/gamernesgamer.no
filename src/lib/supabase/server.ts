@@ -5,19 +5,9 @@ import { cookies } from 'next/headers';
 import type { Database } from './database.types';
 
 /**
- * Cookie-bound server client for Supabase Auth (admin panel — Phase 3).
- *
- * NOT used by the public result-read layer (that is ./read, which is
- * cookieless and reads under RLS with the publishable key). This client
- * carries the admin's session via cookies and is created per request — never
- * module-scoped — because it closes over the current request's cookie store.
- *
- * Pattern follows current @supabase/ssr: async factory, cookies() awaited,
- * getAll/setAll. setAll is wrapped in try/catch because Server Components cannot
- * write cookies; the proxy (src/proxy.ts) refreshes the session there instead.
- *
- * Uses the PUBLISHABLE key (RLS-enforced) — admin privileges come from the
- * authenticated session + RLS policies, not from a privileged key.
+ * Cookie-bound client for the admin session. Per request, never module-scoped:
+ * it closes over the request's cookie store. Admin rights come from the
+ * session + RLS, not a privileged key. Public reads use ./read.
  */
 export async function createAuthClient() {
   const url = process.env.NEXT_PUBLIC_DB_SUPABASE_URL;
@@ -42,7 +32,7 @@ export async function createAuthClient() {
             cookieStore.set(name, value, options),
           );
         } catch {
-          // Called from a Server Component — ignore; middleware refreshes the session.
+          // Server Components can't write cookies; src/proxy.ts refreshes the session.
         }
       },
     },

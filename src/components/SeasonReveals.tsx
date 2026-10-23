@@ -3,21 +3,13 @@ import Link from 'next/link';
 import type { SeasonData } from '@/data/sesong';
 
 /**
- * Under the centred trophy in the upcoming state: one mono row of what the
- * coming season has revealed so far, the whole row ONE link to its season
- * page. Each count respects its reveal flag; unrevealed shows as "?".
- *
- * Readout grammar, like the header display: label over value in mono cells
- * split by hairlines. A normal bordered element on the scene's floor
- * (design.md, "On the hero"): solid `bg-bg`, `border` all round and between
- * the cells, all of which take the accent on hover. From 701px every cell,
- * the season cue included, is four grid cells wide and the row one cell
- * tall, so centred it lands on the grid; on phones the counts share a fixed
- * grid with the cue on its own row beneath.
+ * What the coming season has revealed so far. Each count respects its reveal
+ * flag; unrevealed shows as "?". From 701px every cell is four grid cells
+ * wide, so the centred row lands on the grid.
  */
 
 interface Props {
-  /** The season's zero-padded slug, e.g. "05". */
+  /** Zero-padded slug, e.g. "05". */
   season: string;
   data: SeasonData;
 }

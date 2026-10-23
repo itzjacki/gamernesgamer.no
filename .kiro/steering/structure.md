@@ -1,7 +1,7 @@
 # Project Structure
 
 The tree below is a map of where things go, not an inventory — list the
-directory for the current files. What is built vs planned lives in `TODO.md`.
+directory for the current files. Open work lives in `TODO.md`.
 
 ```
 src/
@@ -57,51 +57,33 @@ working-docs/           Secondary reference: decisions, format inventory, raw CS
 
 ## Results layer (`src/lib/results/`)
 
-Each file has one job; keep the boundaries.
+Each file has one job; keep the boundaries. Data flows
+`fetch → derive → compose → queries → page`.
 
-- `queries.ts` — the public API pages call: `getSeasonView(n)`,
-  `getGameView(n, slug)`, `getCareerView(slug)`, `getAllPlayerSlugs()`,
-  `getRecordsView()`, `getPairView(a, b)`, `getPairSummaries(slug)`,
-  `getAllPairSlugs()`, and for the front page `getSeasonChampions()`,
-  `getArchiveTotals()` and `getSeasonChanges()`. Returns `null` for not-found; throws on error. Also
-  resolves hero portraits off the filesystem so `compose` stays pure.
-- `fetch.ts` — the IO boundary. `fetchSeasonBundle` and `fetchAllSeasonBundles`.
-  Filters `confirmed = true`. Imports no derivation. The bundle also carries
-  the head-to-head tables (`stage`, `match`, `match_game`); they have no
+- `queries.ts` — the only API pages call. Returns `null` for not-found (→
+  `notFound()`), throws on error (→ `error.tsx`). Does the filesystem lookups
+  (hero portraits, season photos) so `compose` stays pure.
+- `fetch.ts` — the IO boundary. Filters `confirmed = true`; imports no
+  derivation. The H2H tables (`stage`, `match`, `match_game`) have no
   `confirmed` flag, so derivation only reads the matches of games that have
-  results. The rounds tables are not fetched yet.
-- `derive/` — pure, synchronous, no IO. Unit-tested. `derive/career/` is the
-  cross-season derivation shared by player pages and `/records`; it reads the
-  per-season assembler's output and never re-derives placements. `derive/`
-  imports no static data, so `derive/career/tags.ts` (`deriveTagStats`) takes
-  rows whose tags the caller has already resolved. `derive/records/` compares
-  all players (`deriveRecords`: the career board and every record on
-  `/records`), on the same terms: its game and match rows arrive with title,
-  tags and own-pick flag already joined. Every record is a best-first list of
-  `RecordEntry` with shared ranks — a tie stays a tie. One file per family:
-  `index.ts` (placement- and season-based records, and the assembly),
-  `match-records.ts` (head-to-head matches), `rivalries.ts` (the pair record),
-  over shared `helpers.ts`, `rank.ts` and `streaks.ts`. A new record is a
-  function there, a field on `RecordsView`, and an entry in
-  `RECORD_PLATES` (`src/lib/record-plates.tsx`; TypeScript errors until it
-  has one). `derive/records/changes.ts` (`diffRecords`)
-  compares two `RecordsView`s (all seasons but the last vs all of them) for
-  the front page's "what last season changed". `derive/totals.ts` counts the
-  archive totals.
-  `derive/pair.ts` (`derivePair`) describes ONE pair for `/vs` from those same
-  joined rows: every figure is over what the two shared (games both played,
-  seasons both finished, matches against each other), never over a whole
-  career, and its sides are `a`/`b` in the order asked for. `derive/matches.ts` decides each head-to-head
-  match from its game rows (the outcome is never stored) and puts the decided
-  ones on `GameSummary.matches`; careers and the match records read from there.
-- `compose.ts` — pure. The one seam that joins DB view-models to static
-  `src/data` content (game by slug, player by name, season by padded slug, title
-  by `titleId`). It resolves each game's tags (`gameTags`) and calls
-  `deriveTagStats` to fill `CareerView.tagStats`. `composeRecordsView` does the
-  same join for all players (`recordsInputs`) and calls `deriveRecords`;
-  `composePairView` and `composePairSummaries` reuse that join for `/vs` and
-  the career page's head-to-head list.
-- `view-models.ts` — the hand-authored camelCase shapes components consume.
+  results. The rounds tables are not fetched.
+- `derive/` — pure, synchronous, no IO, no static data, unit-tested.
+  - `career/` is shared by player pages and `/records`; it reads the
+    per-season output and never re-derives placements. Tag stats take rows
+    whose tags the caller has already resolved.
+  - `records/` compares all players on the same terms. Every record is a
+    best-first list with shared ranks — a tie stays a tie. A new record is a
+    function there, a field on `RecordsView` and an entry in `RECORD_PLATES`
+    (`src/lib/record-plates.tsx`; the build fails until it has one).
+  - `pair.ts` describes ONE pair for `/vs`: every figure is over what the two
+    shared (games both played, seasons both finished, matches against each
+    other), never a whole career; sides are `a`/`b` in the order asked for.
+  - `matches.ts` decides each H2H match from its game rows (the outcome is
+    never stored); everything else reads `GameSummary.matches`.
+- `compose.ts` — pure. The one seam that joins DB data to static `src/data`
+  content (game by slug, player by name, title by `titleId`, tags).
+- `view-models.ts` — the camelCase shapes components consume. Components never
+  see raw rows.
 - `raw.ts` — raw row aliases over the generated types. Module-internal.
 
 ## Results data model
@@ -116,6 +98,9 @@ points that are easy to get wrong:
   tiebreakers can override point totals. Never derive a placement from points.
 - Season points per game ARE derived: `season_ladder[placement] +
 SUM(power_up_use.points_delta)`.
+- Static and DB data join by key: a static `Game.slug` must equal the DB's
+  `game.slug` (the seed writes it from the static data), and players join by
+  name, since the static `Gamer` has no slug.
 - Every `*_season_player_id` column, and `match.player_a`/`player_b`, stores
   `season_player.id` — not `player.id`. Join to `player` through `season_player`.
 
@@ -132,34 +117,27 @@ CS2 are one title; the LoL instances share one), linked by `titleId`.
 - An instance may set its own `genreTags` to replace the title's, only when it
   was not the title's usual genre (CS2 as a parkour map).
 
-The two vocabularies are closed unions in `src/types/tag.ts` (`GenreTag`,
-`FormatTag`) and are human judgement — agree new tags with Jakob. `formatTags`
-are hand-tagged on purpose, not derived from the DB's `stage.kind`, which
-records how results are stored.
+The two vocabularies are closed unions in `src/types/tag.ts` and are human
+judgement — agree new tags with Jakob. `formatTags` are hand-tagged on
+purpose, not derived from the DB's `stage.kind`, which records how results
+are stored.
 
-**Where a tag is attached is a data decision only.** Everything that reads tags
-treats them as one concept, `Tag = GenreTag | FormatTag`: compose merges a
-game's genre and format tags (`gameTags`), `CareerView.tagStats` is one list
-(games, wins, average placement and the underlying game results per tag,
-unfiltered; best first, with averages equal at one decimal tied and broken by
-more games, then more wins), with a sibling `tagStatsWithoutOwnPicks` that
-leaves out the games the player chose (`Game.chosenBy` equal to the player's
-name), the labels
-are one map (`src/data/tag-labels.ts`, a `Record<Tag, string>` so a new tag
-fails the build without a label), and the career page shows one table
-(`src/components/TagRecord.tsx`). Don't reintroduce a genre/format split in the
-stats or UI without a reason.
+**Where a tag is attached is a data decision only.** Everything that reads
+tags treats them as one concept, `Tag = GenreTag | FormatTag`: one stats list,
+one label map, one table. Don't reintroduce a genre/format split in the stats
+or UI.
 
-Any minimum sample for ranking a tag (agreed: 3 games) belongs to the consuming
-component, not to the derivation or compose. It lives in `src/lib/tag-ranking.ts`
-(`MIN_RANKED_GAMES`, `splitRanked`), shared by `TagRecord`, `CareerLedger` and
-`TagCrowns`.
+The minimum sample for ranking a tag (3 games) is a presentation rule: it
+lives in `src/lib/tag-ranking.ts`, applied by the consuming components, never
+in derivation or compose.
 
 ## Adding a new season
 
 1. Create `src/data/sesong/<NN>/` with `meta.ts`, `gamers.ts` and `games.ts`
    (plus `power-ups.ts` if used). `meta.ts` holds the status, the reveal flags
-   and the `start`/`end` dates (`YYYY-MM-DD`; equal for a one-day season). Each gamer carries a `stats` block for the card.
+   and the `start`/`end` dates (`YYYY-MM-DD`; equal for a one-day season).
+   `status` is set by hand, not derived from the dates, and there is no start
+   time. Each gamer carries a `stats` block for the card.
    Each game needs a `titleId` (add a new title to `src/data/titles.ts` if the
    game has not appeared before) and `formatTags`.
 2. Add images under `public/images/gamers/<NN>/` and

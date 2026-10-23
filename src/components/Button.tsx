@@ -36,16 +36,9 @@ interface ButtonAsLink extends CommonProps {
 type Props = ButtonAsButton | ButtonAsAnchor | ButtonAsLink;
 
 /**
- * The VERKSTED action control: an h-11 (44px touch target) bordered surface
- * that gains an accent border on hover/focus. Consolidates the button markup
- * duplicated across the admin dashboard, admin management, and the rejection
- * screen, and serves both real buttons and button-styled links from one place.
- *
- * Polymorphic via a discriminated `as` prop ('button' | 'a' | 'link') rather
- * than asChild/cloneElement, so it stays a plain Server Component over a fixed,
- * known set of elements. Interactive pending state (useFormStatus) deliberately
- * lives OUTSIDE this primitive — a thin client wrapper passes `disabled` in
- * (see GoogleSignInButton), keeping Button itself server-rendered.
+ * Pending state (useFormStatus) deliberately lives outside: a thin client
+ * wrapper passes `disabled` in (see GoogleSignInButton), so Button stays a
+ * Server Component.
  */
 export default function Button(props: Props) {
   const width = props.width ?? 'fit';

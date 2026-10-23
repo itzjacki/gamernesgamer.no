@@ -1,7 +1,5 @@
 import type { RecordSeason } from '../../view-models';
 
-/** Small shared pieces of the records derivations. PURE. */
-
 export const isWin = (game: { placement: number }) => game.placement === 1;
 
 export const wins = (games: readonly { placement: number }[]) =>
@@ -15,7 +13,6 @@ export const mean = (games: readonly { placement: number }[]) =>
 export const shown = (average: number, decimals: number) =>
   Number(average.toFixed(decimals));
 
-/** The season a row belongs to, as records refer to it. */
 export const seasonRef = (row: {
   seasonNumber: number;
   seasonSlug: string;
@@ -24,11 +21,10 @@ export const seasonRef = (row: {
   seasonSlug: row.seasonSlug,
 });
 
-/** A game's identity across seasons: the key for "the same game" lookups. */
 export const gameKey = (row: { seasonSlug: string; gameSlug: string }) =>
   `${row.seasonSlug}/${row.gameSlug}`;
 
-/** Groups items by key, keeping first-seen key order and item order. */
+/** Keeps first-seen key order and item order. */
 export function groupBy<T, K>(
   items: readonly T[],
   keyOf: (item: T) => K,

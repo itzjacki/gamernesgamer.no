@@ -89,3 +89,11 @@ of any DB or browser dependency.
   silently falls back to the Site URL. So the Site URL must be the production
   domain, and preview deploys need `https://*-<vercel-team-slug>.vercel.app/**`.
   The local stack's allow-list lives in `supabase/config.toml`.
+- **Google OAuth client:** its redirect URIs point at Supabase's callback
+  (`http://127.0.0.1:54321/auth/v1/callback` locally,
+  `https://<project-ref>.supabase.co/auth/v1/callback` in prod), not the app.
+  Locally the client id/secret come from `[auth.external.google]` in
+  `config.toml` via `env(...)` (gitignored `supabase/.env`).
+- **Bootstrapping an admin:** sign in once at `/admin/login` (the user row is
+  created automatically; you'll be rejected), insert the `admin_user` row with
+  the service role, reload.

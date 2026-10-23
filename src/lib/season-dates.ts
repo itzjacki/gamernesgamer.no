@@ -1,10 +1,6 @@
 import type { IsoDate, SeasonMeta } from '@/types/season-meta';
 
-/**
- * Display formatting for a season's structured dates (`SeasonMeta.start` /
- * `end`). Norwegian numeric style, day first: "13.12.2025". Pure string work —
- * no Date objects, so no time zone can shift a day.
- */
+// String work only, no Date objects, so no time zone can shift a day.
 
 /** "2025-12-13" → "13.12.2025". */
 export function formatDay(date: IsoDate): string {

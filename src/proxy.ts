@@ -7,11 +7,8 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Run on all routes except static assets and image files. The session must
-     * be refreshed everywhere a signed-in admin might browse; the /admin gate
-     * itself lives in updateSession.
-     */
+    // Everywhere but static assets: the session must refresh wherever a
+    // signed-in admin browses.
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };

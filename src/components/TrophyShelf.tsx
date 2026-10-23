@@ -4,31 +4,12 @@ import Popover from './Popover';
 import TrophyIcon from './TrophyIcon';
 import styles from './TrophyShelf.module.css';
 
-/**
- * The trophy shelf — a Transfermarkt-style row of a player's honours, sitting
- * directly under the hero with NO section heading (it reads on its own). Each
- * trophy is a native-popover trigger (same no-JS pattern as GamePointsMatrix):
- * clicking/activating reveals a panel naming the honour and linking out to the
- * relevant season or game page. Keyboard-accessible, visible focus, >=44px.
- *
- * Two visual tiers (rendered by TrophyIcon):
- *  - season podium (gold/silver/bronze): the larger GG season trophy,
- *  - game-gold: a smaller, simpler token, visually subordinate.
- *
- * Trophies arrive pre-sorted (season trophies first, then game-golds).
- */
+/** Trophies arrive pre-sorted. */
 
 interface Props {
   trophies: CareerTrophyView[];
 }
 
-/* -------------------------------------------------------------------------- */
-
-/**
- * Honour label parts.
- * `sub` is an optional secondary line (used for the game-gold season), rendered
- * smaller/muted beneath the main label.
- */
 function trophyLabel(t: CareerTrophyView): { main: string; sub?: string } {
   if (t.kind === 'game-gold') {
     return { main: t.gameTitle ?? '', sub: `Sesong ${t.seasonNumber}` };
@@ -42,21 +23,17 @@ function trophyLabel(t: CareerTrophyView): { main: string; sub?: string } {
   return { main: `Gamernes Gamer - ${place}`, sub: `Sesong ${t.seasonNumber}` };
 }
 
-/** Where the trophy links: game-gold → game page, season → season page. */
 function trophyHref(t: CareerTrophyView): string {
   return t.kind === 'game-gold'
     ? `/sesong/${t.seasonSlug}/${t.gameSlug}`
     : `/sesong/${t.seasonSlug}`;
 }
 
-/** A stable id per trophy for the popover + anchor-name bridge. */
 function trophyId(t: CareerTrophyView, i: number): string {
   return t.kind === 'game-gold'
     ? `trophy-s${t.seasonNumber}-${t.gameSlug}-${i}`
     : `trophy-s${t.seasonNumber}-${t.kind}-${i}`;
 }
-
-/* -------------------------------------------------------------------------- */
 
 export default function TrophyShelf({ trophies }: Props) {
   if (trophies.length === 0) return null;

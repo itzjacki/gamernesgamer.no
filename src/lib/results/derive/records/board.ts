@@ -5,18 +5,15 @@ import type {
 } from '../../view-models';
 
 /**
- * Season placement-points: 1st = 4 … 4th = 1 (the decided cross-season scale —
- * placement is the one axis every season shares, raw points are not
- * comparable). Participation always scores, so anything below 4th still
- * earns 1.
+ * 1st = 4 … 4th = 1: placement is the one axis every season shares; raw points
+ * are not comparable. Anything below 4th still earns 1.
  */
 export const placementPoints = (placement: number) =>
   Math.max(1, 5 - placement);
 
 /**
- * PURE. The all-time career board: one row per player, ordered by the sum of
- * season placement-points. Ties on the sum fall through to more championships,
- * then the better average game placement; rows equal on all three share a rank.
+ * Placement-points, then championships, then average game placement; rows
+ * equal on all three share a rank.
  */
 export function deriveCareerBoard(
   players: RecordsPlayerInput[],

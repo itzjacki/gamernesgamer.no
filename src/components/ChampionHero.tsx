@@ -1,31 +1,18 @@
 import SectionLabel from './SectionLabel';
 
 interface Props {
-  /** Champion display name. */
   name: string;
-  /** Champion nickname (shown as the mono sub-line). */
   nickname: string;
-  /** Season number, for the eyebrow context. */
   seasonNumber: number;
-  /** Derived total season points. */
   totalPoints: number;
-  /** Resolved image src — a background-removed cutout when available. */
   imagePath: string;
   /**
-   * True when `imagePath` is a dedicated background-removed cutout. Drives the
-   * treatment: a cutout bleeds to the panel edge (no frame); the fallback
-   * gamer image sits framed so a square photo doesn't look broken.
+   * A cutout bleeds to the panel edge; the fallback gamer image sits framed
+   * so a square photo doesn't look broken.
    */
   isCutout: boolean;
 }
 
-/**
- * The champion centrepiece for a finished season — the single above-the-fold
- * accent moment. A full-width VERKSTED band (solid bg, hairline border, no
- * shadow/radius) with the champion name in Neue Montreal 800 and ONE accent
- * hairline marking P1. The cutout PNG, when present, is the hero image; without
- * it we fall back to the regular gamer portrait, framed.
- */
 export default function ChampionHero({
   name,
   nickname,

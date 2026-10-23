@@ -1,8 +1,7 @@
-// What a game was about, for "what is this player good at" stats. ONE concept
-// to everything that reads it (stats, labels, UI — see `Tag`). The two
-// vocabularies exist only because of where a tag is attached in the data.
+// One concept to everything that reads it (see `Tag`). The two vocabularies
+// exist only because of where a tag is attached in the data.
 
-// Follows the title: what kind of game it is, every season it appears.
+// Attached to the title.
 export type GenreTag =
   | 'shooter'
   | 'racing'
@@ -18,9 +17,8 @@ export type GenreTag =
   | 'moba'
   | 'sandbox';
 
-// Follows one season's instance: what the contest was that time. Hand-tagged,
-// deliberately not derived from the DB's stage kinds — those record how
-// results are stored.
+// Attached to one season's instance. Hand-tagged, deliberately not derived
+// from the DB's stage kinds, which record how results are stored.
 export type FormatTag =
   | 'duel'
   | 'free-for-all'

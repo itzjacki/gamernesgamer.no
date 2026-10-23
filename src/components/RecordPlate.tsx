@@ -5,34 +5,9 @@ import Popover, { PopoverGroup } from './Popover';
 import RecordLines from './RecordLines';
 
 /**
- * One record on the /records wall: who holds it, the number, and the three
- * players behind them (the whole field of four). The holder's name sits at the
- * top (sentence case, regular weight, a step larger than the rest); the mono
- * figure, with its unit running on from it on the same line, sits along the
- * bottom of the upper area, directly over the runners-up. Neither is large:
- * the name leads, the figure is a modest readout. `bg-bg` inside a `bg-border`
- * + `gap-px` hairline wall, like a CareerLedger cell.
- *
- * A plate is written to stand alone when cropped into the group chat: its own
- * label, a scope stamp saying which seasons it covers, and the runners-up that
- * give the number its meaning.
- *
- * - Ties: every rank-1 entry is a holder, on one line, over one shared figure.
- *   No tiebreak is applied here that the reader can't see.
- * - The holder's FIGURE carries the accent at rest: it is the record, the
- *   rank-1 datum of the plate. (An earlier pass kept the wall accent-free, on
- *   the grounds that every plate names a winner; the page read too flat.) The
- *   name and the runners-up stay neutral and earn accent on hover; game wins
- *   in the opened list keep it.
- * - A record can be held by a PAIR (closest rivalry): an entry with a `partner`
- *   shows both names. By default each name links to its own player; a record
- *   that is ABOUT two players passes `pairLink`, and the names become one
- *   link to that pair's /vs page.
- * - No portraits: one player on several plates would repeat the same face.
- * - The figure is a `Popover` trigger (native popover, no JS, stays a Server
- *   Component), marked with a dotted underline. The panel lists the games
- *   behind the number (`RecordLines`); each runner-up's figure opens the same
- *   list for that player.
+ * One record on the /records wall. A plate must stand alone when cropped into
+ * the group chat: its own label, a scope stamp and the runners-up. Tied
+ * holders share one line and one figure — no tiebreak the reader can't see.
  */
 
 export interface Props {
@@ -41,18 +16,14 @@ export interface Props {
   label: string;
   /** Which seasons the record covers, e.g. "S1–S4". */
   scope: string;
-  /** The record's entries, best first with shared ranks. */
+  /** Best first, with shared ranks. */
   entries: RecordEntry[];
-  /** The figure for one entry — used for the holder and the runners-up. */
   figure: (entry: RecordEntry) => string;
-  /** The line under the holder's figure: unit and any qualifier. */
+  /** The unit and any qualifier after the holder's figure. */
   unit: (holder: RecordEntry) => string;
   /** Screen-reader label for the figure button that opens the detail. */
   detailLabel: string;
-  /**
-   * What is behind one entry's figure (the holder's or a runner-up's).
-   * Defaults to the list of their games.
-   */
+  /** What is behind one entry's figure. Defaults to the list of their games. */
   detail?: (entry: RecordEntry) => React.ReactNode;
   /**
    * Names an entry as ONE link instead of a link per player — the records
@@ -61,39 +32,29 @@ export interface Props {
    */
   pairLink?: (entry: RecordEntry) => { text: string; href: string };
   /**
-   * The empty ruled row that closes the plate on the wall. A plate that
-   * stands alone over a cell of its own (the front page's record of the day)
-   * leaves it out, so there is no dead strip above that cell.
+   * The empty ruled row that closes the plate on the wall. Leave it out when
+   * the plate stands over a cell of its own, or it leaves a dead strip.
    */
   footerRow?: boolean;
 }
 
-/**
- * Rows under the holder. Three, not the conventional two: with four players a
- * plate then shows the whole field, so nobody is the one left off.
- */
+/** Three, not two: with four players the plate shows the whole field. */
 const MAX_RUNNERS_UP = 3;
 
 const eyebrow = 'text-text-muted font-mono text-xs tracking-widest uppercase';
 const nameLink =
   'hover:text-accent focus-visible:outline-accent underline-offset-2 transition-colors duration-150 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2';
 
-/** A stable key for an entry: the player, plus the partner in a pair record. */
 const entryKey = (entry: RecordEntry) =>
   entry.partner
     ? `${entry.player.slug}-${entry.partner.slug}`
     : entry.player.slug;
 
-/** An entry's name(s) as plain text: "Jakob", or "Jakob – Tobias" for a pair. */
 const plainNames = (entry: RecordEntry) =>
   entry.partner
     ? `${entry.player.name} – ${entry.partner.name}`
     : entry.player.name;
 
-/**
- * An entry's name(s), each linking to that player's page — or, with
- * `pairLink`, the whole string as one link to the pair's /vs page.
- */
 function Names({
   entry,
   pairLink,
@@ -126,7 +87,6 @@ function Names({
   );
 }
 
-/** The games behind a figure: title (to the game page), season, placement. */
 function gameLines(entry: RecordEntry) {
   return (
     <RecordLines
@@ -165,7 +125,6 @@ export default function RecordPlate({
   const shared = holders.length > 1;
 
   const popoverId = `record-${id}`;
-  /** What an entry is called in plain text (popover headings, group names). */
   const nameOf = (entry: RecordEntry) =>
     pairLink ? pairLink(entry).text : plainNames(entry);
 
@@ -181,7 +140,6 @@ export default function RecordPlate({
           <span className={`shrink-0 ${eyebrow}`}>{scope}</span>
         </header>
 
-        {/* Tied holders share one line, comma-separated. */}
         <p className='text-text text-xl'>
           {holders.map((holder, i) => (
             <Fragment key={entryKey(holder)}>
@@ -195,10 +153,8 @@ export default function RecordPlate({
             runners-up each line up across a grid row whatever the name above
             them does. */}
         <div className='mt-auto flex flex-col'>
-          {/* The figure and its unit as ONE line: the unit reads on from the
-              number at its baseline. A long unit wraps inside its own column
-              and grows UPWARD (last-baseline alignment), so its final line
-              always sits on the figure's baseline. */}
+          {/* A long unit wraps upward (last-baseline alignment), so its
+              final line stays on the figure's baseline. */}
           <div className='flex items-baseline-last gap-2 pb-4'>
             <Popover
               id={popoverId}
@@ -233,7 +189,6 @@ export default function RecordPlate({
                   <span className='text-text mr-auto text-sm'>
                     <Names entry={entry} pairLink={pairLink} />
                   </span>
-                  {/* The same detail as the holder's, for this player. */}
                   <Popover
                     id={`${popoverId}-${entryKey(entry)}`}
                     heading={`${label} · ${nameOf(entry)}`}
@@ -259,9 +214,8 @@ export default function RecordPlate({
             </ol>
           )}
 
-          {/* An empty ruled footer row: it closes the plate, so stacked
-              plates don't run into the one below. Its rule runs edge to edge
-              (out through the plate's padding), meeting the wall's hairlines. */}
+          {/* The rule runs out through the padding to meet the wall's
+              hairlines. */}
           {footerRow && (
             <div
               aria-hidden='true'

@@ -3,24 +3,13 @@ import { NextResponse, type NextRequest } from 'next/server';
 import type { Database } from './database.types';
 
 /**
- * Refreshes the Supabase Auth session cookie and gates /admin routes.
+ * Refreshes the Supabase session cookie and redirects signed-out visitors away
+ * from /admin. The client is per-request, never module-scoped: Vercel can reuse
+ * warm instances across requests. getClaims(), not getSession(), because it
+ * verifies the JWT signature; cookie data alone can be spoofed.
  *
- * Called from the root `src/proxy.ts` (Next.js 16's Proxy convention, formerly
- * "middleware"). Follows the current @supabase/ssr pattern: create a per-request
- * server client (never module-scoped — Vercel Fluid compute can reuse warm
- * instances across requests), call getClaims() to validate + refresh the JWT,
- * and return a response that carries any refreshed cookies.
- *
- * getClaims() is used (not getUser/getSession) because it validates the JWT
- * signature locally against the project's asymmetric signing keys — the current
- * recommended way to protect pages. Session data from cookies alone can be
- * spoofed; getClaims verifies it.
- *
- * Gating: only /admin/* is protected. /admin/login is always reachable so an
- * unauthenticated admin can sign in. Everything else (the public site) passes
- * through — the session is still refreshed so a signed-in admin stays signed in
- * as they browse. Being in the allowlist (is_admin) is enforced by RLS at the
- * data layer; this proxy only checks that *someone* is signed in.
+ * This only checks that someone is signed in. The admin allowlist is enforced
+ * server-side in the admin layout and by RLS.
  */
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -51,8 +40,8 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  // Do not run code between createServerClient and getClaims() — it keeps the
-  // session refresh reliable (per @supabase/ssr guidance).
+  // No code between createServerClient and getClaims(), or session refresh
+  // becomes unreliable (@supabase/ssr guidance).
   const { data } = await supabase.auth.getClaims();
   const claims = data?.claims;
 

@@ -10,16 +10,9 @@ import type {
 } from '../../view-models';
 import { shown } from './helpers';
 
-/**
- * PURE. What changed between two records views — in practice the archive
- * without its latest season (`before`) and with it (`after`), which is what
- * the front page's just-crowned block shows. Nothing here re-derives a record:
- * it reads the two views `deriveRecords` already ranked.
- *
- * A record's or crown's HOLDERS are its rank-1 entries, so a tie is several
- * holders and a change in who shares it is a change (see `HolderChangeKind`).
- * Cumulative records (career totals) count only when their holders change —
- * see `CUMULATIVE`. A quiet season gives three empty lists.
+/*
+ * PURE. A record's or crown's HOLDERS are its rank-1 entries, so a change in
+ * who shares a tie is a change (see `HolderChangeKind`).
  */
 
 /**
@@ -58,13 +51,10 @@ const MEASURES = {
 type Measure = (typeof MEASURES)[RecordKey];
 
 /**
- * CUMULATIVE records: career running totals that grow for whoever holds them
- * almost every season they play, so a bigger figure from the same holder is
- * no news. They are reported only when their HOLDERS change (taken, tied,
- * untied, new), never as `improved`.
- *
- * Counts of a specific feat (flawless tournaments, wins at one title) and
- * streaks, averages and rates are not here: a better figure there is an event.
+ * Career running totals grow for their holder almost every season, so a bigger
+ * figure from the same holder is no news: these are never `improved`. Counts
+ * of a specific feat, streaks, averages and rates don't belong here — a better
+ * figure there is an event.
  */
 const CUMULATIVE: ReadonlySet<RecordKey> = new Set<RecordKey>([
   'mostGameWins',
@@ -75,10 +65,7 @@ const CUMULATIVE: ReadonlySet<RecordKey> = new Set<RecordKey>([
   'powerUpPoints',
 ]);
 
-/**
- * Who an entry is about. The pair record (closest rivalry) is held by a PAIR,
- * whichever of the two happens to lead it.
- */
+/** The pair record is held by the PAIR, whichever of the two leads it. */
 function holderKey(entry: RecordEntry): string {
   if (!entry.partner) return entry.player.slug;
   return [entry.player.slug, entry.partner.slug].sort().join('+');
@@ -87,7 +74,7 @@ function holderKey(entry: RecordEntry): string {
 const holdersOf = (entries: RecordEntry[]) =>
   entries.filter((e) => e.rank === 1);
 
-/** How the holder set moved, or null when it is the same set (or empty after). */
+/** Null when the holder set is unchanged or empty after. */
 function holderChange(
   before: RecordEntry[],
   after: RecordEntry[],
@@ -142,7 +129,7 @@ function recordChanges(before: RecordsView, after: RecordsView) {
   return changes;
 }
 
-/** Every player whose board rank differs, including newcomers to the board. */
+/** Includes newcomers to the board. */
 function boardMoves(before: RecordsView, after: RecordsView): BoardMove[] {
   const rankBefore = new Map(before.board.map((r) => [r.player.slug, r.rank]));
   return after.board
@@ -155,9 +142,8 @@ function boardMoves(before: RecordsView, after: RecordsView): BoardMove[] {
 }
 
 /**
- * Crowns whose holders changed. A crown only counts once its holder has played
- * `minCrownGames` games under the tag (the consumer's ranking minimum, the same
- * rule TagCrowns applies), so a crown that was unranked before is `new`.
+ * A crown only counts once its holder has `minCrownGames` games under the tag,
+ * so a crown that was unranked before is `new`.
  */
 function crownChanges(
   before: RecordsView,
@@ -179,7 +165,6 @@ function crownChanges(
 }
 
 export interface DiffOptions {
-  /** Games under a tag before its crown counts (the consumer's minimum). */
   minCrownGames: number;
 }
 

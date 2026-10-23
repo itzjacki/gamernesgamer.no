@@ -1,9 +1,6 @@
 /**
- * PURE. The longest unbroken run of games that `qualifies`, from a list in play
- * order. Runs carry across season boundaries: the list is simply every game the
- * player played, so the last game of one season and the first of the next are
- * neighbours. When two runs are equally long the most recent one is returned.
- * Empty when no game qualifies.
+ * `games` in play order. Runs carry across season boundaries. When two runs are
+ * equally long the most recent one is returned.
  */
 export function longestStreak<G>(
   games: readonly G[],

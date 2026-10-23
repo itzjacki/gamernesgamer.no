@@ -8,29 +8,14 @@ import type { TagCrown } from '@/lib/results/view-models';
 import { MIN_RANKED_GAMES } from '@/lib/tag-ranking';
 
 /**
- * Who is best at each category, as ONE block rather than a plate per tag — a
- * wall of crowns would mostly repeat the same two names. One row per tag: the
- * player(s) with the best average placement under it, their wins and average.
- *
- * Genre and format tags are one list, as everywhere else that reads tags. The
- * crowns arrive unfiltered; the minimum sample is applied here, on the
- * consuming side, with the same cutoff TagRecord and CareerLedger use
- * (`MIN_RANKED_GAMES`). Tags below it are collapsed by default (`UnrankedRows`,
- * shared with TagRecord) as a second table, so both tables use a fixed layout
- * with the same <colgroup> to keep their columns aligned.
- *
- * A checkbox in the frame's footer row leaves out the games each player chose
- * themselves (off by default), the same filter and the same CSS-only toggle as
- * TagRecord: both variants are rendered and `:has(input:checked)` picks one —
- * no JS, so this stays a Server Component.
- *
- * Shares TagRecord's table grammar. No accent at rest — the best of a category
- * is a maximum, not champion data.
+ * The crowns arrive unfiltered; `MIN_RANKED_GAMES` is applied here. Both
+ * variants (with and without own picks) are rendered and the checkbox picks
+ * one via `:has(input:checked)`, so there is no JS. No accent at rest: a
+ * category's best is a maximum, not champion data.
  */
 
 interface Props {
   crowns: TagCrown[];
-  /** The same crowns with every player's own game picks left out. */
   crownsWithoutOwnPicks: TagCrown[];
 }
 
@@ -40,7 +25,6 @@ const numberCell =
 const eyebrowRow =
   'text-text-muted font-mono text-xs tracking-widest uppercase';
 
-/** The ranked table and the folded-away unranked one, for one set of crowns. */
 function CrownsBody({
   crowns,
   idPrefix,
@@ -101,8 +85,6 @@ function CrownsBody({
           scope='row'
           className='text-text-muted py-3 pr-1 pl-3 font-normal wrap-break-word hyphens-auto sm:px-4'
         >
-          {/* The games behind the row: the holder's under this tag, one
-              group per player when the crown is shared. */}
           <GameListPopover
             id={`crown-games-${idPrefix}-${tag}`}
             label={tagLabels[tag]}
@@ -117,8 +99,6 @@ function CrownsBody({
             }))}
           />
         </th>
-        {/* Tied holders share one line, comma-separated (as on the record
-            plates); a long tie wraps inside the column. */}
         <td
           className={`px-2 py-3 sm:px-3 ${
             ranks ? 'text-text font-semibold' : 'text-text-muted'

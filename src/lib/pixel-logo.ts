@@ -5,14 +5,9 @@ import path from 'node:path';
 import { inflateSync } from 'node:zlib';
 
 /**
- * Reads the pixel logo (`public/images/branding/logo-pixel.png`, drawn by
- * Jakob) into a bitmap, so the header can draw it as crisp, recolourable SVG
- * squares — the PNG stays the source of truth.
- *
- * A deliberately small PNG decoder: 8-bit, non-interlaced, RGBA or
- * grey + alpha, which is what the logo is. Anything else throws, so a
- * re-export in another format fails loudly at build time instead of
- * rendering garbage.
+ * Decodes the logo PNG (the source of truth) so the header can draw it as SVG
+ * squares. Supports only 8-bit non-interlaced RGBA or grey+alpha; anything
+ * else throws at build time rather than rendering garbage.
  */
 
 export interface PixelBitmap {
@@ -32,10 +27,7 @@ const LOGO = path.join(
 
 let cached: PixelBitmap | null = null;
 
-/**
- * The decoded logo. Read from disk once per server process in production; in
- * development every time, so an edited PNG shows up without a restart.
- */
+/** Cached in production; re-read in dev so an edited PNG shows without a restart. */
 export function readPixelLogo(): PixelBitmap {
   if (process.env.NODE_ENV !== 'production') return decode(readFileSync(LOGO));
   cached ??= decode(readFileSync(LOGO));
@@ -68,7 +60,7 @@ function decode(buf: Buffer): PixelBitmap {
     i += 12 + len;
   }
 
-  const bpp = colorType === 6 ? 4 : 2; // bytes per pixel
+  const bpp = colorType === 6 ? 4 : 2;
   const stride = width * bpp;
   const raw = inflateSync(Buffer.concat(idat));
   const out = Buffer.alloc(stride * height);

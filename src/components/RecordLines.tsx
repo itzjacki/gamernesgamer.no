@@ -2,27 +2,21 @@ import Link from 'next/link';
 import styles from './Popover.module.css';
 
 /**
- * The list inside a popover: what is behind a number or a word. One row per
- * game (title linking to the game page, season, value), per season (season,
- * value) or per plain label (label, value). Every popover list on the site is
- * built from these rows — the games behind a category, a record, a pair's
- * tally, a points breakdown — so they all read alike. Styled by the shared
- * popover stylesheet.
+ * The one list inside a popover. Every popover list on the site is built from
+ * these rows, so they all read alike.
  */
 
 export interface RecordLine {
   key: string;
-  /** The game the row is about; its title links to the game page. */
   game?: { seasonSlug: string; gameSlug: string; gameTitle: string };
   /** A plain subject instead of a game (a power-up, "points from the game"). */
   label?: string;
-  /** The season the row is from or about; leave out for a label row. */
+  /** Leave out for a label row. */
   seasonNumber?: number;
-  /** The row's figure, set in the mono face on the right. */
   value?: React.ReactNode;
   /** Rank-1 data (a game win): the value takes the accent. */
   accent?: boolean;
-  /** A sentence instead of a figure, set in the text face after the season. */
+  /** A sentence instead of a figure. */
   text?: string;
 }
 

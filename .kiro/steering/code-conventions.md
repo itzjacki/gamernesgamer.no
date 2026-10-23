@@ -44,6 +44,20 @@ define `revealGamerCards` / `revealGames` / `revealPowerups` and pass them down:
   the route level.
 - Dynamic routes pre-render via `generateStaticParams()`.
 
+## Comments
+
+Names and types carry the what; comments carry the why. When unsure whether a
+comment earns its place, leave it out.
+
+- Comment only intent, constraints, gotchas and non-obvious contracts
+  (e.g. "authoritative — from season_result", "null → notFound()").
+- Never restate the name or type (`/** The player's name. */`).
+- No design history in code ("tried X, dropped"). Rejected ideas live in
+  `design.md` or `TODO.md`.
+- A component gets at most a short header comment, and only when its job or a
+  rule it enforces isn't obvious from its name.
+- A wrong comment is a bug: update or delete it with the code it describes.
+
 ## Imports & data files
 
 - `@/*` alias for all cross-directory imports.

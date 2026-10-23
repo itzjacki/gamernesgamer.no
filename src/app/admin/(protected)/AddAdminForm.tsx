@@ -14,11 +14,8 @@ interface Props {
 }
 
 /**
- * Add-admin control: pick an existing signed-in (non-admin) user and promote
- * them. We only ever offer users who already have an auth.users row — there is
- * no email pre-authorization — so the dropdown is the full universe of who can
- * be added. When nobody is addable, we render an explanatory line instead of an
- * empty, confusing select.
+ * Only users who have signed in once (an auth.users row) can be added; there
+ * is no email pre-authorization.
  */
 export default function AddAdminForm({ users }: Props) {
   const [selected, setSelected] = useState('');

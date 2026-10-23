@@ -4,22 +4,11 @@ import { findHeroImage } from '@/lib/results/queries';
 import SectionLabel from './SectionLabel';
 
 /**
- * The front page's short player list: a small version of the /spillere
- * index, with no figures. One hairline row per player, in the roster's own
- * order (most seasons first, then by name): a small picture, then the name.
- * The picture is the one the index uses (the hero portrait, else the latest
- * card art), greyscale at rest and in colour on hover/focus, like the index.
- *
- * Each row is one link to the player's page, at least 56px tall. The label
- * sits over the frame; a 48px door cell to the index closes it. From `sm` up
- * the frame is a whole number of grid cells (at least seven), the rows share
- * its height, and it sits beside SeasonList with the frames equalised by the
- * parent grid (each list is a subgrid of label row and frame row).
- *
- * Static data only: no results are read.
+ * Sits beside SeasonList: from `sm` up both are subgrids of the parent, so
+ * their frames are equalised, and the frame is a whole number of grid cells.
  */
 
-/** A row's floor and the door cell's height, in px. */
+/** A row's floor and the "Alle spillere" cell's height, in px. */
 const ROW = 56;
 const DOOR = 48;
 
@@ -30,8 +19,8 @@ export default function PlayerList() {
     imagePath: findHeroImage(p.slug) ?? p.latest.imagePath,
   }));
 
-  // The frame's floor from `sm` up: the rows, the door and the frame's two
-  // border pixels, rounded up to whole cells.
+  // Rows, the "Alle" cell and the frame's two border pixels, rounded up to
+  // whole cells.
   const minHeight = Math.max(
     280,
     Math.ceil((players.length * ROW + DOOR + 2) / 40) * 40,

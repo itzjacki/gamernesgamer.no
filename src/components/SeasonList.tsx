@@ -4,21 +4,8 @@ import { findSeasonImage, getSeasonChampions } from '@/lib/results/queries';
 import SectionLabel from './SectionLabel';
 
 /**
- * The front page's short season list: a small version of the /sesong index,
- * with no figures. Every season the index lists, newest first, one hairline
- * row each: a small picture, the season number in mono, then the champion
- * (the season's identity, not a figure). The picture is the one the index
- * uses (the season's photo, else the champion's card art from that season);
- * a season with neither keeps an empty frame. Greyscale at rest, in colour on
- * hover/focus.
- *
- * Accent at rest is each champion's name, as on the index (a champion
- * callout). A season with no champion yet shows a muted dash.
- *
- * Each row is one link to the season page, at least 56px tall, with a 48px
- * door cell to the index closing the frame. Sized like PlayerList beside it.
- *
- * Self-contained: fetches its own champions (one pass over every season).
+ * The front page's short version of the /sesong index. Sized like PlayerList
+ * beside it.
  */
 
 /** A row's floor and the door cell's height, in px. */
@@ -28,7 +15,6 @@ const DOOR = 48;
 export default async function SeasonList() {
   const champions = await getSeasonChampions();
 
-  // Newest first, as on the index.
   const seasons = (Object.keys(seasonData) as Season[])
     .sort()
     .reverse()

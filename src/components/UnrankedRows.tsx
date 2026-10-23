@@ -1,20 +1,13 @@
 import { MIN_RANKED_GAMES } from '@/lib/tag-ranking';
 
 /**
- * The "show more" disclosure under a category table: the tags with too few
- * games to be ranked, collapsed by default. A native <details> (no JS, stays a
- * Server Component). Shared by TagRecord (one player's categories) and
- * TagCrowns (best player per category) so the two read and behave the same.
- *
  * A <details> can't wrap table rows, so the children are a second table; the
  * caller keeps its columns aligned with the first (fixed layout + the same
- * <colgroup>) and can use `unrankedCaption` as that table's caption.
+ * <colgroup>).
  */
 
 interface Props {
-  /** How many rows are folded away — shown in the closed label. */
   count: number;
-  /** Layout-only extra classes for the <details>. */
   className?: string;
   children: React.ReactNode;
 }

@@ -6,25 +6,10 @@ import type { HolderChangeKind, RecordEntry } from '@/lib/results/view-models';
 import { MIN_RANKED_GAMES } from '@/lib/tag-ranking';
 
 /**
- * The front page's state slot while just crowned: the records the latest
- * finished season beat or improved. Not a copy of /records: one row per
- * record, label + kind + before and after, each linking to its plate. Career
- * totals only appear when their holder changes (see `diffRecords`).
- *
- * Only `taken` and `improved` are shown (Jakob, 2026-10-23): new, tied and
- * untied records, board movement and category crowns are left out to keep
- * the list short; `diffRecords` still reports them all.
- *
- * A `SectionLabel` heading above one frame, opened by a header row with the
- * column labels; beaten records come before improved ones. From `sm` up every row is one 40px
- * grid cell tall and the columns split the 20-cell content width 6/4/5/5;
- * on phones a row is two lines, label + kind over before → after.
- *
- * Calm on purpose — the just-crowned hero already carries the red: figures
- * are neutral, accent only on the kind tag of a beaten record.
- *
- * Renders nothing when there is no finished season with one before it to
- * compare against; a quiet season gets one row saying so.
+ * The records the latest finished season beat or improved. Only `taken` and
+ * `improved` are shown to keep the list short; `diffRecords` reports more.
+ * Calm on purpose, since the just-crowned hero carries the red: accent only
+ * on a beaten record's kind tag.
  */
 
 const KIND: Partial<Record<HolderChangeKind, string>> = {
@@ -32,10 +17,9 @@ const KIND: Partial<Record<HolderChangeKind, string>> = {
   improved: 'Forbedret',
 };
 
-/** The kinds shown, in row order; within a kind, the diff's order holds. */
+/** Row order; within a kind, the diff's order holds. */
 const SHOWN: HolderChangeKind[] = ['taken', 'improved'];
 
-/** "Jørgen, Tobias" for shared holders; a pair record names both halves. */
 const holderNames = (entries: RecordEntry[]) =>
   entries
     .map((e) =>
@@ -43,10 +27,8 @@ const holderNames = (entries: RecordEntry[]) =>
     )
     .join(', ');
 
-/** Phones: two lines (label + kind, before + after). `sm`: one 40px row. */
 const row =
   'grid grid-cols-2 items-baseline gap-y-1 px-4 py-2.5 sm:h-10 sm:grid-cols-[30%_20%_25%_25%] sm:items-center sm:px-0 sm:py-0';
-/** A cell of the one-line layout: padded, clipped to its column. */
 const cell = 'min-w-0 truncate sm:px-4';
 const eyebrow =
   'text-text-muted font-mono text-xs tracking-wide uppercase sm:tracking-widest';
@@ -54,7 +36,6 @@ const labelLink =
   'text-text hover:text-accent focus-visible:outline-accent underline underline-offset-2 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2';
 const mono = 'font-mono text-sm tabular-nums';
 
-/** The header row: the column labels. */
 function Head() {
   return (
     <li className={`${row} ${eyebrow}`}>
@@ -77,7 +58,6 @@ function Kind({ kind }: { kind: HolderChangeKind }) {
   );
 }
 
-/** One side of a change: who held it, and the figure (when there is one). */
 function Side({
   when,
   names,

@@ -5,20 +5,14 @@ import { removeAdmin } from './actions';
 
 interface Props {
   userId: string;
-  /** Display name/email, used in the confirm() prompt. */
+  /** For the confirm() prompt. */
   label: string;
-  /** When true, removal is blocked (only one admin left) — render a reason. */
   isLastAdmin: boolean;
 }
 
 /**
- * Remove control for a single admin row. A muted-mono text button (the heavy
- * bordered button is reserved for forward actions like "Legg til"); it turns
- * accent on hover/focus — a legitimate accent-on-interaction "stop" moment.
- *
- * When this is the last admin, the control is a dimmed, non-interactive span
- * plus a persistent visible reason, so the lockout guard is explained in the UI
- * (not just enforced in the DB).
+ * A text button: the bordered Button is for forward actions. For the last
+ * admin it is disabled with a visible reason, so the DB's guard is explained.
  */
 export default function RemoveAdminButton({
   userId,

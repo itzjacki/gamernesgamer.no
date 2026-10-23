@@ -41,14 +41,10 @@ export default async function SeasonPage({ params }: Props) {
   const { meta } = season;
   const seasonNumber = Number(sesong);
 
-  // The finished (archive) phase is standings-first and reads results. Live
-  // renders like finished for now (polling is Phase 5). Upcoming is the
-  // hype-building poster — reveal flags gate its sections, no results.
+  // Live renders like finished for now.
   if (meta.status === 'finished' || meta.status === 'live') {
     const view = await getSeasonView(seasonNumber);
-    // A finished season should always have results; if the DB has none yet
-    // (e.g. a season flipped to finished before seeding), fall back to the
-    // poster rather than render an empty results page.
+    // No results yet (e.g. flipped to finished before seeding): show the poster.
     if (view && view.standings.length > 0) {
       const composed = composeSeasonView(view);
       const matrix = toMatrix(view, composed);
@@ -70,11 +66,6 @@ export default async function SeasonPage({ params }: Props) {
   return <UpcomingSeason sesong={sesong} seasonNumber={seasonNumber} />;
 }
 
-/* -------------------------------------------------------------------------- */
-/* Finished phase                                                             */
-/* -------------------------------------------------------------------------- */
-
-/** Map the derived series to the chart's local shape. */
 function toChartSeries(view: Awaited<ReturnType<typeof getSeasonView>>) {
   if (!view) return [];
   const placementBySp = new Map(
@@ -90,7 +81,6 @@ function toChartSeries(view: Awaited<ReturnType<typeof getSeasonView>>) {
   })) satisfies ChartSeries[];
 }
 
-/** Short x-axis labels: game title keyed by ordinal. */
 function gameLabels(composed: ComposedSeasonView): Record<number, string> {
   const labels: Record<number, string> = {};
   for (const g of composed.games) labels[g.ordinal] = g.game.title;
@@ -98,11 +88,8 @@ function gameLabels(composed: ComposedSeasonView): Record<number, string> {
 }
 
 /**
- * Build the points-matrix inputs. Player COLUMNS follow final-standings order
- * (champion first); each game ROW emits its cells in that same column order so
- * columns stay aligned (composed `results` are ordered by per-game placement,
- * which varies per game — we re-key by seasonPlayerId). Game labels + power-up
- * display names come from the composed static content.
+ * Columns follow final standings; each row's cells are re-keyed by
+ * seasonPlayerId into that order, since `results` are ordered per game.
  */
 function toMatrix(
   view: SeasonView,
@@ -141,11 +128,7 @@ function toMatrix(
   return { players, games };
 }
 
-/**
- * Resolve the champion's hero image: a dedicated background-removed cutout at
- * public/images/champions/<NN>.png when present, otherwise the regular gamer
- * portrait. Checked at build time (static page) via the filesystem.
- */
+/** Prefers a cutout at public/images/champions/<NN>.png, checked at build time. */
 function resolveChampionImage(
   seasonSlug: string,
   fallback: string,
@@ -328,10 +311,6 @@ function FinishedSeason({
     </>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/* Upcoming phase (the hype-building poster — unchanged behaviour)            */
-/* -------------------------------------------------------------------------- */
 
 function UpcomingSeason({
   sesong,

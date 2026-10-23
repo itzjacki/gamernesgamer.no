@@ -6,22 +6,9 @@ import type {
 } from '../view-models';
 
 /**
- * PURE. No IO, no async. Builds each player's cumulative season-points line
- * across the games, in ordinal order — the data behind the points-over-games
- * chart (the narrative "race": who led, who collapsed, the comeback).
- *
- * Operates on the already-derived GameSummary[] (not raw rows): a player's
- * contribution to a game is `GamePlacementRow.points` (ladder + power-up delta,
- * already resolved). Running-sums those in ordinal order.
- *
- * Contract:
- *  - `games` need not be pre-sorted; this sorts a copy by ordinal.
- *  - One point per game per player, so every line has the same length and the
- *    same x-axis (ordinals) — the chart can assume aligned series.
- *  - A player absent from a game's results contributes 0 that game (their line
- *    stays flat), rather than breaking the series. In practice every roster
- *    player places in every game, but this keeps the derivation total.
- *  - Players with no games yet get an empty `points` array.
+ * PURE. One point per game per player, so every line shares the same x-axis
+ * and the chart can assume aligned series. A player absent from a game's
+ * results contributes 0 there (the line stays flat) rather than breaking it.
  */
 export function cumulativeSeries(
   games: GameSummary[],

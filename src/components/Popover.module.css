@@ -1,21 +1,6 @@
 /*
- * The site's one detail-on-demand popover (Popover.tsx): a trigger and the
- * panel it opens. Behaviour is 100% platform — `[popover]` + `popovertarget`
- * give toggle, light-dismiss and Escape with no JS, so every user stays a
- * Server Component. The panel is placed with CSS Anchor Positioning where
- * supported and falls back to the browser's centred top-layer popover; it
- * renders in the top layer, so a table's overflow cannot clip it.
- *
- * Also the single source of the panel's typography: the heading, a named
- * group, and the list rows (RecordLines) are styled here, so a popover reads
- * the same on every page.
- *
- * Tokens come from src/styles/global.css @theme. No raw hex, no shadow, no
- * radius — VERKSTED surface language.
- *
- * Note on the cascade: these rules are unlayered, so they beat Tailwind's
- * utilities. The trigger therefore sets NO colour, face or size (Preflight
- * already makes a <button> inherit them) — those come from utility classes on
+ * These rules are unlayered, so they beat Tailwind's utilities. The trigger
+ * therefore sets NO colour, face or size: those come from utility classes on
  * the button or from its context.
  */
 
@@ -53,8 +38,6 @@
   outline-offset: 2px;
 }
 
-/* The default look: a word or figure with a hairline dotted underline — the
-   "there's more here" affordance — that earns the accent on hover. */
 .word {
   text-decoration: underline dotted var(--color-text-muted);
   text-decoration-thickness: 1px;
@@ -67,8 +50,7 @@
   text-decoration-color: var(--color-accent);
 }
 
-/* A figure that is already accent at rest (a record, a best): the underline
-   is accent too, and hover firms it up instead of changing the colour. */
+/* Already accent at rest, so hover firms the underline instead. */
 .accent {
   text-decoration: underline dotted var(--color-accent);
   text-decoration-thickness: 1px;
@@ -103,7 +85,6 @@
   min-width: min(14rem, calc(100vw - 2rem));
   max-width: min(24rem, calc(100vw - 2rem));
   height: max-content;
-  /* A long list scrolls inside the panel, not the page. */
   max-height: min(26rem, calc(100vh - 2rem));
   overflow-y: auto;
   scrollbar-color: var(--color-text-muted) var(--color-bg);
@@ -122,7 +103,6 @@
   text-transform: uppercase;
 }
 
-/* A named group inside the panel (one tied holder's games). */
 .group {
   margin: 0;
   padding: 0.625rem 0.75rem 0.25rem;
@@ -158,7 +138,6 @@
   border-top: 1px solid var(--color-border);
 }
 
-/* The row's subject: a game title (a link) or a plain label. */
 .title {
   font-family: var(--font-sans);
 }
@@ -188,7 +167,6 @@ a.title:focus-visible {
   color: var(--color-text-muted);
 }
 
-/* Rank-1 data (a game win) earns the accent, as in SeasonRecord. */
 .win {
   color: var(--color-accent);
   font-weight: 700;
@@ -196,11 +174,7 @@ a.title:focus-visible {
 
 /* ---- Anchored placement ------------------------------------------------ */
 
-/*
- * Each trigger passes a unique anchor name via the inline `--anchor` custom
- * property, and its panel reads the same one. Feature-detected with
- * `anchor-name`, so unsupported browsers keep the centred fallback above.
- */
+/* Unsupported browsers keep the centred fallback above. */
 @supports (anchor-name: --x) {
   .anchor {
     anchor-name: var(--anchor);

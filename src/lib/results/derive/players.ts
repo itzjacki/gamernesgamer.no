@@ -2,12 +2,8 @@ import type { SeasonPlayerRow, PlayerRow } from '../raw';
 import type { PlayerRef } from '../view-models';
 
 /**
- * PURE. Builds the season_player.id → PlayerRef resolver once, so nothing
- * downstream (or in components) ever touches the season_player indirection.
- *
- * Joining is player → season_player: roster rows carry player_id, which maps to
- * a player row for name/slug. All result tables key off season_player.id, so
- * this Map is the single resolution point.
+ * PURE. All result tables key off season_player.id; this Map is the single
+ * point that resolves it, so nothing downstream touches the indirection.
  */
 export function resolvePlayers(
   roster: SeasonPlayerRow[],
@@ -35,7 +31,7 @@ export function resolvePlayers(
   return refBySeasonPlayerId;
 }
 
-/** Resolve one season_player.id or throw (used where absence is a real bug). */
+/** Throws — use where absence is a real bug. */
 export function requireRef(
   refs: Map<string, PlayerRef>,
   seasonPlayerId: string,

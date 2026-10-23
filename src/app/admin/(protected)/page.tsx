@@ -14,18 +14,8 @@ export const metadata: Metadata = {
 };
 
 /**
- * Admin dashboard landing. The (protected) layout has already verified the
- * visitor is an allowlisted admin. Renders two in-place panels under the single
- * page heading: a read-only DB overview (a sanity glance that the seeded data
- * is intact) and admin membership management (add/remove admins). Results
- * entry/review will join this panel in a later phase.
- *
- * Data: seasons/games counts come from the public-read tables via the
- * publishable read client (head-only exact counts). The user list comes from
- * the admin-only admin_list_users() RPC — reading auth.users requires that
- * privileged path — and is split into current admins + addable (non-admin)
- * users for the management panel. All reads are per-request Server Component
- * reads.
+ * The (protected) layout has already checked the allowlist. The user list
+ * needs the admin-only admin_list_users() RPC, since it reads auth.users.
  */
 export default async function AdminDashboardPage() {
   const read = createReadClient();

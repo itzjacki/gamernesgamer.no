@@ -8,27 +8,19 @@ import { AxisBottom, AxisLeft } from '@visx/axis';
 import { curveMonotoneX } from '@visx/curve';
 import { localPoint } from '@visx/event';
 
-/**
- * Chart input — one line per player. Kept local (not importing the results
- * view-model) so the component is a self-contained client island: the server
- * page maps PlayerSeries -> this shape and passes plain data across the
- * boundary.
- */
+/** Kept local, not the results view-model: the server page maps to it. */
 export interface ChartSeries {
-  /** Stable key + display name. */
+  /** Also the key. */
   name: string;
-  /** True for the season champion — this line earns the single accent. */
   isChampion: boolean;
-  /** Final season placement (1 = champion). Breaks label de-collision ties:
-   *  the better-placed player keeps their spot, the worse-placed one yields. */
+  /** Breaks label collisions: the better-placed player keeps their spot. */
   placement: number;
-  /** Cumulative totals in game order: { x: ordinal, y: runningTotal }. */
+  /** Running totals in game order: x is the game ordinal. */
   points: { x: number; y: number }[];
 }
 
 interface Props {
   series: ChartSeries[];
-  /** Short labels for each game ordinal, for the tooltip (e.g. game titles). */
   gameLabels: Record<number, string>;
 }
 
@@ -38,9 +30,8 @@ const TEXT = '#e6e1db';
 const BORDER = '#222120';
 
 /**
- * Measure a block element's content width via ResizeObserver. We need only the
- * width — the chart's height is a fixed number — so this renders the SVG in
- * normal flow, which keeps the containing <figure> at the SVG's real height.
+ * Width only: the height is fixed, so the SVG stays in normal flow and the
+ * <figure> keeps its real height.
  */
 function useWidth(): [React.RefObject<HTMLDivElement | null>, number] {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -61,22 +52,9 @@ function useWidth(): [React.RefObject<HTMLDivElement | null>, number] {
 }
 
 /**
- * Cumulative points-over-games — the narrative "race" view. VERKSTED chart
- * language: no gradient, no glow, no area fill. The roster is tiny (4–5
- * players), so EVERY line + name is drawn at all times — no hover-to-isolate.
- * The champion's line is the single accent; everyone else is a muted trace,
- * told apart by their always-on end-of-line name label.
- *
- * Hover is for INSPECTION, not isolation: moving the pointer snaps to the
- * nearest game and shows a crosshair + a readout of every player's exact
- * running total at that game (with the game's title). A full-plot invisible
- * overlay captures the pointer, so the hit area is the whole chart — not the
- * 1px line strokes.
- *
- * Sizing: a ResizeObserver (useWidth) gives a real responsive width; height is
- * explicit and taller on narrow screens so the chart never collapses to a
- * sliver on mobile. The x-axis shows game NUMBERS only (never rotated → nothing
- * clips); the full game title lives in the tooltip.
+ * Cumulative points over a season's games. With 4–5 players every line and
+ * name is always drawn; hover inspects one game, it doesn't isolate a line.
+ * The x-axis shows game numbers only, so nothing rotates or clips.
  */
 export default function SeasonPointsChart({ series, gameLabels }: Props) {
   const [ref, width] = useWidth();
@@ -103,13 +81,11 @@ interface InnerProps extends Props {
 }
 
 function ChartInner({ width, series, gameLabels }: InnerProps) {
-  // Taller, roomier layout on small screens so it stays legible; a wider,
-  // shorter aspect on desktop. Height is explicit (not derived from a locked
-  // aspect ratio), so narrow widths don't shrink the whole thing uniformly.
+  // Not a locked aspect ratio, so narrow screens don't shrink to a sliver.
   const isNarrow = width < 480;
   const height = isNarrow ? 320 : 380;
 
-  // Right margin leaves room for the always-on end-of-line name labels.
+  // Right margin leaves room for the end-of-line name labels.
   const margin = {
     top: 16,
     right: isNarrow ? 64 : 96,
@@ -146,7 +122,6 @@ function ChartInner({ width, series, gameLabels }: InnerProps) {
 
   if (series.length === 0 || ordinals.length === 0) return null;
 
-  /** Snap a pointer x (in inner-plot coords) to the nearest game ordinal. */
   function nearestOrdinal(px: number): number {
     let best = ordinals[0];
     let bestDist = Infinity;
@@ -168,18 +143,13 @@ function ChartInner({ width, series, gameLabels }: InnerProps) {
 
   const activeX = activeOrdinal !== null ? (xScale(activeOrdinal) ?? 0) : null;
 
-  // Champion drawn last (on top). Rendering order only — all lines always show.
+  // Champion drawn last, on top.
   const ordered = [...series].sort(
     (a, b) => Number(a.isChampion) - Number(b.isChampion),
   );
 
-  // End-of-line label y-positions, de-collided so players who finish on the
-  // same (or very close) totals don't stack their name labels. Ties are broken
-  // by season PLACEMENT: labels are placed best-placement-first, each keeping
-  // its ideal y (the line's final point) unless it collides with an
-  // already-placed, better-placed label — then it yields to the nearest free
-  // slot at least LABEL_GAP away. So the better-placed player sits on their
-  // line and the worse-placed one moves.
+  // Labels are placed best placement first; one that collides with an
+  // already-placed label moves to the nearest free slot.
   const LABEL_GAP = 13;
   const labelLayout = (() => {
     const byPriority = series
@@ -203,7 +173,6 @@ function ChartInner({ width, series, gameLabels }: InnerProps) {
 
       let y = clampY(item.idealY);
       if (collides(y)) {
-        // Search outward from the ideal y for the nearest non-colliding slot.
         for (let step = 1; step <= Math.ceil(innerHeight / LABEL_GAP); step++) {
           const down = clampY(item.idealY + step * LABEL_GAP);
           const up = clampY(item.idealY - step * LABEL_GAP);
@@ -223,7 +192,6 @@ function ChartInner({ width, series, gameLabels }: InnerProps) {
     return new Map(placed.map((it) => [it.name, it]));
   })();
 
-  // Readout rows for the active game, highest total first.
   const readout =
     activeOrdinal !== null
       ? [...series]
@@ -244,7 +212,6 @@ function ChartInner({ width, series, gameLabels }: InnerProps) {
         aria-label='Poengutvikling gjennom sesongen'
       >
         <Group left={margin.left} top={margin.top}>
-          {/* Horizontal gridlines — blueprint hairlines. */}
           {yScale.ticks(5).map((t) => (
             <Line
               key={`g-${t}`}
@@ -255,7 +222,6 @@ function ChartInner({ width, series, gameLabels }: InnerProps) {
             />
           ))}
 
-          {/* Crosshair at the active game. */}
           {activeX !== null && (
             <Line
               from={{ x: activeX, y: 0 }}
@@ -287,9 +253,7 @@ function ChartInner({ width, series, gameLabels }: InnerProps) {
                   stroke={stroke}
                   strokeWidth={s.isChampion ? 2 : 1.5}
                 />
-                {/* Always-on end-of-line name label, de-collided vertically.
-                    A short leader connects it to the line's endpoint when the
-                    label had to be nudged off its true y. */}
+                {/* A leader joins a nudged label to its line's end. */}
                 {label && (
                   <>
                     {labelNudged && (
@@ -315,7 +279,6 @@ function ChartInner({ width, series, gameLabels }: InnerProps) {
                     </text>
                   </>
                 )}
-                {/* Marker at the active game. */}
                 {activePoint && (
                   <Circle
                     cx={xScale(activePoint.x) ?? 0}
@@ -354,7 +317,7 @@ function ChartInner({ width, series, gameLabels }: InnerProps) {
             })}
           />
 
-          {/* Full-plot invisible hit area — the whole chart is the hover target. */}
+          {/* The whole plot is the hit area, not the 1px strokes. */}
           <rect
             x={0}
             y={0}
@@ -368,9 +331,6 @@ function ChartInner({ width, series, gameLabels }: InnerProps) {
         </Group>
       </svg>
 
-      {/* Tooltip: the active game's title + every player's exact running total.
-          Positioned just inside the plot area (offset by the margins) so it
-          tucks against the top-left of the lines, clear of the axes. */}
       {activeOrdinal !== null && (
         <div
           className='border-border bg-bg pointer-events-none absolute border p-3'
