@@ -21,23 +21,21 @@ interface Props {
 const LABEL =
   'text-text font-mono text-[10px] tracking-widest whitespace-nowrap uppercase min-[701px]:tracking-[0.2em]';
 
-// TODO(copy): the label, the "today" value and the unit labels — placeholders.
 export default function SeasonCountdown({ countdown, season }: Props) {
   const isToday = countdown.kind === 'today';
-  const unit = !isToday && countdown.days === 1 ? '[dag]' : '[dager]';
+  const unit = !isToday && countdown.days === 1 ? 'dag' : 'dager';
 
   // One <p> so it is read as a single sentence. Static: a day count needs
   // no live updates.
   return (
     <p className='flex h-40 flex-col items-center justify-center gap-2'>
       <span className={`${LABEL} flex items-center gap-2`}>
-        <span aria-hidden className='bg-accent size-1.5' />
-        [Sesong {season} starter om]
+        Sesong {season} starter om
       </span>
       <span className='sr-only'> </span>
       {isToday ? (
         <span className='text-text font-sans text-5xl leading-none font-extrabold'>
-          [I dag]
+          I dag
         </span>
       ) : (
         <>

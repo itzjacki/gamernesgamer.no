@@ -77,10 +77,9 @@ const picturePlace = 'absolute top-8 bottom-0 right-0 sm:top-0';
 /** The diagonal, leaning the opposite way to PlayerRoster's. */
 const DIAGONAL_INSET = 18;
 
-// TODO(copy): the status stamps, the champion eyebrow and the figure labels.
 const statusLabel: Record<SeasonStatus, string> = {
   upcoming: 'Kommer',
-  live: 'Pågår',
+  live: 'Live',
   finished: 'Ferdig',
 };
 
@@ -137,7 +136,7 @@ function SeasonPlate({ entry }: { entry: SeasonEntry }) {
           {String(entry.number).padStart(2, '0')}
         </span>
         <span className='border-border flex min-w-0 flex-col justify-center gap-1 self-stretch border-l pl-3 sm:gap-2 sm:pl-6'>
-          <span className={eyebrow}>Mester</span>
+          <span className={eyebrow}>Vinner</span>
           <span
             className={`truncate text-base font-extrabold tracking-tight uppercase sm:text-3xl ${champion ? 'text-accent' : 'text-text-muted'}`}
           >

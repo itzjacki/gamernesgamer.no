@@ -28,7 +28,6 @@ const MONO = 'font-mono text-[10px] tracking-[0.2em] uppercase sm:text-xs';
 const RULE =
   'border-border group-hover:border-accent px-4 transition-colors duration-150 sm:px-6';
 
-// TODO(copy): the eyebrow, the "Sesong" line and the link cue — placeholders.
 export default function LiveSideBlock({ season }: Props) {
   const { meta } = seasonData[season];
 
@@ -41,13 +40,13 @@ export default function LiveSideBlock({ season }: Props) {
         className={`${MONO} ${RULE} text-text-muted flex h-10 shrink-0 items-center gap-2 border-b`}
       >
         <span aria-hidden className={`bg-accent size-1.5 ${styles.blink}`} />
-        [Pågår nå]
+        Live
       </span>
 
       {/* A div: Heading wraps its text in one, which a span can't hold. */}
       <div className='flex flex-1 flex-col justify-center gap-2 px-4 py-6 min-[701px]:py-0 sm:px-6'>
         <Heading as='span' styleAs='h2' className='whitespace-nowrap'>
-          [Sesong] <span className='tabular-nums'>{season}</span>
+          Sesong <span className='tabular-nums'>{season}</span>
         </Heading>
         <span className={`${MONO} text-text-muted tabular-nums`}>
           {formatSeasonDates(meta)}
@@ -57,7 +56,7 @@ export default function LiveSideBlock({ season }: Props) {
       <span
         className={`${MONO} ${RULE} group-hover:text-accent flex min-h-12 shrink-0 items-center border-t lg:min-h-10`}
       >
-        [Følg sesongen]
+        Gå til sesong
       </span>
     </Link>
   );

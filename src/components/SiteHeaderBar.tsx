@@ -123,7 +123,6 @@ const LABEL = 'text-text-muted font-mono text-[8px] tracking-[0.2em] uppercase';
 function Param({
   label,
   value,
-  accent = false,
 }: {
   label: string;
   value: React.ReactNode;
@@ -133,7 +132,7 @@ function Param({
     <div className='border-border flex shrink-0 flex-col justify-center gap-1 border-r px-2 whitespace-nowrap sm:px-3'>
       <span className={LABEL}>{label}</span>
       <span
-        className={`font-mono text-xs leading-none font-medium uppercase sm:text-sm ${accent ? 'text-accent' : 'text-text'}`}
+        className={`font-mono text-xs leading-none font-medium uppercase sm:text-sm`}
       >
         {value}
       </span>
@@ -208,7 +207,6 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
         : 'rest';
 
   // ---------------------------------------------------------------- keys
-  // TODO(copy): key labels — best-effort.
   const keys: ({ section: Section; label: string } & (
     | { chooser: Chooser }
     | { href: string }
@@ -272,7 +270,6 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
   };
 
   // ---------------------------------------------------------------- display
-  // TODO(copy): readout labels and the chooser labels below — best-effort.
   const readout = () => {
     if (route.section === 'vs') {
       // The picker is the readout here (pre-filled with the pair).
@@ -294,7 +291,10 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
           <>
             <Param label='Sesonger' value={data.seasons.length} />
             {latestDone && (
-              <Param label='Mester' value={latestDone.champion!.name} accent />
+              <Param
+                label='Regjerende mester'
+                value={latestDone.champion!.name}
+              />
             )}
           </>
         );
@@ -304,11 +304,7 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
           <Param label='Sesong' value={pad(s.number)} />
           <Param label='Dato' value={s.date} />
           <Param label='Spill' value={s.games} />
-          <Param
-            label='Mester'
-            value={s.champion?.name ?? '—'}
-            accent={!!s.champion}
-          />
+          <Param label='Vinner' value={s.champion?.name ?? '—'} />
         </>
       );
     }
@@ -326,7 +322,7 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
         <>
           <Param label='Spiller' value={p.name} />
           <Param label='Sesonger' value={p.seasons} />
-          <Param label='Titler' value={p.titles} accent={p.titles > 0} />
+          <Param label='Titler' value={p.titles} />
         </>
       );
     }
@@ -334,7 +330,6 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
       const done = data.seasons.filter((s) => s.champion);
       return (
         <>
-          <Param label='Rekorder' value='Alle tider' />
           <Param
             label='Sesonger'
             value={
@@ -350,7 +345,7 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
     return latestDone ? (
       <>
         <Param label='Sesong' value={pad(latestDone.number)} />
-        <Param label='Mester' value={latestDone.champion!.name} accent />
+        <Param label='Regjerende mester' value={latestDone.champion!.name} />
         <Param label='Dato' value={latestDone.date} />
       </>
     ) : null;
@@ -457,7 +452,6 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
           <PixelLogo rows={data.logo} state={logoState} className='size-8' />
         </Link>
         {keys.map(renderKey)}
-        {/* TODO(copy): the model stamp (Teenage Engineering-style) — best-effort. */}
         <span className='text-text-muted ml-auto hidden self-center px-4 font-mono text-[9px] tracking-[0.2em] lg:block'>
           GG–S{pad(Number(data.currentSeason))}
         </span>
@@ -542,8 +536,7 @@ function VsChooser({
         <option value=''>Spiller A</option>
         {options(b)}
       </select>
-      {/* Swap sides, like a flight search's from/to.
-          TODO(copy): the accessible name — best-effort. */}
+      {/* Swap sides, like a flight search's from/to. */}
       <button
         type='button'
         aria-label='Bytt side'

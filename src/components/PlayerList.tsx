@@ -43,8 +43,7 @@ export default function PlayerList() {
       className='flex flex-col gap-6 sm:row-span-2 sm:grid sm:grid-rows-subgrid'
     >
       <SectionLabel as='h2'>
-        {/* TODO(copy): the list's heading. */}
-        <span id='spillere'>[Spillere]</span>
+        <span id='spillere'>Spillere</span>
       </SectionLabel>
 
       <div
@@ -69,7 +68,7 @@ export default function PlayerList() {
                     className='h-full w-full object-cover object-top brightness-90 contrast-125 grayscale transition duration-300 group-hover:brightness-100 group-hover:contrast-100 group-hover:grayscale-0 group-focus-visible:brightness-100 group-focus-visible:contrast-100 group-focus-visible:grayscale-0 motion-reduce:transition-none'
                   />
                 </span>
-                <span className='text-text group-hover:text-accent min-w-0 truncate text-base underline-offset-2 transition-colors duration-150 group-hover:underline'>
+                <span className='text-text-muted group-hover:text-text font-mono text-sm tabular-nums transition-colors duration-150'>
                   {player.name}
                 </span>
               </Link>
@@ -82,8 +81,7 @@ export default function PlayerList() {
           className='group focus-visible:outline-accent flex h-12 shrink-0 items-center px-5 font-mono text-xs tracking-widest uppercase focus-visible:outline-2 focus-visible:-outline-offset-2'
         >
           <span className='text-text group-hover:text-accent underline underline-offset-4 transition-colors duration-150'>
-            {/* TODO(copy): the door's text. */}
-            [Alle spillere]
+            Alle spillere
           </span>
         </Link>
       </div>

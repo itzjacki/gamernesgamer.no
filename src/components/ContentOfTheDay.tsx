@@ -20,8 +20,7 @@ export default function ContentOfTheDay() {
       className='flex flex-col gap-6 sm:row-span-2 sm:grid sm:grid-rows-subgrid'
     >
       <SectionLabel as='h2'>
-        {/* TODO(copy): the block's label. */}
-        <span id='dagens-innhold'>[Dagens innhold]</span>
+        <span id='dagens-innhold'>Dagens content</span>
       </SectionLabel>
 
       <div className='border-border bg-bg grid grid-rows-[1fr_auto] border sm:min-h-80'>
