@@ -182,7 +182,8 @@ Visual "tried and dropped" items are in design.md.
 - [ ] **Instant navigation.** Check that moving between pages feels instant on
       the deployed site, not just in dev. If not: check prefetching, that pages
       are really static, and each route's client weight (the header's client
-      half, images).
+      half, images). Includes `<img>` vs `next/image` (the lint rule is off
+      in `eslint.config.mjs` until then).
 - [ ] **Design audit.** Does the site follow VERKSTED clearly, and does
       VERKSTED (design.md, "indie high performance") still express a permanent
       monument (product.md)? Where not, change the design language, not just

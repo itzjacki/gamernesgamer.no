@@ -30,7 +30,6 @@ export default async function SeasonList() {
 
       return {
         slug,
-        champion: champion?.name ?? null,
         image: photo
           ? { path: photo, landscape: true }
           : card
@@ -59,7 +58,7 @@ export default async function SeasonList() {
         style={{ '--list-min': `${minHeight}px` } as React.CSSProperties}
       >
         <ul className='flex flex-1 flex-col'>
-          {seasons.map(({ slug, champion, image }) => (
+          {seasons.map(({ slug, image }) => (
             <li
               key={slug}
               className='border-border flex min-h-14 flex-1 border-b'

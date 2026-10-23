@@ -3,7 +3,7 @@ import path from 'node:path';
 import Link from 'next/link';
 
 import { seasonData, type Season } from '@/data/sesong';
-import { getCareerView, getSeasonView } from '@/lib/results/queries';
+import { getSeasonView } from '@/lib/results/queries';
 import Heading from './Heading';
 
 /** Renders nothing until a finished season has a champion. */
@@ -53,15 +53,7 @@ export default async function ChampionSideBlock({ season }: Props) {
   const crowned = await findCrowned(season);
   if (!crowned) return null;
 
-  const { slug, view, champion } = crowned;
-  const number = view.seasonNumber;
-  const career = await getCareerView(champion.player.slug);
-
-  // Counted up to this season, so a preview of an older one reads as it did then.
-  const titles = (career?.trophies ?? []).filter(
-    (t) => t.kind === 'season-gold' && t.seasonNumber <= number,
-  ).length;
-
+  const { slug, champion } = crowned;
   const card = seasonData[slug].gamers.find(
     (g) => g.name === champion.player.name,
   );

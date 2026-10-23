@@ -2,7 +2,7 @@
 
 @theme {
   --font-sans: 'Neue Montreal', sans-serif;
-  --font-mono: 'Martian Mono', monospace;
+  --font-mono: var(--font-martian-mono), monospace;
 
   --color-bg: #17181a;
   --color-surface: #1c1d1f;

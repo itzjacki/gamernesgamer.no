@@ -21,7 +21,7 @@ export interface RosterPlayer {
  * Must produce the slugs seeded in the DB (`player.slug`). If a new player's
  * name doesn't round-trip, fix the seed or this mapping — not the call site.
  */
-export function playerSlug(name: string): string {
+function playerSlug(name: string): string {
   return name
     .toLowerCase()
     .replace(/æ/g, 'ae')

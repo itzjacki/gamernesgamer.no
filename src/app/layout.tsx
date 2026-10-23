@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Martian_Mono } from 'next/font/google';
 import '@/styles/global.css';
 import SiteHeader from '@/components/SiteHeader';
 
@@ -14,25 +15,19 @@ export const metadata: Metadata = {
   },
 };
 
+const martianMono = Martian_Mono({
+  weight: ['400', '500'],
+  subsets: ['latin'],
+  variable: '--font-martian-mono',
+});
+
 interface Props {
   children: React.ReactNode;
 }
 
 export default function RootLayout({ children }: Props) {
   return (
-    <html lang='no'>
-      <head>
-        <link rel='preconnect' href='https://fonts.googleapis.com' />
-        <link
-          rel='preconnect'
-          href='https://fonts.gstatic.com'
-          crossOrigin='anonymous'
-        />
-        <link
-          href='https://fonts.googleapis.com/css2?family=Martian+Mono:wght@400;500&display=swap'
-          rel='stylesheet'
-        />
-      </head>
+    <html lang='no' className={martianMono.variable}>
       <body className='bg-bg text-text font-sans'>
         {/* Blueprint grid — scrolls with the page, centred horizontally and
             anchored to the top so the header's bottom (168px) is a grid line.

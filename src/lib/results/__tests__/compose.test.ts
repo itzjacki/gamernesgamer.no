@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { assembleSeasonView, assembleGameView } from '../derive';
-import { composeSeasonView, composeGameView } from '../compose';
+import { assembleSeasonView } from '../derive';
+import { composeSeasonView } from '../compose';
 import { s2Bundle } from './s2.fixtures';
 
 /**
@@ -97,17 +97,6 @@ describe('composeSeasonView — Season 2', () => {
         description: expect.stringContaining('Gjett'),
       },
     ]);
-  });
-});
-
-describe('composeGameView — Season 2', () => {
-  it('joins a single game view to its static content', () => {
-    const gv = assembleGameView(s2Bundle, 'wreckfest')!;
-    const composed = composeGameView(gv);
-    expect(composed.game.title).toBe('Wreckfest');
-    expect(composed.game.chosenBy).toBe('Tobias');
-    expect(composed.ordinal).toBe(6);
-    expect(composed.results.map((r) => r.placement)).toEqual([1, 2, 3, 4]);
   });
 });
 

@@ -103,15 +103,6 @@ export interface SeasonView {
   series: PlayerSeries[];
 }
 
-export interface GameView {
-  seasonNumber: number;
-  seasonSlug: string;
-  slug: string;
-  ordinal: number;
-  /** Ordered by placement. */
-  results: GamePlacementRow[];
-}
-
 /* -------------------------------------------------------------------------- */
 /* Player career (cross-season)                                               */
 /* -------------------------------------------------------------------------- */

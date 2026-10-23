@@ -37,7 +37,7 @@ export function powerUpById(
  * React keys and snapshots are stable. Throws on a dangling power_up id rather
  * than silently dropping archive detail.
  */
-export function powerUpUsesByPlayer(
+function powerUpUsesByPlayer(
   powerUpUsesForGame: PowerUpUseRow[],
   powerUps: Map<string, { slug: string; isCurse: boolean }>,
 ): Map<string, PowerUpUseEntry[]> {

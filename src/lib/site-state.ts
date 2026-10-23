@@ -14,7 +14,7 @@ export const SITE_STATES: SiteState[] = [
 ];
 
 /** Hard-coded until it is set from the admin panel. */
-export const JUST_CROWNED_DAYS = 42;
+const JUST_CROWNED_DAYS = 42;
 
 export function todayInNorway(): IsoDate {
   // en-CA formats as YYYY-MM-DD.

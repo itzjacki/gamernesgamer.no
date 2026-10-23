@@ -27,7 +27,7 @@ per-block windows.
 | Dormant      | right                                            | left: "Gamernes Gamer" in big bold type, nothing else (the page's h1)                                                                   | empty (no filler)        |
 | Live         | right                                            | left: a bordered block linking to the live season page; later (Phase 5) a live table                                                    | empty                    |
 | Upcoming     | centred                                          | the countdown straight on the trophy (bold white numerals, no box); under it a bordered row of reveal counts linking to the season page | what is on the line      |
-| Just crowned | the engraving scene, full width; or trophy right | if not full width, left: the champion's image with a solid footer (name, season, points, titles); one link to their career page         | what last season changed |
+| Just crowned | the engraving scene, full width; or trophy right | if not full width, left: the champion's image with a solid footer (name, season, points); one link to their career page                 | what last season changed |
 
 On phones the trophy is always centred and the side block follows it.
 
@@ -62,7 +62,7 @@ Derived by `deriveSiteState` in `src/lib/site-state.ts`.
      rotating record. Content of the day is a placeholder for a rotating
      piece of tournament content (an image or clip with a caption).
    - **Players | Seasons.** Small versions of the two index lists: a small
-     picture and the name (players) or season number + champion (seasons),
+     picture and the name (players) or season number (seasons),
      one link per row, and a link to the index. No other stats.
    - **Stats row:** seasons, games, matches, power-ups fired, on one line
      (2×2 on phones).
