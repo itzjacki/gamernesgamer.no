@@ -22,12 +22,12 @@ the trophy stands and what sits beside or on it) and one **state slot**
 under the fold; the rest of the page is fixed. No other timelines or
 per-block windows.
 
-| State        | Trophy (desktop)                                 | Beside / on the trophy                                                                                                                  | State slot               |
-| ------------ | ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
-| Dormant      | right                                            | left: "Gamernes Gamer" in big bold type, nothing else (the page's h1)                                                                   | empty (no filler)        |
-| Live         | right                                            | left: a bordered block linking to the live season page; later (Phase 5) a live table                                                    | empty                    |
-| Upcoming     | centred                                          | the countdown straight on the trophy (bold white numerals, no box); under it a bordered row of reveal counts linking to the season page | what is on the line      |
-| Just crowned | the engraving scene, full width; or trophy right | if not full width, left: the champion's image with a solid footer (name, season, points); one link to their career page                 | what last season changed |
+| State        | Trophy (desktop)                                 | Beside / on the trophy                                                                                                  | State slot               |
+| ------------ | ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| Dormant      | right                                            | left: "Gamernes Gamer" in big bold type, nothing else (the page's h1)                                                   | empty (no filler)        |
+| Live         | right                                            | left: a bordered block linking to the live season page; later (Phase 5) a live table                                    | empty                    |
+| Upcoming     | centred                                          | the countdown straight on the trophy (bold white numerals, no box), nothing else                                        | the lineup               |
+| Just crowned | the engraving scene, full width; or trophy right | if not full width, left: the champion's image with a solid footer (name, season, points); one link to their career page | what last season changed |
 
 On phones the trophy is always centred and the side block follows it.
 
@@ -49,9 +49,8 @@ Derived by `deriveSiteState` in `src/lib/site-state.ts`.
    just crowned the champion is not named in the fold; the header readout
    does that.
 2. **The state slot.** Its top edge peeks above the fold.
-   - _What is on the line_ (upcoming): active streaks held by players on the
-     coming roster, records within reach, title counts that could tie. Needs a
-     current-streak derivation and Jakob's rules for "within reach".
+   - _The lineup_ (upcoming): the coming season's players, games and
+     power-ups (see "The lineup block" below).
    - _What last season changed_ (just crowned): only records the season beat
      (the figure got better, not just changed hands) or improved; career
      totals only when they change hands. Diffs `deriveRecords` over all
@@ -74,6 +73,47 @@ Design notes:
 - No scroll animations; the hero is the page's one motion moment.
 - Blocks under the hero snap to whole 40px cells so the hero's grid stays in
   register with the page.
+
+## The lineup block (upcoming)
+
+Decided, not yet built. Its job is the **reveal**: the one thing that changes
+during the upcoming weeks, which the season page (full cards, one click away)
+doesn't make a moment of. It replaces the reveal-count row under the
+countdown, which it would only repeat.
+
+- **Density:** glanceable. Image + name per item; detail stays on the season
+  page.
+- **Shape:** three stacked bands of tiles — Spillere, Spill, Power-ups — each
+  in its images' own aspect (portrait, 16:9, square), wrapping. Height on
+  phones (≈1.5–2 screens) is accepted. A season without a category has no
+  band.
+- **Reveal unit:** the category, via the existing `reveal*` flags. A band is
+  all sealed or all open. Items are hidden because they are not chosen yet,
+  so sealed tiles carry no real data (counts come from the placeholder
+  entries, as today).
+- **Sealed = a spec sheet with redactions**, VERKSTED timing-sheet grammar: a
+  hairline frame, a muted mono serial (`GG-05 / SPILL / 03`), muted field
+  labels, and the hidden fields as hard-edged solid `--color-text` ink bars.
+  Bar lengths are fixed per slot (deterministic, varied), never random per
+  render. Avoid anything that reads as a skeleton loader (soft or
+  low-contrast bars). Accent: a per-band stamp (`SPILL · FORSEGLET`), gone
+  once the band opens — never accent bars.
+- **Open = the same sheet with the ink lifted:** serial and labels stay,
+  values replace the bars. Players: greyscale portrait (Portraits rule) +
+  name; games: thumbnail + title (no "valgt av"); power-ups: icon + name.
+- **Curses** share the power-up band (one flag), marked in the serial
+  (`PU` / `CU`) and a `POWER-UP` / `CURSE` label.
+- **Links per band, not per tile:** each band is one whole-block link to the
+  season page's `#participants` / `#games` / `#power-ups`, accent border on
+  hover, a short accessible name ("Spillere i sesong 05") and empty alt on
+  the tile images.
+- **Static:** no reveal animation (the page's motion rule holds).
+- **Build the ink bar, serial and stamp as shared primitives**, so the season
+  page can adopt them later (`TODO.md`).
+- **Copy:** stamp text, field labels and band labels are public copy:
+  placeholders until Jakob writes them.
+- Left to judge by eye on the first build: band order, tiles per row on
+  phones, tile sizes.
 
 ## Trophy hero (prototype)
 
