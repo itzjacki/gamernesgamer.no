@@ -7,8 +7,8 @@ directory for the current files. Open work lives in `TODO.md`.
 src/
   app/                  App Router. Route segments are Norwegian.
     page.tsx            The front page, per site state (`src/lib/site-state.ts`).
-                        TEMPORARY: one placeholder block (what is on the
-                        line) and the `?tilstand=` state preview.
+                        TEMPORARY: one placeholder block (the lineup) and
+                        the `?tilstand=` state preview.
     sesong/             Season index; [sesong]/ is the season page and
                         [sesong]/[game]/ the game page.
     spillere/           Player index; [spiller]/ is the career page.

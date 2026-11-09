@@ -37,28 +37,24 @@ The front page is built except one block and awaits Jakob's review at `/`
 `working-docs/front-page-and-nav.md`.
 
 1. **Jakob reviews `/`** in all four states, desktop and phone.
-2. **What is on the line** (the upcoming state's slot): Jakob decides the
-   "within reach" rules, then build it (needs a current-streak derivation).
-   Proposal: an active streak by a player on the coming roster counts if it
-   is at least half the record or within 3 of it; count records (game wins,
-   titles) if someone is within 2 of the holder or one win from tying a
-   title count; rates and averages left out.
+2. **The lineup block** (the upcoming state's slot, decided 2026-11-09):
+   build it to the spec in the working doc ("The lineup block"), and remove
+   `SeasonReveals` from the fold with it. Then Jakob judges band order,
+   phone layout and tile sizes by eye.
 3. **Content of the day:** decide what it rotates (clips, photos, a past
-   game…) and where the content comes from.
+   game…) and where the content comes from; its stand-in and caption are the
+   last `TODO(copy)` on the site.
 4. **Open design points:** the champion photo crop (the footer cuts it at the
    chin); accent text contrast (`--color-accent` is 4.23:1 on `bg`, so small
    accent figures miss AA site-wide — needs a token or size decision).
-5. **Copy:** every front-page label is a bracketed `TODO(copy)` placeholder.
-6. **Remove the wireframe switcher** and `?tilstand=` once every block is real
+5. **Remove the wireframe switcher** and `?tilstand=` once every block is real
    (`/` is rendered per request until then).
-7. **Trophy hero** (deferred, a fair amount of work; list in the working doc),
+6. **Trophy hero** (deferred, a fair amount of work; list in the working doc),
    then the **engraving scene** for "just crowned" (the new champion's name
    engraved into the trophy; probably a different trophy treatment).
 
 ### Open items
 
-- [ ] **Copy (`TODO(copy)`):** the season index (headings, status stamps,
-      plate labels) and the site header's labels.
 - [ ] **Season index:** Jakob's visual review.
 - [ ] **"Just crowned" window** (6 weeks after `end`, shared by the logo
       state and the front page): later configurable in the admin panel.
@@ -73,6 +69,10 @@ The front page is built except one block and awaits Jakob's review at `/`
       clipped greyscale portrait and its diagonal; extract a primitive only if
       a third use appears.
 - [ ] **/vs later:** per-match scorelines, an OG image.
+- [ ] **Sealed sheet on the season page** (after the lineup block is judged):
+      the upcoming season page's hidden `GameCard`/`PowerUpCard` adopt the
+      lineup block's ink/serial/stamp primitives instead of the grey "?" box;
+      the hidden `GamerCard` with the gamer-card redesign.
 - [ ] **Season pages — feature expansion (end of Phase 4):** the "go deeper"
       pass (more per-season views, stats, content), scoped at that point.
 
@@ -97,6 +97,13 @@ The front page is built except one block and awaits Jakob's review at `/`
       Vercel OG.
 - [ ] **Skattkammeret (/lore):** floating wall of videos, memes, lore. Scope
       depends on media volume.
+- [ ] **What's at stake (live state, Phase 5):** streaks and records that
+      the next game could extend or break, beside the live leaderboard. Was
+      the upcoming slot's "what is on the line"; dropped there as speculation
+      weeks ahead. Needs a current-streak derivation.
+- [ ] **Lineup "ink lift":** a one-time glitch as a band's bars clear, the
+      first time a viewer sees it open. Judge once the static block exists;
+      it would be a written exception to the front page's motion rule.
 
 ### Decided against (don't re-propose)
 
@@ -108,6 +115,17 @@ Visual "tried and dropped" items are in design.md.
   page.
 - A /vs index, the /vs masthead as a picker, or any per-page pair picker or
   "other pairs" links: the header's VS chooser is the one pair picker.
+
+**Front page — lineup block**
+
+- "What is on the line" in the upcoming slot (moved to Explore later, aimed
+  at live).
+- Keeping the reveal-count row under the countdown beside the block.
+- Per-item reveals or per-item reveal flags: the category is the unit.
+- Card backs as an empty instrument slot with an LED, or the pixel logo on
+  every tile; low-contrast or accent-coloured redaction bars.
+- Per-tile links (career/game pages), "valgt av" on game tiles, a separate
+  curse band.
 
 **Player index (`/spillere`)**
 
