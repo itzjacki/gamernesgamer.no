@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 
 /*
- * PROTOTYPE — not yet production code (working-docs/front-page-and-nav.md).
+ * PROTOTYPE — not yet production code (TODO.md, "Trophy hero").
  * A backlit trophy in raw WebGL. Above the trophy's foot the shader draws the
  * page grid in register with the site grid; below it the grid folds into a
  * perspective floor.

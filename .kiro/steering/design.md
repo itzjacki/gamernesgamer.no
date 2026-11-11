@@ -106,11 +106,46 @@ inside it; on a page whose blocks are its sections, render it `as='h2'`.
 - Grid lines continue through dividers at the same weight.
 - No shadows. No border radius on grid-aligned components.
 
+## Front page
+
+`/` is a short lobby that says "this matters", for the players first: no
+explaining the tournament, and no repeating the archive, which lives on the
+other pages (navigation is the header's job).
+
+- **One site state** (`deriveSiteState`) sets the fold and one slot under
+  it; everything below is the same in every state. No other per-block
+  timelines.
+
+  | State        | Trophy (desktop)                     | Beside / on the trophy                                   | Slot                     |
+  | ------------ | ------------------------------------ | -------------------------------------------------------- | ------------------------ |
+  | Dormant      | right                                | "Gamernes Gamer" in big bold type (the h1), nothing else | empty, no filler         |
+  | Live         | right                                | the live season block (later a live table)               | empty                    |
+  | Upcoming     | centred                              | the countdown on the trophy, nothing else                | the lineup               |
+  | Just crowned | right, or the engraving scene (wide) | the champion's picture and footer                        | what last season changed |
+
+  On phones the trophy is centred and the side block follows it. Outside
+  just crowned the fold names no champion (the header readout does).
+
+- **The slot's top edge peeks above the fold.** Blocks under the hero snap to
+  whole 40px cells so the hero's grid stays in register with the page.
+- **The lineup** (upcoming) is the season page's own cards, games and
+  power-ups `compact`, with a centred button to the season page between
+  Spillere and Spill. Sections are not links; revealed game cards are.
+- **What last season changed** shows only records beaten or improved, and
+  career totals only when they change hands.
+- Only the countdown gets display-size numerals; not too much red at once
+  while just crowned; no scroll animations (the hero is the one motion
+  moment).
+- **Trophy hero** (`TrophyHero`, still a prototype): one scene, not a picture
+  on a pattern (a trophy in front of a texture reads as a sticker; the grid
+  is the room's wall and floor); no hard edges in motion; dot matrix is a
+  strong accent but a poor body texture.
+
 ## On the hero
 
 What sits on the trophy hero (`GgIntro`, `LiveSideBlock`, `ChampionSideBlock`,
-`SeasonCountdown`, `SeasonReveals`) is either bold type straight on the scene or
-an ordinary bordered element. No scrims, halos, masks or faded edges: they were
+`SeasonCountdown`) is either bold type straight on the scene or an ordinary
+bordered element. No scrims, halos, masks or faded edges: they were
 tried and looked bad.
 
 - **Type on the scene:** only large bold white display type (the dormant
@@ -118,7 +153,7 @@ tried and looked bad.
   labels. Never `text-text-muted` directly on the scene: it fails AA against
   the lit fog.
 - **Bordered elements:** solid `bg-bg` with `border`, like the site's panels
-  (live block, reveals row, the champion's footer). Muted labels are fine
+  (live block, the champion's footer). Muted labels are fine
   inside them. Whole-block links take the accent on their border on hover.
 - **Champion:** their picture is the block, unframed and unmasked, with a
   solid footer (name, season, points); with no picture the footer

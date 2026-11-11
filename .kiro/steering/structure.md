@@ -7,8 +7,7 @@ directory for the current files. Open work lives in `TODO.md`.
 src/
   app/                  App Router. Route segments are Norwegian.
     page.tsx            The front page, per site state (`src/lib/site-state.ts`).
-                        TEMPORARY: one placeholder block (the lineup) and
-                        the `?tilstand=` state preview.
+                        TEMPORARY: the `?tilstand=` state preview.
     sesong/             Season index; [sesong]/ is the season page and
                         [sesong]/[game]/ the game page.
     spillere/           Player index; [spiller]/ is the career page.
@@ -19,9 +18,8 @@ src/
                         behind the allowlist gate in its layout.tsx.
     auth/callback/      OAuth code-exchange. Deliberately outside /admin.
     proto/trofe/        TEMPORARY: the front page's trophy hero prototype
-                        (noindex, unlinked; the wireframe `/` borrows it).
-                        Becomes a real component when the front page is
-                        built; see working-docs/front-page-and-nav.md.
+                        (noindex, unlinked; `/` borrows it). Open work on
+                        it is in TODO.md ("Trophy hero").
   components/           Shared components and the UI primitives.
   data/sesong/<NN>/     Static season content: meta.ts, gamers.ts, games.ts,
                         power-ups.ts.
