@@ -256,9 +256,11 @@ function FinishedSeason({
       <section id='games' className='flex flex-col gap-8'>
         <Heading as='h2'>Spill</Heading>
         <ul className='grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3'>
-          {composed.games.map((g) => (
+          {composed.games.map((g, i) => (
             <li key={g.game.slug}>
               <GameCard
+                season={composed.seasonSlug}
+                number={i + 1}
                 title={g.game.title}
                 slug={`/sesong/${composed.seasonSlug}/${g.game.slug}`}
                 thumbnailPath={g.game.thumbnailPath}
@@ -276,17 +278,27 @@ function FinishedSeason({
         <section id='power-ups' className='flex flex-col gap-8'>
           <Heading as='h2'>Power-ups</Heading>
           <ul className='grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3'>
-            {powerUps.map((powerUp) => (
+            {powerUps.map((powerUp, i) => (
               <li key={powerUp.slug}>
-                <PowerUpCard {...powerUp} revealed />
+                <PowerUpCard
+                  {...powerUp}
+                  revealed
+                  season={composed.seasonSlug}
+                  number={i + 1}
+                />
               </li>
             ))}
           </ul>
           {curses && curses.length > 0 && (
             <ul className='grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3'>
-              {curses.map((curse) => (
+              {curses.map((curse, i) => (
                 <li key={curse.slug}>
-                  <PowerUpCard {...curse} revealed />
+                  <PowerUpCard
+                    {...curse}
+                    revealed
+                    season={composed.seasonSlug}
+                    number={i + 1}
+                  />
                 </li>
               ))}
             </ul>
@@ -353,7 +365,7 @@ function UpcomingSeason({
         <Heading as='h2'>Spillere</Heading>
         {gamers.some((g) => g.stats) ? (
           <ul className='grid grid-cols-1 justify-items-center gap-10 sm:grid-cols-2'>
-            {gamers.map((gamer) => (
+            {gamers.map((gamer, i) => (
               <li key={gamer.name}>
                 <GamerCard
                   name={gamer.name}
@@ -361,6 +373,8 @@ function UpcomingSeason({
                   imagePath={gamer.imagePath}
                   stats={gamer.stats}
                   revealed={meta.revealGamerCards}
+                  season={sesong}
+                  number={i + 1}
                 />
               </li>
             ))}
@@ -388,7 +402,7 @@ function UpcomingSeason({
       <section id='games' className='flex flex-col gap-8'>
         <Heading as='h2'>Spill</Heading>
         <ul className='grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3'>
-          {games.map((game) => (
+          {games.map((game, i) => (
             <li key={game.slug}>
               <GameCard
                 title={game.title}
@@ -398,6 +412,8 @@ function UpcomingSeason({
                 duration={game.duration}
                 shortDescription={game.shortDescription}
                 revealed={meta.revealGames}
+                season={sesong}
+                number={i + 1}
               />
             </li>
           ))}
@@ -408,17 +424,27 @@ function UpcomingSeason({
         <section id='power-ups' className='flex flex-col gap-8'>
           <Heading as='h2'>Power-ups</Heading>
           <ul className='grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3'>
-            {powerUps.map((powerUp) => (
+            {powerUps.map((powerUp, i) => (
               <li key={powerUp.name}>
-                <PowerUpCard {...powerUp} revealed={meta.revealPowerups} />
+                <PowerUpCard
+                  {...powerUp}
+                  revealed={meta.revealPowerups}
+                  season={sesong}
+                  number={i + 1}
+                />
               </li>
             ))}
           </ul>
           {curses && curses.length > 0 && (
             <ul className='grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3'>
-              {curses.map((curse) => (
+              {curses.map((curse, i) => (
                 <li key={curse.name}>
-                  <PowerUpCard {...curse} revealed={meta.revealPowerups} />
+                  <PowerUpCard
+                    {...curse}
+                    revealed={meta.revealPowerups}
+                    season={sesong}
+                    number={i + 1}
+                  />
                 </li>
               ))}
             </ul>

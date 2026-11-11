@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { seasonData, currentSeason, type Season } from '@/data/sesong';
 import { countdownTo, findUpcomingSeason } from '@/lib/upcoming-season';
 import SeasonCountdown from '@/components/SeasonCountdown';
-import SeasonReveals from '@/components/SeasonReveals';
+import SeasonLineup from '@/components/SeasonLineup';
 import RecordOfTheDay from '@/components/RecordOfTheDay';
 import ContentOfTheDay from '@/components/ContentOfTheDay';
 import PlayerList from '@/components/PlayerList';
@@ -26,18 +26,12 @@ import TrophyHero, {
 } from '@/app/proto/_components/TrophyHero';
 
 /*
- * TEMPORARY wireframe (working-docs/front-page-and-nav.md): unbuilt blocks are
- * stand-ins and none of their text is copy. The `?tilstand=` override and the
- * state switcher go when the real blocks are built.
+ * TEMPORARY: the `?tilstand=` override and the state switcher go once every
+ * block is final (TODO.md).
  */
 
 interface Props {
   searchParams: Promise<{ tilstand?: string }>;
-}
-
-interface Block {
-  name: string;
-  notes: string[];
 }
 
 const STATE_LABELS: Record<SiteState, string> = {
@@ -62,46 +56,6 @@ const HERO_ALIGN: Record<SiteState, TrophyHeroAlign> = {
   justCrowned: 'right',
   dormant: 'right',
 };
-
-/** First block under the fold; just crowned's is `SeasonChanges`. */
-const SLOT: Record<SiteState, Block | null> = {
-  upcoming: {
-    name: 'What is on the line',
-    notes: [
-      'Active streaks held by players on the coming roster.',
-      'Records within reach; title counts that could tie.',
-      'One-row minimum when little is at stake.',
-    ],
-  },
-  justCrowned: null,
-  live: null,
-  dormant: null,
-};
-
-/** A labelled stand-in for one block, `cells` grid cells tall. */
-function Wire({
-  zone,
-  name,
-  notes,
-  cells,
-  className = '',
-}: Block & { zone: string; cells: number; className?: string }) {
-  return (
-    <div
-      className={`border-border-accent bg-bg grid content-start gap-2 border border-dashed p-4 font-mono text-[11px] ${className}`}
-      style={{ minHeight: cells * 40 }}
-    >
-      <p className='text-text uppercase'>
-        <span className='text-accent'>{zone}</span> {name}
-      </p>
-      <ul className='text-text-muted grid gap-1'>
-        {notes.map((note) => (
-          <li key={note}>{note}</li>
-        ))}
-      </ul>
-    </div>
-  );
-}
 
 export default async function HomePage({ searchParams }: Props) {
   const { tilstand } = await searchParams;
@@ -129,16 +83,26 @@ export default async function HomePage({ searchParams }: Props) {
   }[state];
 
   // With no season registered as upcoming, the `?tilstand=upcoming` preview
-  // stands in the current season and a fixed 34 days.
-  const upcoming = findUpcomingSeason(seasonData) ?? {
-    slug: currentSeason,
-    meta: seasonData[currentSeason].meta,
-  };
-  const countdown = countdownTo(upcoming.meta.start, todayInNorway()) ?? {
+  // stands in the current season and a fixed 34 days, with games and
+  // power-ups sealed so both lineup looks show.
+  const registered = findUpcomingSeason(seasonData);
+  const upcoming = registered
+    ? { slug: registered.slug, data: seasonData[registered.slug] }
+    : {
+        slug: currentSeason,
+        data: {
+          ...seasonData[currentSeason],
+          meta: {
+            ...seasonData[currentSeason].meta,
+            revealGames: false,
+            revealPowerups: false,
+          },
+        },
+      };
+  const countdown = countdownTo(upcoming.data.meta.start, todayInNorway()) ?? {
     kind: 'days' as const,
     days: 34,
   };
-  const slot = SLOT[state];
 
   return (
     // The home page keeps its own stack, three grid cells between blocks,
@@ -155,20 +119,12 @@ export default async function HomePage({ searchParams }: Props) {
           <div className='absolute inset-y-0 right-[calc((100%-100vw)/2)] left-[calc((100%-100vw)/2)]'>
             <TrophyHero mode={HERO_MODE[state]} align={HERO_ALIGN[state]} />
           </div>
+          {/* Over the plinth: its bottom on the cell nearest the trophy's
+              foot (74% down the stage), four cells tall. */}
           {state === 'upcoming' && (
-            <>
-              {/* Over the plinth: its bottom on the cell nearest the
-                  trophy's foot (74% down the stage), four cells tall. */}
-              <div className='absolute top-[calc(round(var(--stage)*0.74,40px)_-_160px)] left-1/2 -translate-x-1/2'>
-                <SeasonCountdown countdown={countdown} season={upcoming.slug} />
-              </div>
-              <div className='absolute bottom-10 left-1/2 w-[calc(100%-32px)] -translate-x-1/2 min-[701px]:w-max'>
-                <SeasonReveals
-                  season={upcoming.slug}
-                  data={seasonData[upcoming.slug]}
-                />
-              </div>
-            </>
+            <div className='absolute top-[calc(round(var(--stage)*0.74,40px)_-_160px)] left-1/2 -translate-x-1/2'>
+              <SeasonCountdown countdown={countdown} season={upcoming.slug} />
+            </div>
           )}
         </div>
         {side && (
@@ -186,7 +142,9 @@ export default async function HomePage({ searchParams }: Props) {
           <SeasonChanges />
         </Suspense>
       )}
-      {slot && <Wire zone='Slot' {...slot} cells={6} />}
+      {state === 'upcoming' && (
+        <SeasonLineup season={upcoming.slug} data={upcoming.data} />
+      )}
 
       {/* Each pair is a two-row grid (labels, then frames) that every block
           subgrids into, so the frames line up and share one hairline. */}

@@ -24,34 +24,43 @@ produces artifacts that feed into it.
 Phases 1–3 (Next.js rewrite, VERKSTED rebrand, Supabase + auth + admin
 panel, S1–S4 seeded on prod). In Phase 4: season pages, player career pages
 and index, the title/tag layer, /records, /vs, the site header, the season
-index, structured season dates, and the front page except one block.
+index, structured season dates, and the front page's blocks.
 
 ---
 
 ## Phase 4 — Historical content & stats 🚧
 
-### Where we left off (2026-10-23)
+### Where we left off (2026-11-11)
 
-The front page is built except one block and awaits Jakob's review at `/`
-(`?tilstand=upcoming|live|justCrowned|dormant` previews each state). Details:
-`working-docs/front-page-and-nav.md`.
+The front page's blocks are all built and await Jakob's review at `/`
+(`?tilstand=upcoming|live|justCrowned|dormant` previews each state; the
+upcoming preview seals games and power-ups so both looks show). Rules are in
+design.md ("Front page").
 
-1. **Jakob reviews `/`** in all four states, desktop and phone.
-2. **The lineup block** (the upcoming state's slot, decided 2026-11-09):
-   build it to the spec in the working doc ("The lineup block"), and remove
-   `SeasonReveals` from the fold with it. Then Jakob judges band order,
-   phone layout and tile sizes by eye.
-3. **Content of the day:** decide what it rotates (clips, photos, a past
-   game…) and where the content comes from; its stand-in and caption are the
-   last `TODO(copy)` on the site.
-4. **Open design points:** the champion photo crop (the footer cuts it at the
+1. **Jakob reviews `/`** in all four states, desktop and phone, and writes the
+   lineup's season-page button copy.
+2. **Content of the day:** decide what it rotates (clips, photos, a past
+   game…) and where the content comes from; its stand-in and caption are
+   placeholder copy (`TODO(copy)`).
+3. **Open design points:** the champion photo crop (the footer cuts it at the
    chin); accent text contrast (`--color-accent` is 4.23:1 on `bg`, so small
    accent figures miss AA site-wide — needs a token or size decision).
-5. **Remove the wireframe switcher** and `?tilstand=` once every block is real
-   (`/` is rendered per request until then).
-6. **Trophy hero** (deferred, a fair amount of work; list in the working doc),
-   then the **engraving scene** for "just crowned" (the new champion's name
-   engraved into the trophy; probably a different trophy treatment).
+4. **Remove the wireframe switcher** and `?tilstand=` once every block is
+   final (`/` is rendered per request until then).
+5. **Trophy hero** (`src/app/proto/_components/TrophyHero.tsx`, previewed at
+   `/proto/trofe`; deferred, a fair amount of work). Jakob judges the grid
+   room (rebuilt from a description) and the dust by eye. Then:
+   - the countdown in the scene, ideally part of it, at least in front of the
+     trophy;
+   - the states: Jakob leans to red throughout, with intensity (light,
+     particles) telling the four apart;
+   - layout: the trophy's size on phones (it nearly fills 375px);
+   - performance: 72 samples per pixel; cap DPR or render smaller on phones;
+   - a static poster for reduced motion and for no WebGL;
+   - whether a scan of the real trophy should give the silhouette;
+   - make it production code (out of `proto/`).
+6. **Engraving scene** for "just crowned" (the new champion's name engraved
+   into the trophy; probably a different trophy treatment).
 
 ### Open items
 
@@ -69,10 +78,6 @@ The front page is built except one block and awaits Jakob's review at `/`
       clipped greyscale portrait and its diagonal; extract a primitive only if
       a third use appears.
 - [ ] **/vs later:** per-match scorelines, an OG image.
-- [ ] **Sealed sheet on the season page** (after the lineup block is judged):
-      the upcoming season page's hidden `GameCard`/`PowerUpCard` adopt the
-      lineup block's ink/serial/stamp primitives instead of the grey "?" box;
-      the hidden `GamerCard` with the gamer-card redesign.
 - [ ] **Season pages — feature expansion (end of Phase 4):** the "go deeper"
       pass (more per-season views, stats, content), scoped at that point.
 
@@ -101,9 +106,6 @@ The front page is built except one block and awaits Jakob's review at `/`
       the next game could extend or break, beside the live leaderboard. Was
       the upcoming slot's "what is on the line"; dropped there as speculation
       weeks ahead. Needs a current-streak derivation.
-- [ ] **Lineup "ink lift":** a one-time glitch as a band's bars clear, the
-      first time a viewer sees it open. Judge once the static block exists;
-      it would be a written exception to the front page's motion rule.
 
 ### Decided against (don't re-propose)
 
@@ -123,9 +125,9 @@ Visual "tried and dropped" items are in design.md.
 - Keeping the reveal-count row under the countdown beside the block.
 - Per-item reveals or per-item reveal flags: the category is the unit.
 - Card backs as an empty instrument slot with an LED, or the pixel logo on
-  every tile; low-contrast or accent-coloured redaction bars.
-- Per-tile links (career/game pages), "valgt av" on game tiles, a separate
-  curse band.
+  every tile.
+- Spec sheets with ink-bar redactions, a "forseglet" stamp and whole-band
+  links (built, replaced by the season page's own cards: wrong feel).
 
 **Player index (`/spillere`)**
 

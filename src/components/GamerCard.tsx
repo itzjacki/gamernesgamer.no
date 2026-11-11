@@ -3,6 +3,7 @@
 import { useRef, useEffect } from 'react';
 import Image from 'next/image';
 import type { GamerStats } from '@/types/gamer';
+import SheetSerial from './SheetSerial';
 import Statbar from './Statbar';
 import styles from './GamerCard.module.css';
 
@@ -12,6 +13,10 @@ export interface Props {
   stats?: GamerStats;
   imagePath: string;
   revealed: boolean;
+  /** Zero-padded season slug, e.g. "04"; with `number`, a sealed card shows a serial and its number. */
+  season?: string;
+  /** 1-based place in the season's roster. */
+  number?: number;
 }
 
 function capitalizeFirst(s: string) {
@@ -24,6 +29,8 @@ export default function GamerCard({
   stats,
   imagePath,
   revealed,
+  season,
+  number,
 }: Props) {
   const cardRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number | null>(null);
@@ -117,6 +124,15 @@ export default function GamerCard({
         />
       </svg>
 
+      {!revealed && season && number && (
+        // Sealed only: on a revealed card it would run over the portrait.
+        <span className='absolute top-[11%] left-[17%] z-20'>
+          <SheetSerial
+            parts={[`GG-${season}`, 'Spiller', String(number).padStart(2, '0')]}
+          />
+        </span>
+      )}
+
       {revealed ? (
         <div
           className={`${styles.cardGrid} text-text absolute top-0 left-0 z-10 h-full w-full pr-[15%] pb-[15%] pl-[16%]`}
@@ -176,7 +192,7 @@ export default function GamerCard({
           <p
             className={`${styles.gridName} self-center pl-1 font-mono text-xs tracking-wide`}
           >
-            Denne personen avsløres snart!
+            {number ? `Spiller #${number}` : 'Denne personen avsløres snart!'}
           </p>
           <div className={`${styles.gridStats} grid grid-cols-2 gap-x-2 p-2`}>
             {statBars.map((stat) => (

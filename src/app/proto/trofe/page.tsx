@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import TrophyHeroPreview from '../_components/TrophyHeroPreview';
 
-// PROTOTYPE — see working-docs/front-page-and-nav.md.
+// PROTOTYPE — open work in TODO.md ("Trophy hero").
 
 export const metadata: Metadata = {
   title: 'Prototype · Trofé',
