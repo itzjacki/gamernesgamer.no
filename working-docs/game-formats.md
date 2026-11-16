@@ -1,10 +1,8 @@
 # GAME FORMATS
 
-**Secondary reference — the Supabase DB is the source of truth.** This documents
-how each game's results are structured, for the DB model. All S1–S4 results are
-seeded in `supabase/seed.sql` and live in the database. Schema: `supabase/migrations/`
-(snapshot: `supabase/schema.sql`). Points/placements: `game-placements.md`.
-Raw CSVs: `working-docs/result-spreadsheets/`.
+**Secondary reference — the Supabase DB is the source of truth.** How each
+game's results are structured, for the DB model. Schema: `supabase/migrations/`.
+Points/placements: `game-placements.md`.
 
 ## TAXONOMY
 

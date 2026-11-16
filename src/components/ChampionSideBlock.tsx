@@ -72,19 +72,20 @@ export default async function ChampionSideBlock({ season }: Props) {
   return (
     <Link
       href={`/spillere/${champion.player.slug}`}
-      className='group border-border bg-bg hover:border-accent focus-visible:outline-accent flex w-full max-w-2xs flex-col border transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2'
+      className='group focus-visible:outline-accent flex w-full max-w-2xs flex-col focus-visible:outline-2 focus-visible:outline-offset-2'
     >
+      {/* Straight on the scene, uncropped, standing on the footer. On
+          desktop the block's foot is on the trophy's (74% down the stage);
+          the cap leaves the footer and two cells of headroom above. */}
       {image && (
         <img
           src={image}
           alt={`Bilde av ${champion.player.name}`}
-          className='h-72 w-full object-cover object-top min-[701px]:h-60'
+          className='mx-auto block max-h-96 w-auto min-[701px]:max-h-[calc(var(--stage)*0.74_-_200px)]'
         />
       )}
 
-      <div
-        className={`border-border group-hover:border-accent flex flex-col gap-4 px-4 py-4 transition-colors duration-150 sm:px-6 ${image ? 'border-t' : ''}`}
-      >
+      <div className='border-border bg-bg group-hover:border-accent flex flex-col gap-4 border px-4 py-4 transition-colors duration-150 sm:px-6'>
         <p className={`${MONO} text-text-muted flex items-center gap-2`}>
           Vinner · Sesong {slug}
         </p>

@@ -4,7 +4,7 @@ import Heading from './Heading';
 export default function GgIntro() {
   return (
     <Heading as='h1'>
-      <span className='min-[701px]:block'>Gamernes</span> Gamer
+      <span className='block'>Gamernes</span> Gamer
     </Heading>
   );
 }

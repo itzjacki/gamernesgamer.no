@@ -18,17 +18,15 @@ export default function ContentOfTheDay() {
       <div className='border-border bg-bg grid grid-rows-[1fr_auto] border sm:min-h-80'>
         <div className='bg-surface flex min-h-60 items-center justify-center sm:min-h-0'>
           <span className='text-text-muted font-mono text-xs tracking-widest uppercase'>
-            {/* TODO(copy): stands in for the picture or clip. */}
-            [Bilde / klipp]
+            Dette kommer snart
           </span>
         </div>
 
         <p className='border-border flex h-12 items-center gap-3 border-t px-5'>
-          {/* TODO(copy): the caption and where the content is from. */}
           <span className='text-text-muted shrink-0 font-mono text-xs tracking-widest uppercase'>
-            [S03]
+            S00
           </span>
-          <span className='text-text truncate text-sm'>[Bildetekst]</span>
+          <span className='text-text truncate text-sm'>Kommer snart</span>
         </p>
       </div>
     </section>

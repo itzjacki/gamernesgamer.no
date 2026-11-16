@@ -77,14 +77,13 @@ the roster's and the hero's job.
 
 ## Career page
 
-The ledger is an instrument panel with large mono figures. A plain
-label-left/value-right `StatList` was tried and read flat next to the trophy
-shelf and cards.
+The ledger is an instrument panel with large mono figures (a plain
+`StatList` read flat next to the trophy shelf and cards).
 
-**Type:** Neue Montreal (self-hosted) for display (800) and body (400); Martian
-Mono (400) for metadata.
+## Type
 
-**Type floor:** no text below 10px. Labels are `SectionLabel` (mono, xs,
+Neue Montreal (self-hosted) for display (800) and body (400); Martian Mono
+(400) for metadata. No text below 10px. Labels are `SectionLabel` (mono, xs,
 widest tracking, muted), placed above a block's frame with `gap-6`, never
 inside it; on a page whose blocks are its sections, render it `as='h2'`.
 
@@ -113,8 +112,8 @@ explaining the tournament, and no repeating the archive, which lives on the
 other pages (navigation is the header's job).
 
 - **One site state** (`deriveSiteState`) sets the fold and one slot under
-  it; everything below is the same in every state. No other per-block
-  timelines.
+  it; below that, every state has the same record and content of the day
+  and the stats row. No other per-block timelines.
 
   | State        | Trophy (desktop)                     | Beside / on the trophy                                   | Slot                     |
   | ------------ | ------------------------------------ | -------------------------------------------------------- | ------------------------ |
@@ -123,7 +122,10 @@ other pages (navigation is the header's job).
   | Upcoming     | centred                              | the countdown on the trophy, nothing else                | the lineup               |
   | Just crowned | right, or the engraving scene (wide) | the champion's picture and footer                        | what last season changed |
 
-  On phones the trophy is centred and the side block follows it. Outside
+  On phones the trophy is centred. The dormant title sits on the floor in
+  four cells starting one above its foot; the live block starts one
+  cell below the foot, on the floor, so it shows on the first screen
+  without covering the trophy; the champion follows the stage. Outside
   just crowned the fold names no champion (the header readout does).
 
 - **The slot's top edge peeks above the fold.** Blocks under the hero snap to
@@ -136,10 +138,21 @@ other pages (navigation is the header's job).
 - Only the countdown gets display-size numerals; not too much red at once
   while just crowned; no scroll animations (the hero is the one motion
   moment).
-- **Trophy hero** (`TrophyHero`, still a prototype): one scene, not a picture
-  on a pattern (a trophy in front of a texture reads as a sticker; the grid
-  is the room's wall and floor); no hard edges in motion; dot matrix is a
-  strong accent but a poor body texture.
+- **Trophy hero** (`TrophyHero`): one scene, not a trophy on a texture
+  (that reads as a sticker). The wall IS the page grid, in register to the
+  pixel; the trophy and the champion's footer stand on a hairline at the
+  fold. The perspective floor can never meet the flat grid, so it runs to
+  the stage's edge and closes with a line, then one row without vertical
+  lines and one row of spacing. Floor lines firm up to meet the closing
+  line. Tried and dropped: the floor as a `--color-display` band; a
+  content-width tick ruler; a circular light mask.
+- **The light:** one red light in every state; intensity tells them apart,
+  from dormant (dim, no dust) to just crowned (brightest). Upcoming breathes,
+  live pulses, echoing the header logo; live alone adds aimed spotlight
+  flashes from the floor (unaimed ones lit the whole canvas). Lines stay
+  subtle under the light. The light fades out at the edges through a
+  rounded-corner mask; on phones only at top and bottom, so it reaches the
+  sides. No WebGL → a static poster; reduced motion → still frames.
 
 ## On the hero
 
@@ -155,9 +168,10 @@ tried and looked bad.
 - **Bordered elements:** solid `bg-bg` with `border`, like the site's panels
   (live block, the champion's footer). Muted labels are fine
   inside them. Whole-block links take the accent on their border on hover.
-- **Champion:** their picture is the block, unframed and unmasked, with a
-  solid footer (name, season, points); with no picture the footer
-  stands alone.
+- **Champion:** their picture stands straight on the scene, uncropped, with
+  no panel behind it, on a solid footer (name, season, points); with no
+  picture the footer stands alone. On desktop the footer's bottom sits on the
+  trophy's foot line, so the two share a floor.
 - **Static:** the scene does not follow the pointer. It keeps the light's
   on-load rise, its slow sideways drift and the dust.
 
@@ -179,9 +193,8 @@ Teenage Engineering instrument grammar on the VERKSTED tokens.
 - **Choosers vs. links.** A key with a set to choose from (Sesonger,
   Spillere) or a choice to make (VS) takes over the display; Rekorder, with
   nothing to choose, is a plain link.
-  - **Sesonger:** season keys, then "Alle" (the index) in its own cell behind
-    a full-height hairline.
-  - **Spillere:** player keys, then "Alle" in the same way.
+  - **Sesonger / Spillere:** one key per season or player, then "Alle" (the
+    index) in its own cell behind a full-height hairline.
   - **VS:** two selects with a swap-sides button between them (a two-way
     arrow icon, like a flight search's from/to; no animation), then GÅ. On /vs
     pages this picker is itself the readout. It is the site's ONE pair
@@ -242,9 +255,3 @@ accent on hover/focus, and accent elsewhere is reserved for stop signals
 - No emoji as icons, no Sparkles icon.
 - No arrow glyphs on links (→).
 - Body text meets WCAG AA. Touch targets ≥ 44px. Focus states always visible.
-
-## Deferred
-
-Gamer-card redesign: the card is the prime candidate for a visual centrepiece
-(chrome specular highlights tracking the tilt, material surfaces). Not started —
-the current SVG shape limits it. Tackle it when a feature calls for it.

@@ -26,14 +26,9 @@ Prefer readable duplication over configurable generics. Avoid clever code.
 
 ## Reveal gating
 
-Hide unrevealed content with a boolean ternary, never by commenting it out. Pages
-define `revealGamerCards` / `revealGames` / `revealPowerups` and pass them down:
-
-```tsx
-{
-  revealed ? <RealContent /> : <Placeholder />;
-} // placeholder: "?", "Mystisk spill", etc.
-```
+Hide unrevealed content with a boolean ternary (`revealed ? <Real /> :
+<Sealed />`), never by commenting it out. The reveal flags live in each
+season's `meta.ts`; pages pass them down.
 
 ## React & Next.js
 
@@ -43,6 +38,11 @@ define `revealGamerCards` / `revealGames` / `revealPowerups` and pass them down:
 - `<Suspense>` around async Server Components; `loading.tsx` and `error.tsx` at
   the route level.
 - Dynamic routes pre-render via `generateStaticParams()`.
+- Pages are static. A page that depends on the date sets `revalidate` (the
+  front page: hourly); any action that changes data shown on public pages
+  calls `revalidatePath` for each of them. Reading `searchParams`, cookies or
+  headers makes a page per-request, so keep dev-only tools behind
+  `process.env.NODE_ENV === 'development'`.
 
 ## Comments
 
