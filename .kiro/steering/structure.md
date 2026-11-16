@@ -7,7 +7,8 @@ directory for the current files. Open work lives in `TODO.md`.
 src/
   app/                  App Router. Route segments are Norwegian.
     page.tsx            The front page, per site state (`src/lib/site-state.ts`).
-                        TEMPORARY: the `?tilstand=` state preview.
+                        Static, refreshed hourly; the `?tilstand=` state
+                        switcher exists only in dev builds.
     sesong/             Season index; [sesong]/ is the season page and
                         [sesong]/[game]/ the game page.
     spillere/           Player index; [spiller]/ is the career page.
@@ -17,25 +18,17 @@ src/
     admin/              login/ is ungated. Everything under (protected)/ sits
                         behind the allowlist gate in its layout.tsx.
     auth/callback/      OAuth code-exchange. Deliberately outside /admin.
-    proto/trofe/        TEMPORARY: the front page's trophy hero prototype
-                        (noindex, unlinked; `/` borrows it). Open work on
-                        it is in TODO.md ("Trophy hero").
   components/           Shared components and the UI primitives.
   data/sesong/<NN>/     Static season content: meta.ts, gamers.ts, games.ts,
                         power-ups.ts.
     index.ts            Season registry + `currentSeason`.
   data/titles.ts        Cross-season title registry (see "Titles and tags").
-  data/tag-labels.ts    Norwegian display labels for every tag.
   lib/
     players/roster.ts   Static cross-season roster and playerSlug().
-    tag-ranking.ts      Presentation rule: which tags have enough games to rank.
-    season-dates.ts     Display formatting for a season's start/end dates.
     site-state.ts       The site's one state (upcoming / live / just crowned /
                         dormant), derived from season status + dates.
-    upcoming-season.ts  The upcoming season and the day countdown to it.
-    record-plates.tsx   `RECORD_PLATES`, the one list of record plates (id,
-                        label, figure…) keyed by `RecordKey`, shared by
-                        /records and the front page's blocks.
+    record-plates.tsx   The one list of record plates, shared by /records and
+                        the front page.
     supabase/           Clients, proxy session helper, generated database.types.ts.
     results/            Results read + derivation layer (see below).
   types/                Shared types.

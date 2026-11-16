@@ -1,8 +1,7 @@
 # Gamernes Gamer — Plan
 
-Open work, and what was decided against so it isn't re-proposed. What is built
-is in the code; how it fits together is in `.kiro/steering/`. Finished items
-collapse to one line or are deleted (git history has the detail).
+Open work, and what was decided against so it isn't re-proposed. Finished
+items collapse to one line or go.
 
 ## Vision
 
@@ -14,98 +13,72 @@ produces artifacts that feed into it.
 ## Open questions
 
 - **Editorial appetite:** season recaps, "how it went down" blocks and
-  Skattkammeret lore need written content from Jakob. Their scope depends on
+  Skattkammeret lore need written content from Jakob; their scope depends on
   how much curation is realistic.
 - **Media volume:** dozens or hundreds of videos, images, memes? Decides
   whether /lore is a data file or needs an asset pipeline.
 
 ## Done
 
-Phases 1–3 (Next.js rewrite, VERKSTED rebrand, Supabase + auth + admin
-panel, S1–S4 seeded on prod). In Phase 4: season pages, player career pages
-and index, the title/tag layer, /records, /vs, the site header, the season
-index, structured season dates, and the front page's blocks.
+Phases 1–3 (Next.js rewrite, VERKSTED rebrand, Supabase + auth + admin,
+S1–S4 seeded on prod). Phase 4 so far: season, game and career pages, the
+indexes, titles and tags, /records, /vs, the site header, and the front page
+with its trophy hero.
 
 ---
 
 ## Phase 4 — Historical content & stats 🚧
 
-### Where we left off (2026-11-11)
-
-The front page's blocks are all built and await Jakob's review at `/`
-(`?tilstand=upcoming|live|justCrowned|dormant` previews each state; the
-upcoming preview seals games and power-ups so both looks show). Rules are in
-design.md ("Front page").
-
-1. **Jakob reviews `/`** in all four states, desktop and phone, and writes the
-   lineup's season-page button copy.
-2. **Content of the day:** decide what it rotates (clips, photos, a past
-   game…) and where the content comes from; its stand-in and caption are
-   placeholder copy (`TODO(copy)`).
-3. **Open design points:** the champion photo crop (the footer cuts it at the
-   chin); accent text contrast (`--color-accent` is 4.23:1 on `bg`, so small
-   accent figures miss AA site-wide — needs a token or size decision).
-4. **Remove the wireframe switcher** and `?tilstand=` once every block is
-   final (`/` is rendered per request until then).
-5. **Trophy hero** (`src/app/proto/_components/TrophyHero.tsx`, previewed at
-   `/proto/trofe`; deferred, a fair amount of work). Jakob judges the grid
-   room (rebuilt from a description) and the dust by eye. Then:
-   - the countdown in the scene, ideally part of it, at least in front of the
-     trophy;
-   - the states: Jakob leans to red throughout, with intensity (light,
-     particles) telling the four apart;
-   - layout: the trophy's size on phones (it nearly fills 375px);
-   - performance: 72 samples per pixel; cap DPR or render smaller on phones;
-   - a static poster for reduced motion and for no WebGL;
-   - whether a scan of the real trophy should give the silhouette;
-   - make it production code (out of `proto/`).
-6. **Engraving scene** for "just crowned" (the new champion's name engraved
-   into the trophy; probably a different trophy treatment).
-
 ### Open items
 
 - [ ] **Season index:** Jakob's visual review.
-- [ ] **"Just crowned" window** (6 weeks after `end`, shared by the logo
-      state and the front page): later configurable in the admin panel.
+- [ ] **"Just crowned" window** (6 weeks after `end`, shared by the logo and
+      the front page): later configurable in the admin panel.
 - [ ] **Manual images (Jakob)** — pages fall back to card art until they exist:
-  - champion cutouts, `public/images/champions/<NN>.png`;
-  - hero portraits, `public/images/heroes/<slug>.png` (then revisit the
-    player index's top crop);
-  - season photos, `public/images/seasons/<NN>.jpg` (about 2:1).
-- [ ] **Career-stat OG card:** deferred until hero portraits exist, since the
-      final hero art may change the shape the card mirrors.
-- [ ] **Diagonal portrait:** `PairHero` and `PlayerRoster` each draw the
-      clipped greyscale portrait and its diagonal; extract a primitive only if
-      a third use appears.
+      champion cutouts (`champions/<NN>.png`), hero portraits
+      (`heroes/<slug>.png`; then revisit the player index's top crop), season
+      photos (`seasons/<NN>.jpg`, about 2:1).
+- [ ] **Career-stat OG card:** waits for hero portraits, which may change the
+      shape the card mirrors.
 - [ ] **/vs later:** per-match scorelines, an OG image.
-- [ ] **Season pages — feature expansion (end of Phase 4):** the "go deeper"
-      pass (more per-season views, stats, content), scoped at that point.
+- [ ] **Season pages — "go deeper" pass** (end of Phase 4): more per-season
+      views, stats, content; scoped then.
+
+### Front page — later
+
+- **Engraving scene** for just crowned: the new champion's name engraved into
+  the trophy.
+- **Countdown in the scene** (upcoming): the numerals part of the hero, not
+  type laid over it.
+- **Trophy silhouette:** a scan of the real trophy (Jakob can scan it) to
+  replace `trophy.svg`?
+- **Content of the day:** what it rotates and where the content comes from.
+  Waits for the content work; a placeholder until then.
+- **Accent text contrast:** `--color-accent` is 4.23:1 on `bg`, so small
+  accent figures miss AA site-wide. Needs a token or size decision.
 
 ### Strong ideas
 
-- [ ] **Season recaps:** editorial title + short recap per season. Gated on
-      editorial appetite.
-- [ ] **Season superlatives:** highest score, most dominant win, etc. per
-      season. Candidate: a "power-up impact" superlative (net power-up points
-      per player across the season); the composed data already carries every
-      `powerUpUse`. This is the home for the season-level power-up story, not
-      a popover on the matrix's totals row.
+- [ ] **Season recaps:** editorial title + short recap per season (gated on
+      editorial appetite).
+- [ ] **Season superlatives:** highest score, most dominant win, etc. A
+      "power-up impact" superlative (net power-up points per player) belongs
+      here; the composed data already carries every `powerUpUse`.
 - [ ] **Champion card treatment:** a special variant for the season winner.
 - [ ] **Attached media on game/season pages:** clips, screenshots, memes.
-- [ ] **Gamer-card redesign** (see design.md, "Deferred").
+- [ ] **Gamer-card redesign:** the prime candidate for a visual centrepiece
+      (chrome highlights tracking the tilt, material surfaces); the current SVG
+      shape limits it. When a feature calls for it.
 
 ### Explore later
 
-- [ ] **Collectible card expansion:** moment cards (MVP, record-breaker, "the
-      collapse").
-- [ ] **OG/shareable images:** champion card, podium, player stat cards via
-      Vercel OG.
-- [ ] **Skattkammeret (/lore):** floating wall of videos, memes, lore. Scope
-      depends on media volume.
-- [ ] **What's at stake (live state, Phase 5):** streaks and records that
-      the next game could extend or break, beside the live leaderboard. Was
-      the upcoming slot's "what is on the line"; dropped there as speculation
-      weeks ahead. Needs a current-streak derivation.
+- [ ] **Moment cards:** MVP, record-breaker, "the collapse".
+- [ ] **OG/shareable images:** champion card, podium, player stat cards.
+- [ ] **Skattkammeret (/lore):** a wall of videos, memes, lore; scope depends
+      on media volume.
+- [ ] **What's at stake (live, Phase 5):** streaks and records the next game
+      could extend or break, beside the live leaderboard. Needs a
+      current-streak derivation.
 
 ### Decided against (don't re-propose)
 
@@ -113,113 +86,103 @@ Visual "tried and dropped" items are in design.md.
 
 **Site-wide**
 
-- A separate Hall page: absorbed into /records (career board) and the front
-  page.
-- A /vs index, the /vs masthead as a picker, or any per-page pair picker or
-  "other pairs" links: the header's VS chooser is the one pair picker.
+- A separate Hall page (absorbed into /records and the front page).
+- A /vs index or any per-page pair picker: the header's VS chooser is the one
+  pair picker.
+- A shared diagonal-portrait primitive for `PairHero` and `PlayerRoster`,
+  until a third use appears.
 
-**Front page — lineup block**
+**Front page**
 
-- "What is on the line" in the upcoming slot (moved to Explore later, aimed
-  at live).
-- Keeping the reveal-count row under the countdown beside the block.
-- Per-item reveals or per-item reveal flags: the category is the unit.
-- Card backs as an empty instrument slot with an LED, or the pixel logo on
-  every tile.
-- Spec sheets with ink-bar redactions, a "forseglet" stamp and whole-band
-  links (built, replaced by the season page's own cards: wrong feel).
+- Player and season lists at the bottom: they repeat the header's choosers.
+  If dormant feels thin, fix the dormant state.
+- "What is on the line" in the upcoming slot (speculation weeks ahead; see
+  "What's at stake").
+- A reveal-count row under the countdown.
+- Per-item reveals: the category is the unit.
+- Card backs as an empty slot with an LED, or the pixel logo on every tile.
+- Lineup as spec sheets with ink-bar redactions and a "forseglet" stamp (wrong
+  feel; it uses the season page's cards).
 
-**Player index (`/spillere`)**
+**Player index**
 
-- More figures than titles and average placement: it is a player list, not a
-  second leaderboard.
+- More figures than titles and average placement: it is a list, not a second
+  leaderboard.
 
 **Career page**
 
-- The season record as a chart: at about four seasons a line chart reads
-  emptier than the numbers.
+- The season record as a chart (reads emptier than the numbers at ~4 seasons).
 
 **Season page**
 
-- Superscript power-up deltas in the matrix (made totals look inflated); the
-  per-cell popover replaced it.
+- Superscript power-up deltas in the matrix (totals looked inflated).
 
 **/records**
 
 - Roast / "worst at" records (one player would hold them all); most
   championships or best average as plates (they are board columns); a
-  consolation plate for a player who holds none.
-- "Closest to a title" (built, removed: slow and said little).
+  consolation plate.
+- "Closest to a title" (slow, said little).
 - Biggest comeback to a title; seasons led without winning; season-deciding
-  power-ups (season page material); fastest to five wins; the H2H
-  rock-paper-scissors cycle; card stats vs. results; biggest
-  season-over-season climb; a runner-up column on the crowns table.
-- Records needing round-level data (rounds won in games not won, share of the
-  field's score, share of rounds won): not worth the fetch for one plate.
-- Not possible from the data: who targets whom with curses (every power-up
-  affects its own user); team/duo records (2v2 composition is not stored).
-- A plate per category for the crowns: a wall of crowns would mostly repeat
-  the same two names.
+  power-ups; fastest to five wins; the H2H rock-paper-scissors cycle; card
+  stats vs. results; biggest season-over-season climb; a runner-up column on
+  the crowns table.
+- Records needing round-level data: not worth the fetch.
+- Not possible from the data: who curses whom (every power-up affects its
+  user); team/duo records (2v2 teams are not stored).
+- A plate per category crown (mostly the same two names).
 - Points-tie win rate counts season ties only, not game-level tiebreaks.
 
 **/vs**
 
-- A "who won when the two took first and second" row (unintuitive).
-- A separate "moments" section, or "longest run ahead" plates (they repeated
-  the Games group's run row).
-- Finals/deciders between the two (samples of one to three), round-level
-  stats, power-up stats, percentages, "nemesis"-style labels.
-- Popovers on the two "longest run" rows: the game-by-game block shows the
-  runs.
+- A "who won when the two took first and second" row.
+- A "moments" section or "longest run ahead" plates (repeat the run row).
+- Finals/deciders between the two (samples of 1–3), round-level stats,
+  power-up stats, percentages, "nemesis" labels.
+- Popovers on the "longest run" rows (the game-by-game block shows them).
 
 ---
 
 ## Phase 5 — Live tournament mode
 
 - [ ] Live leaderboard on the season page (polling, no WebSockets).
-- [ ] **Results entry form** (scores per player per game): schema-heavy;
-      needs an architect + UX pass (H2H match games vs. round scores differ).
-      Design it against the real live-entry workflow.
+- [ ] **Results entry form** (scores per player per game): needs an architect + UX pass against the real live-entry workflow (H2H matches and round
+      scores differ). Every page is static, so its actions must
+      `revalidatePath` each page the data shows on: `/`, season and game
+      pages, career pages, `/records`, `/vs`.
 - [ ] Review/edit submitted results; flip `confirmed` to publish.
 - [ ] Real-time score entry in the admin panel during the tournament.
 
 ---
 
-## Ambient polish (post-Phase 5, exploratory)
+## Ambient polish (post-Phase 5)
 
-- [ ] **"Signal lights" along the angular lines.** Small bright lights that
-      shoot along the site's existing angular lines (the gamer-card diagonal,
-      grid rules, panel hairlines) as a sparing, site-wide motion motif — a
-      timing-board pulse, not per-element decoration. Must stay monochrome or
-      single-accent, honour reduced motion and read as purposeful. (An on-load
-      "arming" sweep on `/spillere` was tried and removed: it didn't carry its
-      weight alone.)
+- [ ] **Signal lights along the angular lines:** small lights shooting along
+      the gamer-card diagonal, grid rules and hairlines; a sparing site-wide
+      timing-board pulse, monochrome or single-accent, honouring reduced
+      motion. (An on-load sweep on `/spillere` alone didn't carry its weight.)
 
 ---
 
 ## Review passes (after the main phases)
 
-- [ ] **Instant navigation.** Check that moving between pages feels instant on
-      the deployed site, not just in dev. If not: check prefetching, that pages
-      are really static, and each route's client weight (the header's client
-      half, images). Includes `<img>` vs `next/image` (the lint rule is off
-      in `eslint.config.mjs` until then).
-- [ ] **Design audit.** Does the site follow VERKSTED clearly, and does
-      VERKSTED (design.md, "indie high performance") still express a permanent
-      monument (product.md)? Where not, change the design language, not just
-      the pages. Known leads:
-  - **The dark display colour** (`--color-display`): try it beyond the header,
-    e.g. for readouts or key figures.
-  - **Spacing:** almost every section has a large gap around it; use spacing
-    more deliberately.
+- [ ] **Cache Components** (after all feature work): `'use cache'`, static
+      shell with dynamic holes, tagged refreshes. A migration of every route,
+      so its own planned piece of work.
+- [ ] **Instant navigation** on the deployed site: prefetching, that pages are
+      really static, per-route client weight, `<img>` vs `next/image` (the
+      lint rule is off in `eslint.config.mjs` until then).
+- [ ] **Design audit:** does the site follow VERKSTED, and does VERKSTED
+      still express a permanent monument? Change the language, not just pages.
+      Leads: `--color-display` beyond the header (readouts, key figures);
+      more deliberate spacing (almost every section has a large gap).
 
 ---
 
 ## Cut / far future
 
-- **Predictions/picks:** far future.
-- **Comments, reactions, notifications:** cut — the group chat is the social
-  layer.
-- **WebSockets:** polling is enough.
-- **Public user accounts:** none. Admin access only.
-- **CMS or multi-editor tooling:** the /admin panel is the ceiling.
+- Predictions/picks: far future.
+- Comments, reactions, notifications: cut (the group chat is the social layer).
+- WebSockets: polling is enough.
+- Public user accounts: none, admin only.
+- CMS or multi-editor tooling: the /admin panel is the ceiling.
