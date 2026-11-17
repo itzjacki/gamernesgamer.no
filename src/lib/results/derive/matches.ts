@@ -78,6 +78,13 @@ export function matchesByGame(
       continue;
     }
 
+    const rows = rowsByMatch.get(match.id) ?? [];
+    const [only] = rows;
+    const score =
+      bestOf === 1 && rows.length === 1 && only.score_a !== only.score_b
+        ? { a: only.score_a, b: only.score_b }
+        : null;
+
     const list = byGame.get(gameId) ?? [];
     list.push({
       playerA: requireRef(refs, match.player_a),
@@ -85,6 +92,7 @@ export function matchesByGame(
       bestOf,
       winsA: wins.a,
       winsB: wins.b,
+      score,
       slotId: match.slot_id,
     });
     byGame.set(gameId, list);

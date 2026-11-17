@@ -46,7 +46,7 @@ export default async function PlayerCareerPage({ params }: Props) {
       <section className='flex flex-col gap-6 pt-8'>
         <Link
           href='/spillere'
-          className='text-text-muted hover:text-accent focus-visible:outline-accent font-mono text-xs tracking-widest uppercase underline transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2'
+          className='text-text-muted hover:text-text-accent focus-visible:outline-accent font-mono text-xs tracking-widest uppercase underline transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2'
         >
           &larr; Spillere
         </Link>

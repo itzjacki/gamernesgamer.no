@@ -35,7 +35,7 @@ export default function CareerBoard({ rows, seasons }: Props) {
             >
               <Link
                 href={`/sesong/${season.seasonSlug}`}
-                className='hover:text-accent focus-visible:outline-accent underline underline-offset-2 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2'
+                className='hover:text-text-accent focus-visible:outline-accent underline underline-offset-2 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2'
               >
                 <span className='sr-only'>Sesong </span>
                 <span aria-hidden='true'>S</span>
@@ -62,7 +62,9 @@ export default function CareerBoard({ rows, seasons }: Props) {
           >
             <td
               className={`text-center ${numberCell} ${
-                row.rank === 1 ? 'text-accent font-bold' : 'text-text-muted'
+                row.rank === 1
+                  ? 'text-text-accent font-bold'
+                  : 'text-text-muted'
               }`}
             >
               {row.rank}

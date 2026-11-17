@@ -115,7 +115,7 @@ export default function GamePointsMatrix({
                 <th
                   key={p.seasonPlayerId}
                   className={`px-3 py-3 text-center font-normal ${
-                    p.isChampion ? 'text-accent' : ''
+                    p.isChampion ? 'text-text-accent' : ''
                   }`}
                 >
                   {p.name}
@@ -155,7 +155,7 @@ export default function GamePointsMatrix({
                 <td
                   key={p.seasonPlayerId}
                   className={`px-3 py-3 text-center font-mono text-sm font-bold tabular-nums ${
-                    p.isChampion ? 'text-accent' : 'text-text'
+                    p.isChampion ? 'text-text-accent' : 'text-text'
                   }`}
                 >
                   {p.totalPoints}

@@ -346,7 +346,7 @@ function ChartInner({ width, series, gameLabels }: InnerProps) {
                 className='flex items-baseline justify-between gap-6'
               >
                 <span
-                  className={`text-xs ${r.isChampion ? 'text-accent' : 'text-text'}`}
+                  className={`text-xs ${r.isChampion ? 'text-text-accent' : 'text-text'}`}
                 >
                   {r.name}
                 </span>

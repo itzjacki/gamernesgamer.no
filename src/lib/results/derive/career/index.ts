@@ -81,6 +81,11 @@ function careerFromViews(
           gamesWon,
           gamesLost,
           won: gamesWon > gamesLost,
+          score:
+            m.score &&
+            (isA
+              ? { own: m.score.a, opponent: m.score.b }
+              : { own: m.score.b, opponent: m.score.a }),
           opponent: isA
             ? { slug: m.playerB.slug, name: m.playerB.name }
             : { slug: m.playerA.slug, name: m.playerA.name },

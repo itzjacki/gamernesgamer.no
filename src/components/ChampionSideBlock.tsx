@@ -4,6 +4,7 @@ import Link from 'next/link';
 
 import { seasonData, type Season } from '@/data/sesong';
 import { getSeasonView } from '@/lib/results/queries';
+import ChampionTone, { CHAMPION_TONE } from './ChampionTone';
 import Heading from './Heading';
 
 /** Renders nothing until a finished season has a champion. */
@@ -63,7 +64,7 @@ export default async function ChampionSideBlock({ season }: Props) {
   const figure = (label: string, value: number) => (
     <div className='flex flex-col items-end gap-1'>
       <dt className={`${MONO} text-text-muted whitespace-nowrap`}>{label}</dt>
-      <dd className='text-accent font-mono text-xl leading-none tabular-nums'>
+      <dd className='text-text-accent font-mono text-xl leading-none tabular-nums'>
         {value}
       </dd>
     </div>
@@ -74,14 +75,17 @@ export default async function ChampionSideBlock({ season }: Props) {
       href={`/spillere/${champion.player.slug}`}
       className='group focus-visible:outline-accent flex w-full max-w-2xs flex-col focus-visible:outline-2 focus-visible:outline-offset-2'
     >
-      {/* Straight on the scene, uncropped, standing on the footer. On
-          desktop the block's foot is on the trophy's (74% down the stage);
-          the cap leaves the footer and two cells of headroom above. */}
+      {/* Straight on the scene, uncropped, standing on the footer, in a
+          square box so champions of different crops come out at a
+          comparable size. On desktop the block's foot is on the trophy's
+          (74% down the stage); the cap leaves the footer and two cells of
+          headroom above. */}
+      {image && <ChampionTone />}
       {image && (
         <img
           src={image}
           alt={`Bilde av ${champion.player.name}`}
-          className='mx-auto block max-h-96 w-auto min-[701px]:max-h-[calc(var(--stage)*0.74_-_200px)]'
+          className={`${CHAMPION_TONE} mx-auto block aspect-square max-h-96 w-full object-contain object-bottom group-hover:[filter:none] group-focus-visible:[filter:none] min-[701px]:max-h-[calc(var(--stage)*0.74_-_200px)]`}
         />
       )}
 

@@ -52,12 +52,12 @@ export default function RemoveAdminButton({
         type='button'
         onClick={handleRemove}
         disabled={isPending}
-        className='text-text-muted hover:text-accent focus-visible:text-accent focus-visible:outline-accent -m-2 p-2 font-mono text-xs transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50'
+        className='text-text-muted hover:text-text-accent focus-visible:text-text-accent focus-visible:outline-accent -m-2 p-2 font-mono text-xs transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-50'
       >
         {isPending ? 'Fjerner …' : 'Fjern'}
       </button>
       {error ? (
-        <span className='text-accent font-mono text-xs' role='alert'>
+        <span className='text-text-accent font-mono text-xs' role='alert'>
           {error}
         </span>
       ) : null}

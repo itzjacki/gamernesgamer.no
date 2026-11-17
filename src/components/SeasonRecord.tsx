@@ -39,7 +39,7 @@ export default function SeasonRecord({ seasons, label }: Props) {
             </td>
             <td
               className={`px-4 py-3 text-center font-mono text-sm tabular-nums ${
-                s.isChampion ? 'text-accent font-bold' : 'text-text-muted'
+                s.isChampion ? 'text-text-accent font-bold' : 'text-text-muted'
               }`}
             >
               {s.placement}

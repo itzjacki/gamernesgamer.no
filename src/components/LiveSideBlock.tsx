@@ -43,7 +43,7 @@ export default function LiveSideBlock({ season }: Props) {
       </div>
 
       <span
-        className={`${MONO} ${RULE} group-hover:text-accent flex min-h-12 shrink-0 items-center border-t lg:min-h-10`}
+        className={`${MONO} ${RULE} group-hover:text-text-accent flex min-h-12 shrink-0 items-center border-t lg:min-h-10`}
       >
         Gå til sesong
       </span>

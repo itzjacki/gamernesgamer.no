@@ -10,14 +10,6 @@ post-tournament (reminiscing, stats, history, "remember when"). Secondary:
 live tracking during the event. The group chat stays the social hub; the site
 produces artifacts that feed into it.
 
-## Open questions
-
-- **Editorial appetite:** season recaps, "how it went down" blocks and
-  Skattkammeret lore need written content from Jakob; their scope depends on
-  how much curation is realistic.
-- **Media volume:** dozens or hundreds of videos, images, memes? Decides
-  whether /lore is a data file or needs an asset pipeline.
-
 ## Done
 
 Phases 1–3 (Next.js rewrite, VERKSTED rebrand, Supabase + auth + admin,
@@ -29,56 +21,52 @@ with its trophy hero.
 
 ## Phase 4 — Historical content & stats 🚧
 
-### Open items
+### 1. Manual images (Jakob)
 
-- [ ] **Season index:** Jakob's visual review.
-- [ ] **"Just crowned" window** (6 weeks after `end`, shared by the logo and
-      the front page): later configurable in the admin panel.
-- [ ] **Manual images (Jakob)** — pages fall back to card art until they exist:
-      champion cutouts (`champions/<NN>.png`), hero portraits
-      (`heroes/<slug>.png`; then revisit the player index's top crop), season
-      photos (`seasons/<NN>.jpg`, about 2:1).
-- [ ] **Career-stat OG card:** waits for hero portraits, which may change the
-      shape the card mirrors.
-- [ ] **/vs later:** per-match scorelines, an OG image.
-- [ ] **Season pages — "go deeper" pass** (end of Phase 4): more per-season
-      views, stats, content; scoped then.
+Pages fall back to card art until each exists.
 
-### Front page — later
+- [ ] **Hero portraits** `public/images/heroes/<slug>.png`: the career page
+      hero, the /vs pair hero and the player index plates (then revisit the
+      index's top crop).
+- [ ] **Season photos** `public/images/seasons/<NN>.jpg`, landscape about
+      2:1: the season index.
 
-- **Engraving scene** for just crowned: the new champion's name engraved into
-  the trophy.
-- **Countdown in the scene** (upcoming): the numerals part of the hero, not
-  type laid over it.
-- **Trophy silhouette:** a scan of the real trophy (Jakob can scan it) to
-  replace `trophy.svg`?
-- **Content of the day:** what it rotates and where the content comes from.
-  Waits for the content work; a placeholder until then.
-- **Accent text contrast:** `--color-accent` is 4.23:1 on `bg`, so small
-  accent figures miss AA site-wide. Needs a token or size decision.
+### 2. OG images for every major page
 
-### Strong ideas
+Waits for the images. The front page, season, game and career pages,
+/records and /vs, plus shareable player images (career stats).
 
-- [ ] **Season recaps:** editorial title + short recap per season (gated on
-      editorial appetite).
-- [ ] **Season superlatives:** highest score, most dominant win, etc. A
-      "power-up impact" superlative (net power-up points per player) belongs
-      here; the composed data already carries every `powerUpUse`.
-- [ ] **Champion card treatment:** a special variant for the season winner.
-- [ ] **Attached media on game/season pages:** clips, screenshots, memes.
-- [ ] **Gamer-card redesign:** the prime candidate for a visual centrepiece
-      (chrome highlights tracking the tilt, material surfaces); the current SVG
-      shape limits it. When a feature calls for it.
+### 3. Design audit
 
-### Explore later
+Before the card redesign. Does the site follow VERKSTED, and does VERKSTED
+still express a permanent monument? Change the language, not just pages.
+Leads: `--color-display` beyond the header (readouts, key figures); more
+deliberate spacing (almost every section has a large gap).
 
-- [ ] **Moment cards:** MVP, record-breaker, "the collapse".
-- [ ] **OG/shareable images:** champion card, podium, player stat cards.
-- [ ] **Skattkammeret (/lore):** a wall of videos, memes, lore; scope depends
-      on media volume.
-- [ ] **What's at stake (live, Phase 5):** streaks and records the next game
-      could extend or break, beside the live leaderboard. Needs a
-      current-streak derivation.
+### 4. Cards part 1
+
+- [ ] **Gamer-card redesign:** the visual centrepiece (chrome highlights
+      tracking the tilt, material surfaces); the current SVG shape limits it.
+- [ ] **Champion card:** a special variant for the season winner.
+
+### 5. Content centre
+
+Needs exploration and direction. A home for the videos, pictures and memes
+there are; it may live on the season, game and player pages rather than as
+its own page. The volume decides whether it is a data file or needs an asset
+pipeline. Covers media on game and season pages, and the front page's content
+of the day (what it rotates; a placeholder until then).
+
+### 6. Season page upgrade
+
+More per-season views, stats and content; scoped when we start.
+
+- [ ] **Season recap:** an editorial title and short recap per season, if the
+      writing is realistic.
+- [ ] **Superlatives:** the season's standout moments (highest score, most
+      dominant game win, power-up impact from each `powerUpUse`). All-time
+      bests stay on /records; don't repeat its plates. When a season's
+      moment is also the all-time record, say so and link to /records.
 
 ### Decided against (don't re-propose)
 
@@ -91,13 +79,13 @@ Visual "tried and dropped" items are in design.md.
   pair picker.
 - A shared diagonal-portrait primitive for `PairHero` and `PlayerRoster`,
   until a third use appears.
+- A configurable just-crowned window: marking a season finished is enough.
 
 **Front page**
 
 - Player and season lists at the bottom: they repeat the header's choosers.
   If dormant feels thin, fix the dormant state.
-- "What is on the line" in the upcoming slot (speculation weeks ahead; see
-  "What's at stake").
+- "What is on the line" in the upcoming slot (speculation weeks ahead).
 - A reveal-count row under the countdown.
 - Per-item reveals: the category is the unit.
 - Card backs as an empty slot with an LED, or the pixel logo on every tile.
@@ -146,17 +134,26 @@ Visual "tried and dropped" items are in design.md.
 ## Phase 5 — Live tournament mode
 
 - [ ] Live leaderboard on the season page (polling, no WebSockets).
-- [ ] **Results entry form** (scores per player per game): needs an architect + UX pass against the real live-entry workflow (H2H matches and round
-      scores differ). Every page is static, so its actions must
+- [ ] **Results entry form** (scores per player per game): needs an
+      architect + UX pass against the real live-entry workflow (H2H matches
+      and round scores differ). Every page is static, so its actions must
       `revalidatePath` each page the data shows on: `/`, season and game
       pages, career pages, `/records`, `/vs`.
 - [ ] Review/edit submitted results; flip `confirmed` to publish.
 - [ ] Real-time score entry in the admin panel during the tournament.
+- [ ] **What's at stake:** beside the live leaderboard, the streaks and
+      records the next game could extend or break. Next game only, not the
+      whole season. Needs a current-streak derivation.
 
 ---
 
-## Ambient polish (post-Phase 5)
+## After Phase 5
 
+- [ ] **Cards part 2:** more card styles (moments: MVP, record-breaker, "the
+      collapse"), FIFA-style shareable gamer cards, a place to view all
+      cards; maybe a collection, a pack simulator, physical cards.
+- [ ] **Engraving scene** for just crowned: the new champion's name engraved
+      into the trophy, the winner's special animation.
 - [ ] **Signal lights along the angular lines:** small lights shooting along
       the gamer-card diagonal, grid rules and hairlines; a sparing site-wide
       timing-board pulse, monochrome or single-accent, honouring reduced
@@ -172,10 +169,6 @@ Visual "tried and dropped" items are in design.md.
 - [ ] **Instant navigation** on the deployed site: prefetching, that pages are
       really static, per-route client weight, `<img>` vs `next/image` (the
       lint rule is off in `eslint.config.mjs` until then).
-- [ ] **Design audit:** does the site follow VERKSTED, and does VERKSTED
-      still express a permanent monument? Change the language, not just pages.
-      Leads: `--color-display` beyond the header (readouts, key figures);
-      more deliberate spacing (almost every section has a large gap).
 
 ---
 

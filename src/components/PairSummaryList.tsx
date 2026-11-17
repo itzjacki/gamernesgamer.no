@@ -38,7 +38,7 @@ export default function PairSummaryList({ player, summaries, labels }: Props) {
               href={`/vs/${player.slug}/${summary.opponent.slug}`}
               className={`group focus-visible:outline-accent min-h-14 focus-visible:outline-2 focus-visible:-outline-offset-2 ${columns}`}
             >
-              <span className='group-hover:text-accent group-focus-visible:text-accent truncate font-extrabold tracking-tight uppercase transition-colors'>
+              <span className='group-hover:text-text-accent group-focus-visible:text-text-accent truncate font-extrabold tracking-tight uppercase transition-colors'>
                 {summary.opponent.name}
               </span>
               <span className={`text-right ${figure}`}>

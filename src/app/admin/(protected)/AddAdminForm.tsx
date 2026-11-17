@@ -79,7 +79,7 @@ export default function AddAdminForm({ users }: Props) {
       </div>
 
       {error ? (
-        <span className='text-accent font-mono text-xs' role='alert'>
+        <span className='text-text-accent font-mono text-xs' role='alert'>
           {error}
         </span>
       ) : null}

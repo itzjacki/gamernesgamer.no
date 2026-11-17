@@ -34,7 +34,7 @@ src/
   types/                Shared types.
   styles/global.css     Tailwind import + @theme tokens.
   proxy.ts              Next.js Proxy (formerly middleware).
-public/images/          gamers/<NN>/, game-thumbnails/<NN>/, power-ups/,
+public/images/          gamers/<N>/, game-thumbnails/<N>/ (both unpadded), power-ups/,
                         champions/<NN>.png, heroes/<slug>.png,
                         seasons/<NN>.jpg (season index photos), branding/
                         (trophy.svg with plinth; logo.svg, the trophy without;
@@ -131,8 +131,8 @@ in derivation or compose.
    time. Each gamer carries a `stats` block for the card.
    Each game needs a `titleId` (add a new title to `src/data/titles.ts` if the
    game has not appeared before) and `formatTags`.
-2. Add images under `public/images/gamers/<NN>/` and
-   `public/images/game-thumbnails/<NN>/`.
+2. Add images under `public/images/gamers/<N>/` and
+   `public/images/game-thumbnails/<N>/` (unpadded: `1`, not `01`).
 3. Register the season in `src/data/sesong/index.ts` and set `currentSeason`. The
    landing redirect and nav follow from it.
 4. Seed the results into Supabase (the `seed-a-season` skill).

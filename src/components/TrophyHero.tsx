@@ -100,6 +100,7 @@ export default function TrophyHero({ state, align }: Props) {
       // Loud in dev, so a shader bug can't hide behind the poster.
       if (process.env.NODE_ENV === 'development')
         console.error(`TrophyHero: ${why}`);
+      delete canvas.dataset.numerals;
       setFailed(true);
     };
 
@@ -152,6 +153,7 @@ export default function TrophyHero({ state, align }: Props) {
     let originCss = { x: 0, y: 0 };
     let box = { x: 0, y: 0, w: 1, h: 1 }; // canvas px
     let laidOutAlign = live.current.align;
+    let laidOutState = live.current.state;
 
     function layout() {
       const w = canvas.width;
@@ -191,6 +193,14 @@ export default function TrophyHero({ state, align }: Props) {
       c.fillRect(0, 0, mask.width, mask.height);
       c.filter = 'invert(1)';
       c.drawImage(img, box.x, box.y, box.w, box.h);
+      c.filter = 'none';
+      // Trophy to the red channel only, so numerals over it keep their own.
+      c.globalCompositeOperation = 'multiply';
+      c.fillStyle = '#f00';
+      c.fillRect(0, 0, mask.width, mask.height);
+      c.globalCompositeOperation = 'lighter';
+      drawNumerals(c);
+      c.globalCompositeOperation = 'source-over';
       gl!.bindTexture(gl!.TEXTURE_2D, tex);
       gl!.pixelStorei(gl!.UNPACK_FLIP_Y_WEBGL, true);
       gl!.texImage2D(
@@ -206,8 +216,45 @@ export default function TrophyHero({ state, align }: Props) {
       gl!.texParameteri(gl!.TEXTURE_2D, gl!.TEXTURE_WRAP_T, gl!.CLAMP_TO_EDGE);
     }
 
+    /*
+     * The countdown's numerals (`data-hero-numerals`, laid out by the page
+     * over the trophy) become part of the scene: drawn into the mask's green
+     * channel at the
+     * element's own place and font, then the HTML glyphs go transparent
+     * (`data-numerals` on the canvas) so they are not drawn twice. Screen
+     * readers and the poster keep the HTML text.
+     */
+    function drawNumerals(c: CanvasRenderingContext2D) {
+      const el = canvas
+        .closest('section')
+        ?.querySelector<HTMLElement>('[data-hero-numerals]');
+      if (!el) {
+        delete canvas.dataset.numerals;
+        return;
+      }
+      const r = el.getBoundingClientRect();
+      const cr = canvas.getBoundingClientRect();
+      const cs = getComputedStyle(el);
+      c.font = `${cs.fontWeight} ${parseFloat(cs.fontSize) * dpr}px ${cs.fontFamily}`;
+      c.fillStyle = '#0f0';
+      c.textAlign = 'center';
+      c.textBaseline = 'alphabetic';
+      const text = el.textContent ?? '';
+      const metrics = c.measureText(text);
+      const top = (r.top - cr.top) * dpr;
+      const height = r.height * dpr;
+      // Centre the glyphs' ink in the element's box, as the HTML does.
+      const ink =
+        metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+      const baseline =
+        top + (height - ink) / 2 + metrics.actualBoundingBoxAscent;
+      c.fillText(text, (r.left - cr.left + r.width / 2) * dpr, baseline);
+      canvas.dataset.numerals = '';
+    }
+
     function resize() {
       laidOutAlign = live.current.align;
+      laidOutState = live.current.state;
       // The shader marches 72 samples per pixel: phones render at 1x.
       dpr = Math.min(devicePixelRatio, innerWidth <= PHONE ? 1 : 1.5);
       const r = canvas.getBoundingClientRect();
@@ -257,7 +304,8 @@ export default function TrophyHero({ state, align }: Props) {
 
     function draw(now: number) {
       const { state: st, align: al } = live.current;
-      if (al !== laidOutAlign) resize();
+      // A state change can add or remove the countdown: lay out again.
+      if (al !== laidOutAlign || st !== laidOutState) resize();
       const sec = (now - t0) / 1000;
       const k = reduce ? 1 : 1 - Math.exp(-(now - last) / 400);
       last = now;
@@ -331,6 +379,10 @@ export default function TrophyHero({ state, align }: Props) {
       resize();
     };
     img.onerror = () => fail('trophy.svg failed to load');
+    // The numerals are drawn in the page's font: redraw once it has loaded.
+    document.fonts.ready.then(() => {
+      if (ready) resize();
+    });
     img.src = '/images/branding/trophy.svg';
 
     const ro = new ResizeObserver(resize);

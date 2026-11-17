@@ -87,8 +87,9 @@ export default async function PairPage({ params }: Props) {
         value: (
           <>
             <span className='sr-only'>{a.name} </span>
-            {match.a}–<span className='sr-only'>{b.name} </span>
-            {match.b}
+            {match.score?.a ?? match.a}–
+            <span className='sr-only'>{b.name} </span>
+            {match.score?.b ?? match.b}
           </>
         ),
       }))}
@@ -116,15 +117,16 @@ export default async function PairPage({ params }: Props) {
       ownPick: game.pickedBy === 'a',
     }));
 
-  // The series score (games won by each) rides in the two placement slots.
+  // The scoreline (a bo1's own score, else games won) rides in the two
+  // placement slots.
   const matchResults = (list: PairMatch[]) =>
     list.map((match) => ({
       seasonNumber: match.seasonNumber,
       seasonSlug: match.seasonSlug,
       gameSlug: match.gameSlug,
       gameTitle: match.gameTitle,
-      placement: match.a,
-      opponentPlacement: match.b,
+      placement: match.score?.a ?? match.a,
+      opponentPlacement: match.score?.b ?? match.b,
       ownPick: false,
     }));
 
@@ -345,7 +347,7 @@ export default async function PairPage({ params }: Props) {
                   <th scope='row' className='px-4 py-3 font-normal sm:px-8'>
                     <Link
                       href={`/sesong/${season.season.seasonSlug}`}
-                      className='hover:text-accent focus-visible:outline-accent font-mono text-sm underline underline-offset-2 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2'
+                      className='hover:text-text-accent focus-visible:outline-accent font-mono text-sm underline underline-offset-2 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2'
                     >
                       <span className='sr-only'>Sesong </span>
                       <span aria-hidden='true'>S</span>
@@ -358,7 +360,7 @@ export default async function PairPage({ params }: Props) {
                       key={side}
                       className={`px-2 py-3 text-right font-mono text-sm tabular-nums ${
                         season[side].placement === 1
-                          ? 'text-accent font-bold'
+                          ? 'text-text-accent font-bold'
                           : 'text-text'
                       }`}
                     >

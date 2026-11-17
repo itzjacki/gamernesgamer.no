@@ -30,7 +30,7 @@ export default async function AdminLoginPage({ searchParams }: Props) {
         {error ? (
           // Shown when the OAuth init or callback exchange fails (not the
           // non-admin case, which the admin layout handles).
-          <p className='text-accent mt-4 font-mono text-xs'>
+          <p className='text-text-accent mt-4 font-mono text-xs'>
             Innloggingen gikk ikke gjennom. Prøv igjen.
           </p>
         ) : null}

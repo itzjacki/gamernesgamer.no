@@ -30,7 +30,7 @@ export default async function GamePage({ params }: Props) {
     <section className='flex w-full flex-col gap-4 pt-8'>
       <Link
         href={`/sesong/${sesong}`}
-        className='text-text-muted hover:text-accent focus-visible:outline-accent font-mono text-xs tracking-widest uppercase underline transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2'
+        className='text-text-muted hover:text-text-accent focus-visible:outline-accent font-mono text-xs tracking-widest uppercase underline transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2'
       >
         &larr; Sesong {Number(sesong)}
       </Link>

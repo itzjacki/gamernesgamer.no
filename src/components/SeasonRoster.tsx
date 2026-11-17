@@ -89,7 +89,7 @@ function SeasonPlate({ entry }: { entry: SeasonEntry }) {
       >
         <span className={`${eyebrow} truncate tabular-nums`}>{entry.date}</span>
         {entry.status !== 'finished' && (
-          <span className='text-accent font-mono text-xs tracking-widest uppercase'>
+          <span className='text-text-accent font-mono text-xs tracking-widest uppercase'>
             {statusLabel[entry.status]}
           </span>
         )}
@@ -98,14 +98,14 @@ function SeasonPlate({ entry }: { entry: SeasonEntry }) {
       <span
         className={`flex min-w-0 flex-1 items-center gap-3 pl-4 sm:gap-6 sm:pl-8 ${clearOfPicture}`}
       >
-        <span className='group-hover:text-accent group-focus-visible:text-accent text-3xl leading-none font-extrabold tracking-tight tabular-nums transition-colors sm:text-6xl'>
+        <span className='group-hover:text-text-accent group-focus-visible:text-text-accent text-3xl leading-none font-extrabold tracking-tight tabular-nums transition-colors sm:text-6xl'>
           <span className='sr-only'>Sesong </span>
           {String(entry.number).padStart(2, '0')}
         </span>
         <span className='border-border flex min-w-0 flex-col justify-center gap-1 self-stretch border-l pl-3 sm:gap-2 sm:pl-6'>
           <span className={eyebrow}>Vinner</span>
           <span
-            className={`truncate text-base font-extrabold tracking-tight uppercase sm:text-3xl ${champion ? 'text-accent' : 'text-text-muted'}`}
+            className={`truncate text-base font-extrabold tracking-tight uppercase sm:text-3xl ${champion ? 'text-text-accent' : 'text-text-muted'}`}
           >
             {champion ? champion.name : '–'}
           </span>

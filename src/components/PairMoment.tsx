@@ -37,7 +37,7 @@ export default function PairMoment({ id, label, player, moment }: Props) {
         <p className='text-text text-xl'>
           <Link
             href={`/spillere/${player.slug}`}
-            className='hover:text-accent focus-visible:outline-accent underline-offset-2 transition-colors duration-150 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2'
+            className='hover:text-text-accent focus-visible:outline-accent underline-offset-2 transition-colors duration-150 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2'
           >
             {player.name}
           </Link>
@@ -52,7 +52,7 @@ export default function PairMoment({ id, label, player, moment }: Props) {
                   heading={`${label} · ${player.name}`}
                   panel={moment.detail}
                   tone='accent'
-                  className='text-accent shrink-0 font-mono text-3xl leading-none tabular-nums'
+                  className='text-text-accent shrink-0 font-mono text-3xl leading-none tabular-nums'
                 >
                   {moment.figure}
                 </Popover>
