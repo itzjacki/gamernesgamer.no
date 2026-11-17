@@ -33,7 +33,7 @@ const cell = 'min-w-0 truncate sm:px-4';
 const eyebrow =
   'text-text-muted font-mono text-xs tracking-wide uppercase sm:tracking-widest';
 const labelLink =
-  'text-text hover:text-accent focus-visible:outline-accent underline underline-offset-2 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2';
+  'text-text hover:text-text-accent focus-visible:outline-accent underline underline-offset-2 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2';
 const mono = 'font-mono text-sm tabular-nums';
 
 function Head() {
@@ -50,7 +50,7 @@ function Kind({ kind }: { kind: HolderChangeKind }) {
   return (
     <span
       className={`${cell} text-right font-mono text-xs tracking-wide uppercase sm:text-left ${
-        kind === 'taken' ? 'text-accent' : 'text-text-muted'
+        kind === 'taken' ? 'text-text-accent' : 'text-text-muted'
       }`}
     >
       {KIND[kind]}

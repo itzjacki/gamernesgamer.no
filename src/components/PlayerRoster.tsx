@@ -76,7 +76,7 @@ function PlayerPlate({ entry }: { entry: RosterEntry }) {
         className={`border-border flex h-8 shrink-0 items-center gap-3 border-b px-4 sm:h-10 sm:px-8 ${clearOfPortrait}`}
       >
         {career && (
-          <span className='text-accent font-mono text-xs tracking-widest tabular-nums'>
+          <span className='text-text-accent font-mono text-xs tracking-widest tabular-nums'>
             <span className='sr-only'>Plass </span>
             {String(career.rank).padStart(2, '0')}
           </span>
@@ -98,7 +98,7 @@ function PlayerPlate({ entry }: { entry: RosterEntry }) {
       <span
         className={`flex min-w-0 flex-1 flex-col justify-center gap-1 pl-4 sm:gap-2 sm:pl-8 ${clearOfPortrait}`}
       >
-        <span className='group-hover:text-accent group-focus-visible:text-accent truncate text-3xl font-extrabold tracking-tight uppercase transition-colors sm:text-6xl'>
+        <span className='group-hover:text-text-accent group-focus-visible:text-text-accent truncate text-3xl font-extrabold tracking-tight uppercase transition-colors sm:text-6xl'>
           {entry.name}
         </span>
         <span className='text-text-muted truncate font-mono text-xs tracking-wide sm:tracking-widest sm:uppercase'>

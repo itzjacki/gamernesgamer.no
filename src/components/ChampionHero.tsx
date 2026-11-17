@@ -1,3 +1,4 @@
+import ChampionTone, { CHAMPION_TONE } from './ChampionTone';
 import SectionLabel from './SectionLabel';
 
 interface Props {
@@ -7,7 +8,8 @@ interface Props {
   totalPoints: number;
   imagePath: string;
   /**
-   * A cutout bleeds to the panel edge; the fallback gamer image sits framed
+   * A cutout fills a square box, bottom-anchored, so champions of different
+   * crops come out at a comparable size; the fallback gamer image sits framed
    * so a square photo doesn't look broken.
    */
   isCutout: boolean;
@@ -34,19 +36,21 @@ export default function ChampionHero({
           {nickname}
         </p>
         <p className='text-text-muted mt-2 font-mono text-xs tracking-widest uppercase'>
-          <span className='text-accent tabular-nums'>{totalPoints}</span> poeng
+          <span className='text-text-accent tabular-nums'>{totalPoints}</span>{' '}
+          poeng
         </p>
       </div>
 
       <div className='border-border flex items-end justify-center border-t sm:border-t-0 sm:border-l'>
+        <ChampionTone />
         <img
           src={imagePath}
           alt={`Bilde av ${name}`}
-          className={
+          className={`${CHAMPION_TONE} ${
             isCutout
-              ? 'max-h-80 w-auto object-contain'
+              ? 'aspect-square w-full max-w-80 object-contain object-bottom sm:w-80'
               : 'm-6 h-56 w-auto object-contain sm:m-10'
-          }
+          }`}
         />
       </div>
     </section>

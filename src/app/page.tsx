@@ -128,10 +128,12 @@ export default async function HomePage({ searchParams }: Props) {
           <div className='absolute inset-y-0 right-[calc((100%-100vw)/2)] left-[calc((100%-100vw)/2)]'>
             <TrophyHero state={state} align={HERO_ALIGN[state]} />
           </div>
-          {/* Over the plinth: its bottom on the cell nearest the trophy's
-              foot (74% down the stage), four cells tall. */}
+          {/* On the hollow between the controller and the pedestal: 38% of
+              the trophy's height up from its foot, then 20px higher (the
+              foot on the cell nearest 74% down the stage; the trophy 62% of
+              the stage tall, on phones min(56%, 63.5vw), as in TrophyHero). */}
           {state === 'upcoming' && (
-            <div className='absolute top-[round(var(--stage)*0.74,40px)] left-1/2 -translate-x-1/2'>
+            <div className='absolute top-[calc(round(var(--stage)*0.74,40px)_-_min(var(--stage)*0.56,63.5vw)*0.38_-_20px)] left-1/2 -translate-x-1/2 -translate-y-1/2 min-[701px]:top-[calc(round(var(--stage)*0.74,40px)_-_var(--stage)*0.62*0.38_-_20px)]'>
               <SeasonCountdown countdown={countdown} season={upcoming.slug} />
             </div>
           )}

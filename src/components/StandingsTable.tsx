@@ -35,7 +35,9 @@ export default function StandingsTable({ rows, pointsLabel = 'POENG' }: Props) {
           >
             <td
               className={`px-4 py-3 text-center font-mono text-sm tabular-nums ${
-                row.isChampion ? 'text-accent font-bold' : 'text-text-muted'
+                row.isChampion
+                  ? 'text-text-accent font-bold'
+                  : 'text-text-muted'
               }`}
             >
               {row.placement}

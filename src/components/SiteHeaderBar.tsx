@@ -93,9 +93,9 @@ const SMALL_KEY =
   'grid h-6 min-w-6 shrink-0 place-items-center border px-1.5 font-mono text-[10px] font-medium uppercase sm:h-7 sm:min-w-7 sm:px-2 sm:text-[11px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
 const SMALL_KEY_ON = 'border-accent bg-accent text-bg';
 const SMALL_KEY_OFF =
-  'border-border-accent text-text-muted hover:border-accent hover:text-accent';
+  'border-border-accent text-text-muted hover:border-accent hover:text-text-accent';
 const SELECT =
-  'bg-display text-text hover:text-accent focus-visible:outline-accent border-border h-full w-28 shrink-0 appearance-none border-r px-2 font-mono text-[11px] font-medium tracking-wide uppercase focus-visible:outline-2 focus-visible:-outline-offset-2 sm:w-36 sm:px-3 sm:text-xs sm:tracking-wider';
+  'bg-display text-text hover:text-text-accent focus-visible:outline-accent border-border h-full w-28 shrink-0 appearance-none border-r px-2 font-mono text-[11px] font-medium tracking-wide uppercase focus-visible:outline-2 focus-visible:-outline-offset-2 sm:w-36 sm:px-3 sm:text-xs sm:tracking-wider';
 const LAYER =
   'absolute inset-0 flex items-stretch overflow-x-auto [scrollbar-width:none]';
 const LABEL = 'text-text-muted font-mono text-[8px] tracking-[0.2em] uppercase';
@@ -213,7 +213,7 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
           } ${choosing ? styles.ledBlink : ''}`}
         />
         <span
-          className={`group-hover:text-accent truncate text-[9px] tracking-normal uppercase sm:text-xs sm:tracking-widest ${
+          className={`group-hover:text-text-accent truncate text-[9px] tracking-normal uppercase sm:text-xs sm:tracking-widest ${
             lit ? 'text-text' : 'text-text-muted'
           }`}
         >
@@ -517,7 +517,7 @@ function VsChooser({
           setB(a);
         }}
         disabled={!a && !b}
-        className='border-border text-text-muted hover:text-accent focus-visible:text-accent focus-visible:outline-accent disabled:hover:text-text-muted grid w-9 shrink-0 cursor-pointer place-items-center border-r focus-visible:outline-2 focus-visible:-outline-offset-2 disabled:cursor-not-allowed sm:w-10'
+        className='border-border text-text-muted hover:text-text-accent focus-visible:text-text-accent focus-visible:outline-accent disabled:hover:text-text-muted grid w-9 shrink-0 cursor-pointer place-items-center border-r focus-visible:outline-2 focus-visible:-outline-offset-2 disabled:cursor-not-allowed sm:w-10'
       >
         <svg
           viewBox='0 0 16 16'
@@ -544,7 +544,7 @@ function VsChooser({
       <button
         type='submit'
         disabled={!ok}
-        className='border-border text-text hover:text-accent disabled:text-text-muted focus-visible:outline-accent disabled:hover:text-text-muted cursor-pointer border-r px-3 font-mono text-[10px] font-medium tracking-[0.2em] uppercase focus-visible:outline-2 focus-visible:-outline-offset-2 disabled:cursor-not-allowed sm:px-4'
+        className='border-border text-text hover:text-text-accent disabled:text-text-muted focus-visible:outline-accent disabled:hover:text-text-muted cursor-pointer border-r px-3 font-mono text-[10px] font-medium tracking-[0.2em] uppercase focus-visible:outline-2 focus-visible:-outline-offset-2 disabled:cursor-not-allowed sm:px-4'
       >
         Gå
       </button>

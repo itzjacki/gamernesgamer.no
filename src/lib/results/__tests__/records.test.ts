@@ -398,6 +398,22 @@ describe('head-to-head matches', () => {
     expect(assembleSeasonView(s1Bundle).games[0].matches).toEqual([]);
   });
 
+  it("keeps a bo1's own score, but not a level one or a series", () => {
+    const summary = assembleSeasonView({
+      ...withMatches,
+      // A bo1 that stored its real score (goals).
+      matches: [...withMatches.matches, match('m-goals', 'bo1')],
+      matchGames: [...withMatches.matchGames, row('m-goals', 1, 3, 1)],
+    }).games.find((g) => g.slug === game.slug)!;
+    expect(summary.matches.map((m) => m.score)).toEqual([
+      null,
+      null,
+      null,
+      null,
+      { a: 3, b: 1 },
+    ]);
+  });
+
   it('ranks match wins and sweeps on their rate', () => {
     const view = composeRecordsView(assembleAllCareers([withMatches]));
     // Jakob (side a) won one of four; Jørgen three of four.
@@ -431,6 +447,7 @@ describe('head-to-head matches', () => {
       gamesLost: won ? 0 : 1,
       won,
       opponent: { slug: 'x', name: 'X' },
+      score: null,
       slotId: null,
     });
     const player = (name: string, matches: RecordMatchRow[]) => ({
@@ -470,6 +487,7 @@ describe('match records built on single matches', () => {
       gamesLost,
       won: gamesWon > gamesLost,
       opponent: { slug: 'x', name: 'X' },
+      score: null,
       slotId: null,
       ...over,
     };

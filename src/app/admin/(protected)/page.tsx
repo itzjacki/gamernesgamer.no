@@ -69,7 +69,7 @@ export default async function AdminDashboardPage() {
 
       {usersError ? (
         <Panel label='Administratorer'>
-          <p className='text-accent mt-4 font-mono text-sm' role='alert'>
+          <p className='text-text-accent mt-4 font-mono text-sm' role='alert'>
             Kunne ikke hente brukerlisten.
           </p>
         </Panel>

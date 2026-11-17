@@ -146,6 +146,7 @@ function pairMatches(
       bestOf: m.bestOf,
       a: m.gamesWon,
       b: m.gamesLost,
+      score: m.score && { a: m.score.own, b: m.score.opponent },
       winner: m.won ? 'a' : 'b',
       slotId: m.slotId,
     }));

@@ -40,7 +40,7 @@ function Side({ player, side }: { player: PairPlayerView; side: 'a' | 'b' }) {
           : 'items-end text-right sm:pl-[10.75rem]'
       }`}
     >
-      <span className='group-hover:text-accent group-focus-visible:text-accent max-w-full truncate text-2xl font-extrabold tracking-tight uppercase transition-colors sm:text-4xl'>
+      <span className='group-hover:text-text-accent group-focus-visible:text-text-accent max-w-full truncate text-2xl font-extrabold tracking-tight uppercase transition-colors sm:text-4xl'>
         {player.name}
       </span>
       <span className='text-text-muted max-w-full truncate font-mono text-xs tracking-wide sm:tracking-widest sm:uppercase'>

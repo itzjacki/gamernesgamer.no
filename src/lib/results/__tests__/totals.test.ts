@@ -31,6 +31,7 @@ const match: GameMatch = {
   bestOf: 1,
   winsA: 1,
   winsB: 0,
+  score: null,
   slotId: null,
 };
 

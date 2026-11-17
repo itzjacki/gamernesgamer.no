@@ -65,6 +65,12 @@ export interface GameMatch {
   /** Never equal. */
   winsA: number;
   winsB: number;
+  /**
+   * A bo1's own score (goals, rounds) when it decides the match by itself;
+   * null for a series or a level score settled by tiebreak. Win-loss games
+   * store 1–0, so theirs matches the wins.
+   */
+  score: { a: number; b: number } | null;
   /** Bracket position (`F`, `GF`, `BR`, `SF1`, …); null in a round-robin. */
   slotId: string | null;
 }
@@ -155,6 +161,8 @@ export interface CareerMatchRow {
   gamesWon: number;
   gamesLost: number;
   won: boolean;
+  /** See `GameMatch.score`. */
+  score: { own: number; opponent: number } | null;
   opponent: { slug: string; name: string };
   /** Bracket position (`F`, `GF`, `BR`, `SF1`, …); null in a round-robin. */
   slotId: string | null;
@@ -522,6 +530,8 @@ export interface PairMatch {
   /** Game rows each side won. */
   a: number;
   b: number;
+  /** See `GameMatch.score`. */
+  score: { a: number; b: number } | null;
   winner: PairSide;
   /** Bracket position (`F`, `GF`, `SF1`, …); null in a round-robin. */
   slotId: string | null;

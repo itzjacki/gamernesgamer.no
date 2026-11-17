@@ -46,8 +46,8 @@
 }
 
 .word:hover {
-  color: var(--color-accent);
-  text-decoration-color: var(--color-accent);
+  color: var(--color-text-accent);
+  text-decoration-color: var(--color-text-accent);
 }
 
 /* Already accent at rest, so hover firms the underline instead. */
@@ -149,7 +149,7 @@ a.title {
 }
 
 a.title:hover {
-  color: var(--color-accent);
+  color: var(--color-text-accent);
 }
 
 a.title:focus-visible {
@@ -168,7 +168,7 @@ a.title:focus-visible {
 }
 
 .win {
-  color: var(--color-accent);
+  color: var(--color-text-accent);
   font-weight: 700;
 }
 

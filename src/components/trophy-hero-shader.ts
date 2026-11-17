@@ -3,7 +3,10 @@
  * scene: god rays from a light behind the trophy (marched over a mask of its
  * silhouette), the page grid as the back wall in register with the site
  * grid, a perspective floor below the trophy's foot, dust in the beams and,
- * while live, two spotlight flashes. Coordinates named `css` are page-grid
+ * while live, two spotlight flashes. The mask's red channel is the trophy,
+ * green the countdown numerals standing in front of it: lit solids that
+ * throw a red glow onto the trophy behind them. Coordinates named `css` are
+ * page-grid
  * css px (offset by +40000 so mod() never sees negatives).
  */
 
@@ -24,9 +27,27 @@ export const FS = `#extension GL_OES_standard_derivatives : enable
 
   const vec3 BG = vec3(23., 24., 26.) / 255.;      // --color-bg
   const vec3 GRIDC = vec3(232., 216., 216.) / 255.;
+  const vec3 TEXT = vec3(230., 225., 219.) / 255.;  // --color-text
   const float CORNER = 0.35; // the light mask's corner radius, canvas heights
 
-  float m(vec2 q){ return texture2D(mask, q).r; }
+  // Anything solid (trophy or numerals): blocks the light.
+  float m(vec2 q){ vec4 k = texture2D(mask, q); return max(k.r, k.g); }
+  float numeral(vec2 q){ return texture2D(mask, q).g; }
+
+  // The numerals' glow on the trophy behind them: their shape blurred over
+  // two rings (6 and 14 css px), shifted a little down, away from the light
+  // above.
+  float halo(){
+    vec2 px = dpr / res;
+    vec2 q = uv + vec2(0.0, 4.0) * px;
+    float acc = 0.0;
+    for (int i = 0; i < 12; i++) {
+      float a = float(i) * 0.5236;
+      vec2 d = vec2(cos(a), sin(a)) * px;
+      acc += numeral(q + d * 6.0) + numeral(q + d * 14.0) * 0.6;
+    }
+    return acc / 19.2;
+  }
   // No sin(): the cell ids are large (the +40000 grid offset), where a
   // sin-based hash loses precision and lines the motes up diagonally.
   float hash(vec2 p){
@@ -113,6 +134,8 @@ export const FS = `#extension GL_OES_standard_derivatives : enable
     vec2 g = mod(css, 40.0);
     float onGrid = (g.x < 1.0 || g.y < 1.0) ? 1.0 : 0.0;
     float inside = m(uv);
+    float trophy = texture2D(mask, uv).r;
+    float num = numeral(uv);
     vec2 px = dpr / res;
     float rim = clamp(inside - m(uv + normalize(light - uv) * px * 2.0), 0.0, 1.0);
     float haze = min(rays, 1.2);
@@ -144,8 +167,17 @@ export const FS = `#extension GL_OES_standard_derivatives : enable
       col = mix(col, GRIDC, fl * smoothstep(0.35, 1.0, depth) * 0.07);
     }
 
-    col = mix(col, vec3(0.055, 0.058, 0.062), inside);
+    col = mix(col, vec3(0.055, 0.058, 0.062), trophy);
+    // The numerals: text-coloured faces in front of the trophy, which takes
+    // their red glow (it breathes with the light).
+    if (trophy > 0.0) col += tint * halo() * trophy * (1.0 - num) * (0.12 + power * 0.3);
+    vec3 face = TEXT * (0.86 + 0.14 * clamp(haze, 0.0, 1.0));
+    col = mix(col, face, num);
     col += tint * rim * (0.08 + power * 0.45);
+    // Their own rim on the side facing the light: over the trophy the
+    // silhouette rim above never reaches them.
+    float numRim = clamp(num - numeral(uv + normalize(light - uv) * px * 2.0), 0.0, 1.0);
+    col += tint * numRim * (0.08 + power * 0.45);
 
     if (dust > 0.0 && inside < 0.5) {
       float lit = clamp(rays * rays * 0.5, 0.0, 1.0);

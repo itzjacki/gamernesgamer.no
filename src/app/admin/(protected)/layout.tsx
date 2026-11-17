@@ -37,7 +37,7 @@ export default async function AdminLayout({ children }: Props) {
         <Panel className='w-80 sm:w-100'>
           {/* Not Panel's label prop: that one is muted, this is the accent
               "stop" signal. */}
-          <p className='text-accent font-mono text-xs tracking-wider uppercase'>
+          <p className='text-text-accent font-mono text-xs tracking-wider uppercase'>
             Ingen tilgang
           </p>
 

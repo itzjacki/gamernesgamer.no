@@ -21,12 +21,17 @@ hex (one exception: the season trophies' real gold, silver and bronze). All
 colours are solid — no transparency, because overlapping translucent
 borders double up.
 
+The accent is one colour in two tokens: `--color-accent` for marks (borders,
+outlines, the diagonal, needles, fills) misses AA as small text, so any text
+in accent, at rest or on hover, uses `--color-text-accent`.
+
 | Token                   | Role                           |
 | ----------------------- | ------------------------------ |
 | `--color-bg`            | Page background                |
 | `--color-surface`       | Single-step surface lift       |
 | `--color-display`       | The header's recessed display  |
 | `--color-accent`        | Pinkish-red. The single accent |
+| `--color-text-accent`   | The accent as text (AA)        |
 | `--color-text`          | Body text                      |
 | `--color-text-muted`    | Metadata, labels (AA on `bg`)  |
 | `--color-border`        | Structural borders             |
@@ -71,9 +76,13 @@ a one-sided pairing paints one side red.
 
 Greyscale at rest so photos from different seasons read as one set; hover or
 focus brings back the photo's own colour. (An accent duotone on hover was
-tried on /vs and dropped.) No portraits on the /records boards and plates:
-one player holding several plates would repeat the same face, and identity is
-the roster's and the hero's job.
+tried on /vs and dropped.) Champion pictures are the exception: at rest they
+take `ChampionTone`, greyscale with red midtones, so they belong to the
+red-lit scene; as a link they get their colour back on hover.
+
+No portraits on the /records boards and plates: one player holding several
+plates would repeat the same face, and identity is the roster's and the
+hero's job.
 
 ## Career page
 
@@ -165,6 +174,14 @@ tried and looked bad.
   "Gamernes Gamer" h1, the countdown's numerals) and its `text-text` mono
   labels. Never `text-text-muted` directly on the scene: it fails AA against
   the lit fog.
+- **In the scene:** the countdown stands on the trophy, on the hollow
+  between the controller and the pedestal (20px above its centre), and the
+  scene draws its numerals itself: lit solids in front of the trophy, with
+  a red rim toward the light and a red glow thrown onto the trophy behind
+  them (a floor reflection beside it was too subtle). The page still lays
+  them out in HTML (`data-hero-numerals`); the HTML glyphs go transparent
+  only while the scene draws them, so screen readers and the poster keep
+  the text.
 - **Bordered elements:** solid `bg-bg` with `border`, like the site's panels
   (live block, the champion's footer). Muted labels are fine
   inside them. Whole-block links take the accent on their border on hover.
