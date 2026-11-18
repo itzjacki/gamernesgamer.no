@@ -89,6 +89,23 @@ hero's job.
 The ledger is an instrument panel with large mono figures (a plain
 `StatList` read flat next to the trophy shelf and cards).
 
+## Game page
+
+Only the game's result is rank-1 data: accent on the standings' winner, the
+deciding bracket plate (F, or GF2 when played, else GF) and its winning
+score, and a rounds table's winner only when that stage settled the game. A
+group or stage leader gets weight, not accent, so one player isn't painted
+red by every stage. Brackets are drawn (plates on the 20px-row grid, hairline
+connectors for winners' routes only); on phones a double-elim bracket splits
+into its sections instead of scrolling.
+
+Each stage opens with an h3 (h5 size) on a 60px `bg-surface` band, kept
+clearly below the h2 (a hairline rule reads as one more grid line; a
+two-cell band at h3 size rivalled the h2; one cell felt cramped). Blocks
+inside a stage take `SectionLabel`s, so a stage never reads at the same
+strength as its parts. Blocks only as wide as they need: the standings beside
+the media, a group's table and matches side by side.
+
 ## Type
 
 Neue Montreal (self-hosted) for display (800) and body (400); Martian Mono

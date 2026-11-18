@@ -95,6 +95,7 @@ describe('composeSeasonView — Season 2', () => {
         pointsDelta: 0,
         name: 'Gamba Time',
         description: expect.stringContaining('Gjett'),
+        imagePath: '/images/power-ups/gamba-time.svg',
       },
     ]);
   });

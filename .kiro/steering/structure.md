@@ -52,12 +52,15 @@ Each file has one job; keep the boundaries. Data flows
 `fetch → derive → compose → queries → page`.
 
 - `queries.ts` — the only API pages call. Returns `null` for not-found (→
-  `notFound()`), throws on error (→ `error.tsx`). Does the filesystem lookups
+  `notFound()`), throws on error (→ `error.tsx`). `getGameView` never returns
+  null: the game page 404s on its static slug and renders without results. Does the filesystem lookups
   (hero portraits, season photos) so `compose` stays pure.
 - `fetch.ts` — the IO boundary. Filters `confirmed = true`; imports no
   derivation. The H2H tables (`stage`, `match`, `match_game`) have no
   `confirmed` flag, so derivation only reads the matches of games that have
-  results. The rounds tables are not fetched.
+  results. The rounds tables (`round`, `round_result`, the largest) are
+  fetched only for the game page, one game's stages at a time, by
+  `fetchRounds`; nothing else reads them.
 - `derive/` — pure, synchronous, no IO, no static data, unit-tested.
   - `career/` is shared by player pages and `/records`; it reads the
     per-season output and never re-derives placements. Tag stats take rows
@@ -69,8 +72,14 @@ Each file has one job; keep the boundaries. Data flows
   - `pair.ts` describes ONE pair for `/vs`: every figure is over what the two
     shared (games both played, seasons both finished, matches against each
     other), never a whole career; sides are `a`/`b` in the order asked for.
+  - `game-detail.ts` builds one game's stages for the game page. A bracket
+    stage maps each match by `slot_id` onto its kind's static template in
+    `src/lib/results/bracket-templates.ts` and throws on a slot the template
+    lacks. Rank-then-sum rounds award N − (players strictly better), so a tie
+    shares the higher points.
   - `matches.ts` decides each H2H match from its game rows (the outcome is
-    never stored); everything else reads `GameSummary.matches`.
+    never stored) in `decideMatch`; everything else reads
+    `GameSummary.matches` or calls `decideMatch`.
 - `compose.ts` — pure. The one seam that joins DB data to static `src/data`
   content (game by slug, player by name, title by `titleId`, tags).
 - `view-models.ts` — the camelCase shapes components consume. Components never
@@ -130,7 +139,8 @@ in derivation or compose.
    `status` is set by hand, not derived from the dates, and there is no start
    time. Each gamer carries a `stats` block for the card.
    Each game needs a `titleId` (add a new title to `src/data/titles.ts` if the
-   game has not appeared before) and `formatTags`.
+   game has not appeared before) and `formatTags`; a game with a rounds stage
+   also a `roundScore` (what its raw scores are; the DB can't tell).
 2. Add images under `public/images/gamers/<N>/` and
    `public/images/game-thumbnails/<N>/` (unpadded: `1`, not `01`).
 3. Register the season in `src/data/sesong/index.ts` and set `currentSeason`. The

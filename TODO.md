@@ -23,10 +23,8 @@ with its trophy hero.
 
 ### 1. Game results on the game page
 
-First in Phase 4. The game page shows only the static content today. Add the
-game's results from Supabase: each player's placement and points, the
-matches/rounds as stored, and the power-ups used in the game (who, which,
-the effect). Scoped when we start.
+- [ ] **Copy (Jakob):** the labels marked `TODO(copy)` (section and stage
+      names, bracket slot names, table headers).
 
 ### 2. Manual images (Jakob)
 
@@ -111,6 +109,16 @@ Visual "tried and dropped" items are in design.md.
 **Season page**
 
 - Superscript power-up deltas in the matrix (totals looked inflated).
+
+**Game page**
+
+- Links to the same title in other seasons: game pages stay per-season.
+- A one-round table for games entered as placements (it repeats the
+  standings); only a measured score (gold, altitude) gets one.
+- Scores, ladder points or power-up points as standings columns (confusing):
+  the standings show the total, and its popover splits out the power-ups.
+- Placement rounds shown as positions (1., 2.): a column of 1s summing to 20
+  reads wrong; the stored 4..1 is easy to read.
 
 **/records**
 

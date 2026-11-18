@@ -7,7 +7,9 @@ import { titles } from '@/data/titles';
 import type { SeasonData } from '@/data/sesong';
 import type {
   SeasonView,
+  GameDetail,
   GamePlacementRow,
+  StageView,
   PlayerRef,
   CareerStats,
   CareerView,
@@ -51,6 +53,7 @@ export interface ComposedPowerUpUse {
   pointsDelta: number;
   name: string;
   description: string;
+  imagePath: string;
 }
 
 export interface ComposedGamePlacementRow {
@@ -156,6 +159,7 @@ function composeResults(
         pointsDelta: use.pointsDelta,
         name: content.name,
         description: content.description,
+        imagePath: content.imagePath,
       };
     }),
   }));
@@ -183,6 +187,26 @@ export function composeSeasonView(view: SeasonView): ComposedSeasonView {
       ordinal: g.ordinal,
       results: composeResults(g.results, powerUps),
     })),
+  };
+}
+
+/** One game's results and stages, power-ups joined. */
+export interface ComposedGameView {
+  /** Ordered by placement; empty until the game has confirmed results. */
+  results: ComposedGamePlacementRow[];
+  stages: StageView[];
+}
+
+export function composeGameView(
+  detail: GameDetail,
+  seasonSlug: string,
+): ComposedGameView {
+  const content = seasonContent(seasonSlug);
+  return {
+    results: detail.summary
+      ? composeResults(detail.summary.results, powerUpBySlug(content))
+      : [],
+    stages: detail.stages,
   };
 }
 

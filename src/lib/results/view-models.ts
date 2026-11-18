@@ -6,6 +6,7 @@
 
 import type { GamerStats } from '@/types/gamer';
 import type { Tag } from '@/types/tag';
+import type { SlotId } from './bracket-templates';
 
 export interface PlayerRef {
   /** season_player.id, not player.id — for keys/lookups, not display. */
@@ -107,6 +108,108 @@ export interface SeasonView {
   games: GameSummary[];
   /** Same order as `players`. Empty when the season has no results yet. */
   series: PlayerSeries[];
+}
+
+/* -------------------------------------------------------------------------- */
+/* Game detail (one game's stages, for the game page)                         */
+/* -------------------------------------------------------------------------- */
+
+export interface MatchGameScore {
+  gameNumber: number;
+  scoreA: number;
+  scoreB: number;
+  winner: 'a' | 'b';
+  /** A level score settled by `tiebreak_winner`. */
+  byTiebreak: boolean;
+}
+
+/** One match as stored. `playerA` is not the winner; read `winner`. */
+export interface StageMatch {
+  playerA: PlayerRef;
+  playerB: PlayerRef;
+  /** Meeting number of this pair in the stage; 2+ is a rematch. */
+  leg: number;
+  bestOf: 1 | 3 | 5;
+  winsA: number;
+  winsB: number;
+  winner: 'a' | 'b';
+  /**
+   * bo1 only: the one game's score (goals, rounds; win-loss games store 1–0).
+   * Level when it was settled by tiebreak.
+   */
+  score: { a: number; b: number; byTiebreak: boolean } | null;
+  /**
+   * A series with real per-game scores (Trombone songs). Null when the series
+   * score says it all: stored as one series row (S2 LoL) or as 1–0 rows (2XKO).
+   */
+  games: MatchGameScore[] | null;
+}
+
+export interface RoundRobinRow {
+  player: PlayerRef;
+  wins: number;
+  losses: number;
+  /** Shared on an equal win–loss record. */
+  rank: number;
+}
+
+export interface RoundRobinStageView {
+  kind: 'round-robin';
+  ordinal: number;
+  /** By record; equal records in final game placement order. */
+  standings: RoundRobinRow[];
+  /** By leg, then by the pair's names: the stage stores no play order. */
+  matches: StageMatch[];
+}
+
+export type BracketKind =
+  | 'single-elim'
+  | 'final-bronze'
+  | 'double-elim-reset'
+  | 'double-elim-no-reset';
+
+export interface BracketSlotView {
+  slotId: SlotId;
+  /** null = not played (a grand-final reset that was not needed). */
+  match: StageMatch | null;
+}
+
+export interface BracketStageView {
+  kind: BracketKind;
+  ordinal: number;
+  /** One per template slot, in template order. */
+  slots: BracketSlotView[];
+}
+
+export interface RoundCell {
+  /** null when the player has no result in the round. */
+  raw: number | null;
+  /** rank-then-sum only: the points the round's ranking awarded. */
+  rankPoints: number | null;
+}
+
+export interface RoundsStageView {
+  kind: 'rounds';
+  ordinal: number;
+  aggregation: 'sum' | 'rank-then-sum';
+  /** The columns: by stage total, then final game placement. */
+  players: PlayerRef[];
+  /** By ordinal; `cells` aligned with `players`. */
+  rounds: { ordinal: number; label: string | null; cells: RoundCell[] }[];
+  /** Aligned with `players`. sum: Σ raw; rank-then-sum: Σ rank points. */
+  totals: number[];
+}
+
+export type StageView =
+  | RoundRobinStageView
+  | BracketStageView
+  | RoundsStageView;
+
+export interface GameDetail {
+  /** null when the game has no DB row. */
+  summary: GameSummary | null;
+  /** By stage ordinal. Empty until the game has confirmed results. */
+  stages: StageView[];
 }
 
 /* -------------------------------------------------------------------------- */

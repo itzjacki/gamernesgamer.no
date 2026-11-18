@@ -12,6 +12,8 @@ export type PowerUpUseRow = Tables<'power_up_use'>;
 export type StageRow = Tables<'stage'>;
 export type MatchRow = Tables<'match'>;
 export type MatchGameRow = Tables<'match_game'>;
+export type RoundRow = Tables<'round'>;
+export type RoundResultRow = Tables<'round_result'>;
 
 /**
  * One season's raw rows as flat arrays; derivation does the nesting. `players`
@@ -32,4 +34,14 @@ export interface SeasonBundle {
   stages: StageRow[];
   matches: MatchRow[];
   matchGames: MatchGameRow[];
+}
+
+/**
+ * The round rows of a set of rounds stages. Fetched apart from SeasonBundle,
+ * only for the game page: round_result is the largest table and no other page
+ * reads it.
+ */
+export interface RoundsBundle {
+  rounds: RoundRow[];
+  roundResults: RoundResultRow[];
 }

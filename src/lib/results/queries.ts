@@ -2,11 +2,16 @@ import 'server-only';
 
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { fetchSeasonBundle, fetchAllSeasonBundles } from './fetch';
+import { fetchSeasonBundle, fetchAllSeasonBundles, fetchRounds } from './fetch';
 import { assembleSeasonView } from './derive';
+import {
+  assembleGameDetail,
+  confirmedRoundsStageIds,
+} from './derive/game-detail';
 import { assembleCareer, assembleAllCareers } from './derive/career';
 import {
   composeCareerView,
+  composeGameView,
   composePairSummaries,
   composePairView,
   composeRecordsView,
@@ -25,6 +30,7 @@ import type { ArchiveTotals } from './view-models';
 import { diffRecords } from './derive/records/changes';
 import type { SeasonChanges } from './view-models';
 import { seasonData } from '@/data/sesong';
+import type { ComposedGameView } from './compose';
 
 /**
  * Public read API — pages call these and nothing else in the module.
@@ -37,6 +43,28 @@ export async function getSeasonView(
   const bundle = await fetchSeasonBundle(seasonNumber);
   if (!bundle) return null;
   return assembleSeasonView(bundle);
+}
+
+/**
+ * Never null: the page's 404 is the static slug lookup, and a game without
+ * results (or not in the DB yet) still renders its static content.
+ */
+export async function getGameView(
+  seasonNumber: number,
+  gameSlug: string,
+): Promise<ComposedGameView> {
+  const bundle = await fetchSeasonBundle(seasonNumber);
+  if (!bundle) return { results: [], stages: [] };
+
+  const game = bundle.games.find((g) => g.slug === gameSlug);
+  const stageIds = confirmedRoundsStageIds(bundle).filter((id) =>
+    bundle.stages.some((s) => s.id === id && s.game_id === game?.id),
+  );
+  const rounds = await fetchRounds(stageIds);
+  return composeGameView(
+    assembleGameDetail(bundle, rounds, gameSlug),
+    bundle.season.number.toString().padStart(2, '0'),
+  );
 }
 
 /**

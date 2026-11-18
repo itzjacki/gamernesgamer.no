@@ -4,6 +4,7 @@ export const games: Game[] = [
   {
     title: 'World of Warcraft',
     slug: 'world-of-warcraft',
+    roundScore: 'value',
     titleId: 'world-of-warcraft',
     formatTags: ['gold-rush'],
     thumbnailPath: '/images/game-thumbnails/3/world-of-warcraft.jpg',
@@ -23,6 +24,7 @@ export const games: Game[] = [
   {
     title: 'BattleBlock Theater',
     slug: 'battleblock-theater',
+    roundScore: 'points',
     titleId: 'battleblock-theater',
     formatTags: ['score-attack'],
     thumbnailPath: '/images/game-thumbnails/3/battleblock-theater.jpg',
@@ -50,6 +52,7 @@ export const games: Game[] = [
   {
     title: 'Kerbal Space Program',
     slug: 'kerbal-space-program',
+    roundScore: 'value',
     titleId: 'kerbal-space-program',
     formatTags: ['score-attack'],
     thumbnailPath: '/images/game-thumbnails/3/kerbal-space-program.jpg',
@@ -67,6 +70,7 @@ export const games: Game[] = [
   {
     title: 'GeoGuessr',
     slug: 'geoguessr',
+    roundScore: 'value',
     titleId: 'geoguessr',
     formatTags: ['score-attack'],
     thumbnailPath: '/images/game-thumbnails/3/geoguessr.jpg',
@@ -90,6 +94,7 @@ export const games: Game[] = [
   {
     title: 'Jump King',
     slug: 'jump-king',
+    roundScore: 'placement',
     titleId: 'jump-king',
     formatTags: ['climb'],
     thumbnailPath: '/images/game-thumbnails/3/jump-king.jpg',
@@ -104,6 +109,7 @@ export const games: Game[] = [
   {
     title: 'Planet Coaster',
     slug: 'planet-coaster',
+    roundScore: 'value',
     titleId: 'planet-coaster',
     formatTags: ['score-attack'],
     thumbnailPath: '/images/game-thumbnails/3/planet-coaster.jpg',
@@ -139,6 +145,7 @@ export const games: Game[] = [
   {
     title: 'Hollow Knight',
     slug: 'hollow-knight',
+    roundScore: 'placement',
     titleId: 'hollow-knight',
     formatTags: ['speedrun'],
     thumbnailPath: '/images/game-thumbnails/3/hollow-knight.jpg',
@@ -165,6 +172,7 @@ export const games: Game[] = [
   {
     title: 'Pummel Party',
     slug: 'pummel-party',
+    roundScore: 'value',
     titleId: 'pummel-party',
     formatTags: ['free-for-all'],
     thumbnailPath: '/images/game-thumbnails/3/pummel-party.jpg',
@@ -179,6 +187,7 @@ export const games: Game[] = [
   {
     title: "PlayerUnknown's Battlegrounds",
     slug: 'pubg',
+    roundScore: 'placement',
     titleId: 'pubg',
     formatTags: ['battle-royale', 'free-for-all'],
     thumbnailPath: '/images/game-thumbnails/3/pubg.jpg',
