@@ -21,7 +21,14 @@ with its trophy hero.
 
 ## Phase 4 — Historical content & stats 🚧
 
-### 1. Manual images (Jakob)
+### 1. Game results on the game page
+
+First in Phase 4. The game page shows only the static content today. Add the
+game's results from Supabase: each player's placement and points, the
+matches/rounds as stored, and the power-ups used in the game (who, which,
+the effect). Scoped when we start.
+
+### 2. Manual images (Jakob)
 
 Pages fall back to card art until each exists.
 
@@ -31,25 +38,25 @@ Pages fall back to card art until each exists.
 - [ ] **Season photos** `public/images/seasons/<NN>.jpg`, landscape about
       2:1: the season index.
 
-### 2. OG images for every major page
+### 3. OG images for every major page
 
 Waits for the images. The front page, season, game and career pages,
 /records and /vs, plus shareable player images (career stats).
 
-### 3. Design audit
+### 4. Design audit
 
 Before the card redesign. Does the site follow VERKSTED, and does VERKSTED
 still express a permanent monument? Change the language, not just pages.
 Leads: `--color-display` beyond the header (readouts, key figures); more
 deliberate spacing (almost every section has a large gap).
 
-### 4. Cards part 1
+### 5. Cards part 1
 
 - [ ] **Gamer-card redesign:** the visual centrepiece (chrome highlights
       tracking the tilt, material surfaces); the current SVG shape limits it.
 - [ ] **Champion card:** a special variant for the season winner.
 
-### 5. Content centre
+### 6. Content centre
 
 Needs exploration and direction. A home for the videos, pictures and memes
 there are; it may live on the season, game and player pages rather than as
@@ -57,7 +64,7 @@ its own page. The volume decides whether it is a data file or needs an asset
 pipeline. Covers media on game and season pages, and the front page's content
 of the day (what it rotates; a placeholder until then).
 
-### 6. Season page upgrade
+### 7. Season page upgrade
 
 More per-season views, stats and content; scoped when we start.
 
