@@ -1,5 +1,6 @@
 import Popover from './Popover';
 import RecordLines from './RecordLines';
+import { signedDelta } from '@/lib/format';
 
 /**
  * Games are rows and players columns on purpose: a season has more games than
@@ -44,13 +45,6 @@ interface Props {
   seasonNumber: number;
   players: MatrixPlayer[];
   games: MatrixGameRow[];
-}
-
-/** Real minus (U+2212). */
-function signedDelta(n: number): string {
-  if (n > 0) return `+${n}`;
-  if (n < 0) return `\u2212${Math.abs(n)}`;
-  return '0';
 }
 
 function PlainCell({ points }: { points: number }) {

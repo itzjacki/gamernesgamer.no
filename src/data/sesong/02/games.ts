@@ -41,6 +41,7 @@ export const games: Game[] = [
   {
     title: 'Curve Fever',
     slug: 'curve-fever',
+    roundScore: 'placement',
     titleId: 'curve-fever',
     formatTags: ['free-for-all'],
     thumbnailPath: '/images/game-thumbnails/2/curve-fever.jpg',
@@ -60,6 +61,7 @@ export const games: Game[] = [
   {
     title: 'The Sims 4',
     slug: 'the-sims-4',
+    roundScore: 'value',
     titleId: 'the-sims-4',
     formatTags: ['gold-rush'],
     thumbnailPath: '/images/game-thumbnails/2/the-sims-4.jpg',
@@ -97,6 +99,7 @@ export const games: Game[] = [
   {
     title: 'Warcraft 3',
     slug: 'warcraft-3',
+    roundScore: 'placement',
     titleId: 'warcraft-3',
     formatTags: ['free-for-all'],
     thumbnailPath: '/images/game-thumbnails/2/warcraft-3.jpg',
@@ -116,6 +119,7 @@ export const games: Game[] = [
   {
     title: "Poker - Texas Hold'em",
     slug: 'poker',
+    roundScore: 'placement',
     titleId: 'poker',
     formatTags: ['free-for-all'],
     thumbnailPath: '/images/game-thumbnails/2/poker.jpg',
@@ -137,6 +141,7 @@ export const games: Game[] = [
   {
     title: 'Wreckfest',
     slug: 'wreckfest',
+    roundScore: 'points',
     titleId: 'wreckfest',
     formatTags: ['free-for-all'],
     thumbnailPath: '/images/game-thumbnails/2/wreckfest.jpg',

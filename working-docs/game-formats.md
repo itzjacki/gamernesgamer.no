@@ -7,10 +7,11 @@ Points/placements: `game-placements.md`.
 ## TAXONOMY
 
 Top-level type:
-score one number per player. direction high|low is DISPLAY-ONLY (noted in the
-static TS game data), NOT stored in the DB — round_result.raw_score is always
-higher = better. A score-low game is modeled as a rounds (sum) game instead,
-with placements as raw_score (see Hollow Knight).
+score one number per player. Direction is NOT stored — round_result.raw_score
+is always higher = better. What raw_score means (a measured value, a 4..1
+placement, or combined points) is the static Game's `roundScore`. A score-low
+game is modeled as a rounds (sum) game instead, with placements as raw_score
+(see Hollow Knight).
 rounds N sub-events. axes: raw_score x aggregation
 h2h matches. structure + series + match_result
 placement final positions only, no sub-data
@@ -52,8 +53,11 @@ round-robin and a "swiss finish" too (repeated pairings
 carry match.leg; no separate kind).
 single-elim 4-player knockout -> bracket template (SF1, SF2, F, BR)
 final-bronze just a final + a bronze -> bracket template (F, BR)
-double-elim-reset double-elim, grand final can be replayed (GF2)
-double-elim-no-reset double-elim, single grand final (unused so far)
+double-elim-reset double-elim, grand final can be replayed -> bracket template
+(WB-SF1, WB-SF2, WB-F, LB-R1, LB-F, GF, GF2). One LB-R1 for 4 players
+(the schema comment's LB-R1-1/LB-R1-2 is wrong).
+double-elim-no-reset double-elim, single grand final (unused so far); the same
+template without GF2
 rounds non-H2H sub-events -> standings via aggregation
 aggregation: sum | rank-then-sum. Required for rounds stages, null otherwise.
 
@@ -81,7 +85,8 @@ raw_score) — one number, HIGHER = BETTER, never null, negatives allowed.
 aggregation decides standings:
 sum add raw_score across rounds. Placement-type rounds store 4..1
 and sum (Trackmania, Curve Fever, Garry's Mod, Warcraft FFA).
-rank-then-sum per round rank by raw_score, award N..1, sum the points. Used
+rank-then-sum per round rank by raw_score, award N..1, sum the points; a tie
+shares the higher points (N − players strictly better). Used
 when raw scores aren't comparable across rounds (Trombone song
 scores, Ratz kills).
 

@@ -1,6 +1,14 @@
 import type { TitleId } from '@/data/titles';
 import type { FormatTag, GenreTag } from '@/types/tag';
 
+/**
+ * What a rounds stage's raw scores are, since the DB can't tell:
+ * - `value`: a measured number (gold, song score, kills);
+ * - `placement`: the round's finish entered as 4..1 (4 = best);
+ * - `points`: points combined from several things (OSRS, Wreckfest).
+ */
+export type RoundScoreKind = 'value' | 'placement' | 'points';
+
 export interface Game {
   title: string;
   slug: string;
@@ -17,4 +25,7 @@ export interface Game {
   shortDescription: string;
   longDescription?: string;
   videoEmbedUrl?: string;
+  // Only for games with a rounds stage. Unset: a multi-round table shows plain
+  // numbers and a one-round table is hidden.
+  roundScore?: RoundScoreKind;
 }

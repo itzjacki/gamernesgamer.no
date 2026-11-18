@@ -2,7 +2,7 @@ import 'server-only';
 
 import { createReadClient } from '../supabase/read';
 import { seasonData } from '@/data/sesong';
-import type { SeasonBundle } from './raw';
+import type { RoundsBundle, SeasonBundle } from './raw';
 
 /**
  * IO boundary: produces raw rows and imports no derivation. The dataset is
@@ -121,6 +121,32 @@ export async function fetchSeasonBundle(
     matchGames: (matchGames.data ?? []).map(
       ({ match: _match, ...rest }) => rest,
     ) as SeasonBundle['matchGames'],
+  };
+}
+
+/**
+ * The rounds of the given stages. Rounds have no `confirmed` flag; the caller
+ * passes only stages of games with confirmed results. Throws on query errors.
+ */
+export async function fetchRounds(stageIds: string[]): Promise<RoundsBundle> {
+  if (stageIds.length === 0) return { rounds: [], roundResults: [] };
+  const supabase = createReadClient();
+
+  const [rounds, roundResults] = await Promise.all([
+    supabase.from('round').select('*').in('stage_id', stageIds),
+    supabase
+      .from('round_result')
+      .select('*, round!inner(stage_id)')
+      .in('round.stage_id', stageIds),
+  ]);
+  if (rounds.error) throw rounds.error;
+  if (roundResults.error) throw roundResults.error;
+
+  return {
+    rounds: rounds.data ?? [],
+    roundResults: (roundResults.data ?? []).map(
+      ({ round: _round, ...rest }) => rest,
+    ) as RoundsBundle['roundResults'],
   };
 }
 

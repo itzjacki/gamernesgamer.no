@@ -4,6 +4,7 @@ export const games: Game[] = [
   {
     title: 'League of Legends',
     slug: 'league-of-legends-04',
+    roundScore: 'points',
     titleId: 'league-of-legends',
     formatTags: ['free-for-all'],
     thumbnailPath: '/images/game-thumbnails/4/league-of-legends-04.jpg',
@@ -18,6 +19,7 @@ export const games: Game[] = [
   {
     title: 'PEAK',
     slug: 'peak',
+    roundScore: 'value',
     titleId: 'peak',
     formatTags: ['climb', 'free-for-all'],
     thumbnailPath: '/images/game-thumbnails/4/peak.jpg',
@@ -32,6 +34,7 @@ export const games: Game[] = [
   {
     title: 'Ratz Instagib',
     slug: 'ratz-instagib',
+    roundScore: 'value',
     titleId: 'ratz-instagib',
     formatTags: ['free-for-all'],
     thumbnailPath: '/images/game-thumbnails/4/ratz-instagib.jpg',
@@ -46,6 +49,7 @@ export const games: Game[] = [
   {
     title: 'Trombone Champ',
     slug: 'trombone-champ',
+    roundScore: 'value',
     titleId: 'trombone-champ',
     formatTags: ['score-attack', 'duel'],
     thumbnailPath: '/images/game-thumbnails/4/trombone-champ.jpg',
@@ -60,6 +64,7 @@ export const games: Game[] = [
   {
     title: 'Counter-Strike 2',
     slug: 'counter-strike-2',
+    roundScore: 'placement',
     titleId: 'counter-strike',
     formatTags: ['climb'],
     genreTags: ['platformer'],
@@ -75,6 +80,7 @@ export const games: Game[] = [
   {
     title: "Garry's Mod",
     slug: 'garrys-mod',
+    roundScore: 'placement',
     titleId: 'garrys-mod',
     formatTags: [],
     thumbnailPath: '/images/game-thumbnails/4/garrys-mod.jpg',

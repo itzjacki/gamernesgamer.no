@@ -15,6 +15,7 @@ export const games: Game[] = [
   {
     title: 'Old School RuneScape',
     slug: 'old-school-runescape',
+    roundScore: 'points',
     titleId: 'old-school-runescape',
     formatTags: ['free-for-all'],
     thumbnailPath: '/images/game-thumbnails/1/old-school-runescape.jpg',
@@ -38,6 +39,7 @@ export const games: Game[] = [
   {
     title: 'The Elder Scrolls V: Skyrim',
     slug: 'the-elder-scrolls-v-skyrim',
+    roundScore: 'value',
     titleId: 'the-elder-scrolls-v-skyrim',
     formatTags: ['gold-rush'],
     thumbnailPath: '/images/game-thumbnails/1/the-elder-scrolls-v-skyrim.jpg',
@@ -49,6 +51,7 @@ export const games: Game[] = [
   {
     title: 'Tetris',
     slug: 'tetris',
+    roundScore: 'value',
     titleId: 'tetris',
     formatTags: ['score-attack'],
     thumbnailPath: '/images/game-thumbnails/1/tetris.jpg',
@@ -71,6 +74,7 @@ export const games: Game[] = [
   {
     title: 'Trackmania',
     slug: 'trackmania',
+    roundScore: 'placement',
     titleId: 'trackmania',
     formatTags: [],
     thumbnailPath: '/images/game-thumbnails/1/trackmania.jpg',
@@ -82,6 +86,7 @@ export const games: Game[] = [
   {
     title: 'Flat Out 2',
     slug: 'flat-out-2',
+    roundScore: 'placement',
     titleId: 'flat-out-2',
     formatTags: ['score-attack'],
     thumbnailPath: '/images/game-thumbnails/1/flat-out-2.jpg',
