@@ -300,8 +300,8 @@ function PlateRow({
   const figureTone = !won
     ? 'text-text-muted'
     : decides
-      ? 'text-text-accent font-bold'
-      : 'text-text font-semibold';
+      ? 'text-text-accent font-medium'
+      : 'text-text font-medium';
 
   return (
     <>

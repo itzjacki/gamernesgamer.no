@@ -109,7 +109,7 @@ function CrownsBody({
               {i > 0 && ', '}
               <Link
                 href={`/spillere/${holder.player.slug}`}
-                className='underline-offset-2 hover:underline'
+                className='focus-visible:outline-accent underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2'
               >
                 {holder.player.name}
               </Link>

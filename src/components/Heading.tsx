@@ -13,8 +13,8 @@ interface Props {
 const styleMap: Record<HeadingLevel, string> = {
   h1: 'text-4xl font-extrabold tracking-tight uppercase sm:text-5xl lg:text-7xl',
   h2: 'text-3xl font-extrabold tracking-tight uppercase sm:text-4xl',
-  h3: 'text-2xl font-bold tracking-tight uppercase',
-  h4: 'text-xl font-bold tracking-tight uppercase',
+  h3: 'text-2xl font-extrabold tracking-tight uppercase',
+  h4: 'text-xl font-extrabold tracking-tight uppercase',
   h5: 'text-lg font-semibold tracking-tight uppercase',
   h6: 'text-base font-semibold tracking-tight uppercase',
 };

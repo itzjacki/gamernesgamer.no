@@ -136,7 +136,7 @@ export default function GamePointsMatrix({
               {players.map((p) => (
                 <td
                   key={p.seasonPlayerId}
-                  className={`px-3 py-3 text-center font-mono text-sm font-bold tabular-nums ${
+                  className={`px-3 py-3 text-center font-mono text-sm font-medium tabular-nums ${
                     p.isChampion ? 'text-text-accent' : 'text-text'
                   }`}
                 >

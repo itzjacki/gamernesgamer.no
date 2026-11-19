@@ -36,7 +36,7 @@ export default function StandingsTable({ rows, pointsLabel = 'POENG' }: Props) {
             <td
               className={`px-4 py-3 text-center font-mono text-sm tabular-nums ${
                 row.isChampion
-                  ? 'text-text-accent font-bold'
+                  ? 'text-text-accent font-medium'
                   : 'text-text-muted'
               }`}
             >
@@ -46,7 +46,7 @@ export default function StandingsTable({ rows, pointsLabel = 'POENG' }: Props) {
               {row.slug ? (
                 <Link
                   href={`/spillere/${row.slug}`}
-                  className='underline-offset-2 hover:underline'
+                  className='focus-visible:outline-accent underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2'
                 >
                   {row.name}
                 </Link>

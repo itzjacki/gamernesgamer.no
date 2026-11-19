@@ -360,7 +360,7 @@ export default async function PairPage({ params }: Props) {
                       key={side}
                       className={`px-2 py-3 text-right font-mono text-sm tabular-nums ${
                         season[side].placement === 1
-                          ? 'text-text-accent font-bold'
+                          ? 'text-text-accent font-medium'
                           : 'text-text'
                       }`}
                     >

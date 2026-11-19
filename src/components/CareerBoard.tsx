@@ -63,7 +63,7 @@ export default function CareerBoard({ rows, seasons }: Props) {
             <td
               className={`text-center ${numberCell} ${
                 row.rank === 1
-                  ? 'text-text-accent font-bold'
+                  ? 'text-text-accent font-medium'
                   : 'text-text-muted'
               }`}
             >

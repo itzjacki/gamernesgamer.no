@@ -43,7 +43,7 @@ export default function GameStandings({ id, rows }: Props) {
             <td
               className={`px-3 text-center font-mono text-sm tabular-nums ${
                 row.placement === 1
-                  ? 'text-text-accent font-bold'
+                  ? 'text-text-accent font-medium'
                   : 'text-text-muted'
               }`}
             >
@@ -52,12 +52,12 @@ export default function GameStandings({ id, rows }: Props) {
             <td className='text-text px-3 font-semibold'>
               <Link
                 href={`/spillere/${row.player.slug}`}
-                className='underline-offset-2 hover:underline'
+                className='focus-visible:outline-accent underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2'
               >
                 {row.player.name}
               </Link>
             </td>
-            <td className='text-text relative px-3 text-right font-mono text-sm font-bold tabular-nums'>
+            <td className='text-text relative px-3 text-right font-mono text-sm font-medium tabular-nums'>
               {row.powerUpUses.length > 0 ? (
                 <Popover
                   id={`${id}-pu-${row.player.seasonPlayerId}`}
