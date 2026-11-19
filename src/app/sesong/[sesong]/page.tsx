@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
@@ -29,6 +30,11 @@ interface Props {
 
 export function generateStaticParams() {
   return Object.keys(seasonData).map((sesong) => ({ sesong }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { sesong } = await params;
+  return isSeason(sesong) ? { title: `Sesong ${Number(sesong)}` } : {};
 }
 
 export default async function SeasonPage({ params }: Props) {

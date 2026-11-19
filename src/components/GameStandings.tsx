@@ -8,9 +8,8 @@ import RecordLines, { pointsBreakdownLines } from './RecordLines';
  * the figure opens the breakdown.
  */
 
-// TODO(copy): placeholder labels.
 const LABELS = {
-  placement: 'POS',
+  placement: 'POS.',
   player: 'Spiller',
   points: 'Poeng',
 };

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -20,6 +21,12 @@ interface Props {
 
 export function generateStaticParams() {
   return getAllPlayerSlugs().map((spiller) => ({ spiller }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { spiller } = await params;
+  const career = await getCareerView(spiller);
+  return career ? { title: career.hero.name } : {};
 }
 
 export default async function PlayerCareerPage({ params }: Props) {

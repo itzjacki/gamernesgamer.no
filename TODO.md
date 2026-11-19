@@ -14,45 +14,27 @@ produces artifacts that feed into it.
 
 Phases 1–3 (Next.js rewrite, VERKSTED rebrand, Supabase + auth + admin,
 S1–S4 seeded on prod). Phase 4 so far: season, game and career pages, the
-indexes, titles and tags, /records, /vs, the site header, and the front page
-with its trophy hero.
+indexes, titles and tags, /records, /vs, the site header, the front page
+with its trophy hero, and the share (OG) images.
 
 ---
 
 ## Phase 4 — Historical content & stats 🚧
 
-### 1. Game results on the game page
-
-- [ ] **Copy (Jakob):** the labels marked `TODO(copy)` (section and stage
-      names, bracket slot names, table headers).
-
-### 2. Manual images (Jakob)
-
-Pages fall back to card art until each exists.
-
-- [ ] **Hero portraits** `public/images/heroes/<slug>.png`: the career page
-      hero, the /vs pair hero and the player index plates (then revisit the
-      index's top crop).
-
-### 3. OG images for every major page
-
-Waits for the images. The front page, season, game and career pages,
-/records and /vs, plus shareable player images (career stats).
-
-### 4. Design audit
+### 1. Design audit
 
 Before the card redesign. Does the site follow VERKSTED, and does VERKSTED
 still express a permanent monument? Change the language, not just pages.
 Leads: `--color-display` beyond the header (readouts, key figures); more
 deliberate spacing (almost every section has a large gap).
 
-### 5. Cards part 1
+### 2. Cards part 1
 
 - [ ] **Gamer-card redesign:** the visual centrepiece (chrome highlights
       tracking the tilt, material surfaces); the current SVG shape limits it.
 - [ ] **Champion card:** a special variant for the season winner.
 
-### 6. Content centre
+### 3. Content centre
 
 Needs exploration and direction. A home for the videos, pictures and memes
 there are; it may live on the season, game and player pages rather than as
@@ -60,7 +42,7 @@ its own page. The volume decides whether it is a data file or needs an asset
 pipeline. Covers media on game and season pages, and the front page's content
 of the day (what it rotates; a placeholder until then).
 
-### 7. Season page upgrade
+### 4. Season page upgrade
 
 More per-season views, stats and content; scoped when we start.
 
@@ -111,6 +93,8 @@ Visual "tried and dropped" items are in design.md.
 **Game page**
 
 - Links to the same title in other seasons: game pages stay per-season.
+- A "rematch" tag on a pair's second meeting in a stage (read as a replay
+  overwriting the first).
 - A one-round table for games entered as placements (it repeats the
   standings); only a measured score (gold, altitude) gets one.
 - Scores, ladder points or power-up points as standings columns (confusing):
@@ -151,7 +135,8 @@ Visual "tried and dropped" items are in design.md.
       architect + UX pass against the real live-entry workflow (H2H matches
       and round scores differ). Every page is static, so its actions must
       `revalidatePath` each page the data shows on: `/`, season and game
-      pages, career pages, `/records`, `/vs`.
+      pages, career pages, `/records`, `/vs`, and each one's
+      `opengraph-image` (prerendered too).
 - [ ] Review/edit submitted results; flip `confirmed` to publish.
 - [ ] Real-time score entry in the admin panel during the tournament.
 - [ ] **What's at stake:** beside the live leaderboard, the streaks and
@@ -162,6 +147,9 @@ Visual "tried and dropped" items are in design.md.
 
 ## After Phase 5
 
+- [ ] **Final hero portraits (Jakob, waiting on the players):** replace the
+      placeholders in `public/images/heroes/<slug>.png` (copies of earlier
+      card art), then revisit the player index's top crop. Not a blocker.
 - [ ] **Cards part 2:** more card styles (moments: MVP, record-breaker, "the
       collapse"), FIFA-style shareable gamer cards, a place to view all
       cards; maybe a collection, a pack simulator, physical cards.

@@ -8,7 +8,6 @@ import Popover from './Popover';
  * The sign carries direction, never colour.
  */
 
-// TODO(copy): placeholder labels.
 const LABELS = {
   powerUp: 'Power-up',
   curse: 'Curse',

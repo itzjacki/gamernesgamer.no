@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { seasonData, isSeason } from '@/data/sesong';
@@ -16,17 +17,16 @@ interface Props {
   params: Promise<{ sesong: string; game: string }>;
 }
 
-// TODO(copy): placeholder labels.
 const LABELS = {
-  details: 'Detaljer',
+  details: 'Resultater',
   powerUps: 'Power-ups',
-  singleRound: 'Resultat',
+  singleRound: 'Score',
   stages: {
     'round-robin': 'Gruppespill',
     'single-elim': 'Sluttspill',
     'final-bronze': 'Finaler',
-    'double-elim-reset': 'Dobbel utslagning',
-    'double-elim-no-reset': 'Dobbel utslagning',
+    'double-elim-reset': 'Sluttspill',
+    'double-elim-no-reset': 'Sluttspill',
     rounds: 'Runder',
   } satisfies Record<StageView['kind'], string>,
 };
@@ -35,6 +35,18 @@ export function generateStaticParams() {
   return Object.entries(seasonData).flatMap(([sesong, data]) =>
     data.games.map((game) => ({ sesong, game: game.slug })),
   );
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { sesong, game: gameSlug } = await params;
+  if (!isSeason(sesong)) return {};
+  const game = seasonData[sesong].games.find((g) => g.slug === gameSlug);
+  // A link shared before the reveal must not give the game away.
+  const { meta } = seasonData[sesong];
+  const sealed = meta.status === 'upcoming' && !meta.revealGames;
+  return game && !sealed
+    ? { title: `${game.title} · Sesong ${Number(sesong)}` }
+    : {};
 }
 
 export default async function GamePage({ params }: Props) {
@@ -134,17 +146,21 @@ export default async function GamePage({ params }: Props) {
           <div className='flex flex-col gap-20'>
             {stages.map((stage) => (
               <div key={stage.ordinal} className='flex flex-col gap-10'>
-                {/* A surface band, not a rule: a hairline reads as one more grid line. */}
-                <div className='bg-surface flex h-15 items-center gap-5 px-5'>
-                  <span className='text-text-muted font-mono text-xs tracking-widest'>
-                    {String(stage.ordinal).padStart(2, '0')}
-                  </span>
-                  <Heading as='h3' styleAs='h5'>
-                    {stage.kind === 'rounds' && stage.rounds.length === 1
-                      ? (stage.rounds[0].label ?? LABELS.singleRound)
-                      : LABELS.stages[stage.kind]}
-                  </Heading>
-                </div>
+                {/* Stage bands only tell stages apart, so a lone stage has
+                    none. A surface band, not a rule: a hairline reads as one
+                    more grid line. */}
+                {stages.length > 1 && (
+                  <div className='bg-surface flex h-15 items-center gap-5 px-5'>
+                    <span className='text-text-muted font-mono text-xs tracking-widest'>
+                      {String(stage.ordinal).padStart(2, '0')}
+                    </span>
+                    <Heading as='h3' styleAs='h5'>
+                      {stage.kind === 'rounds' && stage.rounds.length === 1
+                        ? LABELS.singleRound
+                        : LABELS.stages[stage.kind]}
+                    </Heading>
+                  </div>
+                )}
                 {stage.kind === 'round-robin' ? (
                   <RoundRobinStage
                     id={`${id}-s${stage.ordinal}`}

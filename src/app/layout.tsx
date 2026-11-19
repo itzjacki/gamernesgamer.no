@@ -4,6 +4,9 @@ import '@/styles/global.css';
 import SiteHeader from '@/components/SiteHeader';
 
 export const metadata: Metadata = {
+  // Share images need absolute URLs.
+  metadataBase: new URL('https://gamernesgamer.no'),
+  twitter: { card: 'summary_large_image' },
   title: {
     template: '%s - Gamernes Gamer',
     default: 'Gamernes Gamer',
