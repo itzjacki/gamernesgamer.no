@@ -14,10 +14,16 @@ by default, accent used sparingly.
 Braun/Dieter Rams (grid discipline, no decoration without function), motorsport
 timing sheets (monospace data, hairline rules, density without noise).
 
+The archive doesn't get a more "monumental" language than the live pages.
+Tried and dropped: permanent records on the `--color-display` surface;
+one oversized hero moment per page; section labels on hairline rules with
+catalogue numbers.
+
 ## Tokens
 
 Values live in `src/styles/global.css` under `@theme`. Use the tokens, never raw
-hex (one exception: the season trophies' real gold, silver and bronze). All
+hex (exceptions: the season trophies' real gold, silver and bronze; the points
+chart's other-player lines, darker than any token). All
 colours are solid — no transparency, because overlapping translucent
 borders double up.
 

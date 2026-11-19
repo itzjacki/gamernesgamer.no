@@ -25,7 +25,13 @@ interface Props {
 }
 
 const ACCENT = '#e8334a';
-const MUTED = '#706b66';
+/** --color-text-muted, for text. */
+const MUTED = '#8a847e';
+/**
+ * One-off, darker than any token: the other players' lines recede behind the
+ * champion's. Never for text (3.4:1, under AA).
+ */
+const LINE_MUTED = '#706b66';
 const TEXT = '#e6e1db';
 const BORDER = '#222120';
 
@@ -226,14 +232,14 @@ function ChartInner({ width, series, gameLabels }: InnerProps) {
             <Line
               from={{ x: activeX, y: 0 }}
               to={{ x: activeX, y: innerHeight }}
-              stroke={MUTED}
+              stroke={LINE_MUTED}
               strokeWidth={1}
               strokeDasharray='2,2'
             />
           )}
 
           {ordered.map((s) => {
-            const stroke = s.isChampion ? ACCENT : MUTED;
+            const stroke = s.isChampion ? ACCENT : LINE_MUTED;
             const last = s.points[s.points.length - 1];
             const activePoint =
               activeOrdinal !== null
