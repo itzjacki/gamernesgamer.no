@@ -33,8 +33,6 @@ Pages fall back to card art until each exists.
 - [ ] **Hero portraits** `public/images/heroes/<slug>.png`: the career page
       hero, the /vs pair hero and the player index plates (then revisit the
       index's top crop).
-- [ ] **Season photos** `public/images/seasons/<NN>.jpg`, landscape about
-      2:1: the season index.
 
 ### 3. OG images for every major page
 

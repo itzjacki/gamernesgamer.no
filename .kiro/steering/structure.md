@@ -36,7 +36,7 @@ src/
   proxy.ts              Next.js Proxy (formerly middleware).
 public/images/          gamers/<N>/, game-thumbnails/<N>/ (both unpadded), power-ups/,
                         champions/<NN>.png, heroes/<slug>.png,
-                        seasons/<NN>.jpg (season index photos), branding/
+                        seasons/<NN>.png (season index photos), branding/
                         (trophy.svg with plinth; logo.svg, the trophy without;
                         logo-pixel.png, the 32 × 32 pixel mark in the header).
 supabase/
@@ -149,5 +149,5 @@ in derivation or compose.
 5. Optional, by hand: a background-removed champion cutout at
    `public/images/champions/<NN>.png` and hero portraits at
    `public/images/heroes/<slug>.png`, and a landscape season photo at
-   `public/images/seasons/<NN>.jpg` for the season index. Pages fall back to
-   card art without them.
+   `public/images/seasons/<NN>.png` (2:1; jpg and webp work too) for the
+   season index. Pages fall back to card art without them.
