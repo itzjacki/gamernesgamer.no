@@ -5,6 +5,7 @@ import type {
 } from '@/lib/results/view-models';
 import type { Props as RecordPlateProps } from '@/components/RecordPlate';
 import RecordLines from '@/components/RecordLines';
+import { signedDelta } from '@/lib/format';
 
 /** A new record is a plate here; /records and the front page both read it. */
 export interface RecordPlateGroup {
@@ -20,9 +21,6 @@ function seasonSpan(numbers: number[]) {
 }
 
 const count = (entry: RecordEntry) => String(entry.value);
-/** Uses a real minus (U+2212). */
-const signed = (n: number) =>
-  n > 0 ? `+${n}` : n < 0 ? `−${Math.abs(n)}` : '0';
 const rate = (entry: RecordEntry) =>
   `${Math.round((entry.value / (entry.outOf || 1)) * 100)}%`;
 
@@ -74,7 +72,7 @@ const powerUpLines = (entry: RecordEntry) => (
       key: `${game.seasonSlug}-${game.gameSlug}`,
       game,
       seasonNumber: game.seasonNumber,
-      value: signed(game.powerUpDelta ?? 0),
+      value: signedDelta(game.powerUpDelta ?? 0),
     }))}
   />
 );
@@ -154,7 +152,7 @@ export const RECORD_PLATES: Record<RecordKey, RecordPlateDefinition> = {
     id: 'hjemmebanefordel',
     label: 'Hjemmebanefordel',
     scope: 'all',
-    figure: (e) => signed(Number(e.value.toFixed(2))),
+    figure: (e) => signedDelta(Number(e.value.toFixed(2))),
     unit: (e) =>
       `plasser bedre i egne spillvalg · ${e.split?.own.toFixed(2)} vs ${e.split?.others.toFixed(2)}`,
     detailLabel: 'Vis egne spillvalg',
@@ -237,7 +235,7 @@ export const RECORD_PLATES: Record<RecordKey, RecordPlateDefinition> = {
     id: 'power-up-poeng',
     label: 'Flest power-up-poeng',
     scope: 'games',
-    figure: (e) => signed(e.value),
+    figure: (e) => signedDelta(e.value),
     unit: (e) => `poeng fått direkte fra power-ups · ${e.outOf} spill`,
     detailLabel: 'Vis spillene',
     detail: powerUpLines,

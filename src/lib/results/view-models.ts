@@ -6,7 +6,6 @@
 
 import type { GamerStats } from '@/types/gamer';
 import type { Tag } from '@/types/tag';
-import type { SlotId } from './bracket-templates';
 
 export interface PlayerRef {
   /** season_player.id, not player.id — for keys/lookups, not display. */
@@ -162,6 +161,20 @@ export interface RoundRobinStageView {
   matches: StageMatch[];
 }
 
+/** Bracket positions; `src/lib/results/bracket-templates.ts` wires them. */
+export type SlotId =
+  | 'SF1'
+  | 'SF2'
+  | 'F'
+  | 'BR'
+  | 'WB-SF1'
+  | 'WB-SF2'
+  | 'WB-F'
+  | 'LB-R1'
+  | 'LB-F'
+  | 'GF'
+  | 'GF2';
+
 export type BracketKind =
   | 'single-elim'
   | 'final-bronze'
@@ -179,6 +192,8 @@ export interface BracketStageView {
   ordinal: number;
   /** One per template slot, in template order. */
   slots: BracketSlotView[];
+  /** The slot whose winner takes the stage: F, or GF2 when played, else GF. */
+  decider: SlotId;
 }
 
 export interface RoundCell {
@@ -205,10 +220,11 @@ export type StageView =
   | BracketStageView
   | RoundsStageView;
 
+/** Both empty until the game has confirmed results. */
 export interface GameDetail {
-  /** null when the game has no DB row. */
-  summary: GameSummary | null;
-  /** By stage ordinal. Empty until the game has confirmed results. */
+  /** Ordered by placement. */
+  results: GamePlacementRow[];
+  /** By stage ordinal. */
   stages: StageView[];
 }
 

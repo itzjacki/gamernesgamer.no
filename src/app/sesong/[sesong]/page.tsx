@@ -12,6 +12,7 @@ import GamerCard from '@/components/GamerCard';
 import GameCard from '@/components/GameCard';
 import PowerUpCard from '@/components/PowerUpCard';
 import Heading from '@/components/Heading';
+import VideoEmbed from '@/components/VideoEmbed';
 import ChampionHero from '@/components/ChampionHero';
 import StandingsTable from '@/components/StandingsTable';
 import SeasonPointsChart from '@/components/SeasonPointsChart';
@@ -309,13 +310,9 @@ function FinishedSeason({
       {videoEmbedUrl && (
         <section className='flex flex-col gap-8'>
           <div className='w-full max-w-2xl'>
-            <iframe
-              className='aspect-video w-full rounded-sm'
+            <VideoEmbed
               src={videoEmbedUrl}
               title={`Gamernes Gamer sesong ${seasonNumber}`}
-              allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen'
-              allowFullScreen
-              referrerPolicy='strict-origin-when-cross-origin'
             />
           </div>
         </section>
@@ -349,13 +346,9 @@ function UpcomingSeason({
 
         {meta.videoEmbedUrl && (
           <div className='mt-8 w-full max-w-2xl'>
-            <iframe
-              className='aspect-video w-full rounded-sm'
+            <VideoEmbed
               src={meta.videoEmbedUrl}
               title={`Gamernes Gamer sesong ${seasonNumber}`}
-              allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen'
-              allowFullScreen
-              referrerPolicy='strict-origin-when-cross-origin'
             />
           </div>
         )}

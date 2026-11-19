@@ -1,6 +1,5 @@
 import Popover from './Popover';
-import RecordLines from './RecordLines';
-import { signedDelta } from '@/lib/format';
+import RecordLines, { pointsBreakdownLines } from './RecordLines';
 
 /**
  * Games are rows and players columns on purpose: a season has more games than
@@ -70,18 +69,7 @@ function PopoverCell({
         className='text-text'
         panel={
           <RecordLines
-            lines={[
-              {
-                key: 'ladder',
-                label: 'Poeng fra spillet',
-                value: cell.ladderPoints,
-              },
-              ...cell.powerUpUses.map((use, i) => ({
-                key: `${use.name}-${i}`,
-                label: use.name,
-                value: signedDelta(use.pointsDelta),
-              })),
-            ]}
+            lines={pointsBreakdownLines(cell.ladderPoints, cell.powerUpUses)}
           />
         }
       >

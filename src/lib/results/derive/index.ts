@@ -15,11 +15,11 @@ import { matchesByGame } from './matches';
  * can override point order); points are derived and display-only.
  */
 
-function seasonSlug(seasonNumber: number): string {
+export function seasonSlug(seasonNumber: number): string {
   return String(seasonNumber).padStart(2, '0');
 }
 
-function buildGameSummaries(bundle: SeasonBundle): GameSummary[] {
+export function buildGameSummaries(bundle: SeasonBundle): GameSummary[] {
   const refs = resolvePlayers(bundle.roster, bundle.players);
   const ladder = ladderByPlacement(bundle.ladder);
   const powerUps = powerUpById(bundle.powerUps);

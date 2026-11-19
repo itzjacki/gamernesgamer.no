@@ -1,12 +1,14 @@
 import {
   BRACKET_TEMPLATES,
-  deciderSlot,
   type BracketSection,
-  type SlotId,
-  type SlotPosition,
 } from '@/lib/results/bracket-templates';
-import type { BracketStageView, StageMatch } from '@/lib/results/view-models';
-import { gameLines, settledByTiebreak, sideFigures } from '@/lib/match-figures';
+import type {
+  BracketKind,
+  BracketStageView,
+  SlotId,
+  StageMatch,
+} from '@/lib/results/view-models';
+import { gameLines, sideFigures } from './match-figures';
 import Popover from './Popover';
 import RecordLines from './RecordLines';
 import SectionLabel from './SectionLabel';
@@ -46,16 +48,61 @@ const LABELS = {
   game: 'Kamp',
 };
 
+/* Geometry, in grid units: fr for columns, 20px rows. */
 const PLATE = 5;
 const GUTTER = 1;
 const ROW_PX = 20;
-/** A plate's height in rows: the slot strip and two 40px player rows. */
-const PLATE_ROWS = 5;
+/** The slot strip above a plate. */
+const STRIP_ROWS = 1;
+/** Two 40px player rows. */
+const BODY_ROWS = 4;
+const PLATE_ROWS = STRIP_ROWS + BODY_ROWS;
+
+/** `col` is a plate column, `row` the 20px row the plate's strip starts on. */
+type Layout = Partial<Record<SlotId, { col: number; row: number }>>;
+
+const DOUBLE_ELIM: Layout = {
+  'WB-SF1': { col: 0, row: 0 },
+  'WB-SF2': { col: 0, row: 6 },
+  'WB-F': { col: 1, row: 3 },
+  'LB-R1': { col: 1, row: 12 },
+  'LB-F': { col: 2, row: 12 },
+  GF: { col: 3, row: 8 },
+  GF2: { col: 4, row: 8 },
+};
+
+const DESKTOP: Record<BracketKind, Layout> = {
+  'single-elim': {
+    SF1: { col: 0, row: 0 },
+    SF2: { col: 0, row: 6 },
+    F: { col: 1, row: 3 },
+    BR: { col: 1, row: 10 },
+  },
+  'final-bronze': {
+    F: { col: 0, row: 0 },
+    BR: { col: 1, row: 0 },
+  },
+  'double-elim-reset': DOUBLE_ELIM,
+  'double-elim-no-reset': DOUBLE_ELIM,
+};
+
+/** Phones: a double-elim bracket's sections, each on its own grid. */
+const DOUBLE_ELIM_MOBILE: Layout = {
+  'WB-SF1': { col: 0, row: 0 },
+  'WB-SF2': { col: 0, row: 6 },
+  'WB-F': { col: 1, row: 3 },
+  'LB-R1': { col: 0, row: 0 },
+  'LB-F': { col: 1, row: 0 },
+  GF: { col: 0, row: 0 },
+  GF2: { col: 1, row: 0 },
+};
 
 interface Placed {
   id: SlotId;
+  section: BracketSection;
   winnerTo: SlotId | null;
-  pos: SlotPosition;
+  col: number;
+  row: number;
   match: StageMatch | null;
 }
 
@@ -66,50 +113,37 @@ interface Props {
 }
 
 export default function Bracket({ id, stage }: Props) {
-  const template = BRACKET_TEMPLATES[stage.kind];
   const matchBySlot = new Map(stage.slots.map((s) => [s.slotId, s.match]));
-  const played = new Set(
-    stage.slots.filter((s) => s.match !== null).map((s) => s.slotId),
-  );
-  const decider = deciderSlot(stage.kind, played);
-
-  const placed = (mobile: boolean) =>
-    template.slots.map((slot) => ({
-      id: slot.id,
-      winnerTo: slot.winnerTo,
-      pos: (mobile && slot.mobile) || slot.desktop,
+  const place = (layout: Layout): Placed[] =>
+    BRACKET_TEMPLATES[stage.kind].map((slot) => ({
+      ...slot,
+      ...layout[slot.id]!,
       match: matchBySlot.get(slot.id) ?? null,
     }));
+  const desktop = place(DESKTOP[stage.kind]);
 
-  if (!template.splitOnMobile) {
-    return <BracketGrid id={id} slots={placed(false)} decider={decider} />;
+  if (stage.kind === 'single-elim' || stage.kind === 'final-bronze') {
+    return <BracketGrid id={id} slots={desktop} decider={stage.decider} />;
   }
 
+  const mobile = place(DOUBLE_ELIM_MOBILE);
   const sections: BracketSection[] = ['upper', 'lower', 'final'];
-  const mobile = placed(true);
   return (
     <>
       <div className='hidden md:block'>
-        <BracketGrid id={`${id}-d`} slots={placed(false)} decider={decider} />
+        <BracketGrid id={`${id}-d`} slots={desktop} decider={stage.decider} />
       </div>
       <div className='flex flex-col gap-10 md:hidden'>
-        {sections.map((section) => {
-          const ids = new Set(
-            template.slots
-              .filter((s) => s.section === section)
-              .map((s) => s.id),
-          );
-          return (
-            <div key={section} className='flex flex-col gap-6'>
-              <SectionLabel>{LABELS.sections[section]}</SectionLabel>
-              <BracketGrid
-                id={`${id}-m-${section}`}
-                slots={mobile.filter((s) => ids.has(s.id))}
-                decider={decider}
-              />
-            </div>
-          );
-        })}
+        {sections.map((section) => (
+          <div key={section} className='flex flex-col gap-6'>
+            <SectionLabel>{LABELS.sections[section]}</SectionLabel>
+            <BracketGrid
+              id={`${id}-m-${section}`}
+              slots={mobile.filter((s) => s.section === section)}
+              decider={stage.decider}
+            />
+          </div>
+        ))}
       </div>
     </>
   );
@@ -124,24 +158,22 @@ function BracketGrid({
   slots: Placed[];
   decider: SlotId;
 }) {
-  const cols = Math.max(...slots.map((s) => s.pos.col)) + 1;
-  const lastRow = Math.max(...slots.map((s) => s.pos.row)) + PLATE_ROWS;
+  const cols = Math.max(...slots.map((s) => s.col)) + 1;
+  const lastRow = Math.max(...slots.map((s) => s.row)) + PLATE_ROWS;
   // Whole 40px cells.
   const rows = lastRow + (lastRow % 2);
   const width = cols * PLATE + (cols - 1) * GUTTER;
-  const height = rows * ROW_PX;
 
   const left = (col: number) => col * (PLATE + GUTTER);
-  const right = (col: number) => left(col) + PLATE;
-  const centre = (pos: SlotPosition) => (pos.row + 1 + 2) * ROW_PX;
+  const centre = (s: Placed) => (s.row + STRIP_ROWS + BODY_ROWS / 2) * ROW_PX;
   const bySlot = new Map(slots.map((s) => [s.id, s]));
 
   const paths = slots.flatMap((slot) => {
-    const target = slot.winnerTo ? bySlot.get(slot.winnerTo) : undefined;
+    const target = slot.winnerTo && bySlot.get(slot.winnerTo);
     if (!target) return [];
-    const bend = left(target.pos.col) - GUTTER / 2;
+    const bend = left(target.col) - GUTTER / 2;
     return [
-      `M ${right(slot.pos.col)} ${centre(slot.pos)} H ${bend} V ${centre(target.pos)} H ${left(target.pos.col)}`,
+      `M ${left(slot.col) + PLATE} ${centre(slot)} H ${bend} V ${centre(target)} H ${left(target.col)}`,
     ];
   });
 
@@ -150,7 +182,7 @@ function BracketGrid({
       <svg
         aria-hidden='true'
         className='text-text-muted pointer-events-none absolute inset-0 h-full w-full'
-        viewBox={`0 0 ${width} ${height}`}
+        viewBox={`0 0 ${width} ${rows * ROW_PX}`}
         preserveAspectRatio='none'
       >
         {paths.map((d) => (
@@ -178,8 +210,8 @@ function BracketGrid({
           <li
             key={slot.id}
             style={{
-              gridColumn: slot.pos.col * 2 + 1,
-              gridRow: `${slot.pos.row + 1} / span ${PLATE_ROWS}`,
+              gridColumn: slot.col * 2 + 1,
+              gridRow: `${slot.row + 1} / span ${PLATE_ROWS}`,
             }}
           >
             <Plate
@@ -207,78 +239,97 @@ function Plate({
   decides: boolean;
 }) {
   const label = SLOT_LABELS[slotId];
-  const strip =
-    'text-text-muted flex h-5 items-start justify-between gap-2 font-mono text-[10px] leading-none tracking-widest uppercase';
-  const frame = `bg-bg border ${decides ? 'border-border-accent' : 'border-border'}`;
-
-  if (!match) {
-    return (
-      <div>
-        <p className={strip}>
-          <span className='truncate'>{label}</span>
-        </p>
-        <div
-          className={`${frame} text-text-muted grid h-20 place-items-center font-mono text-xs tracking-widest uppercase`}
-        >
-          {LABELS.notPlayed}
-        </div>
-      </div>
-    );
-  }
-
-  const figures = sideFigures(match);
-  const sides = [
-    { side: 'a' as const, name: match.playerA.name, figure: figures.a },
-    { side: 'b' as const, name: match.playerB.name, figure: figures.b },
-  ];
 
   return (
     <div>
-      <p className={strip}>
+      <p
+        className='text-text-muted flex items-start justify-between gap-2 font-mono text-[10px] leading-none tracking-widest uppercase'
+        style={{ height: STRIP_ROWS * ROW_PX }}
+      >
         <span className='truncate'>{label}</span>
-        {settledByTiebreak(match) && <span>{LABELS.tiebreak}</span>}
+        {match?.score?.byTiebreak && <span>{LABELS.tiebreak}</span>}
       </p>
-      <div className={`${frame} grid h-20 grid-cols-[1fr_2.5rem] grid-rows-2`}>
-        {sides.map(({ side, name, figure }, i) => {
-          const won = match.winner === side;
-          const rule = i === 0 ? 'border-border border-b' : '';
-          return (
-            <div key={side} className='contents'>
-              <span
-                className={`flex items-center truncate px-3 text-sm ${rule} ${
-                  won ? 'text-text font-semibold' : 'text-text-muted'
-                }`}
-              >
-                <span className='truncate'>{name}</span>
-              </span>
-              <span
-                className={`border-border relative flex items-center justify-center border-l font-mono text-sm tabular-nums ${rule} ${
-                  won
-                    ? decides
-                      ? 'text-text-accent font-bold'
-                      : 'text-text font-semibold'
-                    : 'text-text-muted'
-                }`}
-              >
-                {won && match.games ? (
-                  <Popover
-                    id={id}
-                    label={`${label}, vis hver kamp`}
-                    tone={decides ? 'accent' : 'word'}
-                    panel={
-                      <RecordLines lines={gameLines(match, LABELS.game)} />
-                    }
-                  >
-                    {figure}
-                  </Popover>
-                ) : (
-                  figure
-                )}
-              </span>
-            </div>
-          );
-        })}
+      <div
+        className={`bg-bg grid grid-cols-[1fr_2.5rem] grid-rows-2 border ${
+          decides ? 'border-border-accent' : 'border-border'
+        }`}
+        style={{ height: BODY_ROWS * ROW_PX }}
+      >
+        {match ? (
+          <>
+            <PlateRow
+              id={id}
+              label={label}
+              match={match}
+              side='a'
+              decides={decides}
+            />
+            <PlateRow
+              id={id}
+              label={label}
+              match={match}
+              side='b'
+              decides={decides}
+            />
+          </>
+        ) : (
+          <span className='text-text-muted col-span-2 row-span-2 grid place-items-center font-mono text-xs tracking-widest uppercase'>
+            {LABELS.notPlayed}
+          </span>
+        )}
       </div>
     </div>
+  );
+}
+
+function PlateRow({
+  id,
+  label,
+  match,
+  side,
+  decides,
+}: {
+  id: string;
+  label: string;
+  match: StageMatch;
+  side: 'a' | 'b';
+  decides: boolean;
+}) {
+  const won = match.winner === side;
+  const name = side === 'a' ? match.playerA.name : match.playerB.name;
+  const figure = sideFigures(match)[side];
+  const rule = side === 'a' ? 'border-border border-b' : '';
+  const figureTone = !won
+    ? 'text-text-muted'
+    : decides
+      ? 'text-text-accent font-bold'
+      : 'text-text font-semibold';
+
+  return (
+    <>
+      <span
+        className={`flex min-w-0 items-center px-3 text-sm ${rule} ${
+          won ? 'text-text font-semibold' : 'text-text-muted'
+        }`}
+      >
+        <span className='truncate'>{name}</span>
+      </span>
+      <span
+        className={`border-border relative flex items-center justify-center border-l font-mono text-sm tabular-nums ${rule} ${figureTone}`}
+      >
+        {won && match.games ? (
+          <Popover
+            id={id}
+            label={`${label}, vis hver kamp`}
+            tone={decides ? 'accent' : 'word'}
+            panel={<RecordLines lines={gameLines(match, LABELS.game)} />}
+          >
+            {figure}
+          </Popover>
+        ) : (
+          figure
+        )}
+      </span>
+    </>
   );
 }

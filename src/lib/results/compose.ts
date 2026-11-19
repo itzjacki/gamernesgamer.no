@@ -190,7 +190,7 @@ export function composeSeasonView(view: SeasonView): ComposedSeasonView {
   };
 }
 
-/** One game's results and stages, power-ups joined. */
+/** One game's results and the stages worth showing, power-ups joined. */
 export interface ComposedGameView {
   /** Ordered by placement; empty until the game has confirmed results. */
   results: ComposedGamePlacementRow[];
@@ -200,13 +200,20 @@ export interface ComposedGameView {
 export function composeGameView(
   detail: GameDetail,
   seasonSlug: string,
+  gameSlug: string,
 ): ComposedGameView {
   const content = seasonContent(seasonSlug);
+  const game = requireGame(gameBySlug(content.games), gameSlug);
   return {
-    results: detail.summary
-      ? composeResults(detail.summary.results, powerUpBySlug(content))
-      : [],
-    stages: detail.stages,
+    results: composeResults(detail.results, powerUpBySlug(content)),
+    // A one-round table of placements entered as scores repeats the
+    // standings; only a measured score (gold, altitude) earns one.
+    stages: detail.stages.filter(
+      (s) =>
+        s.kind !== 'rounds' ||
+        s.rounds.length > 1 ||
+        game.roundScore === 'value',
+    ),
   };
 }
 

@@ -5,10 +5,7 @@ import type {
   RoundRobinStageView,
   RoundsStageView,
 } from '../view-models';
-import {
-  assembleGameDetail,
-  confirmedRoundsStageIds,
-} from '../derive/game-detail';
+import { assembleGameDetail, gameRoundsStageIds } from '../derive/game-detail';
 import { rankPoints } from '../derive/rounds';
 import { s1Bundle, slugBySeasonPlayerId } from './s1.fixtures';
 
@@ -183,7 +180,7 @@ describe('rankPoints', () => {
 
 describe('assembleGameDetail', () => {
   it('returns no stages for a game not in the DB', () => {
-    expect(detail('no-such-game')).toEqual({ summary: null, stages: [] });
+    expect(detail('no-such-game')).toEqual({ results: [], stages: [] });
   });
 
   it('returns no stages for a game without confirmed results', () => {
@@ -196,9 +193,10 @@ describe('assembleGameDetail', () => {
     expect(
       assembleGameDetail(unconfirmed, roundsBundle, 'sjakk').stages,
     ).toEqual([]);
-    expect(confirmedRoundsStageIds(unconfirmed)).toContain(
+    expect(gameRoundsStageIds(unconfirmed, 'sjakk')).toEqual([]);
+    expect(gameRoundsStageIds(unconfirmed, 'old-school-runescape')).toEqual([
       'old-school-runescape-stage-1',
-    );
+    ]);
   });
 
   it('builds the round-robin record and the bracket in stage order', () => {
@@ -273,12 +271,14 @@ describe('assembleGameDetail', () => {
     });
     expect(slot('GF')).toMatchObject({ leg: 2, winsA: 3, winsB: 0 });
     expect(slot('GF2')).toMatchObject({ leg: 3, bestOf: 5 });
+    expect(bracket.decider).toBe('GF2');
   });
 
   it('keeps an unplayed grand-final reset as an empty slot (Total War)', () => {
     const [bracket] = detail('trackmania').stages as [BracketStageView];
     expect(bracket.slots.map((x) => x.slotId)).toContain('GF2');
     expect(bracket.slots.find((x) => x.slotId === 'GF2')!.match).toBeNull();
+    expect(bracket.decider).toBe('GF');
   });
 
   it('keeps per-game scores for series with real scores (Trombone)', () => {

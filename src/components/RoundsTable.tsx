@@ -26,6 +26,8 @@ export default function RoundsTable({ stage, scoreKind, winnerId }: Props) {
   const rankThenSum = stage.aggregation === 'rank-then-sum';
   // One round: the page names it in the heading, and a total would repeat it.
   const single = stage.rounds.length === 1;
+  const tone = (seasonPlayerId: string) =>
+    seasonPlayerId === winnerId ? 'text-text-accent' : 'text-text';
 
   return (
     <div className='w-full overflow-x-auto'>
@@ -40,11 +42,7 @@ export default function RoundsTable({ stage, scoreKind, winnerId }: Props) {
             {stage.players.map((p) => (
               <th
                 key={p.seasonPlayerId}
-                className={`px-1.5 py-3 text-right font-sans text-sm font-semibold tracking-normal normal-case sm:px-3 ${
-                  p.seasonPlayerId === winnerId
-                    ? 'text-text-accent'
-                    : 'text-text'
-                }`}
+                className={`px-1.5 py-3 text-right font-sans text-sm font-semibold tracking-normal normal-case sm:px-3 ${tone(p.seasonPlayerId)}`}
               >
                 {p.name}
               </th>
@@ -53,10 +51,9 @@ export default function RoundsTable({ stage, scoreKind, winnerId }: Props) {
         </thead>
         <tbody>
           {stage.rounds.map((round) => {
-            const raws = round.cells.flatMap((c) =>
-              c.raw === null ? [] : [c.raw],
+            const best = Math.max(
+              ...round.cells.map((c) => c.raw ?? -Infinity),
             );
-            const best = Math.max(...raws);
             return (
               <tr
                 key={round.ordinal}
@@ -70,22 +67,14 @@ export default function RoundsTable({ stage, scoreKind, winnerId }: Props) {
                 {round.cells.map((cell, i) => {
                   const weight =
                     cell.raw === best ? 'text-text font-semibold' : 'text-text';
-                  if (cell.raw === null) {
-                    return (
-                      <td
-                        key={i}
-                        className='text-text-muted px-1.5 text-right font-mono text-sm sm:px-3'
-                      >
-                        –
-                      </td>
-                    );
-                  }
                   return (
                     <td
                       key={i}
                       className='px-1.5 text-right font-mono text-sm tabular-nums sm:px-3'
                     >
-                      {rankThenSum ? (
+                      {cell.raw === null ? (
+                        <span className='text-text-muted'>–</span>
+                      ) : rankThenSum ? (
                         <span className='flex flex-col items-end leading-tight sm:flex-row sm:items-baseline sm:justify-end sm:gap-3'>
                           <span className='text-text-muted text-xs'>
                             {formatScore(cell.raw)}
@@ -115,11 +104,7 @@ export default function RoundsTable({ stage, scoreKind, winnerId }: Props) {
               {stage.players.map((p, i) => (
                 <td
                   key={p.seasonPlayerId}
-                  className={`px-1.5 text-right font-mono text-sm font-bold tabular-nums sm:px-3 ${
-                    p.seasonPlayerId === winnerId
-                      ? 'text-text-accent'
-                      : 'text-text'
-                  }`}
+                  className={`px-1.5 text-right font-mono text-sm font-bold tabular-nums sm:px-3 ${tone(p.seasonPlayerId)}`}
                 >
                   {formatScore(stage.totals[i])}
                 </td>

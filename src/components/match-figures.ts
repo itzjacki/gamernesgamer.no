@@ -1,6 +1,6 @@
 import type { StageMatch } from '@/lib/results/view-models';
-import type { RecordLine } from '@/components/RecordLines';
-import { formatScore } from './format';
+import { formatScore } from '@/lib/format';
+import type { RecordLine } from './RecordLines';
 
 /** The figure each side shows: a bo1's own score, else the series wins. */
 export function sideFigures(match: StageMatch): { a: string; b: string } {
@@ -8,10 +8,6 @@ export function sideFigures(match: StageMatch): { a: string; b: string } {
     return { a: formatScore(match.score.a), b: formatScore(match.score.b) };
   }
   return { a: String(match.winsA), b: String(match.winsB) };
-}
-
-export function settledByTiebreak(match: StageMatch): boolean {
-  return match.score?.byTiebreak ?? false;
 }
 
 /** One line per game of a series with real per-game scores. */
