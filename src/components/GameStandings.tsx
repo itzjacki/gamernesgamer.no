@@ -1,8 +1,7 @@
 import Link from 'next/link';
 import type { ComposedGamePlacementRow } from '@/lib/results/compose';
-import { signedDelta } from '@/lib/format';
 import Popover from './Popover';
-import RecordLines from './RecordLines';
+import RecordLines, { pointsBreakdownLines } from './RecordLines';
 
 /**
  * A game's final standings. Points are the total; where power-ups moved them,
@@ -14,7 +13,6 @@ const LABELS = {
   placement: 'POS',
   player: 'Spiller',
   points: 'Poeng',
-  ladderLine: 'Poeng fra spillet',
 };
 
 interface Props {
@@ -68,18 +66,10 @@ export default function GameStandings({ id, rows }: Props) {
                   className='text-text'
                   panel={
                     <RecordLines
-                      lines={[
-                        {
-                          key: 'ladder',
-                          label: LABELS.ladderLine,
-                          value: row.ladderPoints,
-                        },
-                        ...row.powerUpUses.map((use, i) => ({
-                          key: `${use.slug}-${i}`,
-                          label: use.name,
-                          value: signedDelta(use.pointsDelta),
-                        })),
-                      ]}
+                      lines={pointsBreakdownLines(
+                        row.ladderPoints,
+                        row.powerUpUses,
+                      )}
                     />
                   }
                 >

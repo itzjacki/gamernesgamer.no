@@ -3,11 +3,8 @@ import 'server-only';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fetchSeasonBundle, fetchAllSeasonBundles, fetchRounds } from './fetch';
-import { assembleSeasonView } from './derive';
-import {
-  assembleGameDetail,
-  confirmedRoundsStageIds,
-} from './derive/game-detail';
+import { assembleSeasonView, seasonSlug } from './derive';
+import { assembleGameDetail, gameRoundsStageIds } from './derive/game-detail';
 import { assembleCareer, assembleAllCareers } from './derive/career';
 import {
   composeCareerView,
@@ -56,14 +53,11 @@ export async function getGameView(
   const bundle = await fetchSeasonBundle(seasonNumber);
   if (!bundle) return { results: [], stages: [] };
 
-  const game = bundle.games.find((g) => g.slug === gameSlug);
-  const stageIds = confirmedRoundsStageIds(bundle).filter((id) =>
-    bundle.stages.some((s) => s.id === id && s.game_id === game?.id),
-  );
-  const rounds = await fetchRounds(stageIds);
+  const rounds = await fetchRounds(gameRoundsStageIds(bundle, gameSlug));
   return composeGameView(
     assembleGameDetail(bundle, rounds, gameSlug),
-    bundle.season.number.toString().padStart(2, '0'),
+    seasonSlug(seasonNumber),
+    gameSlug,
   );
 }
 

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { signedDelta } from '@/lib/format';
 import styles from './Popover.module.css';
 
 /**
@@ -67,4 +68,19 @@ export default function RecordLines({ lines }: { lines: RecordLine[] }) {
       })}
     </ul>
   );
+}
+
+/** A game's points split into the ladder's share and each power-up's. */
+export function pointsBreakdownLines(
+  ladderPoints: number,
+  uses: { name: string; pointsDelta: number }[],
+): RecordLine[] {
+  return [
+    { key: 'ladder', label: 'Poeng fra spillet', value: ladderPoints },
+    ...uses.map((use, i) => ({
+      key: `${use.name}-${i}`,
+      label: use.name,
+      value: signedDelta(use.pointsDelta),
+    })),
+  ];
 }

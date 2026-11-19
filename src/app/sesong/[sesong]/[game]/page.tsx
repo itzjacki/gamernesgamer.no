@@ -10,6 +10,7 @@ import RoundRobinStage from '@/components/RoundRobinStage';
 import Bracket from '@/components/Bracket';
 import RoundsTable from '@/components/RoundsTable';
 import PowerUpUseList from '@/components/PowerUpUseList';
+import VideoEmbed from '@/components/VideoEmbed';
 
 interface Props {
   params: Promise<{ sesong: string; game: string }>;
@@ -51,28 +52,14 @@ export default async function GamePage({ params }: Props) {
   const { results, stages } = await getGameView(Number(sesong), gameSlug);
   const id = `g${sesong}-${gameSlug}`;
 
-  // A one-round table of placements entered as scores repeats the standings;
-  // only a measured score (gold, altitude) is worth its own table.
-  const isSingleRound = (s: StageView) =>
-    s.kind === 'rounds' && s.rounds.length === 1;
-  const detailStages = stages.filter(
-    (s) => !isSingleRound(s) || game.roundScore === 'value',
-  );
   const lastStage = stages[stages.length - 1];
   const winnerId = results.find((r) => r.placement === 1)?.player
     .seasonPlayerId;
-  const notes = results.flatMap((r) => (r.note ? [r.note] : []));
+  const notes = results.map((r) => r.note).filter((n) => n !== null);
   const hasPowerUps = results.some((r) => r.powerUpUses.length > 0);
 
   const media = game.videoEmbedUrl ? (
-    <iframe
-      src={game.videoEmbedUrl}
-      title={`${game.title} – video`}
-      allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen'
-      allowFullScreen
-      referrerPolicy='strict-origin-when-cross-origin'
-      className='aspect-video w-full'
-    />
+    <VideoEmbed src={game.videoEmbedUrl} title={`${game.title} – video`} />
   ) : (
     <img
       className='w-full'
@@ -141,11 +128,11 @@ export default async function GamePage({ params }: Props) {
         )}
       </section>
 
-      {detailStages.length > 0 && (
+      {stages.length > 0 && (
         <section className='flex flex-col gap-8'>
           <Heading as='h2'>{LABELS.details}</Heading>
           <div className='flex flex-col gap-20'>
-            {detailStages.map((stage) => (
+            {stages.map((stage) => (
               <div key={stage.ordinal} className='flex flex-col gap-10'>
                 {/* A surface band, not a rule: a hairline reads as one more grid line. */}
                 <div className='bg-surface flex h-15 items-center gap-5 px-5'>
@@ -153,7 +140,7 @@ export default async function GamePage({ params }: Props) {
                     {String(stage.ordinal).padStart(2, '0')}
                   </span>
                   <Heading as='h3' styleAs='h5'>
-                    {stage.kind === 'rounds' && isSingleRound(stage)
+                    {stage.kind === 'rounds' && stage.rounds.length === 1
                       ? (stage.rounds[0].label ?? LABELS.singleRound)
                       : LABELS.stages[stage.kind]}
                   </Heading>

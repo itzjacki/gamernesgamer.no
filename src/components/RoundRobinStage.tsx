@@ -2,7 +2,7 @@ import type {
   RoundRobinStageView,
   StageMatch,
 } from '@/lib/results/view-models';
-import { gameLines, settledByTiebreak, sideFigures } from '@/lib/match-figures';
+import { gameLines, sideFigures } from './match-figures';
 import Popover from './Popover';
 import RecordLines from './RecordLines';
 import SectionLabel from './SectionLabel';
@@ -86,7 +86,7 @@ function MatchRow({ id, match }: { id: string; match: StageMatch }) {
     match.winner === side ? 'text-text font-semibold' : 'text-text-muted';
   const score = `${figures.a}–${figures.b}`;
   const tags = [
-    settledByTiebreak(match) && LABELS.tiebreak,
+    match.score?.byTiebreak && LABELS.tiebreak,
     match.leg > 1 && LABELS.rematch,
   ].filter(Boolean);
 
