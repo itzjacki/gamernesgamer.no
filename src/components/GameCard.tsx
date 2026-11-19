@@ -36,7 +36,7 @@ export default function GameCard({
     />
   );
   const frame = `bg-bg flex h-full flex-col border ${compact ? 'gap-2 p-3' : 'gap-3 p-4'}`;
-  const heading = `text-text font-bold ${compact ? 'text-sm' : 'text-lg'}`;
+  const heading = `text-text font-extrabold ${compact ? 'text-sm' : 'text-lg'}`;
   const meta = `text-text-muted font-mono uppercase ${compact ? 'text-[10px] tracking-wider' : 'text-xs tracking-widest'}`;
 
   if (revealed) {

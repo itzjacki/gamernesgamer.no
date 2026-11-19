@@ -114,8 +114,12 @@ the media, a group's table and matches side by side.
 
 ## Type
 
-Neue Montreal (self-hosted) for display (800) and body (400); Martian Mono
-(400) for metadata. No text below 10px. Labels are `SectionLabel` (mono, xs,
+Neue Montreal (self-hosted) for display (800), body (400) and emphasis (600:
+names, "weight, not colour"); Martian Mono for metadata and figures, 400 with
+500 for emphasis. Only those weights are loaded: anything else falls back or
+is faked (Martian Mono at 600+ is smeared 500). No text below 10px; 10px is
+the small label size for dense instruments (bracket slots, chart axes, compact
+cards), `text-xs` everywhere else. Labels are `SectionLabel` (mono, xs,
 widest tracking, muted), placed above a block's frame with `gap-6`, never
 inside it; on a page whose blocks are its sections, render it `as='h2'`.
 

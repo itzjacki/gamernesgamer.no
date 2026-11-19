@@ -67,7 +67,7 @@ export default function RoundsTable({ stage, scoreKind, winnerId }: Props) {
                 )}
                 {round.cells.map((cell, i) => {
                   const weight =
-                    cell.raw === best ? 'text-text font-semibold' : 'text-text';
+                    cell.raw === best ? 'text-text font-medium' : 'text-text';
                   return (
                     <td
                       key={i}
@@ -105,7 +105,7 @@ export default function RoundsTable({ stage, scoreKind, winnerId }: Props) {
               {stage.players.map((p, i) => (
                 <td
                   key={p.seasonPlayerId}
-                  className={`px-1.5 text-right font-mono text-sm font-bold tabular-nums sm:px-3 ${tone(p.seasonPlayerId)}`}
+                  className={`px-1.5 text-right font-mono text-sm font-medium tabular-nums sm:px-3 ${tone(p.seasonPlayerId)}`}
                 >
                   {formatScore(stage.totals[i])}
                 </td>

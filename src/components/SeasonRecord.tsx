@@ -32,14 +32,16 @@ export default function SeasonRecord({ seasons, label }: Props) {
             <td className='text-text px-4 py-3 font-semibold'>
               <Link
                 href={`/sesong/${s.seasonSlug}`}
-                className='underline-offset-2 hover:underline'
+                className='focus-visible:outline-accent underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2'
               >
                 Sesong {s.seasonNumber}
               </Link>
             </td>
             <td
               className={`px-4 py-3 text-center font-mono text-sm tabular-nums ${
-                s.isChampion ? 'text-text-accent font-bold' : 'text-text-muted'
+                s.isChampion
+                  ? 'text-text-accent font-medium'
+                  : 'text-text-muted'
               }`}
             >
               {s.placement}
