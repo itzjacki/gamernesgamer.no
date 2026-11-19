@@ -53,8 +53,9 @@ Each file has one job; keep the boundaries. Data flows
 
 - `queries.ts` — the only API pages call. Returns `null` for not-found (→
   `notFound()`), throws on error (→ `error.tsx`). `getGameView` never returns
-  null: the game page 404s on its static slug and renders without results. Does the filesystem lookups
-  (hero portraits, season photos) so `compose` stays pure.
+  null: the game page 404s on its static slug and renders without results.
+  Does the filesystem lookups (hero portraits, season photos) so `compose`
+  stays pure.
 - `fetch.ts` — the IO boundary. Filters `confirmed = true`; imports no
   derivation. The H2H tables (`stage`, `match`, `match_game`) have no
   `confirmed` flag, so derivation only reads the matches of games that have
