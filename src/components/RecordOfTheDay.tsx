@@ -38,7 +38,7 @@ export default async function RecordOfTheDay() {
 
         <Link
           href={`/records#${plate.id}`}
-          className='group border-border focus-visible:outline-accent flex h-12 items-center border-t px-5 font-mono text-xs tracking-widest uppercase focus-visible:outline-2 focus-visible:-outline-offset-2'
+          className='group border-border focus-visible:outline-accent flex h-12 items-center border-t px-5 font-mono text-xs tracking-wide uppercase focus-visible:outline-2 focus-visible:-outline-offset-2 sm:tracking-widest'
         >
           <span className='text-text group-hover:text-text-accent underline underline-offset-4 transition-colors duration-150'>
             Gå til rekord

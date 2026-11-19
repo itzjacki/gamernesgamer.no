@@ -2,6 +2,17 @@ import Link from 'next/link';
 import type { ComposedGamePlacementRow } from '@/lib/results/compose';
 import Popover from './Popover';
 import RecordLines, { pointsBreakdownLines } from './RecordLines';
+import {
+  FIGURE_CELL,
+  HEAD_CELL,
+  HEAD_ROW,
+  NAME_CELL,
+  NAME_LINK,
+  PAD,
+  RANK_CELL,
+  ROW,
+  TABLE,
+} from './table-classes';
 
 /**
  * A game's final standings. Points are the total; where power-ups moved them,
@@ -22,26 +33,23 @@ interface Props {
 
 export default function GameStandings({ id, rows }: Props) {
   return (
-    <table className='border-border bg-bg w-full border-collapse border text-left'>
+    <table className={TABLE}>
       <thead>
-        <tr className='border-border text-text-muted border-b font-mono text-xs tracking-widest uppercase'>
-          <th className='w-12 px-3 py-3 text-center font-normal'>
+        <tr className={HEAD_ROW}>
+          <th className={`${RANK_CELL} ${PAD} ${HEAD_CELL}`}>
             {LABELS.placement}
           </th>
-          <th className='px-3 py-3 font-normal lg:min-w-40'>{LABELS.player}</th>
-          <th className='w-20 px-3 py-3 text-right font-normal'>
+          <th className={`${PAD} ${HEAD_CELL} lg:min-w-40`}>{LABELS.player}</th>
+          <th className={`${FIGURE_CELL} ${PAD} ${HEAD_CELL}`}>
             {LABELS.points}
           </th>
         </tr>
       </thead>
       <tbody>
         {rows.map((row) => (
-          <tr
-            key={row.player.seasonPlayerId}
-            className='border-border h-10 border-b last:border-b-0'
-          >
+          <tr key={row.player.seasonPlayerId} className={ROW}>
             <td
-              className={`px-3 text-center font-mono text-sm tabular-nums ${
+              className={`${RANK_CELL} ${PAD} ${
                 row.placement === 1
                   ? 'text-text-accent font-medium'
                   : 'text-text-muted'
@@ -49,15 +57,12 @@ export default function GameStandings({ id, rows }: Props) {
             >
               {row.placement}
             </td>
-            <td className='text-text px-3 font-semibold'>
-              <Link
-                href={`/spillere/${row.player.slug}`}
-                className='focus-visible:outline-accent underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2'
-              >
+            <td className={`${NAME_CELL} ${PAD}`}>
+              <Link href={`/spillere/${row.player.slug}`} className={NAME_LINK}>
                 {row.player.name}
               </Link>
             </td>
-            <td className='text-text relative px-3 text-right font-mono text-sm font-medium tabular-nums'>
+            <td className={`${FIGURE_CELL} ${PAD} text-text relative`}>
               {row.powerUpUses.length > 0 ? (
                 <Popover
                   id={`${id}-pu-${row.player.seasonPlayerId}`}

@@ -5,7 +5,9 @@ import {
   getCareerView,
   getAllPlayerSlugs,
   getPairSummaries,
+  getRecordsView,
 } from '@/lib/results/queries';
+import { rankByAveragePlacement } from '@/lib/players/ranking';
 import PlayerHero from '@/components/PlayerHero';
 import TrophyShelf from '@/components/TrophyShelf';
 import CareerLedger from '@/components/CareerLedger';
@@ -37,6 +39,9 @@ export default async function PlayerCareerPage({ params }: Props) {
     notFound();
   }
   const rivals = await getPairSummaries(spiller);
+  const rank = rankByAveragePlacement((await getRecordsView()).board).find(
+    (r) => r.slug === spiller,
+  )?.career.rank;
 
   const {
     hero,
@@ -51,12 +56,18 @@ export default async function PlayerCareerPage({ params }: Props) {
   return (
     <>
       <section className='flex flex-col gap-6 pt-8'>
-        <Link
-          href='/spillere'
-          className='text-text-muted hover:text-text-accent focus-visible:outline-accent font-mono text-xs tracking-widest uppercase underline transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2'
-        >
-          &larr; Spillere
-        </Link>
+        {/* Catalogue line (design.md, Notation): the player's mark on the
+            index, whose name part is the way back. */}
+        <p className='text-text-muted font-mono text-xs tracking-wide uppercase sm:tracking-widest'>
+          GG /{' '}
+          <Link
+            href='/spillere'
+            className='hover:text-text-accent focus-visible:outline-accent relative underline underline-offset-2 transition-colors duration-150 after:absolute after:inset-x-0 after:-inset-y-3 focus-visible:outline-2 focus-visible:outline-offset-2'
+          >
+            Spillere
+          </Link>
+          {rank !== undefined && <> / {String(rank).padStart(2, '0')}</>}
+        </p>
         <PlayerHero hero={hero} />
         {trophies.length > 0 && <TrophyShelf trophies={trophies} />}
       </section>
@@ -65,8 +76,9 @@ export default async function PlayerCareerPage({ params }: Props) {
         <CareerLedger ledger={ledger} tagStats={tagStats} />
       </section>
 
-      <section id='season-record' className='flex flex-col gap-8'>
-        <SeasonRecord seasons={seasons} label='Resultater' />
+      <section id='season-record' className='flex flex-col gap-6'>
+        <SectionLabel as='h2'>Resultater</SectionLabel>
+        <SeasonRecord seasons={seasons} />
       </section>
 
       <section id='tag-record' className='flex flex-col gap-8'>
@@ -78,7 +90,7 @@ export default async function PlayerCareerPage({ params }: Props) {
 
       {rivals.length > 0 && (
         <section id='head-to-head' className='flex flex-col gap-6'>
-          <SectionLabel>Innbyrdes statistikk</SectionLabel>
+          <SectionLabel as='h2'>Innbyrdes statistikk</SectionLabel>
           <PairSummaryList
             player={{ slug: career.slug, name: hero.name }}
             summaries={rivals}

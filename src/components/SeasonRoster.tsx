@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { SeasonStatus } from '@/types/season-meta';
+import { PORTRAIT_TONE_LINK } from './portrait-tone';
 
 /** Kept local so the primitive doesn't depend on the results layer's types. */
 export interface SeasonEntry {
@@ -89,7 +90,7 @@ function SeasonPlate({ entry }: { entry: SeasonEntry }) {
       >
         <span className={`${eyebrow} truncate tabular-nums`}>{entry.date}</span>
         {entry.status !== 'finished' && (
-          <span className='text-text-accent font-mono text-xs tracking-widest uppercase'>
+          <span className='text-text-accent font-mono text-xs tracking-wide uppercase sm:tracking-widest'>
             {statusLabel[entry.status]}
           </span>
         )}
@@ -131,7 +132,7 @@ function SeasonPlate({ entry }: { entry: SeasonEntry }) {
             src={image.path}
             alt=''
             aria-hidden='true'
-            className={`h-full w-full object-cover ${image.landscape ? 'object-center' : 'object-top'} brightness-90 contrast-125 grayscale transition duration-300 group-hover:brightness-100 group-hover:contrast-100 group-hover:grayscale-0 group-focus-visible:brightness-100 group-focus-visible:contrast-100 group-focus-visible:grayscale-0 motion-reduce:transition-none`}
+            className={`h-full w-full object-cover ${image.landscape ? 'object-center' : 'object-top'} ${PORTRAIT_TONE_LINK}`}
           />
         </span>
       )}

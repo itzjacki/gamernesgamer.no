@@ -41,9 +41,10 @@ export interface Props {
 /** Three, not two: with four players the plate shows the whole field. */
 const MAX_RUNNERS_UP = 3;
 
-const eyebrow = 'text-text-muted font-mono text-xs tracking-widest uppercase';
+const eyebrow =
+  'text-text-muted font-mono text-xs tracking-wide sm:tracking-widest uppercase';
 const nameLink =
-  'hover:text-text-accent focus-visible:outline-accent underline-offset-2 transition-colors duration-150 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2';
+  'hover:text-text-accent focus-visible:outline-accent relative underline-offset-2 after:absolute after:inset-x-0 after:-inset-y-1 transition-colors duration-150 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2';
 
 const entryKey = (entry: RecordEntry) =>
   entry.partner

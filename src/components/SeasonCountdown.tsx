@@ -14,7 +14,7 @@ const NUMERALS =
   'text-text font-sans leading-none font-extrabold [section:has(canvas[data-numerals])_&]:text-transparent';
 
 const LABEL =
-  'text-text font-mono text-[10px] tracking-widest whitespace-nowrap uppercase min-[701px]:tracking-[0.2em]';
+  'text-text font-mono text-[10px] tracking-wide sm:tracking-widest whitespace-nowrap uppercase min-[701px]:tracking-[0.2em]';
 
 export default function SeasonCountdown({ countdown, season }: Props) {
   const isToday = countdown.kind === 'today';
@@ -25,7 +25,7 @@ export default function SeasonCountdown({ countdown, season }: Props) {
   return (
     <p className='flex flex-col items-center justify-center gap-3'>
       <span className={`${LABEL} flex items-center gap-2`}>
-        Sesong {season} starter om
+        Sesong {Number(season)} starter om
       </span>
       <span className='sr-only'> </span>
       {isToday ? (

@@ -6,6 +6,16 @@ import { gameLines, sideFigures } from './match-figures';
 import Popover from './Popover';
 import RecordLines from './RecordLines';
 import SectionLabel from './SectionLabel';
+import {
+  FIGURE_CELL,
+  HEAD_CELL,
+  HEAD_ROW,
+  NAME_CELL,
+  PAD,
+  RANK_CELL,
+  ROW,
+  TABLE,
+} from './table-classes';
 
 /**
  * A round-robin stage: the win–loss table beside every match. Who won is told
@@ -33,31 +43,26 @@ export default function RoundRobinStage({ id, stage }: Props) {
     <div className='grid grid-cols-1 items-start gap-10 md:grid-cols-2'>
       <div className='flex min-w-0 flex-col gap-6'>
         <SectionLabel>{LABELS.table}</SectionLabel>
-        <table className='border-border bg-bg w-full border-collapse border text-left'>
+        <table className={TABLE}>
           <thead>
-            <tr className='border-border text-text-muted border-b font-mono text-xs tracking-widest uppercase'>
-              <th className='w-12 px-3 py-3 text-center font-normal'>
+            <tr className={HEAD_ROW}>
+              <th className={`${RANK_CELL} ${PAD} ${HEAD_CELL}`}>
                 {LABELS.placement}
               </th>
-              <th className='px-3 py-3 font-normal'>{LABELS.player}</th>
-              <th className='w-20 px-3 py-3 text-right font-normal'>
+              <th className={`${PAD} ${HEAD_CELL}`}>{LABELS.player}</th>
+              <th className={`${FIGURE_CELL} ${PAD} ${HEAD_CELL}`}>
                 {LABELS.record}
               </th>
             </tr>
           </thead>
           <tbody>
             {stage.standings.map((row) => (
-              <tr
-                key={row.player.seasonPlayerId}
-                className='border-border h-10 border-b last:border-b-0'
-              >
-                <td className='text-text-muted px-3 text-center font-mono text-sm tabular-nums'>
+              <tr key={row.player.seasonPlayerId} className={ROW}>
+                <td className={`${RANK_CELL} ${PAD} text-text-muted`}>
                   {row.rank}
                 </td>
-                <td className='text-text px-3 font-semibold'>
-                  {row.player.name}
-                </td>
-                <td className='text-text px-3 text-right font-mono text-sm tabular-nums'>
+                <td className={`${NAME_CELL} ${PAD}`}>{row.player.name}</td>
+                <td className={`${FIGURE_CELL} ${PAD} text-text`}>
                   {row.wins}–{row.losses}
                 </td>
               </tr>
@@ -129,7 +134,7 @@ function MatchRow({ id, match, tagged }: MatchRowProps) {
         )}
       </span>
       <span className={`truncate ${weight('b')}`}>{match.playerB.name}</span>
-      <span className='text-text-muted text-right font-mono text-xs tracking-widest uppercase'>
+      <span className='text-text-muted text-right font-mono text-xs tracking-wide uppercase sm:tracking-widest'>
         {tags.join(' · ')}
       </span>
     </li>

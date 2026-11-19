@@ -13,6 +13,7 @@ import GamerCard from '@/components/GamerCard';
 import GameCard from '@/components/GameCard';
 import PowerUpCard from '@/components/PowerUpCard';
 import Heading from '@/components/Heading';
+import SectionLabel from '@/components/SectionLabel';
 import VideoEmbed from '@/components/VideoEmbed';
 import ChampionHero from '@/components/ChampionHero';
 import StandingsTable from '@/components/StandingsTable';
@@ -27,6 +28,13 @@ import type {
 interface Props {
   params: Promise<{ sesong: string }>;
 }
+
+// TODO(copy): placeholder labels for the result blocks.
+const LABELS = {
+  standings: 'Sluttstilling',
+  chart: 'Poengutvikling',
+  matrix: 'Poeng per spill',
+};
 
 export function generateStaticParams() {
   return Object.keys(seasonData).map((sesong) => ({ sesong }));
@@ -65,6 +73,7 @@ export default async function SeasonPage({ params }: Props) {
           powerUps={'powerUps' in season ? season.powerUps : undefined}
           curses={'curses' in season ? season.curses : undefined}
           videoEmbedUrl={meta.videoEmbedUrl}
+          dates={formatSeasonDates(meta)}
         />
       );
     }
@@ -156,6 +165,8 @@ interface FinishedProps {
   powerUps?: PowerUp[];
   curses?: PowerUp[];
   videoEmbedUrl?: string;
+  /** Formatted, for the catalogue line. */
+  dates: string;
 }
 
 function FinishedSeason({
@@ -167,6 +178,7 @@ function FinishedSeason({
   powerUps,
   curses,
   videoEmbedUrl,
+  dates,
 }: FinishedProps) {
   const champion = composed.standings.find((s) => s.isChampion);
   const championImage = champion
@@ -184,11 +196,7 @@ function FinishedSeason({
   return (
     <>
       <section className='flex flex-col gap-4 pt-8'>
-        <Heading
-          as='h1'
-          aboveLine={`GG — Sesong ${seasonNumber}`}
-          belowLine={composed.seasonSlug}
-        >
+        <Heading as='h1' aboveLine={`GG-${composed.seasonSlug} / ${dates}`}>
           Sesong {seasonNumber}
         </Heading>
       </section>
@@ -204,28 +212,35 @@ function FinishedSeason({
         />
       )}
 
-      <section id='standings' className='flex flex-col gap-8'>
-        <StandingsTable rows={standingsRows} />
-      </section>
-
-      {series.length > 0 && (
-        <section id='points-chart' className='flex flex-col gap-8'>
-          <SeasonPointsChart series={series} gameLabels={gameLabels} />
+      {/* Three views of one result, so they sit one cell apart, closer than
+          the page's sections. */}
+      <div className='flex flex-col gap-10'>
+        <section id='standings' className='flex flex-col gap-6'>
+          <SectionLabel as='h2'>{LABELS.standings}</SectionLabel>
+          <StandingsTable rows={standingsRows} />
         </section>
-      )}
 
-      {matrix.games.length > 0 && (
-        <section id='points-matrix' className='flex flex-col gap-8'>
-          <GamePointsMatrix
-            seasonNumber={seasonNumber}
-            players={matrix.players}
-            games={matrix.games}
-          />
-        </section>
-      )}
+        {series.length > 0 && (
+          <section id='points-chart' className='flex flex-col gap-6'>
+            <SectionLabel as='h2'>{LABELS.chart}</SectionLabel>
+            <SeasonPointsChart series={series} gameLabels={gameLabels} />
+          </section>
+        )}
 
-      <section id='participants' className='flex flex-col gap-8'>
-        <Heading as='h2'>Spillere</Heading>
+        {matrix.games.length > 0 && (
+          <section id='points-matrix' className='flex flex-col gap-6'>
+            <SectionLabel as='h2'>{LABELS.matrix}</SectionLabel>
+            <GamePointsMatrix
+              seasonNumber={seasonNumber}
+              players={matrix.players}
+              games={matrix.games}
+            />
+          </section>
+        )}
+      </div>
+
+      <section id='participants' className='flex flex-col gap-6'>
+        <SectionLabel as='h2'>Spillere</SectionLabel>
         {composed.standings.some((s) => s.gamer.stats) ? (
           <ul className='grid grid-cols-1 justify-items-center gap-10 sm:grid-cols-2'>
             {composed.standings.map((s) => (
@@ -260,8 +275,8 @@ function FinishedSeason({
         )}
       </section>
 
-      <section id='games' className='flex flex-col gap-8'>
-        <Heading as='h2'>Spill</Heading>
+      <section id='games' className='flex flex-col gap-6'>
+        <SectionLabel as='h2'>Spill</SectionLabel>
         <ul className='grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3'>
           {composed.games.map((g, i) => (
             <li key={g.game.slug}>
@@ -282,8 +297,8 @@ function FinishedSeason({
       </section>
 
       {powerUps && powerUps.length > 0 && (
-        <section id='power-ups' className='flex flex-col gap-8'>
-          <Heading as='h2'>Power-ups</Heading>
+        <section id='power-ups' className='flex flex-col gap-6'>
+          <SectionLabel as='h2'>Power-ups</SectionLabel>
           <ul className='grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3'>
             {powerUps.map((powerUp, i) => (
               <li key={powerUp.slug}>
@@ -344,8 +359,7 @@ function UpcomingSeason({
       <section className='flex flex-col gap-4 pt-8'>
         <Heading
           as='h1'
-          aboveLine={`GG — Sesong ${seasonNumber}`}
-          belowLine={formatSeasonDates(meta)}
+          aboveLine={`GG-${sesong} / ${formatSeasonDates(meta)}`}
         >
           Sesong {seasonNumber}
         </Heading>
@@ -360,8 +374,8 @@ function UpcomingSeason({
         )}
       </section>
 
-      <section id='participants' className='flex flex-col gap-8'>
-        <Heading as='h2'>Spillere</Heading>
+      <section id='participants' className='flex flex-col gap-6'>
+        <SectionLabel as='h2'>Spillere</SectionLabel>
         {gamers.some((g) => g.stats) ? (
           <ul className='grid grid-cols-1 justify-items-center gap-10 sm:grid-cols-2'>
             {gamers.map((gamer, i) => (
@@ -398,8 +412,8 @@ function UpcomingSeason({
         )}
       </section>
 
-      <section id='games' className='flex flex-col gap-8'>
-        <Heading as='h2'>Spill</Heading>
+      <section id='games' className='flex flex-col gap-6'>
+        <SectionLabel as='h2'>Spill</SectionLabel>
         <ul className='grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3'>
           {games.map((game, i) => (
             <li key={game.slug}>
@@ -420,8 +434,8 @@ function UpcomingSeason({
       </section>
 
       {powerUps && powerUps.length > 0 && (
-        <section id='power-ups' className='flex flex-col gap-8'>
-          <Heading as='h2'>Power-ups</Heading>
+        <section id='power-ups' className='flex flex-col gap-6'>
+          <SectionLabel as='h2'>Power-ups</SectionLabel>
           <ul className='grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3'>
             {powerUps.map((powerUp, i) => (
               <li key={powerUp.name}>

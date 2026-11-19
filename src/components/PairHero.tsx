@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { PairPlayerView } from '@/lib/results/view-models';
+import { PORTRAIT_TONE_LINK } from './portrait-tone';
 
 /**
  * The diagonal hairline between the portraits is the page's only "vs": there
@@ -51,7 +52,7 @@ function Side({ player, side }: { player: PairPlayerView; side: 'a' | 'b' }) {
         <img
           src={player.imagePath}
           alt=''
-          className={`absolute inset-y-0 h-full w-[58%] object-cover object-top brightness-90 contrast-125 grayscale transition duration-300 group-hover:brightness-100 group-hover:contrast-100 group-hover:grayscale-0 group-focus-visible:brightness-100 group-focus-visible:contrast-100 group-focus-visible:grayscale-0 motion-reduce:transition-none ${
+          className={`absolute inset-y-0 h-full w-[58%] object-cover object-top ${PORTRAIT_TONE_LINK} ${
             side === 'a' ? 'left-0' : 'right-0'
           }`}
         />

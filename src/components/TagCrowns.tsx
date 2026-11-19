@@ -6,6 +6,7 @@ import UnrankedRows, { unrankedCaption } from './UnrankedRows';
 import { tagLabels } from '@/data/tag-labels';
 import type { TagCrown } from '@/lib/results/view-models';
 import { MIN_RANKED_GAMES } from '@/lib/tag-ranking';
+import { ROW } from '@/components/table-classes';
 
 /**
  * The crowns arrive unfiltered; `MIN_RANKED_GAMES` is applied here. Both
@@ -19,11 +20,11 @@ interface Props {
   crownsWithoutOwnPicks: TagCrown[];
 }
 
-const headCell = 'px-2 py-3 font-normal sm:px-3';
+const headCell = 'px-1.5 py-2 font-normal sm:px-3';
 const numberCell =
-  'px-2 py-3 text-right font-mono text-sm tabular-nums sm:px-3';
+  'px-1.5 py-2 text-right font-mono text-sm tabular-nums sm:px-3';
 const eyebrowRow =
-  'text-text-muted font-mono text-xs tracking-widest uppercase';
+  'text-text-muted font-mono text-xs tracking-wide sm:tracking-widest uppercase';
 
 function CrownsBody({
   crowns,
@@ -61,7 +62,7 @@ function CrownsBody({
 
   const headRow = (
     <tr className={`border-border border-b ${eyebrowRow}`}>
-      <th scope='col' className='px-3 py-3 font-normal sm:px-4'>
+      <th scope='col' className='px-3 py-2 font-normal'>
         Kategori
       </th>
       <th scope='col' className={headCell}>
@@ -80,10 +81,10 @@ function CrownsBody({
     const [first] = holders;
     const won = first.games.filter((g) => g.placement === 1).length;
     return (
-      <tr key={tag} className='border-border border-b last:border-b-0'>
+      <tr key={tag} className={ROW}>
         <th
           scope='row'
-          className='text-text-muted py-3 pr-1 pl-3 font-normal wrap-break-word hyphens-auto sm:px-4'
+          className='text-text-muted py-2 pr-1 pl-3 font-normal wrap-break-word hyphens-auto sm:px-3'
         >
           <GameListPopover
             id={`crown-games-${idPrefix}-${tag}`}
@@ -100,7 +101,7 @@ function CrownsBody({
           />
         </th>
         <td
-          className={`px-2 py-3 sm:px-3 ${
+          className={`px-1.5 py-2 sm:px-3 ${
             ranks ? 'text-text font-semibold' : 'text-text-muted'
           }`}
         >
@@ -109,7 +110,7 @@ function CrownsBody({
               {i > 0 && ', '}
               <Link
                 href={`/spillere/${holder.player.slug}`}
-                className='focus-visible:outline-accent underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2'
+                className='focus-visible:outline-accent relative underline-offset-2 after:absolute after:inset-x-0 after:-inset-y-3 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2'
               >
                 {holder.player.name}
               </Link>
@@ -146,7 +147,7 @@ function CrownsBody({
         <UnrankedRows count={unranked.length} className='bg-bg'>
           <table className='border-border w-full table-fixed border-collapse border-t text-left'>
             <caption
-              className={`border-border border-b px-3 py-3 text-left sm:px-4 ${eyebrowRow}`}
+              className={`border-border border-b px-3 py-2 text-left sm:px-4 ${eyebrowRow}`}
             >
               {unrankedCaption}
             </caption>

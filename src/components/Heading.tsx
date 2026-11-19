@@ -4,8 +4,8 @@ type HeadingElement = HeadingLevel | 'div' | 'span';
 interface Props {
   as: HeadingElement;
   styleAs?: HeadingLevel;
-  aboveLine?: string;
-  belowLine?: string;
+  /** The catalogue line above the title (design.md, Notation). */
+  aboveLine?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
 }
@@ -23,7 +23,6 @@ export default function Heading({
   as: Tag,
   styleAs,
   aboveLine,
-  belowLine,
   children,
   className = '',
 }: Props) {
@@ -33,18 +32,13 @@ export default function Heading({
   return (
     <div className='flex flex-col gap-1'>
       {aboveLine && (
-        <p className='text-text-muted font-mono text-xs tracking-widest uppercase'>
+        <p className='text-text-muted font-mono text-xs tracking-wide uppercase sm:tracking-widest'>
           {aboveLine}
         </p>
       )}
       <Tag className={`text-text ${styleMap[level]} ${className}`}>
         {children}
       </Tag>
-      {belowLine && (
-        <p className='text-text-muted font-mono text-xs tracking-widest uppercase'>
-          {belowLine}
-        </p>
-      )}
     </div>
   );
 }

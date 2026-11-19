@@ -21,7 +21,7 @@ export default function UnrankedRows({
 }: Props) {
   return (
     <details className={`group ${className}`.trim()}>
-      <summary className='text-text-muted hover:text-text-accent focus-visible:outline-accent flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 px-3 font-mono text-xs tracking-widest uppercase transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 sm:px-4 [&::-webkit-details-marker]:hidden'>
+      <summary className='text-text-muted hover:text-text-accent focus-visible:outline-accent flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 px-3 font-mono text-xs tracking-wide uppercase transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 sm:px-4 sm:tracking-widest [&::-webkit-details-marker]:hidden'>
         <span className='group-open:hidden'>Vis flere ({count})</span>
         <span className='hidden group-open:inline'>Vis færre</span>
         <svg

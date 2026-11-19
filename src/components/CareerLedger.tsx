@@ -1,4 +1,4 @@
-import SectionLabel from './SectionLabel';
+import Readout from './Readout';
 import { tagLabels } from '@/data/tag-labels';
 import type {
   CareerLedger as CareerLedgerData,
@@ -29,16 +29,15 @@ function Stat({
   wide?: boolean;
   word?: boolean;
 }) {
-  const valueClass = word
-    ? 'text-xl font-semibold wrap-break-word hyphens-auto sm:text-2xl'
-    : `font-mono tabular-nums ${big ? 'text-5xl sm:text-6xl' : 'text-3xl'}`;
-
   return (
-    <div
-      className={`bg-bg flex flex-col justify-between gap-3 p-5 ${wide ? 'col-span-2' : ''}`}
-    >
-      <SectionLabel>{label}</SectionLabel>
-      <span className={`text-text ${valueClass}`}>{value}</span>
+    <div className={`bg-bg p-5 ${wide ? 'col-span-2' : ''}`}>
+      <Readout
+        label={label}
+        value={value}
+        size={big ? 'l' : 'm'}
+        word={word}
+        className='h-full justify-between'
+      />
     </div>
   );
 }

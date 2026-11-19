@@ -11,7 +11,7 @@ interface Props {
 export default function Checkbox({ children, className = '' }: Props) {
   return (
     <label
-      className={`text-text-muted hover:text-text flex min-h-11 cursor-pointer items-center gap-3 font-mono text-xs tracking-widest uppercase transition-colors duration-150 ${className}`.trim()}
+      className={`text-text-muted hover:text-text flex min-h-11 cursor-pointer items-center gap-3 font-mono text-xs tracking-wide uppercase transition-colors duration-150 sm:tracking-widest ${className}`.trim()}
     >
       <span className='relative grid size-4 shrink-0 place-items-center'>
         <input

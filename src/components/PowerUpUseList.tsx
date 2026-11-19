@@ -54,7 +54,7 @@ export default function PowerUpUseList({ id, rows }: Props) {
                 {use.name}
               </Popover>
             </span>
-            <span className='text-text-muted shrink-0 font-mono text-xs tracking-widest uppercase'>
+            <span className='text-text-muted shrink-0 font-mono text-xs tracking-wide uppercase sm:tracking-widest'>
               {use.isCurse ? LABELS.curse : LABELS.powerUp}
             </span>
           </span>

@@ -37,12 +37,12 @@ export default function GameCard({
   );
   const frame = `bg-bg flex h-full flex-col border ${compact ? 'gap-2 p-3' : 'gap-3 p-4'}`;
   const heading = `text-text font-extrabold ${compact ? 'text-sm' : 'text-lg'}`;
-  const meta = `text-text-muted font-mono uppercase ${compact ? 'text-[10px] tracking-wider' : 'text-xs tracking-widest'}`;
+  const meta = `text-text-muted font-mono uppercase ${compact ? 'text-[10px] tracking-wider' : 'text-xs tracking-wide sm:tracking-widest'}`;
 
   if (revealed) {
     return (
       <Link
-        className={`${frame} border-border-accent hover:border-accent focus-visible:outline-accent transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2`}
+        className={`${frame} border-border hover:border-accent focus-visible:outline-accent transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2`}
         href={slug}
       >
         {serial}
