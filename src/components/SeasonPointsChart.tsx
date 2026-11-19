@@ -336,7 +336,7 @@ function ChartInner({ width, series, gameLabels }: InnerProps) {
           className='border-border bg-bg pointer-events-none absolute border p-3'
           style={{ top: margin.top + 6, left: margin.left + 6 }}
         >
-          <p className='text-text-muted mb-2 font-mono text-[10px] tracking-widest uppercase'>
+          <p className='text-text-muted mb-2 font-mono text-[10px] tracking-wide uppercase sm:tracking-widest'>
             {gameLabels[activeOrdinal] ?? `Spill ${activeOrdinal}`}
           </p>
           <ul className='flex flex-col gap-1'>

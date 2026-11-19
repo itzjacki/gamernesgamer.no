@@ -60,6 +60,8 @@ export default async function GamePage({ params }: Props) {
   if (!game) {
     notFound();
   }
+  // Numbered as on its game card in the season's lineup.
+  const gameNumber = seasonData[sesong].games.indexOf(game) + 1;
 
   const { results, stages } = await getGameView(Number(sesong), gameSlug);
   const id = `g${sesong}-${gameSlug}`;
@@ -84,14 +86,22 @@ export default async function GamePage({ params }: Props) {
     <>
       <section className='flex flex-col gap-10 pt-8'>
         <div className='flex flex-col gap-4'>
-          <Link
-            href={`/sesong/${sesong}`}
-            className='text-text-muted hover:text-text-accent focus-visible:outline-accent w-fit font-mono text-xs tracking-widest uppercase underline transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2'
+          {/* The game card's serial; its season part is the way back. */}
+          <Heading
+            as='h1'
+            aboveLine={
+              <>
+                <Link
+                  href={`/sesong/${sesong}`}
+                  aria-label={`Tilbake til sesong ${Number(sesong)}`}
+                  className='hover:text-text-accent focus-visible:outline-accent relative underline underline-offset-2 transition-colors duration-150 after:absolute after:inset-x-0 after:-inset-y-3 focus-visible:outline-2 focus-visible:outline-offset-2'
+                >
+                  GG-{sesong}
+                </Link>{' '}
+                / Spill / {String(gameNumber).padStart(2, '0')}
+              </>
+            }
           >
-            &larr; Sesong {Number(sesong)}
-          </Link>
-
-          <Heading as='h1' aboveLine={`GG — Sesong ${Number(sesong)}`}>
             {game.title}
           </Heading>
 
@@ -123,8 +133,8 @@ export default async function GamePage({ params }: Props) {
         )}
       </section>
 
-      <section className='flex flex-col gap-8'>
-        <Heading as='h2'>Beskrivelse &amp; regler</Heading>
+      <section className='flex flex-col gap-6'>
+        <SectionLabel as='h2'>Beskrivelse &amp; regler</SectionLabel>
         {game.longDescription ? (
           <article
             className='prose prose-invert text-text-muted'
@@ -141,8 +151,8 @@ export default async function GamePage({ params }: Props) {
       </section>
 
       {stages.length > 0 && (
-        <section className='flex flex-col gap-8'>
-          <Heading as='h2'>{LABELS.details}</Heading>
+        <section className='flex flex-col gap-6'>
+          <SectionLabel as='h2'>{LABELS.details}</SectionLabel>
           <div className='flex flex-col gap-20'>
             {stages.map((stage) => (
               <div key={stage.ordinal} className='flex flex-col gap-10'>
@@ -182,8 +192,8 @@ export default async function GamePage({ params }: Props) {
       )}
 
       {hasPowerUps && (
-        <section className='flex flex-col gap-8'>
-          <Heading as='h2'>{LABELS.powerUps}</Heading>
+        <section className='flex flex-col gap-6'>
+          <SectionLabel as='h2'>{LABELS.powerUps}</SectionLabel>
           <PowerUpUseList id={`${id}-pu`} rows={results} />
         </section>
       )}

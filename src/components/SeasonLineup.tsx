@@ -58,7 +58,7 @@ export default function SeasonLineup({ season, data }: Props) {
         as='link'
         href={`/sesong/${season}`}
         width='responsive'
-        className='hover:text-text-accent h-12 self-center px-10 font-mono tracking-widest uppercase'
+        className='hover:text-text-accent h-12 self-center px-10 font-mono tracking-wide uppercase sm:tracking-widest'
       >
         Se mer om sesong {season}
       </Button>

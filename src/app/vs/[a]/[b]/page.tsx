@@ -18,6 +18,7 @@ import { PairLine, PairMini, PairMinis, PairRow } from '@/components/PairRow';
 import RecordLines from '@/components/RecordLines';
 import GameListPopover from '@/components/GameListPopover';
 import UnrankedRows, { unrankedCaption } from '@/components/UnrankedRows';
+import { HEAD_ROW, ROW } from '@/components/table-classes';
 
 interface Props {
   params: Promise<{ a: string; b: string }>;
@@ -185,7 +186,7 @@ export default async function PairPage({ params }: Props) {
       </section>
 
       <section id='spill' className='flex flex-col gap-6'>
-        <SectionLabel>Resultater</SectionLabel>
+        <SectionLabel as='h2'>Resultater</SectionLabel>
         <PairTrace
           seasons={pair.seasons}
           names={names}
@@ -198,7 +199,7 @@ export default async function PairPage({ params }: Props) {
 
       {matches.matches.length > 0 && (
         <section id='matcher' className='flex flex-col gap-6'>
-          <SectionLabel>Matcher</SectionLabel>
+          <SectionLabel as='h2'>Matcher</SectionLabel>
           <div className={wall}>
             <PairRow
               id='matcher'
@@ -248,7 +249,7 @@ export default async function PairPage({ params }: Props) {
       )}
 
       <section id='spill-balanse' className='flex flex-col gap-6'>
-        <SectionLabel>Spill</SectionLabel>
+        <SectionLabel as='h2'>Spill</SectionLabel>
         <div className={wall}>
           <PairRow
             id='foran-spill'
@@ -304,7 +305,7 @@ export default async function PairPage({ params }: Props) {
       </section>
 
       <section id='sesonger' className='flex flex-col gap-6'>
-        <SectionLabel>Sesonger</SectionLabel>
+        <SectionLabel as='h2'>Sesonger</SectionLabel>
         <div className={wall}>
           <PairRow
             id='sesonger-foran'
@@ -320,19 +321,19 @@ export default async function PairPage({ params }: Props) {
               Sesonger begge spilte: sluttplassering og poeng
             </caption>
             <thead>
-              <tr className='border-border text-text-muted border-b font-mono text-xs tracking-wide uppercase sm:tracking-widest'>
-                <th scope='col' className='px-4 py-3 font-normal sm:px-8'>
+              <tr className={HEAD_ROW}>
+                <th scope='col' className='px-4 py-2 font-normal sm:px-8'>
                   Sesong
                 </th>
-                <th scope='col' className='px-2 py-3 text-right font-normal'>
+                <th scope='col' className='px-2 py-2 text-right font-normal'>
                   {a.name}
                 </th>
-                <th scope='col' className='px-2 py-3 text-right font-normal'>
+                <th scope='col' className='px-2 py-2 text-right font-normal'>
                   {b.name}
                 </th>
                 <th
                   scope='col'
-                  className='px-4 py-3 text-right font-normal sm:px-8'
+                  className='px-4 py-2 text-right font-normal sm:px-8'
                 >
                   Poeng
                 </th>
@@ -340,14 +341,11 @@ export default async function PairPage({ params }: Props) {
             </thead>
             <tbody>
               {pair.seasons.map((season) => (
-                <tr
-                  key={season.season.seasonSlug}
-                  className='border-border border-b last:border-b-0'
-                >
-                  <th scope='row' className='px-4 py-3 font-normal sm:px-8'>
+                <tr key={season.season.seasonSlug} className={ROW}>
+                  <th scope='row' className='px-4 py-2 font-normal sm:px-8'>
                     <Link
                       href={`/sesong/${season.season.seasonSlug}`}
-                      className='hover:text-text-accent focus-visible:outline-accent font-mono text-sm underline underline-offset-2 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2'
+                      className='hover:text-text-accent focus-visible:outline-accent relative font-mono text-sm underline underline-offset-2 transition-colors duration-150 after:absolute after:inset-x-0 after:-inset-y-3 focus-visible:outline-2 focus-visible:outline-offset-2'
                     >
                       <span className='sr-only'>Sesong </span>
                       <span aria-hidden='true'>S</span>
@@ -358,7 +356,7 @@ export default async function PairPage({ params }: Props) {
                   {sides.map((side) => (
                     <td
                       key={side}
-                      className={`px-2 py-3 text-right font-mono text-sm tabular-nums ${
+                      className={`px-2 py-2 text-right font-mono text-sm tabular-nums ${
                         season[side].placement === 1
                           ? 'text-text-accent font-medium'
                           : 'text-text'
@@ -368,7 +366,7 @@ export default async function PairPage({ params }: Props) {
                       <span className='sr-only'> plass</span>
                     </td>
                   ))}
-                  <td className='text-text-muted px-4 py-3 text-right font-mono text-sm tabular-nums sm:px-8'>
+                  <td className='text-text-muted px-4 py-2 text-right font-mono text-sm tabular-nums sm:px-8'>
                     {season.a.totalPoints}–{season.b.totalPoints}
                   </td>
                 </tr>
@@ -407,7 +405,7 @@ export default async function PairPage({ params }: Props) {
 
       {pair.categories.length > 0 && (
         <section id='kategorier' className='flex flex-col gap-6'>
-          <SectionLabel>Innbyrdes oppgjør: Spillkategori</SectionLabel>
+          <SectionLabel as='h2'>Innbyrdes oppgjør: Spillkategori</SectionLabel>
           <div className='border-border bg-bg border'>
             <div className='flex flex-col px-4 sm:px-8 [&>div:first-child]:border-t-0'>
               {ranked.map((c) => categoryLine(c, true))}
@@ -418,7 +416,7 @@ export default async function PairPage({ params }: Props) {
                 className={`[&>summary]:px-4 sm:[&>summary]:px-8 ${ranked.length > 0 ? 'border-border border-t' : ''}`}
               >
                 <p
-                  className={`border-border border-y px-4 py-3 sm:px-8 ${eyebrow}`}
+                  className={`border-border border-y px-4 py-2 sm:px-8 ${eyebrow}`}
                 >
                   {unrankedCaption}
                 </p>

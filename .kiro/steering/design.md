@@ -82,7 +82,9 @@ Greyscale at rest so photos from different seasons read as one set; hover or
 focus brings back the photo's own colour. (An accent duotone on hover was
 tried on /vs and dropped.) Champion pictures are the exception: at rest they
 take `ChampionTone`, greyscale with red midtones, so they belong to the
-red-lit scene; as a link they get their colour back on hover.
+red-lit scene; as a link they get their colour back on hover. Use the shared
+tones (`portrait-tone.ts`, `CHAMPION_TONE`), never a hand-copied filter. A
+portrait that isn't a link (the career hero) just stays greyscale.
 
 No portraits on the /records boards and plates: one player holding several
 plates would repeat the same face, and identity is the roster's and the
@@ -91,7 +93,9 @@ hero's job.
 ## Career page
 
 The ledger is an instrument panel with large mono figures (a plain
-`StatList` read flat next to the trophy shelf and cards).
+`StatList` read flat next to the trophy shelf and cards). The hero is the
+shared `Hero` (as is the season page's champion), with the player's name as
+the page's h1 and the catalogue line above it.
 
 ## Game page
 
@@ -105,9 +109,11 @@ into its sections instead of scrolling.
 
 With two or more stages, each opens with an h3 (h5 size) on a 60px
 `bg-surface` band (a lone stage has none; a one-round table is headed "Score"
-and names what was scored in its row), kept
-clearly below the h2 (a hairline rule reads as one more grid line; a
-two-cell band at h3 size rivalled the h2; one cell felt cramped). Blocks
+and names what was scored in its row). The band is louder than the mono h2
+label above it; accepted, since the stages are the page's main content (a
+hairline rule reads as one more grid line; one cell felt cramped). If more
+places end up with a child louder than its mono heading, revisit mono
+section headings. Blocks
 inside a stage take `SectionLabel`s, so a stage never reads at the same
 strength as its parts. Blocks only as wide as they need: the standings beside
 the media, a group's table and matches side by side.
@@ -117,23 +123,60 @@ the media, a group's table and matches side by side.
 Neue Montreal (self-hosted) for display (800), body (400) and emphasis (600:
 names, "weight, not colour"); Martian Mono for metadata and figures, 400 with
 500 for emphasis. Only those weights are loaded: anything else falls back or
-is faked (Martian Mono at 600+ is smeared 500). No text below 10px; 10px is
+is faked (Martian Mono at 600+ is smeared 500). No text below 10px, except
+the site header's instrument micro text (function numbers, readout labels),
+which is one size, 8px; the phone key labels are navigation, so 10px. 10px is
 the small label size for dense instruments (bracket slots, chart axes, compact
 cards), `text-xs` everywhere else. Labels are `SectionLabel` (mono, xs,
-widest tracking, muted), placed above a block's frame with `gap-6`, never
-inside it; on a page whose blocks are its sections, render it `as='h2'`.
+muted), placed above a block's frame with `gap-6`, never inside it. A label
+that heads a section is the section's heading: render it `as='h2'` (pages
+use mono labels, not large h2s, for their sections). Every uppercase mono
+label is `tracking-wide sm:tracking-widest`, so long labels fit a phone; only
+the header's and the hero's instrument text keeps its wider 0.2em.
+
+## Notation
+
+- **Seasons:** "Sesong 4" in headings and prose; "S4" in tables and
+  readouts ("S1–S4" for a range); the zero-padded "04" only as the season
+  index plates' big figure and inside sheet serials (`GG-04`).
+- **Placements** next to points are written "1.", so the two can't be
+  confused; a table's leading rank column stays a plain "1".
+- **The line above a page title** is a catalogue line in the sheet-serial
+  grammar (`GG-04 / 13.12.2025 – 14.12.2025`, `GG / 4 spillere`): facts the
+  page doesn't state elsewhere, parts split by " / ", never a sentence. No
+  line when there is nothing new to say. On a game page it is the game
+  card's serial, and its season part links back.
+- **Names in tables and lists** are mixed-case semibold; only mono labels
+  are uppercase. Heroes set names in uppercase display type.
 
 ## Grid
 
 - 40px cells, `rgba(232,216,216,0.04)`, centred horizontally and anchored to
   the top: `background-position: calc(50% + 20px) 8px`, so the header's
-  bottom edge (168px on desktop) is a grid line and every page has the same
-  rows whatever its height. Vertical sizes and gaps below the header come in
-  whole cells (40px; the front page stacks its blocks 120px apart).
+  bottom edge (168px on desktop) is a grid line. Blocks line up with the
+  grid's columns (the 800px content width is 20 cells). Vertically, only the
+  header and the front page's hero are kept in register (the front page
+  stacks its blocks 120px apart); pages with dynamic content don't chase grid
+  rows, since table and text heights can't be held to cells.
 - Container `max-w-220` (880px = 22 cells) with `lg:px-10`, giving an 800px
   content width (20 cells).
 - The grid scrolls with the page. Alignment is a desktop feature: on mobile the
   grid is texture only, with normal padding (`px-4 sm:px-6`).
+
+## Tables, rows and readouts
+
+- **Tables** use the shared classes in `table-classes.ts`: 40px rows,
+  `px-3` cells (`px-1.5 sm:px-3` for tables with many columns), a 48px rank
+  column and an 80px figure column. Tables of the same shape look identical
+  (the season standings, game standings and a group's table). /vs keeps its
+  `sm:px-8` cells to line up with the page's walls.
+- **Rows outside tables:** data rows 40px; a row that is itself a link 44px
+  (tap target); dense lines inside a plate 32px. The /vs gauge rows are
+  plates, not data rows.
+- **Readouts** (a label with its figure) are `Readout`: stacked or inline,
+  at three figure sizes: 14px in rows and tables, 24px in plates, 48–60px
+  for a page's headline figure. The site header's parameters are the one
+  exception.
 
 ## Surfaces
 
@@ -260,11 +303,13 @@ Teenage Engineering instrument grammar on the VERKSTED tokens.
 
 ## Interaction states
 
-- Card hover: border turns accent.
+- Card hover: border turns accent. Every linked card and plate rests on a
+  neutral border; a curse card's accent border is its mark, not a link state.
 - Stacked plates (the season and player indexes) do not share hairlines:
   they sit 12px apart so each reads as its own plate. (Corner registration
   marks on top were tried and dropped.)
-- Link: underlined at rest, accent on hover.
+- Link: underlined at rest, accent on hover. Exception: names and seasons
+  inside tables stay plain until hover, so a table reads as data, not links.
 - Focus: 2px solid accent outline, 2px offset.
 - Table rows: no hover state.
 - No spinners on actions that navigate away (e.g. Google sign-in).

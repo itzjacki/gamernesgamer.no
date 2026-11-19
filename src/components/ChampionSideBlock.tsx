@@ -6,6 +6,7 @@ import { seasonData, type Season } from '@/data/sesong';
 import { getSeasonView } from '@/lib/results/queries';
 import ChampionTone, { CHAMPION_TONE } from './ChampionTone';
 import Heading from './Heading';
+import Readout from './Readout';
 
 /** Renders nothing until a finished season has a champion. */
 
@@ -60,16 +61,6 @@ export default async function ChampionSideBlock({ season }: Props) {
   );
   const image = findChampionImage(slug, card?.imagePath);
 
-  // Accent: rank-1 data.
-  const figure = (label: string, value: number) => (
-    <div className='flex flex-col items-end gap-1'>
-      <dt className={`${MONO} text-text-muted whitespace-nowrap`}>{label}</dt>
-      <dd className='text-text-accent font-mono text-xl leading-none tabular-nums'>
-        {value}
-      </dd>
-    </div>
-  );
-
   return (
     <Link
       href={`/spillere/${champion.player.slug}`}
@@ -91,7 +82,7 @@ export default async function ChampionSideBlock({ season }: Props) {
 
       <div className='border-border bg-bg group-hover:border-accent flex flex-col gap-4 border px-4 py-4 transition-colors duration-150 sm:px-6'>
         <p className={`${MONO} text-text-muted flex items-center gap-2`}>
-          Vinner · Sesong {slug}
+          Vinner · Sesong {Number(slug)}
         </p>
         <div className='flex items-end justify-between gap-4'>
           <div className='min-w-0'>
@@ -100,7 +91,14 @@ export default async function ChampionSideBlock({ season }: Props) {
             </Heading>
           </div>
           <dl className='flex shrink-0 gap-5'>
-            {figure('Poeng', champion.totalPoints)}
+            {/* Accent: rank-1 data. */}
+            <Readout
+              term
+              align='end'
+              accent
+              label='Poeng'
+              value={champion.totalPoints}
+            />
           </dl>
         </div>
       </div>

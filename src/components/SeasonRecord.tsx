@@ -1,52 +1,44 @@
 import Link from 'next/link';
 import type { CareerSeasonRow } from '@/lib/results/view-models';
+import { HEAD_ROW, ROW, TABLE } from '@/components/table-classes';
 
 /** A player's season-by-season table. A readout, not a chart, by decision. */
 
 interface Props {
   seasons: CareerSeasonRow[];
-  label?: string;
 }
 
-export default function SeasonRecord({ seasons, label }: Props) {
+export default function SeasonRecord({ seasons }: Props) {
   return (
-    <table className='border-border bg-bg w-full border-collapse border text-left'>
-      {label && (
-        <caption className='text-text-muted border-border border-b px-4 py-3 text-left font-mono text-xs tracking-widest uppercase'>
-          {label}
-        </caption>
-      )}
+    <table className={TABLE}>
       <thead>
-        <tr className='border-border text-text-muted border-b font-mono text-xs tracking-widest uppercase'>
-          <th className='px-4 py-3 font-normal'>SESONG</th>
-          <th className='w-24 px-4 py-3 text-center font-normal'>PLASS</th>
-          <th className='w-24 px-4 py-3 text-right font-normal'>POENG</th>
+        <tr className={HEAD_ROW}>
+          <th className='px-3 py-2 font-normal'>SESONG</th>
+          <th className='w-24 px-3 py-2 text-center font-normal'>PLASS</th>
+          <th className='w-24 px-3 py-2 text-right font-normal'>POENG</th>
         </tr>
       </thead>
       <tbody>
         {seasons.map((s) => (
-          <tr
-            key={s.seasonNumber}
-            className='border-border border-b last:border-b-0'
-          >
-            <td className='text-text px-4 py-3 font-semibold'>
+          <tr key={s.seasonNumber} className={ROW}>
+            <td className='text-text px-3 py-2 font-semibold'>
               <Link
                 href={`/sesong/${s.seasonSlug}`}
-                className='focus-visible:outline-accent underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2'
+                className='focus-visible:outline-accent relative underline-offset-2 after:absolute after:inset-x-0 after:-inset-y-3 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2'
               >
-                Sesong {s.seasonNumber}
+                S{s.seasonNumber}
               </Link>
             </td>
             <td
-              className={`px-4 py-3 text-center font-mono text-sm tabular-nums ${
+              className={`px-3 py-2 text-center font-mono text-sm tabular-nums ${
                 s.isChampion
                   ? 'text-text-accent font-medium'
                   : 'text-text-muted'
               }`}
             >
-              {s.placement}
+              {s.placement}.
             </td>
-            <td className='text-text px-4 py-3 text-right font-mono text-sm tabular-nums'>
+            <td className='text-text px-3 py-2 text-right font-mono text-sm tabular-nums'>
               {s.totalPoints}
             </td>
           </tr>

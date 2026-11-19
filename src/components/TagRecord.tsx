@@ -6,6 +6,7 @@ import { tagLabels } from '@/data/tag-labels';
 import type { TagStat } from '@/lib/results/view-models';
 import { splitRanked } from '@/lib/tag-ranking';
 import type { Tag } from '@/types/tag';
+import { ROW } from '@/components/table-classes';
 
 /**
  * The stats arrive unfiltered, best first; the ranking cutoff is applied here,
@@ -23,10 +24,10 @@ const average = (stat: { averagePlacement: number }) =>
   stat.averagePlacement.toFixed(1);
 
 const numberCell =
-  'px-2 py-3 text-right font-mono text-sm tabular-nums sm:px-3';
-const headCell = 'px-2 py-3 text-right font-normal sm:px-3';
+  'px-1.5 py-2 text-right font-mono text-sm tabular-nums sm:px-3';
+const headCell = 'px-1.5 py-2 text-right font-normal sm:px-3';
 const eyebrowRow =
-  'text-text-muted font-mono text-xs tracking-widest uppercase';
+  'text-text-muted font-mono text-xs tracking-wide sm:tracking-widest uppercase';
 
 /** `idPrefix` keeps popover ids unique: TagRecord renders two of these. */
 function TagBody({
@@ -76,7 +77,7 @@ function TagBody({
 
   const headRow = (
     <tr className={`border-border border-b ${eyebrowRow}`}>
-      <th scope='col' className='px-3 py-3 font-normal sm:px-4'>
+      <th scope='col' className='px-3 py-2 font-normal'>
         Kategori
       </th>
       <th scope='col' className={headCell}>
@@ -100,10 +101,10 @@ function TagBody({
   );
 
   const row = (stat: TagStat<Tag>, isRanked: boolean) => (
-    <tr key={stat.tag} className='border-border border-b last:border-b-0'>
+    <tr key={stat.tag} className={ROW}>
       <th
         scope='row'
-        className={`px-3 py-3 sm:px-4 ${
+        className={`px-3 py-2 ${
           isRanked ? 'text-text font-semibold' : 'text-text-muted font-normal'
         }`}
       >
@@ -147,7 +148,7 @@ function TagBody({
         <UnrankedRows count={unranked.length} className='bg-bg col-span-2'>
           <table className='border-border w-full table-fixed border-collapse border-t text-left'>
             <caption
-              className={`border-border border-b px-3 py-3 text-left sm:px-4 ${eyebrowRow}`}
+              className={`border-border border-b px-3 py-2 text-left sm:px-4 ${eyebrowRow}`}
             >
               {unrankedCaption}
             </caption>

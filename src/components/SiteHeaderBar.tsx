@@ -203,7 +203,7 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
     const lit = here || choosing;
     const inner = (
       <>
-        <span className='text-text-muted text-[9px] tracking-widest'>
+        <span className='text-text-muted text-[8px] tracking-widest'>
           {pad(index + 1)}
         </span>
         <span
@@ -213,7 +213,7 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
           } ${choosing ? styles.ledBlink : ''}`}
         />
         <span
-          className={`group-hover:text-text-accent truncate text-[9px] tracking-normal uppercase sm:text-xs sm:tracking-widest ${
+          className={`group-hover:text-text-accent truncate text-[10px] tracking-normal uppercase sm:text-xs sm:tracking-widest ${
             lit ? 'text-text' : 'text-text-muted'
           }`}
         >
@@ -279,7 +279,7 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
       }
       return (
         <>
-          <Param label='Sesong' value={pad(s.number)} />
+          <Param label='Sesong' value={`S${s.number}`} />
           <Param label='Dato' value={s.date} />
           <Param label='Spill' value={s.games} />
           <Param label='Vinner' value={s.champion?.name ?? '—'} />
@@ -321,7 +321,7 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
     }
     return latestDone ? (
       <>
-        <Param label='Sesong' value={pad(latestDone.number)} />
+        <Param label='Sesong' value={`S${latestDone.number}`} />
         <Param label='Regjerende mester' value={latestDone.champion!.name} />
         <Param label='Dato' value={latestDone.date} />
       </>
@@ -425,7 +425,7 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
           <PixelLogo rows={data.logo} state={logoState} className='size-8' />
         </Link>
         {keys.map(renderKey)}
-        <span className='text-text-muted ml-auto hidden self-center px-4 font-mono text-[9px] tracking-[0.2em] lg:block'>
+        <span className='text-text-muted ml-auto hidden self-center px-4 font-mono text-[8px] tracking-[0.2em] lg:block'>
           GG–S{pad(Number(data.currentSeason))}
         </span>
       </nav>

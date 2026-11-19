@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { CareerBoardRow, RecordSeason } from '@/lib/results/view-models';
+import { HEAD_ROW, ROW, TABLE } from '@/components/table-classes';
 
 /**
  * Accent at rest is the leader's position marker only: the season strip stays
@@ -12,15 +13,15 @@ interface Props {
   seasons: RecordSeason[];
 }
 
-const headCell = 'px-2 py-3 font-normal sm:px-3';
-const numberCell = 'px-2 py-3 font-mono text-sm tabular-nums sm:px-3';
+const headCell = 'px-1.5 py-2 font-normal sm:px-3';
+const numberCell = 'px-1.5 py-2 font-mono text-sm tabular-nums sm:px-3';
 
 export default function CareerBoard({ rows, seasons }: Props) {
   return (
-    <table className='border-border bg-bg w-full border-collapse border text-left'>
+    <table className={TABLE}>
       <caption className='sr-only'>Sammenlagtscore, alle sesonger</caption>
       <thead>
-        <tr className='border-border text-text-muted border-b font-mono text-xs tracking-wide uppercase sm:tracking-widest'>
+        <tr className={HEAD_ROW}>
           <th scope='col' className={`w-10 text-center sm:w-16 ${headCell}`}>
             POS.
           </th>
@@ -56,10 +57,7 @@ export default function CareerBoard({ rows, seasons }: Props) {
       </thead>
       <tbody>
         {rows.map((row) => (
-          <tr
-            key={row.player.slug}
-            className='border-border border-b last:border-b-0'
-          >
+          <tr key={row.player.slug} className={ROW}>
             <td
               className={`text-center ${numberCell} ${
                 row.rank === 1
@@ -71,11 +69,11 @@ export default function CareerBoard({ rows, seasons }: Props) {
             </td>
             <th
               scope='row'
-              className='text-text px-2 py-3 font-semibold sm:px-3'
+              className='text-text px-1.5 py-2 font-semibold sm:px-3'
             >
               <Link
                 href={`/spillere/${row.player.slug}`}
-                className='underline-offset-2 hover:underline'
+                className='focus-visible:outline-accent relative underline-offset-2 after:absolute after:inset-x-0 after:-inset-y-3 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2'
               >
                 {row.player.name}
               </Link>
@@ -85,7 +83,7 @@ export default function CareerBoard({ rows, seasons }: Props) {
                 key={seasons[index].seasonNumber}
                 className={`text-text-muted hidden text-center sm:table-cell ${numberCell}`}
               >
-                {placement ?? '–'}
+                {placement === null ? '–' : `${placement}.`}
               </td>
             ))}
             <td className={`text-text-muted text-right ${numberCell}`}>

@@ -6,7 +6,7 @@ interface Props {
 
 export default function SheetSerial({ parts }: Props) {
   return (
-    <span className='text-text-muted font-mono text-[10px] tracking-widest uppercase'>
+    <span className='text-text-muted font-mono text-[10px] tracking-wide uppercase sm:tracking-widest'>
       {parts.join(' / ')}
     </span>
   );

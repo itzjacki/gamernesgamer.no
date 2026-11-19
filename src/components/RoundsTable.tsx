@@ -1,6 +1,7 @@
 import type { RoundsStageView } from '@/lib/results/view-models';
 import type { RoundScoreKind } from '@/types/game';
 import { formatScore } from '@/lib/format';
+import { HEAD_ROW, ROW, TABLE } from '@/components/table-classes';
 
 /**
  * A rounds stage: rounds as rows, players as columns, so the table grows tall
@@ -32,18 +33,18 @@ export default function RoundsTable({ stage, scoreKind, winnerId }: Props) {
 
   return (
     <div className='w-full overflow-x-auto'>
-      <table className='border-border bg-bg w-full border-collapse border text-left'>
+      <table className={TABLE}>
         <thead>
-          <tr className='border-border text-text-muted border-b font-mono text-xs tracking-widest uppercase'>
+          <tr className={HEAD_ROW}>
             {labelColumn && (
-              <th className='px-1.5 py-3 font-normal sm:px-3'>
+              <th className='px-1.5 py-2 font-normal sm:px-3'>
                 {!single && LABELS.round}
               </th>
             )}
             {stage.players.map((p) => (
               <th
                 key={p.seasonPlayerId}
-                className={`px-1.5 py-3 text-right font-sans text-sm font-semibold tracking-normal normal-case sm:px-3 ${tone(p.seasonPlayerId)}`}
+                className={`px-1.5 py-2 text-right font-sans text-sm font-semibold tracking-normal normal-case sm:px-3 ${tone(p.seasonPlayerId)}`}
               >
                 {p.name}
               </th>
@@ -56,10 +57,7 @@ export default function RoundsTable({ stage, scoreKind, winnerId }: Props) {
               ...round.cells.map((c) => c.raw ?? -Infinity),
             );
             return (
-              <tr
-                key={round.ordinal}
-                className='border-border h-10 border-b last:border-b-0'
-              >
+              <tr key={round.ordinal} className={ROW}>
                 {labelColumn && (
                   <td className='text-text px-1.5 text-sm font-semibold sm:px-3 sm:text-base'>
                     {round.label ?? `${LABELS.round} ${round.ordinal}`}
@@ -97,7 +95,7 @@ export default function RoundsTable({ stage, scoreKind, winnerId }: Props) {
         {!single && (
           <tfoot>
             <tr className='border-border h-10 border-t-2'>
-              <td className='text-text-muted px-1.5 font-mono text-xs tracking-widest uppercase sm:px-3'>
+              <td className='text-text-muted px-1.5 font-mono text-xs tracking-wide uppercase sm:px-3 sm:tracking-widest'>
                 {rankThenSum || scoreKind === 'placement'
                   ? LABELS.rankTotal
                   : LABELS.total}

@@ -6,7 +6,7 @@ interface Props {
 
 export default function SectionLabel({ children, as: Tag = 'p' }: Props) {
   return (
-    <Tag className='text-text-muted font-mono text-xs tracking-widest uppercase'>
+    <Tag className='text-text-muted font-mono text-xs tracking-wide uppercase sm:tracking-widest'>
       {children}
     </Tag>
   );

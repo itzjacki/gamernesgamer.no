@@ -28,7 +28,7 @@ export default function PowerUpCard({
   return (
     <div
       className={`flex h-full flex-col border ${compact ? 'gap-2 p-3' : 'gap-4 p-4 pb-6'} ${
-        isCurse ? 'border-accent bg-bg' : 'border-border-accent bg-bg'
+        isCurse ? 'border-accent bg-bg' : 'border-border bg-bg'
       }`}
     >
       <SheetSerial

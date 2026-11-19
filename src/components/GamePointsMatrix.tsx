@@ -1,5 +1,6 @@
 import Popover from './Popover';
 import RecordLines, { pointsBreakdownLines } from './RecordLines';
+import { HEAD_ROW, ROW, TABLE } from '@/components/table-classes';
 
 /**
  * Games are rows and players columns on purpose: a season has more games than
@@ -48,7 +49,7 @@ interface Props {
 
 function PlainCell({ points }: { points: number }) {
   return (
-    <td className='text-text px-3 py-3 text-center font-mono text-sm tabular-nums'>
+    <td className='text-text px-3 py-2 text-center font-mono text-sm tabular-nums'>
       {points}
     </td>
   );
@@ -62,7 +63,7 @@ function PopoverCell({
   popoverId: string;
 }) {
   return (
-    <td className='relative px-3 py-3 text-center font-mono text-sm tabular-nums'>
+    <td className='relative px-3 py-2 text-center font-mono text-sm tabular-nums'>
       <Popover
         id={popoverId}
         label={`${cell.points} poeng, vis poengfordeling`}
@@ -89,14 +90,14 @@ export default function GamePointsMatrix({
   return (
     <div>
       <div className='w-full overflow-x-auto'>
-        <table className='border-border bg-bg w-full border-collapse border text-left'>
+        <table className={TABLE}>
           <thead>
-            <tr className='border-border text-text-muted border-b font-mono text-xs tracking-widest uppercase'>
-              <th className='px-4 py-3 font-normal'>SPILL</th>
+            <tr className={HEAD_ROW}>
+              <th className='px-3 py-2 font-normal'>SPILL</th>
               {players.map((p) => (
                 <th
                   key={p.seasonPlayerId}
-                  className={`px-3 py-3 text-center font-normal ${
+                  className={`px-3 py-2 text-center font-normal ${
                     p.isChampion ? 'text-text-accent' : ''
                   }`}
                 >
@@ -107,11 +108,8 @@ export default function GamePointsMatrix({
           </thead>
           <tbody>
             {games.map((game) => (
-              <tr
-                key={game.ordinal}
-                className='border-border border-b last:border-b-0'
-              >
-                <td className='text-text px-4 py-3 font-semibold'>
+              <tr key={game.ordinal} className={ROW}>
+                <td className='text-text px-3 py-2 font-semibold'>
                   {game.label}
                 </td>
                 {game.cells.map((cell) =>
@@ -130,13 +128,13 @@ export default function GamePointsMatrix({
           </tbody>
           <tfoot>
             <tr className='border-border border-t-2'>
-              <td className='text-text-muted px-4 py-3 font-mono text-xs tracking-widest uppercase'>
+              <td className='text-text-muted px-3 py-2 font-mono text-xs tracking-wide uppercase sm:tracking-widest'>
                 Sum
               </td>
               {players.map((p) => (
                 <td
                   key={p.seasonPlayerId}
-                  className={`px-3 py-3 text-center font-mono text-sm font-medium tabular-nums ${
+                  className={`px-3 py-2 text-center font-mono text-sm font-medium tabular-nums ${
                     p.isChampion ? 'text-text-accent' : 'text-text'
                   }`}
                 >

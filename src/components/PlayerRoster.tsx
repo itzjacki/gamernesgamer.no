@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import TrophyIcon from './TrophyIcon';
+import { PORTRAIT_TONE_LINK } from './portrait-tone';
+import Readout from './Readout';
 
 /** Kept local so the primitive doesn't depend on the players lib's types. */
 export interface RosterEntry {
@@ -43,8 +45,6 @@ export default function PlayerRoster({ entries }: Props) {
 
 /* -------------------------------------------------------------------------- */
 
-const eyebrow =
-  'text-text-muted font-mono text-xs tracking-wide uppercase sm:tracking-widest';
 /** The text side keeps clear of the portrait with the same value. */
 const portraitWidth = 'w-32 sm:w-60';
 const clearOfPortrait = 'pr-32 sm:pr-60';
@@ -54,12 +54,7 @@ const DIAGONAL_INSET = 22;
 function Figure({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <span className='border-border flex items-center border-r px-3 first:pl-4 sm:px-8 sm:first:pl-8'>
-      <span className='flex items-baseline gap-2 sm:flex-col sm:gap-1'>
-        <span className={eyebrow}>{label}</span>
-        <span className='text-text font-mono text-sm tabular-nums sm:text-2xl'>
-          {value}
-        </span>
-      </span>
+      <Readout layout='inline-then-stacked' label={label} value={value} />
     </span>
   );
 }
@@ -126,7 +121,7 @@ function PlayerPlate({ entry }: { entry: RosterEntry }) {
           src={entry.imagePath}
           alt=''
           aria-hidden='true'
-          className='h-full w-full object-cover object-top brightness-90 contrast-125 grayscale transition duration-300 group-hover:brightness-100 group-hover:contrast-100 group-hover:grayscale-0 group-focus-visible:brightness-100 group-focus-visible:contrast-100 group-focus-visible:grayscale-0 motion-reduce:transition-none'
+          className={`h-full w-full object-cover object-top ${PORTRAIT_TONE_LINK}`}
         />
       </span>
       <svg

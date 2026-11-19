@@ -1,4 +1,15 @@
 import Link from 'next/link';
+import {
+  FIGURE_CELL,
+  HEAD_CELL,
+  HEAD_ROW,
+  NAME_CELL,
+  NAME_LINK,
+  PAD,
+  RANK_CELL,
+  ROW,
+  TABLE,
+} from './table-classes';
 
 /** Kept local so the primitive doesn't depend on the results layer's types. */
 export interface StandingsRow {
@@ -17,24 +28,21 @@ interface Props {
 
 export default function StandingsTable({ rows, pointsLabel = 'POENG' }: Props) {
   return (
-    <table className='border-border bg-bg w-full border-collapse border text-left'>
+    <table className={TABLE}>
       <thead>
-        <tr className='border-border text-text-muted border-b font-mono text-xs tracking-widest uppercase'>
-          <th className='w-16 px-4 py-3 text-center font-normal'>POS.</th>
-          <th className='px-4 py-3 font-normal'>Spiller</th>
-          <th className='w-24 px-4 py-3 text-right font-normal'>
+        <tr className={HEAD_ROW}>
+          <th className={`${RANK_CELL} ${PAD} ${HEAD_CELL}`}>POS.</th>
+          <th className={`${PAD} ${HEAD_CELL}`}>Spiller</th>
+          <th className={`${FIGURE_CELL} ${PAD} ${HEAD_CELL}`}>
             {pointsLabel}
           </th>
         </tr>
       </thead>
       <tbody>
         {rows.map((row) => (
-          <tr
-            key={`${row.placement}-${row.name}`}
-            className='border-border border-b last:border-b-0'
-          >
+          <tr key={`${row.placement}-${row.name}`} className={ROW}>
             <td
-              className={`px-4 py-3 text-center font-mono text-sm tabular-nums ${
+              className={`${RANK_CELL} ${PAD} ${
                 row.isChampion
                   ? 'text-text-accent font-medium'
                   : 'text-text-muted'
@@ -42,19 +50,16 @@ export default function StandingsTable({ rows, pointsLabel = 'POENG' }: Props) {
             >
               {row.placement}
             </td>
-            <td className='text-text px-4 py-3 font-semibold'>
+            <td className={`${NAME_CELL} ${PAD}`}>
               {row.slug ? (
-                <Link
-                  href={`/spillere/${row.slug}`}
-                  className='focus-visible:outline-accent underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2'
-                >
+                <Link href={`/spillere/${row.slug}`} className={NAME_LINK}>
                   {row.name}
                 </Link>
               ) : (
                 row.name
               )}
             </td>
-            <td className='text-text px-4 py-3 text-right font-mono text-sm tabular-nums'>
+            <td className={`${FIGURE_CELL} ${PAD} text-text`}>
               {row.totalPoints}
             </td>
           </tr>

@@ -1,5 +1,6 @@
 import { getArchiveTotals } from '@/lib/results/queries';
 import SectionLabel from './SectionLabel';
+import Readout from './Readout';
 
 /** Body-size counts: the countdown is the page's only big numerals. */
 
@@ -23,17 +24,15 @@ export default async function ArchiveTotals() {
           hairlines between cells. */}
       <dl className='border-border bg-bg grid grid-cols-2 border sm:h-10 sm:grid-cols-4'>
         {cells.map(({ label, value }, i) => (
-          <div
+          <Readout
             key={label}
-            className={`border-border flex h-12 min-w-0 items-center justify-between gap-3 px-5 sm:h-auto sm:border-b-0 ${i % 2 === 0 ? 'border-r' : ''} ${i < 2 ? 'border-b' : ''} ${i === 1 ? 'sm:border-r' : ''}`}
-          >
-            <dt className='text-text-muted truncate font-mono text-xs tracking-wide uppercase sm:tracking-widest'>
-              {label}
-            </dt>
-            <dd className='text-text font-mono text-sm tabular-nums'>
-              {value}
-            </dd>
-          </div>
+            term
+            layout='inline'
+            size='s'
+            label={label}
+            value={value}
+            className={`border-border h-10 min-w-0 px-5 sm:h-auto sm:border-b-0 ${i % 2 === 0 ? 'border-r' : ''} ${i < 2 ? 'border-b' : ''} ${i === 1 ? 'sm:border-r' : ''}`}
+          />
         ))}
       </dl>
     </section>

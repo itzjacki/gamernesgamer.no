@@ -241,7 +241,7 @@ function Plate({
   return (
     <div>
       <p
-        className='text-text-muted flex items-start justify-between gap-2 font-mono text-[10px] leading-none tracking-widest uppercase'
+        className='text-text-muted flex items-start justify-between gap-2 font-mono text-[10px] leading-none tracking-wide uppercase sm:tracking-widest'
         style={{ height: STRIP_ROWS * ROW_PX }}
       >
         <span className='truncate'>{label}</span>
@@ -271,7 +271,7 @@ function Plate({
             />
           </>
         ) : (
-          <span className='text-text-muted col-span-2 row-span-2 grid place-items-center font-mono text-xs tracking-widest uppercase'>
+          <span className='text-text-muted col-span-2 row-span-2 grid place-items-center font-mono text-xs tracking-wide uppercase sm:tracking-widest'>
             {LABELS.notPlayed}
           </span>
         )}

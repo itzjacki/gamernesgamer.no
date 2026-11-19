@@ -20,14 +20,17 @@ export default async function RecordsPage() {
   return (
     <>
       <section className='flex flex-col gap-4 pt-8'>
-        <Heading as='h1' aboveLine='GG - Alle sesonger'>
+        <Heading
+          as='h1'
+          aboveLine={`GG / S${records.seasons[0]?.seasonNumber}–S${records.seasons.at(-1)?.seasonNumber}`}
+        >
           Rekorder
         </Heading>
       </section>
 
       {records.board.length > 0 && (
         <section id='sammenlagt' className='flex flex-col gap-6'>
-          <SectionLabel>Sammenlagtscore</SectionLabel>
+          <SectionLabel as='h2'>Sammenlagtscore</SectionLabel>
           <CareerBoard rows={records.board} seasons={records.seasons} />
         </section>
       )}
@@ -35,7 +38,7 @@ export default async function RecordsPage() {
       <section id='rekorder' className='flex flex-col gap-10'>
         {recordPlateGroups(records).map((group) => (
           <div key={group.label} className='flex flex-col gap-6'>
-            <SectionLabel>{group.label}</SectionLabel>
+            <SectionLabel as='h2'>{group.label}</SectionLabel>
             <ul className={wall}>
               {group.plates.map((plate) => (
                 <RecordPlate key={plate.id} {...plate} />
@@ -46,7 +49,7 @@ export default async function RecordsPage() {
       </section>
 
       <section id='kategorier' className='flex flex-col gap-6'>
-        <SectionLabel>Best per spillkategori</SectionLabel>
+        <SectionLabel as='h2'>Best per spillkategori</SectionLabel>
         <TagCrowns
           crowns={records.tagCrowns}
           crownsWithoutOwnPicks={records.tagCrownsWithoutOwnPicks}
