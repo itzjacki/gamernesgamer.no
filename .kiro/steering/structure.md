@@ -31,6 +31,10 @@ src/
                         the front page.
     supabase/           Clients, proxy session helper, generated database.types.ts.
     results/            Results read + derivation layer (see below).
+    og/                 Shared parts of the share images. Each route's own
+                        image is its `opengraph-image.tsx`; pages without one
+                        inherit the front page's. They read the same queries
+                        and are prerendered with the pages.
   types/                Shared types.
   styles/global.css     Tailwind import + @theme tokens.
   proxy.ts              Next.js Proxy (formerly middleware).

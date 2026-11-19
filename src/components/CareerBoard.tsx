@@ -22,7 +22,7 @@ export default function CareerBoard({ rows, seasons }: Props) {
       <thead>
         <tr className='border-border text-text-muted border-b font-mono text-xs tracking-wide uppercase sm:tracking-widest'>
           <th scope='col' className={`w-10 text-center sm:w-16 ${headCell}`}>
-            POS
+            POS.
           </th>
           <th scope='col' className={headCell}>
             Spiller

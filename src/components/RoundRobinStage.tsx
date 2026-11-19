@@ -12,16 +12,14 @@ import SectionLabel from './SectionLabel';
  * by weight, never colour: a group leader is not the game's winner.
  */
 
-// TODO(copy): placeholder labels.
 const LABELS = {
-  placement: 'POS',
+  placement: 'POS.',
   player: 'Spiller',
-  record: 'S–T',
+  record: 'W/L',
   table: 'Tabell',
-  matches: 'Kamper',
-  tiebreak: 'TB',
-  rematch: 'Omkamp',
-  game: 'Kamp',
+  matches: 'Matcher',
+  tiebreak: 'Tiebreak',
+  game: 'Match',
 };
 
 interface Props {
@@ -72,7 +70,12 @@ export default function RoundRobinStage({ id, stage }: Props) {
         <SectionLabel>{LABELS.matches}</SectionLabel>
         <ul className='border-border bg-bg border'>
           {stage.matches.map((match, i) => (
-            <MatchRow key={i} id={`${id}-m${i}`} match={match} />
+            <MatchRow
+              key={i}
+              id={`${id}-m${i}`}
+              match={match}
+              tagged={stage.matches.some((m) => m.score?.byTiebreak)}
+            />
           ))}
         </ul>
       </div>
@@ -80,18 +83,33 @@ export default function RoundRobinStage({ id, stage }: Props) {
   );
 }
 
-function MatchRow({ id, match }: { id: string; match: StageMatch }) {
+interface MatchRowProps {
+  id: string;
+  match: StageMatch;
+  /**
+   * Any match in the stage carries a tag. The tag columns are wide enough for
+   * "Tiebreak" only then, so stages without one keep the room for names.
+   */
+  tagged: boolean;
+}
+
+function MatchRow({ id, match, tagged }: MatchRowProps) {
   const figures = sideFigures(match);
   const weight = (side: 'a' | 'b') =>
     match.winner === side ? 'text-text font-semibold' : 'text-text-muted';
   const score = `${figures.a}–${figures.b}`;
-  const tags = [
-    match.score?.byTiebreak && LABELS.tiebreak,
-    match.leg > 1 && LABELS.rematch,
-  ].filter(Boolean);
+  // No tag for a second meeting (`leg` > 1): it is just another match
+  // between the two, and "rematch" read as a replay overwriting the first.
+  const tags = [match.score?.byTiebreak && LABELS.tiebreak].filter(Boolean);
 
   return (
-    <li className='border-border grid h-10 grid-cols-[3.5rem_1fr_auto_1fr_3.5rem] items-center gap-3 border-b px-3 last:border-b-0'>
+    <li
+      className={`border-border grid h-10 items-center gap-3 border-b px-3 last:border-b-0 ${
+        tagged
+          ? 'grid-cols-[5rem_1fr_auto_1fr_5rem]'
+          : 'grid-cols-[0_1fr_auto_1fr_0]'
+      }`}
+    >
       {/* Balances the tag column so the score sits in the centre. */}
       <span aria-hidden='true' />
       <span className={`truncate text-right ${weight('a')}`}>
@@ -101,7 +119,7 @@ function MatchRow({ id, match }: { id: string; match: StageMatch }) {
         {match.games ? (
           <Popover
             id={id}
-            label={`${score}, vis hver kamp`}
+            label={`${score}, vis hver match`}
             panel={<RecordLines lines={gameLines(match, LABELS.game)} />}
           >
             {score}

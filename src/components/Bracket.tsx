@@ -21,7 +21,6 @@ import SectionLabel from './SectionLabel';
  * On phones a double-elim bracket splits into its sections.
  */
 
-// TODO(copy): placeholder labels.
 const SLOT_LABELS: Record<SlotId, string> = {
   SF1: 'Semifinale 1',
   SF2: 'Semifinale 2',
@@ -32,11 +31,10 @@ const SLOT_LABELS: Record<SlotId, string> = {
   'WB-F': 'Vinnerfinale',
   'LB-R1': 'Taperrunde',
   'LB-F': 'Taperfinale',
-  GF: 'Storfinale',
-  GF2: 'Storfinale 2',
+  GF: 'Finale',
+  GF2: 'Finale (omspill)',
 };
 
-// TODO(copy): placeholder labels.
 const LABELS = {
   sections: {
     upper: 'Vinnerside',
@@ -44,8 +42,8 @@ const LABELS = {
     final: 'Finale',
   } satisfies Record<BracketSection, string>,
   notPlayed: 'Ikke spilt',
-  tiebreak: 'TB',
-  game: 'Kamp',
+  tiebreak: 'Tiebreak',
+  game: 'Match',
 };
 
 /* Geometry, in grid units: fr for columns, 20px rows. */
@@ -320,7 +318,7 @@ function PlateRow({
         {won && match.games ? (
           <Popover
             id={id}
-            label={`${label}, vis hver kamp`}
+            label={`${label}, vis hver match`}
             tone={decides ? 'accent' : 'word'}
             panel={<RecordLines lines={gameLines(match, LABELS.game)} />}
           >

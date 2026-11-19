@@ -8,7 +8,6 @@ import { formatScore } from '@/lib/format';
  * the game winner's column, and only when this stage settled the game.
  */
 
-// TODO(copy): placeholder labels.
 const LABELS = {
   round: 'Runde',
   total: 'Sum',
@@ -24,8 +23,10 @@ interface Props {
 
 export default function RoundsTable({ stage, scoreKind, winnerId }: Props) {
   const rankThenSum = stage.aggregation === 'rank-then-sum';
-  // One round: the page names it in the heading, and a total would repeat it.
+  // One round: no total (it would repeat the row), and the round column only
+  // when the round has a label to show (what the score is, e.g. "Gold").
   const single = stage.rounds.length === 1;
+  const labelColumn = !single || stage.rounds[0].label !== null;
   const tone = (seasonPlayerId: string) =>
     seasonPlayerId === winnerId ? 'text-text-accent' : 'text-text';
 
@@ -34,9 +35,9 @@ export default function RoundsTable({ stage, scoreKind, winnerId }: Props) {
       <table className='border-border bg-bg w-full border-collapse border text-left'>
         <thead>
           <tr className='border-border text-text-muted border-b font-mono text-xs tracking-widest uppercase'>
-            {!single && (
+            {labelColumn && (
               <th className='px-1.5 py-3 font-normal sm:px-3'>
-                {LABELS.round}
+                {!single && LABELS.round}
               </th>
             )}
             {stage.players.map((p) => (
@@ -59,7 +60,7 @@ export default function RoundsTable({ stage, scoreKind, winnerId }: Props) {
                 key={round.ordinal}
                 className='border-border h-10 border-b last:border-b-0'
               >
-                {!single && (
+                {labelColumn && (
                   <td className='text-text px-1.5 text-sm font-semibold sm:px-3 sm:text-base'>
                     {round.label ?? `${LABELS.round} ${round.ordinal}`}
                   </td>

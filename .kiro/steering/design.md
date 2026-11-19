@@ -21,6 +21,10 @@ hex (one exception: the season trophies' real gold, silver and bronze). All
 colours are solid — no transparency, because overlapping translucent
 borders double up.
 
+The share images can't read CSS variables, so `src/lib/og/frame.tsx` copies
+the tokens as hex: change a token in both places. The images follow the page
+rules (greyscale portraits, accent only on rank-1 data and the instrument).
+
 The accent is one colour in two tokens: `--color-accent` for marks (borders,
 outlines, the diagonal, needles, fills) misses AA as small text, so any text
 in accent, at rest or on hover, uses `--color-text-accent`.
@@ -99,7 +103,9 @@ red by every stage. Brackets are drawn (plates on the 20px-row grid, hairline
 connectors for winners' routes only); on phones a double-elim bracket splits
 into its sections instead of scrolling.
 
-Each stage opens with an h3 (h5 size) on a 60px `bg-surface` band, kept
+With two or more stages, each opens with an h3 (h5 size) on a 60px
+`bg-surface` band (a lone stage has none; a one-round table is headed "Score"
+and names what was scored in its row), kept
 clearly below the h2 (a hairline rule reads as one more grid line; a
 two-cell band at h3 size rivalled the h2; one cell felt cramped). Blocks
 inside a stage take `SectionLabel`s, so a stage never reads at the same
