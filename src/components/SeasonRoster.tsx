@@ -135,22 +135,28 @@ function SeasonPlate({ entry }: { entry: SeasonEntry }) {
           />
         </span>
       )}
-      <svg
-        viewBox='0 0 100 100'
-        preserveAspectRatio='none'
+      {/* Wrapped: a positioned <svg> keeps its viewBox's square shape rather
+          than stretching to top/bottom, which tilts the line off the clip. */}
+      <span
         aria-hidden='true'
-        className={`text-border group-hover:text-accent group-focus-visible:text-accent pointer-events-none transition-colors ${picturePlace} ${pictureWidth}`}
+        className={`pointer-events-none ${picturePlace} ${pictureWidth}`}
       >
-        <line
-          x1='0'
-          y1='0'
-          x2={DIAGONAL_INSET}
-          y2='100'
-          stroke='currentColor'
-          strokeWidth='1'
-          vectorEffect='non-scaling-stroke'
-        />
-      </svg>
+        <svg
+          viewBox='0 0 100 100'
+          preserveAspectRatio='none'
+          className='text-border group-hover:text-accent group-focus-visible:text-accent h-full w-full transition-colors'
+        >
+          <line
+            x1='0'
+            y1='0'
+            x2={DIAGONAL_INSET}
+            y2='100'
+            stroke='currentColor'
+            strokeWidth='1'
+            vectorEffect='non-scaling-stroke'
+          />
+        </svg>
+      </span>
     </Link>
   );
 }
