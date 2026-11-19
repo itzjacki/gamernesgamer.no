@@ -29,11 +29,8 @@ interface Props {
   params: Promise<{ sesong: string }>;
 }
 
-// TODO(copy): placeholder labels for the result blocks.
 const LABELS = {
-  standings: 'Sluttstilling',
-  chart: 'Poengutvikling',
-  matrix: 'Poeng per spill',
+  standings: 'Resultater',
 };
 
 export function generateStaticParams() {
@@ -222,14 +219,12 @@ function FinishedSeason({
 
         {series.length > 0 && (
           <section id='points-chart' className='flex flex-col gap-6'>
-            <SectionLabel as='h2'>{LABELS.chart}</SectionLabel>
             <SeasonPointsChart series={series} gameLabels={gameLabels} />
           </section>
         )}
 
         {matrix.games.length > 0 && (
           <section id='points-matrix' className='flex flex-col gap-6'>
-            <SectionLabel as='h2'>{LABELS.matrix}</SectionLabel>
             <GamePointsMatrix
               seasonNumber={seasonNumber}
               players={matrix.players}

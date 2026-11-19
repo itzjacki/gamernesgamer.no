@@ -15,26 +15,22 @@ produces artifacts that feed into it.
 Phases 1–3 (Next.js rewrite, VERKSTED rebrand, Supabase + auth + admin,
 S1–S4 seeded on prod). Phase 4 so far: season, game and career pages, the
 indexes, titles and tags, /records, /vs, the site header, the front page
-with its trophy hero, and the share (OG) images.
+with its trophy hero, the share (OG) images and the design audit.
 
 ---
 
 ## Phase 4 — Historical content & stats 🚧
 
-### 1. Design audit
+### 1. Cards part 1
 
-Before the card redesign. Does the site follow VERKSTED, and does VERKSTED
-still express a permanent monument? Change the language, not just pages.
-Leads: `--color-display` beyond the header (readouts, key figures); more
-deliberate spacing (almost every section has a large gap).
-
-### 2. Cards part 1
+The gamer cards are the one place off VERKSTED (rounded corners, saturated
+red shapes, colour photos); the redesign brings them in line.
 
 - [ ] **Gamer-card redesign:** the visual centrepiece (chrome highlights
       tracking the tilt, material surfaces); the current SVG shape limits it.
 - [ ] **Champion card:** a special variant for the season winner.
 
-### 3. Content centre
+### 2. Content centre
 
 Needs exploration and direction. A home for the videos, pictures and memes
 there are; it may live on the season, game and player pages rather than as
@@ -42,7 +38,7 @@ its own page. The volume decides whether it is a data file or needs an asset
 pipeline. Covers media on game and season pages, and the front page's content
 of the day (what it rotates; a placeholder until then).
 
-### 4. Season page upgrade
+### 3. Season page upgrade
 
 More per-season views, stats and content; scoped when we start.
 
