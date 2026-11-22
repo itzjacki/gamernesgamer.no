@@ -49,13 +49,15 @@ function Side({ player, side }: { player: PairPlayerView; side: 'a' | 'b' }) {
       </span>
 
       <span aria-hidden='true' className={box} style={{ clipPath: clip[side] }}>
-        <img
-          src={player.imagePath}
-          alt=''
-          className={`absolute inset-y-0 h-full w-[58%] object-cover object-top ${PORTRAIT_TONE_LINK} ${
-            side === 'a' ? 'left-0' : 'right-0'
-          }`}
-        />
+        {player.imagePath && (
+          <img
+            src={player.imagePath}
+            alt=''
+            className={`absolute inset-y-0 h-full w-[58%] object-cover object-top ${PORTRAIT_TONE_LINK} ${
+              side === 'a' ? 'left-0' : 'right-0'
+            }`}
+          />
+        )}
       </span>
     </Link>
   );

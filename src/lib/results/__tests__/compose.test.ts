@@ -26,7 +26,6 @@ describe('composeSeasonView — Season 2', () => {
     // From src/data/sesong/02/gamers.ts
     expect(tobias.gamer.name).toBe('Tobias');
     expect(tobias.gamer.nickname).toBe('"The Maestro"');
-    expect(tobias.gamer.imagePath).toContain('/images/gamers/2/');
     for (const row of view.standings) {
       expect(row.gamer.name).toBe(row.player.name);
     }

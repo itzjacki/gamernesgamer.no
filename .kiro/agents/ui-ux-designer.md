@@ -42,7 +42,7 @@ Enforced, not optional: the list in `design.md` ("Anti-slop rules").
 2. Match the existing visual vocabulary — color, radius, spacing, typography — before extending it.
 3. Be concrete: name token values, Tailwind classes, and component structure. Do not leave developers guessing.
 4. Propose token changes as updates to `src/styles/global.css` (`@theme` block), not as one-off values in markup.
-5. Think about the GamerCard: every layout decision should be compatible with it as the primary visual artifact.
+5. Think about the gamer card (`src/components/card/`): every layout decision should be compatible with it as the primary visual artifact.
 6. When designing components, specify all interactive states — hover, active, focus, disabled, loading.
 
 ## Accessibility (non-negotiable)
@@ -50,5 +50,5 @@ Enforced, not optional: the list in `design.md` ("Anti-slop rules").
 - WCAG AA contrast on all text. Test it, don't assume.
 - Semantic HTML — `<button>` for buttons, real `<label>` elements on inputs, proper heading hierarchy.
 - Visible focus rings — never `outline: none` without a replacement.
-- `prefers-reduced-motion` respected — the GamerCard tilt is intentional, but don't add unchecked motion elsewhere.
+- `prefers-reduced-motion` respected — the gamer card's tilt is intentional, but don't add unchecked motion elsewhere.
 - Touch targets ≥ 44px.

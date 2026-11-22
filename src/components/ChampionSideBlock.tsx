@@ -27,19 +27,10 @@ function finishedSeasons(): Season[] {
     .reverse();
 }
 
-/**
- * A dedicated cutout when present, else that season's own card art. A season
- * whose gamers point at another season's art (S1 reuses S2's) gets no picture.
- */
-function findChampionImage(season: Season, cardPath?: string): string | null {
-  const exists = (rel: string) =>
-    existsSync(path.join(process.cwd(), 'public', rel));
-
+/** The season's champion cutout; none, no picture. */
+function findChampionImage(season: Season): string | null {
   const cutout = `/images/champions/${season}.png`;
-  if (exists(cutout)) return cutout;
-
-  const ownArt = `/images/gamers/${Number(season)}/`;
-  return cardPath?.startsWith(ownArt) && exists(cardPath) ? cardPath : null;
+  return existsSync(path.join(process.cwd(), 'public', cutout)) ? cutout : null;
 }
 
 async function findCrowned(season?: Season) {
@@ -56,10 +47,7 @@ export default async function ChampionSideBlock({ season }: Props) {
   if (!crowned) return null;
 
   const { slug, champion } = crowned;
-  const card = seasonData[slug].gamers.find(
-    (g) => g.name === champion.player.name,
-  );
-  const image = findChampionImage(slug, card?.imagePath);
+  const image = findChampionImage(slug);
 
   return (
     <Link

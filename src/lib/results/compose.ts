@@ -233,8 +233,6 @@ export function composeCareerView(stats: CareerStats): CareerView {
       seasonNumber: row.seasonNumber,
       seasonSlug: row.seasonSlug,
       nickname: gamer.nickname,
-      imagePath: gamer.imagePath,
-      stats: gamer.stats,
     };
   });
 
@@ -268,8 +266,7 @@ export function composeCareerView(stats: CareerStats): CareerView {
     hero: {
       name: stats.name,
       nickname: latest.nickname,
-      imagePath: latest.imagePath,
-      heroImageIsFallback: true, // queries.ts flips this if a hero portrait exists
+      imagePath: null, // queries.ts sets the hero portrait, if any
     },
     ledger: stats.ledger,
     seasons: stats.seasons,
@@ -359,7 +356,7 @@ export function composePairView(
     return {
       ...input.player,
       nickname: gamer.nickname,
-      imagePath: gamer.imagePath,
+      imagePath: null, // queries.ts sets the hero portrait, if any
     };
   };
 

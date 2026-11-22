@@ -1,7 +1,9 @@
-import type { SeasonData } from '@/data/sesong';
+import type { Season, SeasonData } from '@/data/sesong';
+import { gamerCards } from '@/lib/cards';
 import Button from './Button';
 import GameCard from './GameCard';
-import GamerCard from './GamerCard';
+import Card from './card/Card';
+import GamerCards from './card/GamerCards';
 import PowerUpCard from './PowerUpCard';
 import SectionLabel from './SectionLabel';
 
@@ -36,19 +38,20 @@ export default function SeasonLineup({ season, data }: Props) {
 
   return (
     <div className='flex flex-col gap-10'>
-      {gamers.length > 0 &&
+      {(meta.revealGamerCards ? data.cards.length : gamers.length) > 0 &&
         band(
           'lineup-spillere',
           'Spillere',
           <ul className='grid grid-cols-1 justify-items-center gap-10 sm:grid-cols-2'>
-            {gamers.map((gamer, i) => (
+            {gamers.map((gamer) => (
               <li key={gamer.name}>
-                <GamerCard
-                  {...gamer}
-                  revealed={meta.revealGamerCards}
-                  season={season}
-                  number={i + 1}
-                />
+                {meta.revealGamerCards ? (
+                  <GamerCards
+                    cards={gamerCards(season as Season, gamer.name)}
+                  />
+                ) : (
+                  <Card />
+                )}
               </li>
             ))}
           </ul>,

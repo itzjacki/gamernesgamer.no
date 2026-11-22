@@ -22,9 +22,9 @@ src/
                         (protected)/content/ edits the media.
     auth/callback/      OAuth code-exchange. Deliberately outside /admin.
   components/           Shared components and the UI primitives.
-  data/sesong/<NN>/     Static season content: meta.ts, gamers.ts, games.ts,
-                        power-ups.ts, cards.ts (special cards; every gamer
-                        gets a base card without an entry).
+  data/sesong/<NN>/     Static season content: meta.ts, gamers.ts (who
+                        played: name, nickname), games.ts, power-ups.ts,
+                        cards.ts (every card, fully written out).
     index.ts            Season registry + `currentSeason`.
   data/titles.ts        Cross-season title registry (see "Titles and tags").
   lib/
@@ -168,9 +168,15 @@ in derivation or compose.
    (plus `power-ups.ts` if used). `meta.ts` holds the status, the reveal flags
    and the `start`/`end` dates (`YYYY-MM-DD`; equal for a one-day season).
    `status` is set by hand, not derived from the dates, and there is no start
-   time. Each gamer carries a `stats` block for the card. `cards.ts` lists
-   the special cards, at least the champion's MESTER card (with the season
-   points, by hand) once the season is finished.
+   time. `gamers.ts` lists who plays (name, nickname). `cards.ts` holds
+   every card in full: a SPILLER card per gamer (image, stats, and an
+   `overallChange` against their previous card if any), and once the season
+   is finished the champion's MESTER card (with the season points and their
+   title count). Each card says whether it's `overnumbered` (numbered past
+   the set, as MESTER is); the serial's total counts the cards that aren't. Cards read nothing from `gamers.ts`, other seasons or the
+   DB: every printed value is entered, and `cards.test.ts` checks the names
+   and the numbering. A season can be announced with `gamers.ts` alone; it
+   shows sealed backs, or nothing once revealed, until `cards.ts` is filled.
    Each game needs a `titleId` (add a new title to `src/data/titles.ts` if the
    game has not appeared before) and `formatTags`; a game with a rounds stage
    also a `roundScore` (what its raw scores are; the DB can't tell).
@@ -183,4 +189,5 @@ in derivation or compose.
    `public/images/champions/<NN>.png` and hero portraits at
    `public/images/heroes/<slug>.png`, and a landscape season photo at
    `public/images/seasons/<NN>.png` (2:1; jpg and webp work too) for the
-   season index. Pages fall back to card art without them.
+   season index. Without them those spots have no picture: card art is only
+   ever used on cards.

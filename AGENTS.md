@@ -17,7 +17,7 @@ the event. Supabase holds the results; UI copy is Norwegian.
 ## Commands
 
 - `npm run build` — primary correctness check (TypeScript strict + Next compile)
-- `npm run test` — Vitest, pure results layer only (`src/lib/results/__tests__`)
+- `npm run test` — Vitest, pure `src/lib` code only (`src/lib/**/__tests__`)
 - `npm run lint`
 - `npx prettier --write <files>`
 

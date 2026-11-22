@@ -14,8 +14,8 @@ interface Props {
   nickname: string;
   /** A last mono line under the nickname. */
   extra?: React.ReactNode;
-  /** The right-hand cell: the picture, already toned. */
-  picture: React.ReactNode;
+  /** The right-hand cell: the picture, already toned. None, no cell. */
+  picture?: React.ReactNode;
 }
 
 export default function Hero({
@@ -45,9 +45,11 @@ export default function Hero({
         )}
       </div>
 
-      <div className='border-border flex items-end justify-center border-t sm:border-t-0 sm:border-l'>
-        {picture}
-      </div>
+      {picture && (
+        <div className='border-border flex items-end justify-center border-t sm:border-t-0 sm:border-l'>
+          {picture}
+        </div>
+      )}
     </section>
   );
 }

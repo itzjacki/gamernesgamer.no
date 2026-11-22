@@ -23,6 +23,9 @@
   --card-tilt: 0;
   --card-inset: 0px;
   --card-light: 180deg;
+  /* The light's direction, -1..1 per axis, for edges that catch it. */
+  --card-lx: 0;
+  --card-ly: -0.6;
   /* Mostly silver; the hues only tint it. */
   --card-silver: linear-gradient(
     115deg,
@@ -36,6 +39,21 @@
     #a9afb5 82%,
     #8a9096 100%
   );
+
+  /* Foil: the silver ink with a little more contrast, and only faint
+     warm and cool tints. */
+  --card-foil: linear-gradient(
+    115deg,
+    #858c93 0%,
+    #c4c9ce 20%,
+    #eceeef 34%,
+    #b4bac0 48%,
+    #e4e9ea 62%,
+    #f2efea 74%,
+    #a3aab0 88%,
+    #858c93 100%
+  );
+  --card-stamp: var(--card-foil);
 
   position: relative;
   width: 100%;
@@ -57,6 +75,19 @@
 
 .card[data-bleed] {
   --card-inset: 7px;
+}
+
+/* Holo red: saturated reds only, drifting slightly toward coral and rose. */
+.card[data-stock='red'] {
+  --card-stamp: linear-gradient(
+    115deg,
+    #9c1729 0%,
+    #c41e36 25%,
+    #e8334a 45%,
+    #ee4a52 60%,
+    #d6264a 78%,
+    #a8192c 100%
+  );
 }
 
 .card[data-bleed] .front {
@@ -159,6 +190,16 @@
   );
   background-clip: text;
   color: transparent;
+  /* Hot foil is pressed into the stock: a dark lip on the side facing the
+     light, a bright one on the side away. */
+  filter: drop-shadow(
+      calc(var(--card-lx) * 0.5px) calc(var(--card-ly) * 0.5px) 0
+        rgb(0 0 0 / 0.55)
+    )
+    drop-shadow(
+      calc(var(--card-lx) * -0.4px) calc(var(--card-ly) * -0.4px) 0
+        rgb(255 255 255 / 0.2)
+    );
 }
 
 .overallLabel {
@@ -168,6 +209,12 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--color-text);
+}
+
+/* The change since the gamer's previous card. */
+.delta {
+  margin-left: 5px;
+  color: var(--color-text-muted);
 }
 
 /* ---- Data panel ---- */
@@ -200,6 +247,32 @@
   font-weight: 800;
   line-height: 1.1;
   text-transform: uppercase;
+}
+
+/* A foil star per title won so far. */
+.stars {
+  display: inline-flex;
+  gap: 3px;
+  margin-left: 7px;
+  vertical-align: 0.1em;
+}
+
+.star {
+  width: 10px;
+  height: 10px;
+  background: var(--card-silver) var(--card-mx) var(--card-my) / 300% 300%;
+  clip-path: polygon(
+    50% 0%,
+    61% 35%,
+    98% 35%,
+    68% 57%,
+    79% 91%,
+    50% 70%,
+    21% 91%,
+    32% 57%,
+    2% 35%,
+    39% 35%
+  );
 }
 
 .nickname {
@@ -255,13 +328,30 @@
   background: #d9dde1;
 }
 
+/* The foil stamp: silver, or holo red on red stock. A broad gradient that
+   drifts as the card tilts, not stripes. */
 .markFoil {
   width: 11px;
   height: 10px;
-  background: var(--card-silver);
-  background-size: 300% 300%;
+  background: var(--card-stamp);
+  background-size: 180% 180%;
   background-position: var(--card-mx) var(--card-my);
+  filter: brightness(calc(0.95 + 0.2 * var(--card-tilt)));
   mask: url('/images/branding/logo.svg') center / contain no-repeat;
+}
+
+/* Pressed in like the overall's foil. On the wrapper: a filter on the
+   masked mark itself would be masked away. */
+.markBite {
+  display: inline-flex;
+  filter: drop-shadow(
+      calc(var(--card-lx) * 0.35px) calc(var(--card-ly) * 0.35px) 0
+        rgb(0 0 0 / 0.6)
+    )
+    drop-shadow(
+      calc(var(--card-lx) * -0.35px) calc(var(--card-ly) * -0.35px) 0
+        rgb(255 255 255 / 0.2)
+    );
 }
 
 .serial {
@@ -277,6 +367,16 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-text-muted);
+}
+
+/* MESTER's serial is stamped in silver foil; its logo stays red. */
+.card[data-stock='red'] .serialText {
+  background-image: var(--card-foil);
+  background-size: 180% 180%;
+  background-position: var(--card-mx) var(--card-my);
+  background-clip: text;
+  color: transparent;
+  filter: brightness(calc(1.05 + 0.2 * var(--card-tilt)));
 }
 
 /* ---- Front: light ---- */
@@ -300,6 +400,11 @@
   mix-blend-mode: screen;
   opacity: calc(0.12 + 0.26 * var(--card-tilt));
   pointer-events: none;
+}
+
+/* The champion's points, engraved along a gap in the rings. */
+.etchPoints text {
+  font-family: var(--font-mono);
 }
 
 /* The data panel takes a different etch: fine horizontal rules. */
@@ -395,6 +500,16 @@
   pointer-events: none;
 }
 
+/* Red stock is red through, so its cut edge is red. */
+.card[data-stock='red'] .edge {
+  background: linear-gradient(
+    var(--card-light),
+    rgb(255 120 136 / 0.4) 0%,
+    rgb(200 30 52 / 0.14) 45%,
+    rgb(140 20 36 / 0.1) 100%
+  );
+}
+
 .flipButton {
   position: absolute;
   inset: 0;
@@ -402,6 +517,11 @@
   border-radius: 15px;
   background: transparent;
   cursor: pointer;
+}
+
+/* A sealed card's stand-in: it labels the card but can't flip it. */
+span.flipButton {
+  cursor: default;
 }
 
 .flipButton:focus-visible {

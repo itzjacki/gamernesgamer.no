@@ -70,8 +70,8 @@ export default async function Image({ params }: Props) {
 
   const { a, b, finishedAhead } = pair;
   const [srcA, srcB] = await Promise.all([
-    publicImage(a.imagePath),
-    publicImage(b.imagePath),
+    a.imagePath && publicImage(a.imagePath),
+    b.imagePath && publicImage(b.imagePath),
   ]);
   const games = finishedAhead.games;
   const scope = [
@@ -85,35 +85,36 @@ export default async function Image({ params }: Props) {
   // 0 = all the way to a's side; centred when level.
   const needle = decided === 0 ? 0.5 : finishedAhead.b / decided;
 
-  const portrait = (src: string, side: 'a' | 'b') => (
-    <div
-      style={{
-        display: 'flex',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: BOX.width,
-        height: BOX.height,
-        clipPath:
-          side === 'a'
-            ? `polygon(0 0, ${TOP}% 0, ${BOTTOM}% 100%, 0 100%)`
-            : `polygon(${TOP}% 0, 100% 0, 100% 100%, ${BOTTOM}% 100%)`,
-        justifyContent: side === 'a' ? 'flex-start' : 'flex-end',
-      }}
-    >
-      <img
-        src={src}
-        alt=''
-        width={BOX.width * 0.58}
-        height={BOX.height}
+  const portrait = (src: string | null, side: 'a' | 'b') =>
+    src && (
+      <div
         style={{
-          objectFit: 'cover',
-          objectPosition: 'top',
-          filter: 'grayscale(1)',
+          display: 'flex',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: BOX.width,
+          height: BOX.height,
+          clipPath:
+            side === 'a'
+              ? `polygon(0 0, ${TOP}% 0, ${BOTTOM}% 100%, 0 100%)`
+              : `polygon(${TOP}% 0, 100% 0, 100% 100%, ${BOTTOM}% 100%)`,
+          justifyContent: side === 'a' ? 'flex-start' : 'flex-end',
         }}
-      />
-    </div>
-  );
+      >
+        <img
+          src={src}
+          alt=''
+          width={BOX.width * 0.58}
+          height={BOX.height}
+          style={{
+            objectFit: 'cover',
+            objectPosition: 'top',
+            filter: 'grayscale(1)',
+          }}
+        />
+      </div>
+    );
 
   const figure = (value: number) => (
     <div

@@ -13,15 +13,13 @@ export default function PlayerHero({ hero }: Props) {
       nameAs='h1'
       nickname={hero.nickname}
       picture={
-        <img
-          src={hero.imagePath}
-          alt={`Bilde av ${hero.name}`}
-          className={`${PORTRAIT_TONE} ${
-            hero.heroImageIsFallback
-              ? 'm-6 h-56 w-auto object-contain sm:m-10'
-              : 'max-h-80 w-auto object-contain'
-          }`}
-        />
+        hero.imagePath && (
+          <img
+            src={hero.imagePath}
+            alt={`Bilde av ${hero.name}`}
+            className={`${PORTRAIT_TONE} max-h-80 w-auto object-contain`}
+          />
+        )
       }
     />
   );

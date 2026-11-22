@@ -6,13 +6,12 @@ interface Props {
   nickname: string;
   seasonNumber: number;
   totalPoints: number;
-  imagePath: string;
   /**
-   * A cutout fills a square box, bottom-anchored, so champions of different
-   * crops come out at a comparable size; the fallback gamer image sits framed
-   * so a square photo doesn't look broken.
+   * The champion cutout; none, no picture. It fills a square box,
+   * bottom-anchored, so champions of different crops come out at a
+   * comparable size.
    */
-  isCutout: boolean;
+  imagePath: string | null;
 }
 
 export default function ChampionHero({
@@ -21,7 +20,6 @@ export default function ChampionHero({
   seasonNumber,
   totalPoints,
   imagePath,
-  isCutout,
 }: Props) {
   return (
     <Hero
@@ -35,18 +33,16 @@ export default function ChampionHero({
         </>
       }
       picture={
-        <>
-          <ChampionTone />
-          <img
-            src={imagePath}
-            alt={`Bilde av ${name}`}
-            className={`${CHAMPION_TONE} ${
-              isCutout
-                ? 'aspect-square w-full max-w-80 object-contain object-bottom sm:w-80'
-                : 'm-6 h-56 w-auto object-contain sm:m-10'
-            }`}
-          />
-        </>
+        imagePath && (
+          <>
+            <ChampionTone />
+            <img
+              src={imagePath}
+              alt={`Bilde av ${name}`}
+              className={`${CHAMPION_TONE} aspect-square w-full max-w-80 object-contain object-bottom sm:w-80`}
+            />
+          </>
+        )
       }
     />
   );

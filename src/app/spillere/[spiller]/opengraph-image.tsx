@@ -38,7 +38,13 @@ export default async function Image({ params }: Props) {
   return new ImageResponse(
     <OgFrame
       aside={
-        <Picture src={await publicImage(hero.imagePath)} width={440} diagonal />
+        hero.imagePath && (
+          <Picture
+            src={await publicImage(hero.imagePath)}
+            width={440}
+            diagonal
+          />
+        )
       }
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 56 }}>
