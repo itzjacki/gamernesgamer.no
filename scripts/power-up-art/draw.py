@@ -1,7 +1,7 @@
 """Draws the power-up and curse illustrations (243x162 SVG).
 
 The style and the process live in the power-up-art skill
-(.kiro/skills/power-up-art/SKILL.md); this file implements them. One function per slug in ART below; a new power-up
+(.claude/skills/power-up-art/SKILL.md); this file implements them. One function per slug in ART below; a new power-up
 gets a new function. Writes to public/images/power-ups/<slug>.svg.
 
     python scripts/power-up-art/draw.py            # every slug

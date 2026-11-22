@@ -1,85 +1,72 @@
-# PER-GAME POINTS & PLACEMENTS
+# Per-game points and placements
 
-**Secondary reference — the Supabase DB is the source of truth.** These numbers
-are seeded into `supabase/seed.sql` (S1–S4) and live in the database; this file
-is kept for provenance and quick human reading. If they disagree, the DB wins.
-Companion: `game-formats.md` (how each game is structured + DB model). Raw CSVs:
+**Secondary reference — the Supabase DB is the source of truth.** These
+numbers are seeded by `supabase/seed.sql` (S1–S4); this file is kept for
+provenance and as the tests' oracle. If they disagree, the DB wins. Raw CSVs:
 `working-docs/result-spreadsheets/`.
 
-Points = cell from the season overall/poeng sheet. Placement = finishing order,
-decoded against the base ladder with power-ups undone.
+Points = the cell from the season's overall/poeng sheet. Placement = finishing
+order, decoded against the base ladder with power-ups undone.
 
-Base ladder: S1 4/3/2/1 · S2 7/4/2/1 · S3 & S4 8/5/3/1 (1st/2nd/3rd/4th).
+Base ladder (1st/2nd/3rd/4th): S1 4/3/2/1 · S2 7/4/2/1 · S3 and S4 8/5/3/1.
 
-Columns: Jakob / Jørgen / Tobias / William (points, then placement)
+Each cell: points (placement).
 
-## SESONG 1
+## Sesong 1
 
-                       Jakob     Jørgen    Tobias    William
+| Game       | Jakob   | Jørgen  | Tobias  | William |
+| ---------- | ------- | ------- | ------- | ------- |
+| Sjakk      | 2 (3rd) | 4 (1st) | 3 (2nd) | 1 (4th) |
+| OSRS       | 3 (2nd) | 4 (1st) | 2 (3rd) | 1 (4th) |
+| CS:GO      | 2 (3rd) | 1 (4th) | 3 (2nd) | 4 (1st) |
+| Skyrim     | 4 (1st) | 2 (3rd) | 3 (2nd) | 1 (4th) |
+| Tetris     | 1 (4th) | 3 (2nd) | 4 (1st) | 2 (3rd) |
+| Pokemon    | 3 (2nd) | 4 (1st) | 1 (4th) | 2 (3rd) |
+| Trackmania | 3 (2nd) | 1 (4th) | 4 (1st) | 2 (3rd) |
+| Flat Out 2 | 2 (3rd) | 1 (4th) | 4 (1st) | 3 (2nd) |
+| **Total**  | 20      | 20      | 24      | 16      |
+| **Season** | 3rd     | 2nd     | 1st     | 4th     |
 
-Sjakk 2 (3rd) 4 (1st) 3 (2nd) 1 (4th)
-OSRS 3 (2nd) 4 (1st) 2 (3rd) 1 (4th)
-CS:GO 2 (3rd) 1 (4th) 3 (2nd) 4 (1st)
-Skyrim 4 (1st) 2 (3rd) 3 (2nd) 1 (4th)
-Tetris 1 (4th) 3 (2nd) 4 (1st) 2 (3rd)
-Pokemon 3 (2nd) 4 (1st) 1 (4th) 2 (3rd)
-Trackmania 3 (2nd) 1 (4th) 4 (1st) 2 (3rd)
-Flat Out 2 2 (3rd) 1 (4th) 4 (1st) 3 (2nd)
+## Sesong 2
 
----
+| Game              | Jakob   | Jørgen  | Tobias  | William |
+| ----------------- | ------- | ------- | ------- | ------- |
+| Hearthstone       | 3 (4th) | 8 (2nd) | 2 (3rd) | 7 (1st) |
+| Curve Fever       | 1 (4th) | 2 (3rd) | 7 (1st) | 4 (2nd) |
+| The Sims 4        | 7 (1st) | 2 (3rd) | 4 (2nd) | 1 (4th) |
+| Warcraft 3        | 4 (2nd) | 1 (4th) | 3 (3rd) | 7 (1st) |
+| Poker             | 1 (4th) | 7 (1st) | 4 (2nd) | 2 (3rd) |
+| Wreckfest         | 8 (2nd) | 3 (4th) | 7 (1st) | 4 (3rd) |
+| Total War: Empire | 7 (1st) | 2 (3rd) | 8 (2nd) | 3 (4th) |
+| League of Legends | 1 (4th) | 7 (1st) | 4 (2nd) | 2 (3rd) |
+| **Total**         | 32      | 32      | 39      | 30      |
 
-TOTAL 20 20 24 16
-SEASON 3rd 2nd 1st 4th
+## Sesong 3
 
-## SESONG 2
+| Game                | Jakob    | Jørgen  | Tobias   | William  |
+| ------------------- | -------- | ------- | -------- | -------- |
+| World of Warcraft   | 8 (1st)  | 1 (4th) | 3 (3rd)  | 5 (2nd)  |
+| BattleBlock Theater | 5 (2nd)  | 3 (3rd) | 8 (1st)  | 1 (4th)  |
+| Kerbal Space Prog.  | 10 (1st) | 5 (3rd) | 7 (2nd)  | 3 (4th)  |
+| GeoGuessr           | 5 (2nd)  | 8 (1st) | 1 (4th)  | 3 (3rd)  |
+| Jump King           | 5 (2nd)  | 1 (4th) | 8 (1st)  | 3 (3rd)  |
+| Planet Coaster      | 13 (1st) | 5 (2nd) | 3 (3rd)  | 1 (4th)  |
+| War Thunder         | 8 (1st)  | 3 (3rd) | 5 (2nd)  | 1 (4th)  |
+| Hollow Knight       | 5 (2nd)  | 1 (4th) | 13 (1st) | 3 (3rd)  |
+| Pummel Party        | 8 (1st)  | 3 (3rd) | 5 (2nd)  | -1 (4th) |
+| PUBG                | 8 (1st)  | 3 (3rd) | 5 (2nd)  | 1 (4th)  |
+| **Total**           | 75       | 33      | 58       | 20       |
 
-                       Jakob     Jørgen    Tobias    William
+## Sesong 4
 
-Hearthstone 3 (4th) 8 (2nd) 2 (3rd) 7 (1st)
-Curve Fever 1 (4th) 2 (3rd) 7 (1st) 4 (2nd)
-The Sims 4 7 (1st) 2 (3rd) 4 (2nd) 1 (4th)
-Warcraft 3 4 (2nd) 1 (4th) 3 (3rd) 7 (1st)
-Poker 1 (4th) 7 (1st) 4 (2nd) 2 (3rd)
-Wreckfest 8 (2nd) 3 (4th) 7 (1st) 4 (3rd)
-Total War: Empire 7 (1st) 2 (3rd) 8 (2nd) 3 (4th)
-League of Legends 1 (4th) 7 (1st) 4 (2nd) 2 (3rd)
-
----
-
-TOTAL 32 32 39 30
-
-## SESONG 3
-
-                       Jakob     Jørgen    Tobias    William
-
-World of Warcraft 8 (1st) 1 (4th) 3 (3rd) 5 (2nd)
-BattleBlock Theater 5 (2nd) 3 (3rd) 8 (1st) 1 (4th)
-Kerbal Space Prog. 10 (1st) 5 (3rd) 7 (2nd) 3 (4th)
-GeoGuessr 5 (2nd) 8 (1st) 1 (4th) 3 (3rd)
-Jump King 5 (2nd) 1 (4th) 8 (1st) 3 (3rd)
-Planet Coaster 13 (1st) 5 (2nd) 3 (3rd) 1 (4th)
-War Thunder 8 (1st) 3 (3rd) 5 (2nd) 1 (4th)
-Hollow Knight 5 (2nd) 1 (4th) 13 (1st) 3 (3rd)
-Pummel Party 8 (1st) 3 (3rd) 5 (2nd) -1 (4th)
-PUBG 8 (1st) 3 (3rd) 5 (2nd) 1 (4th)
-
----
-
-TOTAL 75 33 58 20
-
-## SESONG 4
-
-                       Jakob     Jørgen    Tobias    William
-
-League of Legends 5 (2nd) 8 (1st) 3 (3rd) 0 (4th)
-PEAK 8 (1st) 5 (2nd) 3 (3rd) 1 (4th)
-Ratz Instagib 5 (2nd) 1 (4th) 8 (1st) 3 (3rd)
-Trombone Champ 5 (2nd) 3 (3rd) 8 (1st) 1 (4th)
-Counter-Strike 2 5 (2nd) 4 (3rd) 8 (1st) 1 (4th)
-Garry's Mod 12 (1st) 3 (3rd) 6 (2nd) 3 (4th)
-FC25 8 (1st) 1 (4th) 3 (3rd) 5 (2nd)
-2XKO 1 (4th) 4 (3rd) 8 (1st) 8 (2nd)
-
----
-
-TOTAL 49 29 47 22
+| Game              | Jakob    | Jørgen  | Tobias  | William |
+| ----------------- | -------- | ------- | ------- | ------- |
+| League of Legends | 5 (2nd)  | 8 (1st) | 3 (3rd) | 0 (4th) |
+| PEAK              | 8 (1st)  | 5 (2nd) | 3 (3rd) | 1 (4th) |
+| Ratz Instagib     | 5 (2nd)  | 1 (4th) | 8 (1st) | 3 (3rd) |
+| Trombone Champ    | 5 (2nd)  | 3 (3rd) | 8 (1st) | 1 (4th) |
+| Counter-Strike 2  | 5 (2nd)  | 4 (3rd) | 8 (1st) | 1 (4th) |
+| Garry's Mod       | 12 (1st) | 3 (3rd) | 6 (2nd) | 3 (4th) |
+| FC25              | 8 (1st)  | 1 (4th) | 3 (3rd) | 5 (2nd) |
+| 2XKO              | 1 (4th)  | 4 (3rd) | 8 (1st) | 8 (2nd) |
+| **Total**         | 49       | 29      | 47      | 22      |
