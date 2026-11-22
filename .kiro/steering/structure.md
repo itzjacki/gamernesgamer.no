@@ -167,8 +167,9 @@ in derivation or compose.
 ## Adding a new season
 
 1. Create `src/data/sesong/<NN>/` with `meta.ts`, `gamers.ts` and `games.ts`
-   (plus `power-ups.ts` if used). `meta.ts` holds the status, the reveal flags
-   and the `start`/`end` dates (`YYYY-MM-DD`; equal for a one-day season).
+   (plus `power-ups.ts` if used). `meta.ts` holds the status, the reveal flags,
+   the `start`/`end` dates (`YYYY-MM-DD`; equal for a one-day season) and,
+   once written, the hand-written `recap`.
    `status` is set by hand, not derived from the dates, and there is no start
    time. `gamers.ts` lists who plays (name, nickname). `cards.ts` holds
    every card in full: a SPILLER card per gamer (image, stats, and an
