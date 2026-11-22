@@ -23,12 +23,19 @@ with its trophy hero, the share (OG) images and the design audit.
 
 ### 1. Cards part 1
 
-The gamer cards are the one place off VERKSTED (rounded corners, saturated
-red shapes, colour photos); the redesign brings them in line.
+Cards as physical TCG cards, exempt from design.md's rules (see its "Gamer
+cards"). Built as one family: a variant is a type code in the serial plus a
+skin (`card-types.ts`), not a new component. Card data is content in code
+(`src/data/sesong/<NN>/cards.ts`), never the DB.
 
-- [ ] **Gamer-card redesign:** the visual centrepiece (chrome highlights
-      tracking the tilt, material surfaces); the current SVG shape limits it.
-- [ ] **Champion card:** a special variant for the season winner.
+- [ ] **Prototype at `/kort`** (public, unlinked, noindex): workshop the
+      look until Jakob calls it (next: tune the MESTER etch), then write
+      the copy (stat labels in full words).
+- [ ] **Swap in:** `Card` replaces `GamerCard` on the season page, the
+      lineup and the career gallery, then `GamerCard` and `Statbar` go. A
+      MESTER card shows as a toggle on the winner's base card.
+- [ ] **Reveal for upcoming seasons:** the new card has no sealed state yet;
+      until it does, keep the old card's sealed face or show the back.
 
 ### 2. Content centre
 
@@ -61,6 +68,19 @@ Visual "tried and dropped" items are in design.md.
 - A shared diagonal-portrait primitive for `PairHero` and `PlayerRoster`,
   until a third use appears.
 - A configurable just-crowned window: marking a season finished is enough.
+
+**Gamer cards**
+
+- LISENS (race-licence card) and PLATE (anodised aluminium): too far from
+  TCG cards.
+- Different backs per variant (TCG cards share one back); graded slabs;
+  thicker stock; age wear; print-ready exports from the start.
+- Card data from the DB; gyroscope tilt.
+- Parallax between layers: a real card is flat, so only light moves on it.
+- Clear (acetate) stock: the base card is black stock.
+- Holo on the back, and gloss patterns on it (rays, rings, guilloche,
+  pinstripe, dots): the back is a matte black with a satin-black logo.
+- A compact card size: one target size only.
 
 **Front page**
 
@@ -148,7 +168,9 @@ Visual "tried and dropped" items are in design.md.
       card art), then revisit the player index's top crop. Not a blocker.
 - [ ] **Cards part 2:** more card styles (moments: MVP, record-breaker, "the
       collapse"), FIFA-style shareable gamer cards, a place to view all
-      cards; maybe a collection, a pack simulator, physical cards.
+      cards; maybe a collection, a pack simulator, physical cards. Sealed
+      cards and the reveal belong with the packs; video portraits later; the
+      champion's points in a hidden spot on the MESTER card (e.g. its etch).
 - [ ] **Engraving scene** for just crowned: the new champion's name engraved
       into the trophy, the winner's special animation.
 - [ ] **Signal lights along the angular lines:** small lights shooting along
@@ -176,3 +198,12 @@ Visual "tried and dropped" items are in design.md.
 - WebSockets: polling is enough.
 - Public user accounts: none, admin only.
 - CMS or multi-editor tooling: the /admin panel is the ceiling.
+
+---
+
+## In case
+
+- **Timestamped moments** in long videos, if cutting separate clips proves
+  too much editing work: a nullable `start_seconds` on a media item, so
+  several items share one video. That would turn the S2 aftermovie into
+  linkable moments.

@@ -1,0 +1,410 @@
+/*
+ * Cards are their own product: design.md's rules are optional here (raw
+ * colours, radius, translucency and blend modes are all allowed).
+ * Geometry is in px on purpose: the card is one fixed object, 300 × 420
+ * (the 63 × 88 mm TCG ratio), with 15px corners and a 7px black border, so
+ * each face's inner area is 286 × 406. A full-art face has no border: its
+ * print (stock, etch, the panel's ink) runs to the edge, and only the
+ * content is inset by `--card-inset`, so it lines up with a bordered card.
+ */
+
+.wrapper {
+  position: relative;
+  width: 300px;
+  height: 420px;
+  /* Vertical drags scroll the page; horizontal ones tilt the card. */
+  touch-action: pan-y;
+}
+
+.card {
+  --card-transform: none;
+  --card-mx: 50%;
+  --card-my: 50%;
+  --card-tilt: 0;
+  --card-inset: 0px;
+  --card-light: 180deg;
+  /* Mostly silver; the hues only tint it. */
+  --card-silver: linear-gradient(
+    115deg,
+    #8a9096 0%,
+    #d7dbdf 18%,
+    #f7f3f4 30%,
+    #e9dfe3 38%,
+    #c3c8cd 48%,
+    #e2eef0 58%,
+    #fbfbfa 68%,
+    #a9afb5 82%,
+    #8a9096 100%
+  );
+
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 15px;
+  transform: var(--card-transform);
+  box-shadow: 0 24px 40px -24px rgb(0 0 0 / 0.9);
+}
+
+.front,
+.back {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border: 7px solid #050506;
+  border-radius: 15px;
+  isolation: isolate;
+}
+
+.card[data-bleed] {
+  --card-inset: 7px;
+}
+
+.card[data-bleed] .front {
+  border-width: 0;
+}
+
+/* Past 90° the card shows its back; mirrored so it reads the right way. */
+.back {
+  transform: scaleX(-1);
+}
+
+.card[data-side='front'] .back,
+.card[data-side='back'] .front {
+  visibility: hidden;
+}
+
+/* ---- Front: stock ---- */
+
+.stock {
+  position: absolute;
+  inset: 0;
+  background-color: #0e0e10;
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.035) 1px, transparent 1px);
+  background-size: 15px 15px;
+  background-position: 7px 7px;
+}
+
+.card[data-stock='red'] .stock {
+  background-color: #8d1424;
+  background-image: radial-gradient(
+    ellipse at 50% 30%,
+    #e8334a 0%,
+    #a8192c 45%,
+    #4a0a13 100%
+  );
+  /* Reset the black stock's grid tiling, or the gradient tiles and shifts. */
+  background-size: auto;
+  background-position: 0 0;
+}
+
+.seasonFigure {
+  position: absolute;
+  top: calc(var(--card-inset) - 48px);
+  right: calc(var(--card-inset) - 18px);
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 230px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(255 255 255 / 0.09);
+  user-select: none;
+}
+
+/* ---- Portrait ---- */
+
+.portrait {
+  position: absolute;
+  top: calc(var(--card-inset) + 8px);
+  right: var(--card-inset);
+  bottom: calc(var(--card-inset) + 168px);
+  left: calc(var(--card-inset) + 50px);
+}
+
+.portraitImage {
+  object-fit: contain;
+  object-position: bottom center;
+}
+
+/* ---- Overall ---- */
+
+.overall {
+  position: absolute;
+  top: calc(var(--card-inset) + 12px);
+  left: calc(var(--card-inset) + 13px);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.overallFigure {
+  margin: 0 0 4px;
+  font-family: var(--font-sans);
+  font-size: 64px;
+  font-weight: 800;
+  line-height: 0.9;
+  color: var(--color-accent);
+}
+
+.card[data-ink='silver'] .overallFigure {
+  background: linear-gradient(
+    calc(var(--card-light) + 90deg),
+    #9aa3ab 0%,
+    #ffffff 45%,
+    #c3c9cf 60%,
+    #7d858d 100%
+  );
+  background-clip: text;
+  color: transparent;
+}
+
+.overallLabel {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text);
+}
+
+/* ---- Data panel ---- */
+
+/* On a full-art face the panel's ink runs to the edge; only its content is
+   inset. */
+.panel {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: calc(168px + var(--card-inset));
+  display: flex;
+  flex-direction: column;
+  padding: 11px calc(13px + var(--card-inset)) calc(8px + var(--card-inset));
+  background: #0b0b0c;
+  border-top: 1px solid var(--color-accent);
+  color: var(--color-text);
+}
+
+.card[data-ink='silver'] .panel {
+  background: #120709;
+  border-top-color: #d9dde1;
+}
+
+.name {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.nickname {
+  margin: 2px 0 0;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--color-text-muted);
+}
+
+.stats {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-content: space-between;
+  column-gap: 16px;
+  margin: 10px 0 0;
+}
+
+.stat {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  row-gap: 3px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  line-height: 1.2;
+}
+
+.stat dt {
+  color: var(--color-text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.stat dd {
+  margin: 0;
+  font-weight: 500;
+}
+
+.gauge {
+  grid-column: 1 / -1;
+  height: 2px;
+  background: #2a2a2d;
+}
+
+.gauge > span {
+  display: block;
+  height: 100%;
+  background: var(--color-accent);
+}
+
+.card[data-ink='silver'] .gauge > span {
+  background: #d9dde1;
+}
+
+.markFoil {
+  width: 11px;
+  height: 10px;
+  background: var(--card-silver);
+  background-size: 300% 300%;
+  background-position: var(--card-mx) var(--card-my);
+  mask: url('/images/branding/logo.svg') center / contain no-repeat;
+}
+
+.serial {
+  position: absolute;
+  right: calc(13px + var(--card-inset));
+  bottom: calc(8px + var(--card-inset));
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* ---- Front: light ---- */
+
+/*
+ * The full-art etch: silver hairlines with only a hint of hue, a little
+ * visible at rest and brightest where the light falls. Screen, not a
+ * dodge: it has to show on dark photos too, and stays a print, not a lamp.
+ */
+.etch {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 300px;
+  height: 420px;
+  mask: radial-gradient(
+    circle at var(--card-mx) var(--card-my),
+    #000 0%,
+    rgb(0 0 0 / 0.3) 65%
+  );
+  mix-blend-mode: screen;
+  opacity: calc(0.12 + 0.26 * var(--card-tilt));
+  pointer-events: none;
+}
+
+/* The data panel takes a different etch: fine horizontal rules. */
+.panelEtch {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: calc(167px + var(--card-inset));
+  background: repeating-linear-gradient(
+    0deg,
+    #f2f0f1 0 1px,
+    transparent 1px 3px
+  );
+  mask: radial-gradient(
+    circle at var(--card-mx) var(--card-my),
+    #000 0%,
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+  opacity: calc(0.04 + 0.12 * var(--card-tilt));
+  pointer-events: none;
+}
+
+.sheen {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--card-mx) var(--card-my),
+    rgb(255 255 255 / 0.3) 0%,
+    rgb(255 255 255 / 0.08) 30%,
+    transparent 60%
+  );
+  mix-blend-mode: overlay;
+  opacity: var(--card-tilt);
+  pointer-events: none;
+}
+
+/* ---- Back: blacks only ---- */
+
+/* Matte coating: a soft black with grain, barely moved by the light. */
+.back {
+  background-color: #070708;
+  background-image:
+    radial-gradient(
+      circle at var(--card-mx) var(--card-my),
+      rgb(255 255 255 / 0.02),
+      transparent 70%
+    ),
+    var(--card-grain);
+  background-size:
+    auto,
+    160px 160px;
+}
+
+/* Satin black, near the border's black: a soft ramp that swings with the
+ * light, no mirror. */
+.backLogo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 176px;
+  height: 164px;
+  translate: -50% -50%;
+  background:
+    radial-gradient(
+      circle at var(--card-mx) var(--card-my),
+      rgb(255 255 255 / 0.035) 0%,
+      transparent 45%
+    ),
+    linear-gradient(var(--card-light), #0f0f11 0%, #030304 50%, #09090a 100%);
+  mask: url('/images/branding/logo.svg') center / contain no-repeat;
+}
+
+/* ---- Edge and interaction ---- */
+
+/* The cut edge catches the light on the side facing it. */
+.edge {
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: 15px;
+  background: linear-gradient(
+    var(--card-light),
+    rgb(255 255 255 / 0.28) 0%,
+    rgb(255 255 255 / 0.05) 45%,
+    rgb(255 255 255 / 0.025) 100%
+  );
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.flipButton {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  border-radius: 15px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.flipButton:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}

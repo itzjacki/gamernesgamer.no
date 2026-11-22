@@ -1,4 +1,5 @@
 import type { Game } from '@/types/game';
+import type { SpecialCard } from '@/types/card';
 import type { Gamer } from '@/types/gamer';
 import type { PowerUp } from '@/types/power-up';
 import type { SeasonMeta } from '@/types/season-meta';
@@ -12,28 +13,37 @@ export type SeasonData = {
   meta: SeasonMeta;
   games: Game[];
   gamers: Gamer[];
+  cards: SpecialCard[];
   powerUps?: PowerUp[];
   curses?: PowerUp[];
 };
 
 export const seasonData = {
-  '01': { meta: s01.meta, games: s01.games, gamers: s01.gamers },
+  '01': {
+    meta: s01.meta,
+    games: s01.games,
+    gamers: s01.gamers,
+    cards: s01.cards,
+  },
   '02': {
     meta: s02.meta,
     games: s02.games,
     gamers: s02.gamers,
+    cards: s02.cards,
     powerUps: s02.powerUps,
   },
   '03': {
     meta: s03.meta,
     games: s03.games,
     gamers: s03.gamers,
+    cards: s03.cards,
     powerUps: s03.powerUps,
   },
   '04': {
     meta: s04.meta,
     games: s04.games,
     gamers: s04.gamers,
+    cards: s04.cards,
     powerUps: s04.powerUps,
     curses: s04.curses,
   },

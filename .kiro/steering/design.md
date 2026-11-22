@@ -124,6 +124,14 @@ inside a stage take `SectionLabel`s, so a stage never reads at the same
 strength as its parts. Blocks only as wide as they need: the standings beside
 the media, a group's table and matches side by side.
 
+## Gamer cards
+
+The cards are their own product, physical trading cards rather than UI:
+every rule in this file is optional for them (radius, shadows, translucency,
+light effects, colours beyond the accent). They only have to work on the
+site, not look integrated. Aim for cool first. They share the site's sheet
+serial grammar (`GG-04 / SPILLER / 03`).
+
 ## Type
 
 Neue Montreal (self-hosted) for display (800), body (400) and emphasis (600:

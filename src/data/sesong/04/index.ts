@@ -2,3 +2,4 @@ export { meta } from './meta';
 export { gamers } from './gamers';
 export { games } from './games';
 export { powerUps, curses } from './power-ups';
+export { cards } from './cards';

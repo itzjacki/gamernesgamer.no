@@ -20,7 +20,8 @@ src/
     auth/callback/      OAuth code-exchange. Deliberately outside /admin.
   components/           Shared components and the UI primitives.
   data/sesong/<NN>/     Static season content: meta.ts, gamers.ts, games.ts,
-                        power-ups.ts.
+                        power-ups.ts, cards.ts (special cards; every gamer
+                        gets a base card without an entry).
     index.ts            Season registry + `currentSeason`.
   data/titles.ts        Cross-season title registry (see "Titles and tags").
   lib/
@@ -142,7 +143,9 @@ in derivation or compose.
    (plus `power-ups.ts` if used). `meta.ts` holds the status, the reveal flags
    and the `start`/`end` dates (`YYYY-MM-DD`; equal for a one-day season).
    `status` is set by hand, not derived from the dates, and there is no start
-   time. Each gamer carries a `stats` block for the card.
+   time. Each gamer carries a `stats` block for the card. `cards.ts` lists
+   the special cards, at least the champion's MESTER card (with the season
+   points, by hand) once the season is finished.
    Each game needs a `titleId` (add a new title to `src/data/titles.ts` if the
    game has not appeared before) and `formatTags`; a game with a rounds stage
    also a `roundScore` (what its raw scores are; the DB can't tell).
