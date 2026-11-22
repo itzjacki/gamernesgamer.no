@@ -16,6 +16,9 @@ import CardGallery from '@/components/CardGallery';
 import TagRecord from '@/components/TagRecord';
 import SectionLabel from '@/components/SectionLabel';
 import PairSummaryList from '@/components/PairSummaryList';
+import MediaSection from '@/components/MediaSection';
+import { getAllMedia } from '@/lib/media/queries';
+import { byKind, forPlayer } from '@/lib/media/select';
 
 interface Props {
   params: Promise<{ spiller: string }>;
@@ -42,6 +45,16 @@ export default async function PlayerCareerPage({ params }: Props) {
   const rank = rankByAveragePlacement((await getRecordsView()).board).find(
     (r) => r.slug === spiller,
   )?.career.rank;
+
+  // The intros first, oldest season first: the player across the years.
+  const playerMedia = forPlayer(await getAllMedia(), spiller);
+  const intros = playerMedia
+    .filter((item) => item.kind === 'player_intro')
+    .sort((a, b) => (a.season ?? 0) - (b.season ?? 0));
+  const media = [
+    ...intros,
+    ...byKind(playerMedia.filter((item) => item.kind !== 'player_intro')),
+  ];
 
   const {
     hero,
@@ -106,6 +119,9 @@ export default async function PlayerCareerPage({ params }: Props) {
       <section id='cards' className='flex flex-col gap-8'>
         <CardGallery cards={cards} playerName={hero.name} label='Samlekort' />
       </section>
+
+      {/* Beside the cards: both are the player's identity per season. */}
+      <MediaSection items={media} />
     </>
   );
 }

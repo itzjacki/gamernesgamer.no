@@ -124,6 +124,28 @@ inside a stage take `SectionLabel`s, so a stage never reads at the same
 strength as its parts. Blocks only as wide as they need: the standings beside
 the media, a group's table and matches side by side.
 
+## Media
+
+- **A media tile** (`MediaTile`) is a bordered plate: the media area on
+  `bg-surface`, then the 48px footer row Dagens content shares (season code,
+  title). Hover or focus turns the border accent, nothing else. Titles and
+  labels sit below the image, never on it: no scrims, badges, durations or
+  YouTube's logo over a thumbnail. The one exception is Dagens content, whose
+  footer row is the link to /content (matching "Dagens rekord"): there the
+  season code and title sit on the image in a solid bordered bar beside the
+  play key.
+- **Thumbnails stay in full colour.** The portrait rule isn't applied: a
+  greyscale thumbnail doesn't invite the click.
+- **Play** is a solid 40px key in the bottom-left corner on the grid (the
+  header's key grammar), its triangle accent on hover. The player loads on
+  click, in place.
+- **Shapes:** landscape tiles are 16:9; vertical items (Shorts, tall images)
+  get their own row of 9:16 tiles; memes are never cropped (`contain`), photos
+  may be. A frame with a fixed size (Dagens) pillarboxes instead of growing.
+- **The image viewer** is the site's one modal: a native `<dialog>` on a solid
+  backdrop with the image and the footer row. No zoom, paging or animation.
+- A page shows a media section only when it has items.
+
 ## Gamer cards
 
 The cards are their own product, physical trading cards rather than UI:

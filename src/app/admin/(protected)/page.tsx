@@ -5,6 +5,7 @@ import { createAuthClient } from '@/lib/supabase/server';
 import { currentSeason } from '@/data/sesong';
 import Panel from '@/components/Panel';
 import Button from '@/components/Button';
+import { StatList, StatRow } from '@/components/StatList';
 import DbOverview from './DbOverview';
 import AdminManagement, { type AdminRow } from './AdminManagement';
 import { type AddableUser } from './AddAdminForm';
@@ -21,15 +22,23 @@ export default async function AdminDashboardPage() {
   const read = createReadClient();
   const auth = await createAuthClient();
 
-  const [seasonsRes, gamesRes, usersRes, claimsRes] = await Promise.all([
-    read.from('season').select('*', { count: 'exact', head: true }),
-    read.from('game').select('*', { count: 'exact', head: true }),
-    auth.rpc('admin_list_users'),
-    auth.auth.getClaims(),
-  ]);
+  const [seasonsRes, gamesRes, mediaRes, videosRes, usersRes, claimsRes] =
+    await Promise.all([
+      read.from('season').select('*', { count: 'exact', head: true }),
+      read.from('game').select('*', { count: 'exact', head: true }),
+      read.from('media_item').select('*', { count: 'exact', head: true }),
+      read
+        .from('media_item')
+        .select('*', { count: 'exact', head: true })
+        .not('youtube_id', 'is', null),
+      auth.rpc('admin_list_users'),
+      auth.auth.getClaims(),
+    ]);
 
   const seasons = seasonsRes.count ?? 0;
   const games = gamesRes.count ?? 0;
+  const mediaTotal = mediaRes.count ?? 0;
+  const videos = videosRes.count ?? 0;
 
   const users = usersRes.data ?? [];
   const signedInUsers = users.length;
@@ -66,6 +75,24 @@ export default async function AdminDashboardPage() {
         signedInUsers={signedInUsers}
         currentSeason={currentSeason}
       />
+
+      <Panel label='Content'>
+        <p className='text-text-muted mt-4 text-sm leading-relaxed'>
+          Videoer og bilder på sesong-, spill- og spillersidene, /content og
+          «Dagens content».
+        </p>
+        <StatList className='mt-6'>
+          <StatRow label='Totalt' value={String(mediaTotal)} />
+          <StatRow label='Videoer' value={String(videos)} />
+          {/* Every item is either a video or an image (a DB check). */}
+          <StatRow label='Bilder' value={String(mediaTotal - videos)} />
+        </StatList>
+        <div className='mt-6'>
+          <Button as='link' href='/admin/content'>
+            Administrer content
+          </Button>
+        </div>
+      </Panel>
 
       {usersError ? (
         <Panel label='Administratorer'>

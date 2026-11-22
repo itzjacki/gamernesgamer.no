@@ -225,6 +225,83 @@ export type Database = {
           },
         ];
       };
+      media_item: {
+        Row: {
+          alt: string | null;
+          created_at: string;
+          game_slug: string | null;
+          id: string;
+          image_file: string | null;
+          kind: Database['public']['Enums']['media_kind'];
+          season_number: number | null;
+          title: string;
+          vertical: boolean;
+          youtube_id: string | null;
+        };
+        Insert: {
+          alt?: string | null;
+          created_at?: string;
+          game_slug?: string | null;
+          id?: string;
+          image_file?: string | null;
+          kind: Database['public']['Enums']['media_kind'];
+          season_number?: number | null;
+          title: string;
+          vertical?: boolean;
+          youtube_id?: string | null;
+        };
+        Update: {
+          alt?: string | null;
+          created_at?: string;
+          game_slug?: string | null;
+          id?: string;
+          image_file?: string | null;
+          kind?: Database['public']['Enums']['media_kind'];
+          season_number?: number | null;
+          title?: string;
+          vertical?: boolean;
+          youtube_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'media_item_season_number_fkey';
+            columns: ['season_number'];
+            isOneToOne: false;
+            referencedRelation: 'season';
+            referencedColumns: ['number'];
+          },
+        ];
+      };
+      media_item_player: {
+        Row: {
+          media_item_id: string;
+          player_slug: string;
+        };
+        Insert: {
+          media_item_id: string;
+          player_slug: string;
+        };
+        Update: {
+          media_item_id?: string;
+          player_slug?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'media_item_player_media_item_id_fkey';
+            columns: ['media_item_id'];
+            isOneToOne: false;
+            referencedRelation: 'media_item';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'media_item_player_player_slug_fkey';
+            columns: ['player_slug'];
+            isOneToOne: false;
+            referencedRelation: 'player';
+            referencedColumns: ['slug'];
+          },
+        ];
+      };
       player: {
         Row: {
           created_at: string;
@@ -587,9 +664,34 @@ export type Database = {
       };
       admin_remove: { Args: { target_user_id: string }; Returns: undefined };
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
+      media_save: {
+        Args: {
+          p_alt?: string;
+          p_game_slug?: string;
+          p_id?: string;
+          p_image_file?: string;
+          p_kind: Database['public']['Enums']['media_kind'];
+          p_player_slugs: string[];
+          p_season_number?: number;
+          p_title: string;
+          p_vertical: boolean;
+          p_youtube_id?: string;
+        };
+        Returns: string;
+      };
     };
     Enums: {
       game_status: 'not-started' | 'in-progress' | 'complete';
+      media_kind:
+        | 'player_intro'
+        | 'welcome'
+        | 'aftermovie'
+        | 'game_intro'
+        | 'ad'
+        | 'documentary'
+        | 'clip'
+        | 'photo'
+        | 'meme';
       season_status: 'not-started' | 'live' | 'complete';
       series_length: 'bo1' | 'bo3' | 'bo5';
       stage_aggregation: 'sum' | 'rank-then-sum';
@@ -735,6 +837,17 @@ export const Constants = {
   public: {
     Enums: {
       game_status: ['not-started', 'in-progress', 'complete'],
+      media_kind: [
+        'player_intro',
+        'welcome',
+        'aftermovie',
+        'game_intro',
+        'ad',
+        'documentary',
+        'clip',
+        'photo',
+        'meme',
+      ],
       season_status: ['not-started', 'live', 'complete'],
       series_length: ['bo1', 'bo3', 'bo5'],
       stage_aggregation: ['sum', 'rank-then-sum'],

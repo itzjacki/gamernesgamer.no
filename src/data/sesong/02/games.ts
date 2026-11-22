@@ -35,8 +35,6 @@ export const games: Game[] = [
       Death knight er bannet.
     </p>
     `,
-    videoEmbedUrl:
-      'https://www.youtube.com/embed/p-JmssuWe08?si=gbioTwQtvy1ygeO7',
   },
   {
     title: 'Curve Fever',
@@ -55,8 +53,6 @@ export const games: Game[] = [
       poeng. Den som har flest poeng etter 30 minutter har vunnet. Det er bare 
       lov til å bruke homing missile og jump som abilites.
     `,
-    videoEmbedUrl:
-      'https://www.youtube.com/embed/8RGefKTBFV4?si=6NonpAVheLjbiQaJ',
   },
   {
     title: 'The Sims 4',
@@ -65,8 +61,6 @@ export const games: Game[] = [
     titleId: 'the-sims-4',
     formatTags: ['gold-rush'],
     thumbnailPath: '/images/game-thumbnails/2/the-sims-4.jpg',
-    videoEmbedUrl:
-      'https://www.youtube.com/embed/TdZfbh7AdCM?si=5KXcv52O3s0yggRO',
     chosenBy: 'Jakob',
     duration: '30 min',
     shortDescription:
@@ -113,8 +107,6 @@ export const games: Game[] = [
         forhånd ved å researche på nettet.
       </p>
     `,
-    videoEmbedUrl:
-      'https://www.youtube.com/embed/jJWT3VvxmLo?si=5GUHwpe7GIgHhTNA',
   },
   {
     title: "Poker - Texas Hold'em",
@@ -135,8 +127,6 @@ export const games: Game[] = [
       det rekkefølgen man ryker ut som gjelder.
       </p>
     `,
-    videoEmbedUrl:
-      'https://www.youtube.com/embed/h7wfklQCyRo?si=_LI-rJ9rSK_Tf7mH',
   },
   {
     title: 'Wreckfest',
@@ -206,8 +196,6 @@ export const games: Game[] = [
         Man får også 1 ekstrapoeng for raskeste rundetid i hvert race. Vinneren
         er den som har flest poeng totalt på slutten av siste race.
     `,
-    videoEmbedUrl:
-      'https://www.youtube.com/embed/V3l56tS_yms?si=g3QNROSZgE9BZr9N',
   },
   {
     title: 'Total War: Empire',
@@ -215,8 +203,6 @@ export const games: Game[] = [
     titleId: 'total-war-empire',
     formatTags: ['duel'],
     thumbnailPath: '/images/game-thumbnails/2/total-war-empire.jpg',
-    videoEmbedUrl:
-      'https://www.youtube.com/embed/WSD3k5_TgH4?si=FQulanI70-yWG3Cd',
     chosenBy: 'Jakob',
     duration: '60 min',
     shortDescription:
@@ -297,7 +283,5 @@ export const games: Game[] = [
       src="/images/game-detail-images/mundo-dodgeball-runes.png"
       alt="Runes til mundo-dodgeball"
     />`,
-    videoEmbedUrl:
-      'https://www.youtube.com/embed/UaC0OBF018I?si=piqCgvapeRlkYN6v',
   },
 ];

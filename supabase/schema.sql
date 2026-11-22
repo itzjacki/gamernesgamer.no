@@ -7,6 +7,9 @@
 -- migration; never hand-edit it.
 -- =============================================================================
 
+
+
+
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -61,6 +64,22 @@ CREATE TYPE "public"."game_status" AS ENUM (
 ALTER TYPE "public"."game_status" OWNER TO "postgres";
 
 
+CREATE TYPE "public"."media_kind" AS ENUM (
+    'player_intro',
+    'welcome',
+    'aftermovie',
+    'game_intro',
+    'ad',
+    'documentary',
+    'clip',
+    'photo',
+    'meme'
+);
+
+
+ALTER TYPE "public"."media_kind" OWNER TO "postgres";
+
+
 CREATE TYPE "public"."season_status" AS ENUM (
     'not-started',
     'live',
@@ -112,6 +131,101 @@ CREATE TYPE "public"."tiebreak_winner" AS ENUM (
 ALTER TYPE "public"."tiebreak_winner" OWNER TO "postgres";
 
 
+CREATE OR REPLACE FUNCTION "public"."admin_add"("target_user_id" "uuid", "target_note" "text" DEFAULT NULL::"text") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+begin
+  if not public.is_admin() then
+    raise exception 'not authorized' using errcode = '42501';
+  end if;
+
+  if not exists (select 1 from auth.users u where u.id = target_user_id) then
+    raise exception 'user does not exist' using errcode = 'P0002';
+  end if;
+
+  insert into public.admin_user (user_id, note)
+  values (target_user_id, target_note)
+  on conflict (user_id) do nothing;
+end;
+$$;
+
+
+ALTER FUNCTION "public"."admin_add"("target_user_id" "uuid", "target_note" "text") OWNER TO "postgres";
+
+
+COMMENT ON FUNCTION "public"."admin_add"("target_user_id" "uuid", "target_note" "text") IS 'Admin-only. Adds an existing auth user to the admin allowlist. Idempotent. Rejects unknown user ids.';
+
+
+
+CREATE OR REPLACE FUNCTION "public"."admin_list_users"() RETURNS TABLE("id" "uuid", "email" "text", "display_name" "text", "is_admin" boolean, "note" "text", "admin_since" timestamp with time zone)
+    LANGUAGE "sql" STABLE SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+  select
+    u.id,
+    u.email::text,
+    coalesce(
+      u.raw_user_meta_data ->> 'full_name',
+      u.raw_user_meta_data ->> 'name',
+      u.email::text
+    ) as display_name,
+    (au.user_id is not null) as is_admin,
+    au.note,
+    au.created_at as admin_since
+  from auth.users u
+  left join public.admin_user au on au.user_id = u.id
+  where public.is_admin()
+  order by (au.user_id is not null) desc, display_name asc;
+$$;
+
+
+ALTER FUNCTION "public"."admin_list_users"() OWNER TO "postgres";
+
+
+COMMENT ON FUNCTION "public"."admin_list_users"() IS 'Admin-only. Lists all signed-in auth users with a resolved display name and admin flag, for the /admin/admins management UI. Returns no rows to non-admins.';
+
+
+
+CREATE OR REPLACE FUNCTION "public"."admin_remove"("target_user_id" "uuid") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO ''
+    AS $$
+declare
+  remaining integer;
+begin
+  if not public.is_admin() then
+    raise exception 'not authorized' using errcode = '42501';
+  end if;
+
+  -- Lock every admin row so concurrent removes serialize here; the second
+  -- caller waits, then re-reads the count below and correctly sees one left.
+  -- (FOR UPDATE can't be combined with an aggregate, so lock in a plain row
+  -- query first, then count.)
+  perform 1 from public.admin_user for update;
+
+  if not exists (select 1 from public.admin_user au where au.user_id = target_user_id) then
+    -- Already not an admin; nothing to do (idempotent).
+    return;
+  end if;
+
+  select count(*) into remaining from public.admin_user;
+  if remaining <= 1 then
+    raise exception 'cannot remove the last admin' using errcode = 'P0001';
+  end if;
+
+  delete from public.admin_user where user_id = target_user_id;
+end;
+$$;
+
+
+ALTER FUNCTION "public"."admin_remove"("target_user_id" "uuid") OWNER TO "postgres";
+
+
+COMMENT ON FUNCTION "public"."admin_remove"("target_user_id" "uuid") IS 'Admin-only. Removes a user from the admin allowlist. Blocks removing the last remaining admin (lockout guard), race-safe via SELECT ... FOR UPDATE on admin_user. Idempotent for non-admins.';
+
+
+
 CREATE OR REPLACE FUNCTION "public"."is_admin"() RETURNS boolean
     LANGUAGE "sql" STABLE
     SET "search_path" TO ''
@@ -128,6 +242,56 @@ ALTER FUNCTION "public"."is_admin"() OWNER TO "postgres";
 
 COMMENT ON FUNCTION "public"."is_admin"() IS 'True if the current authenticated user is in the admin_user allowlist. Used by write policies across the schema.';
 
+
+
+CREATE OR REPLACE FUNCTION "public"."media_save"("p_kind" "public"."media_kind", "p_vertical" boolean, "p_title" "text", "p_player_slugs" "text"[], "p_id" "uuid" DEFAULT NULL::"uuid", "p_youtube_id" "text" DEFAULT NULL::"text", "p_image_file" "text" DEFAULT NULL::"text", "p_alt" "text" DEFAULT NULL::"text", "p_season_number" integer DEFAULT NULL::integer, "p_game_slug" "text" DEFAULT NULL::"text") RETURNS "uuid"
+    LANGUAGE "plpgsql"
+    SET "search_path" TO ''
+    AS $$
+declare
+  v_id uuid;
+begin
+  if p_kind = 'player_intro' and coalesce(cardinality(p_player_slugs), 0) <> 1 then
+    raise exception 'A player intro links exactly one player'
+      using errcode = 'P0001';
+  end if;
+
+  if p_id is null then
+    insert into public.media_item (
+      kind, youtube_id, image_file, vertical, title, alt, season_number, game_slug
+    ) values (
+      p_kind, p_youtube_id, p_image_file, p_vertical, p_title, p_alt, p_season_number, p_game_slug
+    )
+    returning id into v_id;
+  else
+    update public.media_item set
+      kind          = p_kind,
+      youtube_id    = p_youtube_id,
+      image_file    = p_image_file,
+      vertical      = p_vertical,
+      title         = p_title,
+      alt           = p_alt,
+      season_number = p_season_number,
+      game_slug     = p_game_slug
+    where id = p_id
+    returning id into v_id;
+
+    if v_id is null then
+      raise exception 'No media item %', p_id using errcode = 'P0002';
+    end if;
+
+    delete from public.media_item_player where media_item_id = v_id;
+  end if;
+
+  insert into public.media_item_player (media_item_id, player_slug)
+  select v_id, slug from unnest(coalesce(p_player_slugs, '{}')) as slug;
+
+  return v_id;
+end;
+$$;
+
+
+ALTER FUNCTION "public"."media_save"("p_kind" "public"."media_kind", "p_vertical" boolean, "p_title" "text", "p_player_slugs" "text"[], "p_id" "uuid", "p_youtube_id" "text", "p_image_file" "text", "p_alt" "text", "p_season_number" integer, "p_game_slug" "text") OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "public"."set_updated_at"() RETURNS "trigger"
@@ -162,7 +326,7 @@ CREATE TABLE IF NOT EXISTS "public"."admin_user" (
 ALTER TABLE "public"."admin_user" OWNER TO "postgres";
 
 
-COMMENT ON TABLE "public"."admin_user" IS 'Allowlist of admin auth users. Membership grants write access to all tournament tables via RLS. Invite-only: managed by existing admins or the service role (dashboard). No public signup.';
+COMMENT ON TABLE "public"."admin_user" IS 'Allowlist of admin auth users. Membership grants write access to all tournament tables via RLS. Managed from the /admin panel by existing admins (admin_add / admin_remove RPCs) or via the service role (dashboard). No public signup. Adds are limited to users who have already signed in with Google.';
 
 
 
@@ -315,6 +479,44 @@ COMMENT ON COLUMN "public"."match_game"."tiebreak_winner" IS '''a'' or ''b'' —
 
 COMMENT ON COLUMN "public"."match_game"."updated_at" IS 'Not auto-maintained — set explicitly on update. See UPDATED_AT MAINTENANCE.';
 
+
+
+CREATE TABLE IF NOT EXISTS "public"."media_item" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "kind" "public"."media_kind" NOT NULL,
+    "youtube_id" "text",
+    "image_file" "text",
+    "vertical" boolean DEFAULT false NOT NULL,
+    "title" "text" NOT NULL,
+    "alt" "text",
+    "season_number" integer,
+    "game_slug" "text",
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    CONSTRAINT "media_item_game_intro_has_game" CHECK ((("kind" <> 'game_intro'::"public"."media_kind") OR ("game_slug" IS NOT NULL))),
+    CONSTRAINT "media_item_game_needs_season" CHECK ((("game_slug" IS NULL) OR ("season_number" IS NOT NULL))),
+    CONSTRAINT "media_item_image_file_format" CHECK (("image_file" ~ '^[a-z0-9][a-z0-9._-]*\.(png|jpe?g|webp|gif)$'::"text")),
+    CONSTRAINT "media_item_image_kinds" CHECK ((("kind" <> ALL (ARRAY['photo'::"public"."media_kind", 'meme'::"public"."media_kind"])) OR (("image_file" IS NOT NULL) AND ("alt" IS NOT NULL)))),
+    CONSTRAINT "media_item_one_source" CHECK (("num_nonnulls"("youtube_id", "image_file") = 1)),
+    CONSTRAINT "media_item_season_kinds_have_season" CHECK ((("kind" <> ALL (ARRAY['player_intro'::"public"."media_kind", 'welcome'::"public"."media_kind", 'aftermovie'::"public"."media_kind", 'game_intro'::"public"."media_kind"])) OR ("season_number" IS NOT NULL))),
+    CONSTRAINT "media_item_title_present" CHECK (("length"("btrim"("title")) > 0)),
+    CONSTRAINT "media_item_youtube_id_format" CHECK (("youtube_id" ~ '^[A-Za-z0-9_-]{11}$'::"text"))
+);
+
+
+ALTER TABLE "public"."media_item" OWNER TO "postgres";
+
+
+COMMENT ON TABLE "public"."media_item" IS 'A YouTube video or a repo image (public/images/media/), with optional links to a season, game and players. Entered by hand in /admin.';
+
+
+
+CREATE TABLE IF NOT EXISTS "public"."media_item_player" (
+    "media_item_id" "uuid" NOT NULL,
+    "player_slug" "text" NOT NULL
+);
+
+
+ALTER TABLE "public"."media_item_player" OWNER TO "postgres";
 
 
 CREATE TABLE IF NOT EXISTS "public"."player" (
@@ -637,6 +839,16 @@ ALTER TABLE ONLY "public"."match"
 
 
 
+ALTER TABLE ONLY "public"."media_item"
+    ADD CONSTRAINT "media_item_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."media_item_player"
+    ADD CONSTRAINT "media_item_player_pkey" PRIMARY KEY ("media_item_id", "player_slug");
+
+
+
 ALTER TABLE ONLY "public"."player"
     ADD CONSTRAINT "player_pkey" PRIMARY KEY ("id");
 
@@ -752,6 +964,22 @@ CREATE INDEX "match_stage_id_idx" ON "public"."match" USING "btree" ("stage_id")
 
 
 
+CREATE UNIQUE INDEX "media_item_image_file_key" ON "public"."media_item" USING "btree" ("image_file") WHERE ("image_file" IS NOT NULL);
+
+
+
+CREATE INDEX "media_item_player_player_slug_idx" ON "public"."media_item_player" USING "btree" ("player_slug");
+
+
+
+CREATE INDEX "media_item_season_number_idx" ON "public"."media_item" USING "btree" ("season_number");
+
+
+
+CREATE UNIQUE INDEX "media_item_youtube_id_key" ON "public"."media_item" USING "btree" ("youtube_id") WHERE ("youtube_id" IS NOT NULL);
+
+
+
 CREATE INDEX "power_up_season_id_idx" ON "public"."power_up" USING "btree" ("season_id");
 
 
@@ -845,6 +1073,21 @@ ALTER TABLE ONLY "public"."match"
 
 ALTER TABLE ONLY "public"."match"
     ADD CONSTRAINT "match_stage_id_fkey" FOREIGN KEY ("stage_id") REFERENCES "public"."stage"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."media_item_player"
+    ADD CONSTRAINT "media_item_player_media_item_id_fkey" FOREIGN KEY ("media_item_id") REFERENCES "public"."media_item"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."media_item_player"
+    ADD CONSTRAINT "media_item_player_player_slug_fkey" FOREIGN KEY ("player_slug") REFERENCES "public"."player"("slug") ON UPDATE CASCADE DEFERRABLE INITIALLY DEFERRED;
+
+
+
+ALTER TABLE ONLY "public"."media_item"
+    ADD CONSTRAINT "media_item_season_number_fkey" FOREIGN KEY ("season_number") REFERENCES "public"."season"("number") ON UPDATE CASCADE DEFERRABLE INITIALLY DEFERRED;
 
 
 
@@ -974,6 +1217,28 @@ CREATE POLICY "match_select_public" ON "public"."match" FOR SELECT TO "authentic
 
 
 CREATE POLICY "match_write_admin" ON "public"."match" TO "authenticated" USING (( SELECT "public"."is_admin"() AS "is_admin")) WITH CHECK (( SELECT "public"."is_admin"() AS "is_admin"));
+
+
+
+ALTER TABLE "public"."media_item" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."media_item_player" ENABLE ROW LEVEL SECURITY;
+
+
+CREATE POLICY "media_item_player_select_public" ON "public"."media_item_player" FOR SELECT TO "authenticated", "anon" USING (true);
+
+
+
+CREATE POLICY "media_item_player_write_admin" ON "public"."media_item_player" TO "authenticated" USING (( SELECT "public"."is_admin"() AS "is_admin")) WITH CHECK (( SELECT "public"."is_admin"() AS "is_admin"));
+
+
+
+CREATE POLICY "media_item_select_public" ON "public"."media_item" FOR SELECT TO "authenticated", "anon" USING (true);
+
+
+
+CREATE POLICY "media_item_write_admin" ON "public"."media_item" TO "authenticated" USING (( SELECT "public"."is_admin"() AS "is_admin")) WITH CHECK (( SELECT "public"."is_admin"() AS "is_admin"));
 
 
 
@@ -1250,9 +1515,33 @@ GRANT USAGE ON SCHEMA "public" TO "service_role";
 
 
 
+REVOKE ALL ON FUNCTION "public"."admin_add"("target_user_id" "uuid", "target_note" "text") FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."admin_add"("target_user_id" "uuid", "target_note" "text") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."admin_add"("target_user_id" "uuid", "target_note" "text") TO "service_role";
+
+
+
+REVOKE ALL ON FUNCTION "public"."admin_list_users"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."admin_list_users"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."admin_list_users"() TO "service_role";
+
+
+
+REVOKE ALL ON FUNCTION "public"."admin_remove"("target_user_id" "uuid") FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."admin_remove"("target_user_id" "uuid") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."admin_remove"("target_user_id" "uuid") TO "service_role";
+
+
+
 REVOKE ALL ON FUNCTION "public"."is_admin"() FROM PUBLIC;
 GRANT ALL ON FUNCTION "public"."is_admin"() TO "authenticated";
 GRANT ALL ON FUNCTION "public"."is_admin"() TO "service_role";
+
+
+
+REVOKE ALL ON FUNCTION "public"."media_save"("p_kind" "public"."media_kind", "p_vertical" boolean, "p_title" "text", "p_player_slugs" "text"[], "p_id" "uuid", "p_youtube_id" "text", "p_image_file" "text", "p_alt" "text", "p_season_number" integer, "p_game_slug" "text") FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."media_save"("p_kind" "public"."media_kind", "p_vertical" boolean, "p_title" "text", "p_player_slugs" "text"[], "p_id" "uuid", "p_youtube_id" "text", "p_image_file" "text", "p_alt" "text", "p_season_number" integer, "p_game_slug" "text") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."media_save"("p_kind" "public"."media_kind", "p_vertical" boolean, "p_title" "text", "p_player_slugs" "text"[], "p_id" "uuid", "p_youtube_id" "text", "p_image_file" "text", "p_alt" "text", "p_season_number" integer, "p_game_slug" "text") TO "service_role";
 
 
 
@@ -1304,6 +1593,18 @@ GRANT ALL ON TABLE "public"."match" TO "service_role";
 GRANT ALL ON TABLE "public"."match_game" TO "anon";
 GRANT ALL ON TABLE "public"."match_game" TO "authenticated";
 GRANT ALL ON TABLE "public"."match_game" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."media_item" TO "anon";
+GRANT ALL ON TABLE "public"."media_item" TO "authenticated";
+GRANT ALL ON TABLE "public"."media_item" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."media_item_player" TO "anon";
+GRANT ALL ON TABLE "public"."media_item_player" TO "authenticated";
+GRANT ALL ON TABLE "public"."media_item_player" TO "service_role";
 
 
 

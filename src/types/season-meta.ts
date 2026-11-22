@@ -13,7 +13,6 @@ export interface SeasonMeta {
   start: IsoDate;
   /** Same as `start` for a one-day season. */
   end: IsoDate;
-  videoEmbedUrl?: string;
   /** Only read while `upcoming`; `live` and `finished` show everything. */
   revealGamerCards: boolean;
   revealGames: boolean;

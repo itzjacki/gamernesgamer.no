@@ -32,8 +32,11 @@ the docs are updated (see Rules).
   (`src/app/admin/**`), where you write real Norwegian directly, and invisible
   a11y text.
 - **Data split:** static content (gamers, games, power-ups) lives in
-  `src/data/sesong/<NN>/`, never in the DB. Results live in Supabase only; the DB
-  is the source of truth and `working-docs/` is secondary reference.
+  `src/data/sesong/<NN>/`, never in the DB. Results and the media mapping
+  (which YouTube video or repo image belongs to which season, game or player)
+  live in Supabase only; the DB is the source of truth and `working-docs/` is
+  secondary reference. Media files themselves never go in the DB: videos are
+  on YouTube, images in `public/images/media/`.
 - **Admin routes** (`src/app/admin/`) check the Supabase session server-side.
   Never gate auth client-side.
 - **Database:** schema changes go through migrations. Read

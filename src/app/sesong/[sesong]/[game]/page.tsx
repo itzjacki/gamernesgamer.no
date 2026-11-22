@@ -11,7 +11,10 @@ import RoundRobinStage from '@/components/RoundRobinStage';
 import Bracket from '@/components/Bracket';
 import RoundsTable from '@/components/RoundsTable';
 import PowerUpUseList from '@/components/PowerUpUseList';
-import VideoEmbed from '@/components/VideoEmbed';
+import MediaTile from '@/components/MediaTile';
+import MediaSection from '@/components/MediaSection';
+import { getAllMedia } from '@/lib/media/queries';
+import { byKind, forGame } from '@/lib/media/select';
 
 interface Props {
   params: Promise<{ sesong: string; game: string }>;
@@ -72,8 +75,19 @@ export default async function GamePage({ params }: Props) {
   const notes = results.map((r) => r.note).filter((n) => n !== null);
   const hasPowerUps = results.some((r) => r.powerUpUses.length > 0);
 
-  const media = game.videoEmbedUrl ? (
-    <VideoEmbed src={game.videoEmbedUrl} title={`${game.title} – video`} />
+  const gameMedia = byKind(
+    forGame(await getAllMedia(), Number(sesong), gameSlug),
+  );
+  const intro = gameMedia.find((item) => item.kind === 'game_intro');
+  const otherMedia = gameMedia.filter((item) => item !== intro);
+
+  // The game's own screenshot is the intro's poster: calmer than YouTube's.
+  const media = intro ? (
+    <MediaTile
+      item={intro}
+      poster={game.thumbnailPath}
+      sizes='(min-width: 880px) 480px, 100vw'
+    />
   ) : (
     <img
       className='w-full'
@@ -149,6 +163,8 @@ export default async function GamePage({ params }: Props) {
           </em>
         )}
       </section>
+
+      <MediaSection items={otherMedia} />
 
       {stages.length > 0 && (
         <section className='flex flex-col gap-6'>

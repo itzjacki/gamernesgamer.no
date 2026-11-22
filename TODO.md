@@ -15,7 +15,8 @@ produces artifacts that feed into it.
 Phases 1–3 (Next.js rewrite, VERKSTED rebrand, Supabase + auth + admin,
 S1–S4 seeded on prod). Phase 4 so far: season, game and career pages, the
 indexes, titles and tags, /records, /vs, the site header, the front page
-with its trophy hero, the share (OG) images and the design audit.
+with its trophy hero, the share (OG) images, the design audit and the content
+centre (shipping steps below).
 
 ---
 
@@ -39,11 +40,19 @@ skin (`card-types.ts`), not a new component. Card data is content in code
 
 ### 2. Content centre
 
-Needs exploration and direction. A home for the videos, pictures and memes
-there are; it may live on the season, game and player pages rather than as
-its own page. The volume decides whether it is a data file or needs an asset
-pipeline. Covers media on game and season pages, and the front page's content
-of the day (what it rotates; a placeholder until then).
+Built: media in the DB, edited at `/admin/content`; shown on the season, game,
+career and /vs pages, `/content` and "Dagens content".
+
+- [ ] **Deploy:** the migration and the day-one media are on prod; the code
+      isn't yet.
+- [ ] **Navigation:** `/content` has no header key; only Dagens links to it.
+- [ ] **Check on a preview deploy:** after a media save, hero and champion art
+      still resolve. `existsSync(public/…)` in `queries.ts`,
+      `ChampionSideBlock` and the season page ran only at build time before
+      on-demand revalidation. If it falls back, move those lookups onto a
+      build-time manifest like `scripts/media-manifest.mjs`.
+- [ ] The 8 S2 game intros sit on personal channels: re-upload them to the
+      GG channel so they can't disappear.
 
 ### 3. Season page upgrade
 
@@ -134,6 +143,18 @@ Visual "tried and dropped" items are in design.md.
 - A plate per category crown (mostly the same two names).
 - Points-tie win rate counts season ties only, not game-level tiebreaks.
 
+**Content centre**
+
+- File uploads, an asset pipeline, or a visual image picker: images ship in
+  the repo and /admin lists them.
+- Drafts, a `published` flag or reveal gating: intros are added after the
+  tournament.
+- Weighting Dagens content by kind: mostly intros is honest.
+- Greyscale media thumbnails (uninviting to click); durations on tiles;
+  `maxresdefault` thumbnails (not guaranteed to exist).
+- An `other` kind (a new kind is a migration); per-item pages (`/content#m-<id>`
+  is the item's address).
+
 **/vs**
 
 - A "who won when the two took first and second" row.
@@ -149,10 +170,13 @@ Visual "tried and dropped" items are in design.md.
 - [ ] Live leaderboard on the season page (polling, no WebSockets).
 - [ ] **Results entry form** (scores per player per game): needs an
       architect + UX pass against the real live-entry workflow (H2H matches
-      and round scores differ). Every page is static, so its actions must
-      `revalidatePath` each page the data shows on: `/`, season and game
-      pages, career pages, `/records`, `/vs`, and each one's
-      `opengraph-image` (prerendered too).
+      and round scores differ). Every page is static, so its actions call
+      `revalidateSite()` (`src/lib/revalidate.ts`).
+- [ ] **The seed vs. admin-entered data:** `seed.sql` deletes and
+      re-inserts seasons 1–4, so it can't own prod once results are entered
+      in /admin. It also no longer re-runs over itself: deleting a season
+      trips `match_player_a_fkey` (RESTRICT). Decide how a new season is
+      seeded before Phase 5.
 - [ ] Review/edit submitted results; flip `confirmed` to publish.
 - [ ] Real-time score entry in the admin panel during the tournament.
 - [ ] **What's at stake:** beside the live leaderboard, the streaks and

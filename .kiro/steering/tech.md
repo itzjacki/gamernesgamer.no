@@ -24,8 +24,8 @@ Env vars: `NEXT_PUBLIC_DB_SUPABASE_URL` and
 integration's prefix, so the same names are used in prod and in `.env.local`
 (which points at the local stack).
 
-Public pages read results only through `src/lib/results/queries` — Server
-Components only. Queries filter `confirmed = true` as defense-in-depth on top of
+Public pages read results only through `src/lib/results/queries`, and media
+only through `src/lib/media/queries` — Server Components only. Queries filter `confirmed = true` as defense-in-depth on top of
 RLS.
 
 ## Testing
@@ -33,8 +33,10 @@ RLS.
 Vitest covers only the pure results layer (`derive/**` and `compose.ts`) via
 `src/lib/results/__tests__/` — silent arithmetic the build can't catch. Seasons 1
 and 2 are the verified oracle. The IO layer (`fetch.ts`, `queries.ts`) and the
-Supabase clients are not unit-tested; `next build` is their gate. Keep tests free
-of any DB or browser dependency.
+Supabase clients are not unit-tested; `next build` is their gate. The one
+exception outside results is `parseYoutubeId` (`src/lib/media/__tests__/`):
+many link forms, and a regression would be silent. The rest of the media layer
+is untested on purpose. Keep tests free of any DB or browser dependency.
 
 ## Database workflow
 
@@ -43,9 +45,16 @@ of any DB or browser dependency.
 - **The local stack** (`supabase start`, Docker) is dev, test and staging. Verify
   a migration with `supabase db reset` (replays migrations + `seed.sql`).
 - **`supabase db push` is the only apply path to prod**, for schema and data.
-  - Seed data: `supabase db push --linked --include-seed`. `seed.sql` is
-    idempotent (deletes the seasons it owns, then re-inserts) and is kept out of
-    migrations so a plain push never re-runs it.
+  - Seed data: `supabase db push --linked --include-seed`. `seed.sql` deletes
+    the seasons it owns, then re-inserts them, and is kept out of migrations so
+    a plain push never re-runs it. It currently fails when re-run over its own
+    data (see TODO.md, Phase 5).
+  - `seed-media.sql` (day-one media) only inserts videos that are missing and
+    never deletes: media is owned by /admin. Re-running it restores an item
+    deleted there.
+  - **Media links use natural keys** (`season.number`, `player.slug`) with
+    deferred FKs, because the seed re-inserts seasons and players with new
+    uuids. Never link hand-entered data to a seed-written uuid.
   - **Never apply file-backed schema via MCP `apply_migration`** — it stamps a
     different version and drifts history. MCP `execute_sql` is fine for read-only
     inspection.
@@ -55,13 +64,15 @@ of any DB or browser dependency.
   - regenerate `supabase/schema.sql` (`supabase db dump --local`, keep the
     "DO NOT EDIT" header) and `database.types.ts`
     (`supabase gen types typescript --local`);
-  - run advisors (`get_advisors`) and fix the findings;
+  - run advisors (`get_advisors`, or `supabase db advisors --local`) and fix
+    the findings;
   - pin `search_path = ''` on every function.
 - **Accepted advisor exception:** lint 0029 fires for `admin_add`,
   `admin_list_users` and `admin_remove`. They must be SECURITY DEFINER and
   callable by `authenticated`, and each checks `is_admin()` first. Re-dismiss the
   finding in Studio if it reappears; do not switch them to INVOKER or revoke
-  EXECUTE.
+  EXECUTE. Lint 0006 (multiple permissive policies) fires on every table: it is
+  the public-read + admin-write policy pair, accepted.
 
 ### What may be pushed to prod without asking
 

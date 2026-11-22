@@ -6,6 +6,9 @@ import { seasonData, isSeason } from '@/data/sesong';
 import { formatSeasonDates } from '@/lib/season-dates';
 import type { PowerUp } from '@/types/power-up';
 import { getSeasonView } from '@/lib/results/queries';
+import { getAllMedia } from '@/lib/media/queries';
+import { byKind, forSeason } from '@/lib/media/select';
+import type { MediaItemView } from '@/lib/media/view-models';
 import { composeSeasonView } from '@/lib/results/compose';
 import type { ComposedSeasonView } from '@/lib/results/compose';
 import type { SeasonView } from '@/lib/results/view-models';
@@ -14,7 +17,7 @@ import GameCard from '@/components/GameCard';
 import PowerUpCard from '@/components/PowerUpCard';
 import Heading from '@/components/Heading';
 import SectionLabel from '@/components/SectionLabel';
-import VideoEmbed from '@/components/VideoEmbed';
+import MediaSection from '@/components/MediaSection';
 import ChampionHero from '@/components/ChampionHero';
 import StandingsTable from '@/components/StandingsTable';
 import SeasonPointsChart from '@/components/SeasonPointsChart';
@@ -52,6 +55,7 @@ export default async function SeasonPage({ params }: Props) {
   const season = seasonData[sesong];
   const { meta } = season;
   const seasonNumber = Number(sesong);
+  const media = byKind(forSeason(await getAllMedia(), seasonNumber));
 
   // Live renders like finished for now.
   if (meta.status === 'finished' || meta.status === 'live') {
@@ -69,14 +73,16 @@ export default async function SeasonPage({ params }: Props) {
           matrix={matrix}
           powerUps={'powerUps' in season ? season.powerUps : undefined}
           curses={'curses' in season ? season.curses : undefined}
-          videoEmbedUrl={meta.videoEmbedUrl}
+          media={media}
           dates={formatSeasonDates(meta)}
         />
       );
     }
   }
 
-  return <UpcomingSeason sesong={sesong} seasonNumber={seasonNumber} />;
+  return (
+    <UpcomingSeason sesong={sesong} seasonNumber={seasonNumber} media={media} />
+  );
 }
 
 function toChartSeries(view: Awaited<ReturnType<typeof getSeasonView>>) {
@@ -161,7 +167,7 @@ interface FinishedProps {
   matrix: { players: MatrixPlayer[]; games: MatrixGameRow[] };
   powerUps?: PowerUp[];
   curses?: PowerUp[];
-  videoEmbedUrl?: string;
+  media: MediaItemView[];
   /** Formatted, for the catalogue line. */
   dates: string;
 }
@@ -174,7 +180,7 @@ function FinishedSeason({
   matrix,
   powerUps,
   curses,
-  videoEmbedUrl,
+  media,
   dates,
 }: FinishedProps) {
   const champion = composed.standings.find((s) => s.isChampion);
@@ -323,16 +329,7 @@ function FinishedSeason({
         </section>
       )}
 
-      {videoEmbedUrl && (
-        <section className='flex flex-col gap-8'>
-          <div className='w-full max-w-2xl'>
-            <VideoEmbed
-              src={videoEmbedUrl}
-              title={`Gamernes Gamer sesong ${seasonNumber}`}
-            />
-          </div>
-        </section>
-      )}
+      <MediaSection items={media} />
     </>
   );
 }
@@ -340,9 +337,11 @@ function FinishedSeason({
 function UpcomingSeason({
   sesong,
   seasonNumber,
+  media,
 }: {
   sesong: string;
   seasonNumber: number;
+  media: MediaItemView[];
 }) {
   const season = seasonData[sesong as keyof typeof seasonData];
   const { meta, gamers, games } = season;
@@ -358,16 +357,10 @@ function UpcomingSeason({
         >
           Sesong {seasonNumber}
         </Heading>
-
-        {meta.videoEmbedUrl && (
-          <div className='mt-8 w-full max-w-2xl'>
-            <VideoEmbed
-              src={meta.videoEmbedUrl}
-              title={`Gamernes Gamer sesong ${seasonNumber}`}
-            />
-          </div>
-        )}
       </section>
+
+      {/* Before the event the welcome video does the hype job, so it leads. */}
+      <MediaSection items={media} />
 
       <section id='participants' className='flex flex-col gap-6'>
         <SectionLabel as='h2'>Spillere</SectionLabel>
