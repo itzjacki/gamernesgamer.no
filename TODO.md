@@ -26,14 +26,12 @@ page, the lineup, the career gallery and `/kort`.
 
 ### 1. Season page upgrade
 
-More per-season views, stats and content; scoped when we start.
+Built: the power-up effect (points with and without) and the season's beaten
+records, under the results; a recap slot above them.
 
-- [ ] **Season recap:** an editorial title and short recap per season, if the
-      writing is realistic.
-- [ ] **Superlatives:** the season's standout moments (highest score, most
-      dominant game win, power-up impact from each `powerUpUse`). All-time
-      bests stay on /records; don't repeat its plates. When a season's
-      moment is also the all-time record, say so and link to /records.
+- [ ] **Copy:** the new section labels and column heads (`TODO(copy)`).
+- [ ] **Recaps (Jakob):** an editorial title and paragraphs per season, in
+      its `meta.ts` (`recap`). Nothing shows until one is written.
 
 ### 2. Navigation
 
@@ -99,6 +97,10 @@ Visual "tried and dropped" items are in design.md.
 **Season page**
 
 - Superscript power-up deltas in the matrix (totals looked inflated).
+- Season moments beyond power-ups and records: the biggest single-game haul,
+  the most dominant win, lead changes in the race, the biggest comeback.
+- In the power-up effect: the biggest single swing (filler) and a verdict line
+  on who'd have had the most without power-ups (the table already says it).
 
 **Game page**
 

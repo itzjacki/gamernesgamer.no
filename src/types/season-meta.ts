@@ -17,4 +17,11 @@ export interface SeasonMeta {
   revealGamerCards: boolean;
   revealGames: boolean;
   revealPowerups: boolean;
+  /** Hand-written; the season page shows it under the results once set. */
+  recap?: SeasonRecap;
+}
+
+export interface SeasonRecap {
+  title: string;
+  paragraphs: string[];
 }

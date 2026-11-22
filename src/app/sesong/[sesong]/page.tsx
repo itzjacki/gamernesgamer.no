@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
@@ -6,6 +7,7 @@ import { seasonData, isSeason, type Season } from '@/data/sesong';
 import { gamerCards } from '@/lib/cards';
 import { formatSeasonDates } from '@/lib/season-dates';
 import type { PowerUp } from '@/types/power-up';
+import type { SeasonRecap } from '@/types/season-meta';
 import { getSeasonView } from '@/lib/results/queries';
 import { getAllMedia } from '@/lib/media/queries';
 import { byKind, forSeason } from '@/lib/media/select';
@@ -13,6 +15,10 @@ import type { MediaItemView } from '@/lib/media/view-models';
 import { composeSeasonView } from '@/lib/results/compose';
 import type { ComposedSeasonView } from '@/lib/results/compose';
 import type { SeasonView } from '@/lib/results/view-models';
+import {
+  derivePowerUpImpact,
+  type PowerUpImpactRow,
+} from '@/lib/results/power-up-impact';
 import Card from '@/components/card/Card';
 import GamerCards from '@/components/card/GamerCards';
 import GameCard from '@/components/GameCard';
@@ -25,6 +31,8 @@ import StandingsTable from '@/components/StandingsTable';
 import SeasonPointsChart from '@/components/SeasonPointsChart';
 import type { ChartSeries } from '@/components/SeasonPointsChart';
 import GamePointsMatrix from '@/components/GamePointsMatrix';
+import PowerUpImpact from '@/components/PowerUpImpact';
+import SeasonChanges from '@/components/SeasonChanges';
 import type {
   MatrixPlayer,
   MatrixGameRow,
@@ -73,6 +81,8 @@ export default async function SeasonPage({ params }: Props) {
           series={toChartSeries(view)}
           gameLabels={gameLabels(composed)}
           matrix={matrix}
+          impact={derivePowerUpImpact(composed)}
+          recap={meta.recap}
           powerUps={'powerUps' in season ? season.powerUps : undefined}
           curses={'curses' in season ? season.curses : undefined}
           media={media}
@@ -161,6 +171,9 @@ interface FinishedProps {
   series: ChartSeries[];
   gameLabels: Record<number, string>;
   matrix: { players: MatrixPlayer[]; games: MatrixGameRow[] };
+  /** Null without power-up uses (S1). */
+  impact: PowerUpImpactRow[] | null;
+  recap?: SeasonRecap;
   powerUps?: PowerUp[];
   curses?: PowerUp[];
   media: MediaItemView[];
@@ -174,6 +187,8 @@ function FinishedSeason({
   series,
   gameLabels,
   matrix,
+  impact,
+  recap,
   powerUps,
   curses,
   media,
@@ -231,6 +246,28 @@ function FinishedSeason({
           </section>
         )}
       </div>
+
+      {recap && (
+        <section id='oppsummering' className='flex flex-col gap-6'>
+          <SectionLabel as='h2'>Oppsummering</SectionLabel>
+          <div className='flex max-w-prose flex-col gap-4'>
+            <h3 className='text-text text-2xl font-extrabold tracking-tight'>
+              {recap.title}
+            </h3>
+            {recap.paragraphs.map((paragraph, i) => (
+              <p key={i} className='text-text'>
+                {paragraph}
+              </p>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {impact && <PowerUpImpact rows={impact} />}
+
+      <Suspense>
+        <SeasonChanges seasonNumber={seasonNumber} />
+      </Suspense>
 
       {seasonData[composed.seasonSlug as Season].cards.length > 0 && (
         <section id='participants' className='flex flex-col gap-6'>

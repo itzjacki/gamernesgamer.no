@@ -808,7 +808,7 @@ export interface RecordsDiff {
   crowns: CrownChange[];
 }
 
-/** The latest finished season's diff. */
+/** One finished season's diff. */
 export interface SeasonChanges extends RecordsDiff {
   season: RecordSeason;
 }

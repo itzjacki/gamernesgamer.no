@@ -6,7 +6,8 @@ import type { HolderChangeKind, RecordEntry } from '@/lib/results/view-models';
 import { MIN_RANKED_GAMES } from '@/lib/tag-ranking';
 
 /**
- * The records the latest finished season beat or improved. Only `taken` and
+ * The records a finished season beat or improved: the latest by default (the
+ * front page), or `seasonNumber`'s (its season page). Only `taken` and
  * `improved` are shown to keep the list short; `diffRecords` reports more.
  * Calm on purpose, since the just-crowned hero carries the red: accent only
  * on a beaten record's kind tag.
@@ -92,8 +93,15 @@ function Side({
   );
 }
 
-export default async function SeasonChanges() {
-  const changes = await getSeasonChanges({ minCrownGames: MIN_RANKED_GAMES });
+export default async function SeasonChanges({
+  seasonNumber,
+}: {
+  seasonNumber?: number;
+}) {
+  const changes = await getSeasonChanges({
+    minCrownGames: MIN_RANKED_GAMES,
+    seasonNumber,
+  });
   if (!changes) return null;
 
   const { season } = changes;

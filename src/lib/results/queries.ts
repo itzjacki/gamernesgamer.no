@@ -115,16 +115,18 @@ export async function getArchiveTotals(): Promise<ArchiveTotals> {
 }
 
 /**
- * What the latest finished season (by `meta.status`) changed in the all-time
- * records: the records up to the season before it, diffed against those up to
- * it. `minCrownGames` is passed in so the ranking minimum stays on the
- * consuming side. Null when no season is finished or there is nothing earlier
- * to compare against.
+ * What one finished season (by `meta.status`; default the latest) changed in
+ * the all-time records: the records up to the season before it, diffed
+ * against those up to it. `minCrownGames` is passed in so the ranking minimum
+ * stays on the consuming side. Null when that season isn't finished with
+ * results, or there is nothing earlier to compare against.
  */
 export async function getSeasonChanges({
   minCrownGames,
+  seasonNumber,
 }: {
   minCrownGames: number;
+  seasonNumber?: number;
 }): Promise<SeasonChanges | null> {
   const bundles = await fetchAllSeasonBundles();
   const finished = Object.entries(seasonData)
@@ -133,7 +135,8 @@ export async function getSeasonChanges({
     .filter((n) => bundles.some((b) => b.season.number === n));
   if (finished.length === 0) return null;
 
-  const latest = Math.max(...finished);
+  const latest = seasonNumber ?? Math.max(...finished);
+  if (!finished.includes(latest)) return null;
   const upTo = (last: number) =>
     composeRecordsView(
       assembleAllCareers(bundles.filter((b) => b.season.number <= last)),
