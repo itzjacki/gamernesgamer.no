@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getMediaOfTheDay } from '@/lib/media/queries';
 import { MediaArea } from './MediaTile';
 import SectionLabel from './SectionLabel';
+import { MUTED_THUMB_TONE } from './portrait-tone';
 
 /**
  * One media item per Norwegian calendar day, over every item, the same for
@@ -27,7 +28,9 @@ export default async function ContentOfTheDay() {
       <div className='border-border bg-bg grid grid-rows-[1fr_auto] border sm:min-h-80'>
         {item ? (
           <>
-            <div className='bg-surface relative min-h-60 overflow-hidden sm:min-h-0'>
+            <div
+              className={`bg-surface relative min-h-60 overflow-hidden sm:min-h-0 ${MUTED_THUMB_TONE}`}
+            >
               <MediaArea
                 item={item}
                 sizes='(min-width: 640px) 400px, 100vw'

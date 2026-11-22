@@ -15,40 +15,16 @@ produces artifacts that feed into it.
 Phases 1–3 (Next.js rewrite, VERKSTED rebrand, Supabase + auth + admin,
 S1–S4 seeded on prod). Phase 4 so far: season, game and career pages, the
 indexes, titles and tags, /records, /vs, the site header, the front page
-with its trophy hero, the share (OG) images, the design audit and the content
-centre (shipping steps below).
+with its trophy hero, the share (OG) images, the design audit, the content
+centre (media in the DB, edited at `/admin/content`) and cards part 1:
+physical TCG-style cards from each season's `cards.ts`, live on the season
+page, the lineup, the career gallery and `/kort`.
 
 ---
 
 ## Phase 4 — Historical content & stats 🚧
 
-### 1. Cards part 1
-
-Cards as physical TCG cards, exempt from design.md's rules (see its "Gamer
-cards"). Built as one family: a variant is a type code in the serial plus a
-skin (`card-types.ts`), not a new component. Card data is content in code
-(`src/data/sesong/<NN>/cards.ts`), never the DB.
-
-Live on the season page, the lineup and the career gallery; a sealed card
-(unrevealed season) shows only the back. `/kort` shows every card; linking
-it is in Navigation below.
-
-### 2. Content centre
-
-Built: media in the DB, edited at `/admin/content`; shown on the season, game,
-career and /vs pages, `/content` and "Dagens content".
-
-- [ ] **Deploy:** the migration and the day-one media are on prod; the code
-      isn't yet.
-- [ ] **Check on a preview deploy:** after a media save, hero and champion art
-      still resolve. `existsSync(public/…)` in `queries.ts`,
-      `ChampionSideBlock` and the season page ran only at build time before
-      on-demand revalidation. If it falls back, move those lookups onto a
-      build-time manifest like `scripts/media-manifest.mjs`.
-- [ ] The 8 S2 game intros sit on personal channels: re-upload them to the
-      GG channel so they can't disappear.
-
-### 3. Season page upgrade
+### 1. Season page upgrade
 
 More per-season views, stats and content; scoped when we start.
 
@@ -59,13 +35,12 @@ More per-season views, stats and content; scoped when we start.
       bests stay on /records; don't repeat its plates. When a season's
       moment is also the all-time record, say so and link to /records.
 
-### 4. Navigation
+### 2. Navigation
 
-One pass over the header for the pages phase 4 added, with Jakob's other
-nav fixes.
+Done: the overflow menu (/kort and /admin live in it) and the /vs picker.
 
-- [ ] **`/kort`:** no header key yet.
-- [ ] **`/content`:** no header key; only Dagens links to it.
+- [ ] **Try the menu chooser:** if the menu in the display feels wrong, swap
+      it for a conventional drop-down panel.
 
 ### Decided against (don't re-propose)
 
@@ -74,8 +49,8 @@ Visual "tried and dropped" items are in design.md.
 **Site-wide**
 
 - A separate Hall page (absorbed into /records and the front page).
-- A /vs index or any per-page pair picker: the header's VS chooser is the one
-  pair picker.
+- Pair pickers outside /vs: the header's VS chooser and the pair hero are
+  the only two.
 - A shared diagonal-portrait primitive for `PairHero` and `PlayerRoster`,
   until a third use appears.
 - A configurable just-crowned window: marking a season finished is enough.

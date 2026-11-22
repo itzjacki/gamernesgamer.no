@@ -1,7 +1,7 @@
 import { currentSeason, seasonData, type Season } from '@/data/sesong';
 import { allPlayers } from '@/lib/players/roster';
 import {
-  getAllPairSlugs,
+  getPairKeys,
   getSeasonChampions,
   type SeasonChampion,
 } from '@/lib/results/queries';
@@ -47,7 +47,7 @@ export default async function SiteHeader() {
       seasons: p.seasons.length,
       titles: champions.filter((c) => c.champion?.slug === p.slug).length,
     })),
-    pairs: getAllPairSlugs().map((p) => `${p.a}|${p.b}`),
+    pairs: getPairKeys(),
   };
 
   return <SiteHeaderBar data={data} />;

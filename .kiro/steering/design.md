@@ -68,6 +68,11 @@ diagonal.)
 "Ahead of the other" is not rank-1 data: never accent the leader of a stat, or
 a one-sided pairing paints one side red.
 
+- **The hero picks the pair**, on /vs (empty) and every pair page. Each name
+  is a select drawn as name + chevron on a hairline; the whole half of the
+  plate opens it, and changing a side opens the new pair. A picked side gets a
+  "Gå til spiller" link in its bottom corner, inset by the side padding. The
+  field and the portrait's colour turn together (150ms).
 - **One reading on a shared axis, never two columns.** Both figures share a
   colour and weight; a needle on a hairline gauge leans toward whoever has
   more (centre when level). Every gauge shows its needle whatever the sample:
@@ -135,7 +140,9 @@ the media, a group's table and matches side by side.
   season code and title sit on the image in a solid bordered bar beside the
   play key.
 - **Thumbnails stay in full colour.** The portrait rule isn't applied: a
-  greyscale thumbnail doesn't invite the click.
+  greyscale thumbnail doesn't invite the click. Exception: Dagens content's
+  is greyscale and dimmed at rest (it outshouted the front page) and gets its
+  colour back on hover/focus (`MUTED_THUMB_TONE`).
 - **Play** is a solid 40px key in the bottom-left corner on the grid (the
   header's key grammar), its triangle accent on hover. The player loads on
   click, in place.
@@ -315,14 +322,22 @@ Teenage Engineering instrument grammar on the VERKSTED tokens.
   unreadable. Accent on the display follows the usual rule: rank-1 data only
   (a champion, a titles count).
 - **Choosers vs. links.** A key with a set to choose from (Sesonger,
-  Spillere) or a choice to make (VS) takes over the display; Rekorder, with
-  nothing to choose, is a plain link.
+  Spillere, the menu) or a choice to make (VS) takes over the display;
+  Rekorder and Content, with nothing to choose, are plain links.
   - **Sesonger / Spillere:** one key per season or player, then "Alle" (the
     index) in its own cell behind a full-height hairline.
   - **VS:** two selects with a swap-sides button between them (a two-way
     arrow icon, like a flight search's from/to; no animation), then GÅ. On /vs
-    pages this picker is itself the readout. It is the site's ONE pair
-    picker: there is no /vs index, and pages do not grow their own pickers.
+    pages this picker is itself the readout. The pair hero (Two-player pages)
+    is the only other pair picker; no other page grows one.
+- **Overflow.** The menu key (logo-width, a three-bar icon) is always there,
+  at the bar's right edge: Kort and Admin live only in it, never in the bar. Sesonger and Spillere
+  always stay in the bar; VS, Rekorder and Content drop, from the right, into
+  the menu when the header is too narrow. Its chooser lists them as small
+  keys, and VS there is a link to /vs, not the picker. Pure container queries
+  on the header with their own px thresholds (in `SiteHeaderBar`), never JS
+  measuring. The menu key's LED lights when the current page is in it. (A
+  `GG–Sxx` season label beside it was dropped: it almost never had room.)
 - **The display glitches, it doesn't slide.** Every change (switching
   choosers, closing back to the readout) glitches in over what the display
   shows, like a signal switching: brief torn horizontal slices, hard stepped

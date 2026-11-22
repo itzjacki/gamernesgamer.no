@@ -39,8 +39,15 @@ export interface HeaderData {
   pairs: string[];
 }
 
-type Section = 'sesonger' | 'spillere' | 'vs' | 'rekorder';
-type Chooser = 'seasons' | 'players' | 'vs';
+type Section =
+  | 'sesonger'
+  | 'spillere'
+  | 'vs'
+  | 'rekorder'
+  | 'kort'
+  | 'content'
+  | 'admin';
+type Chooser = 'seasons' | 'players' | 'vs' | 'menu';
 
 function parsePath(pathname: string) {
   const [first, a, b] = pathname.split('/').filter(Boolean);
@@ -48,8 +55,44 @@ function parsePath(pathname: string) {
   if (first === 'spillere') return { section: 'spillere' as const, player: a };
   if (first === 'records') return { section: 'rekorder' as const };
   if (first === 'vs') return { section: 'vs' as const, a, b };
+  if (first === 'kort') return { section: 'kort' as const };
+  if (first === 'content') return { section: 'content' as const };
+  if (first === 'admin') return { section: 'admin' as const };
   return { section: null };
 }
+
+/**
+ * Keys after Spillere drop into the menu key, from the right, when the header
+ * is too narrow for them. Pure CSS: each threshold is the header width the
+ * row needs with that key shown (logo 64 + Sesonger/Spillere 2 × 120 + 120
+ * per key + menu key 64 + nav border 2, at the sm+ key sizes). The classes
+ * are spelled out so Tailwind can see them. Kort and Admin never get a key
+ * (`key: null`): they live in the menu, so the menu key is always there.
+ */
+const OVERFLOW: Partial<
+  Record<Section, { key: string | null; item: string; menuLedOff: string }>
+> = {
+  vs: {
+    key: 'hidden @min-[490px]/hdr:flex',
+    item: '@min-[490px]/hdr:hidden',
+    menuLedOff:
+      '@min-[490px]/hdr:border-border-accent @min-[490px]/hdr:bg-transparent',
+  },
+  rekorder: {
+    key: 'hidden @min-[610px]/hdr:flex',
+    item: '@min-[610px]/hdr:hidden',
+    menuLedOff:
+      '@min-[610px]/hdr:border-border-accent @min-[610px]/hdr:bg-transparent',
+  },
+  content: {
+    key: 'hidden @min-[730px]/hdr:flex',
+    item: '@min-[730px]/hdr:hidden',
+    menuLedOff:
+      '@min-[730px]/hdr:border-border-accent @min-[730px]/hdr:bg-transparent',
+  },
+  kort: { key: null, item: '', menuLedOff: '' },
+  admin: { key: null, item: '', menuLedOff: '' },
+};
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
@@ -87,8 +130,15 @@ function pushFrame(set: SetFrames, kind: Frame['kind'], path: string) {
   setTimeout(() => settle(set, frame.id), 500);
 }
 
+// No display utility: a key is `flex`, or hidden until its overflow width.
 const KEY =
-  'group border-border relative flex min-w-0 flex-1 flex-col justify-between border-r px-2 py-2 text-left font-mono transition-transform duration-75 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent active:translate-y-px sm:w-30 sm:flex-none sm:px-3 sm:py-2.5';
+  'group border-border relative min-w-0 flex-1 flex-col justify-between border-r px-2 py-2 text-left font-mono transition-transform duration-75 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent active:translate-y-px sm:w-30 sm:flex-none sm:px-3 sm:py-2.5';
+/**
+ * The overflow key, at the right edge: logo-width, an icon instead of number
+ * and label. Its left hairline overlaps the last key's when they touch.
+ */
+const MENU_KEY =
+  'group border-border relative -ml-px flex w-12 shrink-0 cursor-pointer items-center justify-center border-l transition-transform duration-75 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent active:translate-y-px sm:w-16';
 const SMALL_KEY =
   'grid h-6 min-w-6 shrink-0 place-items-center border px-1.5 font-mono text-[10px] font-medium uppercase sm:h-7 sm:min-w-7 sm:px-2 sm:text-[11px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
 const SMALL_KEY_ON = 'border-accent bg-accent text-bg';
@@ -149,12 +199,14 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
 
   useEffect(() => {
     if (!chooser) return;
-    // Hand focus to the layer so the chooser is reachable by keyboard.
+    // Hand focus to the layer so the chooser is reachable by keyboard. The
+    // menu hides items whose key is in the bar, so skip anything not shown.
     const layerEl = displayRef.current?.querySelector('[data-layer]');
-    (
-      layerEl?.querySelector<HTMLElement>('[data-autofocus]') ??
-      layerEl?.querySelector<HTMLElement>('a, select, button')
-    )?.focus();
+    const visible = (sel: string) =>
+      [...(layerEl?.querySelectorAll<HTMLElement>(sel) ?? [])].find(
+        (el) => el.getClientRects().length > 0,
+      );
+    (visible('[data-autofocus]') ?? visible('a, select, button'))?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
       // Return focus to the key that opened the chooser.
@@ -195,12 +247,33 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
     { section: 'spillere', label: 'Spillere', chooser: 'players' },
     { section: 'vs', label: 'VS', chooser: 'vs' },
     { section: 'rekorder', label: 'Rekorder', href: '/records' },
+    { section: 'content', label: 'Content', href: '/content' },
+    { section: 'kort', label: 'Kort', href: '/kort' },
+    { section: 'admin', label: 'Admin', href: '/admin' },
   ];
+  // In the menu every key is a link: VS goes to /vs and picks there.
+  const menuItems = keys.flatMap((k) => {
+    const overflow = OVERFLOW[k.section];
+    return overflow
+      ? [
+          {
+            section: k.section,
+            label: k.label,
+            href: 'href' in k ? k.href : '/vs',
+            hide: overflow.item,
+          },
+        ]
+      : [];
+  });
+  const menuLed = route.section && OVERFLOW[route.section];
 
   const renderKey = (k: (typeof keys)[number], index: number) => {
+    const overflow = OVERFLOW[k.section];
+    if (overflow?.key === null) return null;
     const here = route.section === k.section;
     const choosing = 'chooser' in k && chooser === k.chooser;
     const lit = here || choosing;
+    const display = overflow?.key ?? 'flex';
     const inner = (
       <>
         <span className='text-text-muted text-[8px] tracking-widest'>
@@ -226,7 +299,7 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
         <button
           key={k.section}
           type='button'
-          className={`${KEY} cursor-pointer`}
+          className={`${KEY} ${display} cursor-pointer`}
           aria-label={k.label}
           aria-expanded={choosing}
           aria-controls='site-display'
@@ -240,7 +313,7 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
       <Link
         key={k.section}
         href={k.href}
-        className={KEY}
+        className={`${KEY} ${display}`}
         aria-label={k.label}
         aria-current={here ? 'page' : undefined}
       >
@@ -399,6 +472,26 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
         </div>
       );
     }
+    if (c === 'menu') {
+      return (
+        <div className='flex items-center gap-1 px-2 sm:gap-1.5 sm:px-3'>
+          {menuItems.map((m) => {
+            const here = route.section === m.section;
+            return (
+              <Link
+                key={m.section}
+                href={m.href}
+                data-autofocus={here || undefined}
+                aria-current={here ? 'page' : undefined}
+                className={`${SMALL_KEY} ${here ? SMALL_KEY_ON : SMALL_KEY_OFF} ${m.hide}`}
+              >
+                {m.label}
+              </Link>
+            );
+          })}
+        </div>
+      );
+    }
     return (
       <VsChooser
         data={data}
@@ -412,7 +505,10 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
   };
 
   return (
-    <header ref={headerRef} className='pt-4 pb-8 sm:pt-6 sm:pb-10'>
+    <header
+      ref={headerRef}
+      className='@container/hdr pt-4 pb-8 sm:pt-6 sm:pb-10'
+    >
       <nav
         aria-label='Hovedmeny'
         className='border-border bg-bg flex h-14 border sm:h-16'
@@ -425,9 +521,41 @@ export default function SiteHeaderBar({ data }: { data: HeaderData }) {
           <PixelLogo rows={data.logo} state={logoState} className='size-8' />
         </Link>
         {keys.map(renderKey)}
-        <span className='text-text-muted ml-auto hidden self-center px-4 font-mono text-[8px] tracking-[0.2em] lg:block'>
-          GG–S{pad(Number(data.currentSeason))}
-        </span>
+        {/* Pushes the menu key to the right edge. Below sm the keys fill the
+            row themselves. */}
+        <div aria-hidden='true' className='sm:flex-1' />
+        <button
+          type='button'
+          className={MENU_KEY}
+          aria-label='Flere sider'
+          aria-expanded={chooser === 'menu'}
+          aria-controls='site-display'
+          onClick={() => toggle('menu')}
+        >
+          <span
+            aria-hidden='true'
+            className={`absolute top-2 right-2 size-1.5 border sm:top-2.5 sm:right-3 ${
+              chooser === 'menu'
+                ? `border-accent bg-accent ${styles.ledBlink}`
+                : menuLed
+                  ? `border-accent bg-accent ${menuLed.menuLedOff}`
+                  : 'border-border-accent'
+            }`}
+          />
+          <svg
+            viewBox='0 0 12 12'
+            aria-hidden='true'
+            className={`group-hover:text-text-accent size-3 ${
+              chooser === 'menu' ? 'text-text' : 'text-text-muted'
+            }`}
+            fill='currentColor'
+            shapeRendering='crispEdges'
+          >
+            <rect x='0' y='2' width='12' height='1' />
+            <rect x='0' y='5.5' width='12' height='1' />
+            <rect x='0' y='9' width='12' height='1' />
+          </svg>
+        </button>
       </nav>
       <div
         id='site-display'

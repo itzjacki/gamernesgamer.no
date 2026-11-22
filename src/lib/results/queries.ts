@@ -25,7 +25,7 @@ import { allPlayers } from '../players/roster';
 import { deriveArchiveTotals } from './derive/totals';
 import type { ArchiveTotals } from './view-models';
 import { diffRecords } from './derive/records/changes';
-import type { SeasonChanges } from './view-models';
+import type { HeroPlayer, SeasonChanges } from './view-models';
 import { seasonData } from '@/data/sesong';
 import type { ComposedGameView } from './compose';
 
@@ -164,6 +164,11 @@ export function getAllPairSlugs(): { a: string; b: string }[] {
   );
 }
 
+/** "a|b" for every ordered pair with a /vs page: what the pair pickers test. */
+export function getPairKeys(): string[] {
+  return getAllPairSlugs().map((p) => `${p.a}|${p.b}`);
+}
+
 /**
  * Null when either slug is unknown, they are the same player, or the two never
  * shared a game.
@@ -194,6 +199,16 @@ export function findHeroImage(slug: string): string | null {
   const rel = `/images/heroes/${slug}.png`;
   const abs = path.join(process.cwd(), 'public', rel);
   return existsSync(abs) ? rel : null;
+}
+
+/** Every player as the /vs hero offers them, latest nickname. */
+export function getHeroPlayers(): HeroPlayer[] {
+  return allPlayers().map((p) => ({
+    slug: p.slug,
+    name: p.name,
+    nickname: p.latest.nickname,
+    imagePath: findHeroImage(p.slug),
+  }));
 }
 
 /** public/images/seasons/<NN>.{jpg,png,webp} when it exists on disk. */

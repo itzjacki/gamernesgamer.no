@@ -13,8 +13,10 @@ src/
                         [sesong]/[game]/ the game page.
     spillere/           Player index; [spiller]/ is the career page.
     records/            All-time career board, record wall, category crowns.
-    vs/[a]/[b]/         Head-to-head page for one ORDERED pair of players: the
-                        first slug is the left-hand side, so both orders exist.
+    vs/                 Pair picker (the pair hero, empty);
+                        [a]/[b]/ is the head-to-head page for one ORDERED pair:
+                        the first slug is the left-hand side, so both orders
+                        exist.
     content/            The media index (/content); every item's anchor.
     admin/              login/ is ungated. Everything under (protected)/ sits
                         behind the allowlist gate in its layout.tsx (pages
