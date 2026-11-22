@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Card from '@/components/card/Card';
+import Heading from '@/components/Heading';
 import SectionLabel from '@/components/SectionLabel';
 import { seasonData, type Season } from '@/data/sesong';
 import { seasonCards } from '@/lib/cards';
@@ -11,13 +12,16 @@ export const metadata: Metadata = {
 /** Every card, season by season. */
 export default function CardShowcasePage() {
   const seasons = (Object.keys(seasonData) as Season[]).toReversed();
+  const count = seasons.reduce((n, s) => n + seasonCards(s).length, 0);
 
   return (
     <section className='flex flex-col gap-16 pt-8'>
-      <div className='flex flex-col gap-2'>
-        <h1 className='text-text text-3xl font-extrabold'>Kort</h1>
+      <div className='flex flex-col gap-4'>
+        <Heading as='h1' serial={[`${count} kort`]}>
+          Kort
+        </Heading>
         <p className='text-text-muted text-sm'>
-          Her finner du en alle spillerkortene som har blitt laget siden første
+          Her finner du alle spillerkortene som har blitt laget siden første
           sesong av Gamernes Gamer.
         </p>
       </div>

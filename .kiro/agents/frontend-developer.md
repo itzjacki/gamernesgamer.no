@@ -22,7 +22,8 @@ This Next.js version differs from your training data: check
   writing new markup.
 - Pages read results only through `src/lib/results/queries`; components get
   view-models, never raw rows.
-- Public copy is human-written: use an obvious `TODO(copy)` placeholder and
+- Public copy is human-written: follow the copy lifecycle in
+  `code-conventions.md` (a `TODO(copy)` placeholder in a `LABELS` object) and
   flag it.
 - Done means: `npm run build` passes and `npx prettier --write` has run on the
   changed files.

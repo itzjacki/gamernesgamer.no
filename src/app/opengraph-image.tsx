@@ -66,7 +66,7 @@ export default async function Image() {
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-          <Title size={112}>{OG_LABELS.site}</Title>
+          <Title size={112}>Gamernes Gamer</Title>
           {latest?.champion && (
             <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
               <Label>{OG_LABELS.winner(latest.seasonNumber)}</Label>
@@ -78,9 +78,9 @@ export default async function Image() {
         </div>
         <Readouts
           items={[
-            { label: OG_LABELS.totals.seasons, value: totals.seasons },
-            { label: OG_LABELS.totals.games, value: totals.games },
-            { label: OG_LABELS.totals.matches, value: totals.matches },
+            { label: 'Sesonger', value: totals.seasons },
+            { label: 'Spill', value: totals.games },
+            { label: 'Matcher spilt', value: totals.matches },
           ]}
         />
       </div>

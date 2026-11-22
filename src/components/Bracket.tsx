@@ -35,16 +35,11 @@ const SLOT_LABELS: Record<SlotId, string> = {
   GF2: 'Finale (omspill)',
 };
 
-const LABELS = {
-  sections: {
-    upper: 'Vinnerside',
-    lower: 'Taperside',
-    final: 'Finale',
-  } satisfies Record<BracketSection, string>,
-  notPlayed: 'Ikke spilt',
-  tiebreak: 'Tiebreak',
-  game: 'Match',
-};
+const SECTION_LABELS = {
+  upper: 'Vinnerside',
+  lower: 'Taperside',
+  final: 'Finale',
+} satisfies Record<BracketSection, string>;
 
 /* Geometry, in grid units: fr for columns, 20px rows. */
 const PLATE = 5;
@@ -134,7 +129,7 @@ export default function Bracket({ id, stage }: Props) {
       <div className='flex flex-col gap-10 md:hidden'>
         {sections.map((section) => (
           <div key={section} className='flex flex-col gap-6'>
-            <SectionLabel>{LABELS.sections[section]}</SectionLabel>
+            <SectionLabel>{SECTION_LABELS[section]}</SectionLabel>
             <BracketGrid
               id={`${id}-m-${section}`}
               slots={mobile.filter((s) => s.section === section)}
@@ -245,7 +240,7 @@ function Plate({
         style={{ height: STRIP_ROWS * ROW_PX }}
       >
         <span className='truncate'>{label}</span>
-        {match?.score?.byTiebreak && <span>{LABELS.tiebreak}</span>}
+        {match?.score?.byTiebreak && <span>Tiebreak</span>}
       </p>
       <div
         className={`bg-bg grid grid-cols-[1fr_2.5rem] grid-rows-2 border ${
@@ -272,7 +267,7 @@ function Plate({
           </>
         ) : (
           <span className='text-text-muted col-span-2 row-span-2 grid place-items-center font-mono text-xs tracking-wide uppercase sm:tracking-widest'>
-            {LABELS.notPlayed}
+            Ikke spilt
           </span>
         )}
       </div>
@@ -320,7 +315,7 @@ function PlateRow({
             id={id}
             label={`${label}, vis hver match`}
             tone={decides ? 'accent' : 'word'}
-            panel={<RecordLines lines={gameLines(match, LABELS.game)} />}
+            panel={<RecordLines lines={gameLines(match, 'Match')} />}
           >
             {figure}
           </Popover>

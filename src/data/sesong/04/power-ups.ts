@@ -20,42 +20,42 @@ export const powerUps: PowerUp[] = [
     name: 'Double-Edged Sword',
     description:
       'Man bruker 4 poeng for å få doble poeng fra neste spill. Man kan ikke velge sitt eget spill',
-    imagePath: '/images/power-ups/double-up.svg',
+    imagePath: '/images/power-ups/double-edged-sword.svg',
   },
   {
     slug: 'crystal-ballin',
     name: "Crystal Ballin'",
     description:
       'Man gjetter rekkefølgen som alle kommer på i et spill. Man får 2 poeng dersom man treffer på alle.',
-    imagePath: '/images/power-ups/gamba-time.svg',
+    imagePath: '/images/power-ups/crystal-ballin.svg',
   },
   {
     slug: 'successful-tax-evasion',
     name: 'Successful tax evasion',
     description:
       'Man får en liten forbedring i resultatet i et spill, som avhenger av spillet power-upen brukes i.',
-    imagePath: '/images/power-ups/safety-net.svg',
+    imagePath: '/images/power-ups/successful-tax-evasion.svg',
   },
   {
     slug: 'power-up-cloner',
     name: 'Power-up-cloner',
     description:
       'Hvis man klarer å forutse at noen vil bruke en power-up på et spill, får man bruke den samme power-upen. Power-upens regler gjelder fortsatt. Kan brukes to ganger.',
-    imagePath: '/images/power-ups/gamba-time.svg',
+    imagePath: '/images/power-ups/power-up-cloner.svg',
   },
   {
     slug: 'wide-net',
     name: 'Wide net',
     description:
       'Man får +1 på alle posisjoner unntatt første plass, der man får -2.',
-    imagePath: '/images/power-ups/safety-net.svg',
+    imagePath: '/images/power-ups/wide-net.svg',
   },
   {
     slug: 'back-to-back',
     name: 'Back to back',
     description:
       'Brukes før et spill. Får man samme posisjon i spillet og spillet etter, så får man +2 poeng.',
-    imagePath: '/images/power-ups/double-up.svg',
+    imagePath: '/images/power-ups/back-to-back.svg',
   },
 ];
 
@@ -65,7 +65,7 @@ export const curses: PowerUp[] = [
     name: 'Unsuccessful tax evasion',
     description:
       'Man får en liten ulempe i et spill, avhenger av spillet den brukes i.',
-    imagePath: '/images/power-ups/gamba-time.svg',
+    imagePath: '/images/power-ups/unsuccessful-tax-evasion.svg',
     isCurse: true,
   },
   {
@@ -73,7 +73,7 @@ export const curses: PowerUp[] = [
     name: 'Sucks to suck',
     description:
       'Få 0 poeng dersom du får 4. eller 3. plass. Kan ikke brukes på eget spill.',
-    imagePath: '/images/power-ups/safety-net.svg',
+    imagePath: '/images/power-ups/sucks-to-suck.svg',
     isCurse: true,
   },
   {
@@ -81,14 +81,14 @@ export const curses: PowerUp[] = [
     name: 'Not beating the allegations',
     description:
       'Motstanderne gjetter plasseringen du kommer til å få i et spill, dersom gjennomsnittet er riktig mister du 2 poeng.',
-    imagePath: '/images/power-ups/double-up.svg',
+    imagePath: '/images/power-ups/not-beating-the-allegations.svg',
     isCurse: true,
   },
   {
     slug: 'curse-of-the-gambler',
     name: 'Curse of the gambler',
     description: 'Du får en tilfeldig curse, blant cursesa valgt av andre.',
-    imagePath: '/images/power-ups/gamba-time.svg',
+    imagePath: '/images/power-ups/curse-of-the-gambler.svg',
     isCurse: true,
   },
 ];

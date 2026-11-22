@@ -24,6 +24,7 @@ import GamerCards from '@/components/card/GamerCards';
 import GameCard from '@/components/GameCard';
 import PowerUpCard from '@/components/PowerUpCard';
 import Heading from '@/components/Heading';
+import SerialLink from '@/components/SerialLink';
 import SectionLabel from '@/components/SectionLabel';
 import MediaSection from '@/components/MediaSection';
 import ChampionHero from '@/components/ChampionHero';
@@ -41,10 +42,6 @@ import type {
 interface Props {
   params: Promise<{ sesong: string }>;
 }
-
-const LABELS = {
-  standings: 'Resultater',
-};
 
 export function generateStaticParams() {
   return Object.keys(seasonData).map((sesong) => ({ sesong }));
@@ -207,7 +204,16 @@ function FinishedSeason({
   return (
     <>
       <section className='flex flex-col gap-4 pt-8'>
-        <Heading as='h1' aboveLine={`GG-${composed.seasonSlug} / ${dates}`}>
+        <Heading
+          as='h1'
+          serial={[
+            <SerialLink key='index' href='/sesong'>
+              Sesonger
+            </SerialLink>,
+            composed.seasonSlug,
+            dates,
+          ]}
+        >
           Sesong {seasonNumber}
         </Heading>
       </section>
@@ -226,7 +232,7 @@ function FinishedSeason({
           the page's sections. */}
       <div className='flex flex-col gap-10'>
         <section id='standings' className='flex flex-col gap-6'>
-          <SectionLabel as='h2'>{LABELS.standings}</SectionLabel>
+          <SectionLabel as='h2'>Resultater</SectionLabel>
           <StandingsTable rows={standingsRows} />
         </section>
 
@@ -364,7 +370,13 @@ function UpcomingSeason({
       <section className='flex flex-col gap-4 pt-8'>
         <Heading
           as='h1'
-          aboveLine={`GG-${sesong} / ${formatSeasonDates(meta)}`}
+          serial={[
+            <SerialLink key='index' href='/sesong'>
+              Sesonger
+            </SerialLink>,
+            sesong,
+            formatSeasonDates(meta),
+          ]}
         >
           Sesong {seasonNumber}
         </Heading>

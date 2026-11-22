@@ -9,12 +9,6 @@ import { HEAD_ROW, ROW, TABLE } from '@/components/table-classes';
  * the game winner's column, and only when this stage settled the game.
  */
 
-const LABELS = {
-  round: 'Runde',
-  total: 'Sum',
-  rankTotal: 'Poeng',
-};
-
 interface Props {
   stage: RoundsStageView;
   scoreKind: RoundScoreKind | undefined;
@@ -38,7 +32,7 @@ export default function RoundsTable({ stage, scoreKind, winnerId }: Props) {
           <tr className={HEAD_ROW}>
             {labelColumn && (
               <th className='px-1.5 py-2 font-normal sm:px-3'>
-                {!single && LABELS.round}
+                {!single && 'Runde'}
               </th>
             )}
             {stage.players.map((p) => (
@@ -60,7 +54,7 @@ export default function RoundsTable({ stage, scoreKind, winnerId }: Props) {
               <tr key={round.ordinal} className={ROW}>
                 {labelColumn && (
                   <td className='text-text px-1.5 text-sm font-semibold sm:px-3 sm:text-base'>
-                    {round.label ?? `${LABELS.round} ${round.ordinal}`}
+                    {round.label ?? `Runde ${round.ordinal}`}
                   </td>
                 )}
                 {round.cells.map((cell, i) => {
@@ -96,9 +90,7 @@ export default function RoundsTable({ stage, scoreKind, winnerId }: Props) {
           <tfoot>
             <tr className='border-border h-10 border-t-2'>
               <td className='text-text-muted px-1.5 font-mono text-xs tracking-wide uppercase sm:px-3 sm:tracking-widest'>
-                {rankThenSum || scoreKind === 'placement'
-                  ? LABELS.rankTotal
-                  : LABELS.total}
+                {rankThenSum || scoreKind === 'placement' ? 'Poeng' : 'Sum'}
               </td>
               {stage.players.map((p, i) => (
                 <td

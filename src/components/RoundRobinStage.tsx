@@ -22,16 +22,6 @@ import {
  * by weight, never colour: a group leader is not the game's winner.
  */
 
-const LABELS = {
-  placement: 'POS.',
-  player: 'Spiller',
-  record: 'W/L',
-  table: 'Tabell',
-  matches: 'Matcher',
-  tiebreak: 'Tiebreak',
-  game: 'Match',
-};
-
 interface Props {
   /** Namespaces popover ids. */
   id: string;
@@ -42,17 +32,13 @@ export default function RoundRobinStage({ id, stage }: Props) {
   return (
     <div className='grid grid-cols-1 items-start gap-10 md:grid-cols-2'>
       <div className='flex min-w-0 flex-col gap-6'>
-        <SectionLabel>{LABELS.table}</SectionLabel>
+        <SectionLabel>Tabell</SectionLabel>
         <table className={TABLE}>
           <thead>
             <tr className={HEAD_ROW}>
-              <th className={`${RANK_CELL} ${PAD} ${HEAD_CELL}`}>
-                {LABELS.placement}
-              </th>
-              <th className={`${PAD} ${HEAD_CELL}`}>{LABELS.player}</th>
-              <th className={`${FIGURE_CELL} ${PAD} ${HEAD_CELL}`}>
-                {LABELS.record}
-              </th>
+              <th className={`${RANK_CELL} ${PAD} ${HEAD_CELL}`}>POS.</th>
+              <th className={`${PAD} ${HEAD_CELL}`}>Spiller</th>
+              <th className={`${FIGURE_CELL} ${PAD} ${HEAD_CELL}`}>W/L</th>
             </tr>
           </thead>
           <tbody>
@@ -72,7 +58,7 @@ export default function RoundRobinStage({ id, stage }: Props) {
       </div>
 
       <div className='flex min-w-0 flex-col gap-6'>
-        <SectionLabel>{LABELS.matches}</SectionLabel>
+        <SectionLabel>Matcher</SectionLabel>
         <ul className='border-border bg-bg border'>
           {stage.matches.map((match, i) => (
             <MatchRow
@@ -105,7 +91,7 @@ function MatchRow({ id, match, tagged }: MatchRowProps) {
   const score = `${figures.a}–${figures.b}`;
   // No tag for a second meeting (`leg` > 1): it is just another match
   // between the two, and "rematch" read as a replay overwriting the first.
-  const tags = [match.score?.byTiebreak && LABELS.tiebreak].filter(Boolean);
+  const tags = [match.score?.byTiebreak && 'Tiebreak'].filter(Boolean);
 
   return (
     <li
@@ -125,7 +111,7 @@ function MatchRow({ id, match, tagged }: MatchRowProps) {
           <Popover
             id={id}
             label={`${score}, vis hver match`}
-            panel={<RecordLines lines={gameLines(match, LABELS.game)} />}
+            panel={<RecordLines lines={gameLines(match, 'Match')} />}
           >
             {score}
           </Popover>

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
+import SerialLink from '@/components/SerialLink';
 import { seasonData, isSeason } from '@/data/sesong';
 import { getGameView } from '@/lib/results/queries';
 import type { StageView } from '@/lib/results/view-models';
@@ -20,19 +20,14 @@ interface Props {
   params: Promise<{ sesong: string; game: string }>;
 }
 
-const LABELS = {
-  details: 'Resultater',
-  powerUps: 'Power-ups',
-  singleRound: 'Score',
-  stages: {
-    'round-robin': 'Gruppespill',
-    'single-elim': 'Sluttspill',
-    'final-bronze': 'Finaler',
-    'double-elim-reset': 'Sluttspill',
-    'double-elim-no-reset': 'Sluttspill',
-    rounds: 'Runder',
-  } satisfies Record<StageView['kind'], string>,
-};
+const STAGE_LABELS = {
+  'round-robin': 'Gruppespill',
+  'single-elim': 'Sluttspill',
+  'final-bronze': 'Finaler',
+  'double-elim-reset': 'Sluttspill',
+  'double-elim-no-reset': 'Sluttspill',
+  rounds: 'Runder',
+} satisfies Record<StageView['kind'], string>;
 
 export function generateStaticParams() {
   return Object.entries(seasonData).flatMap(([sesong, data]) =>
@@ -100,21 +95,23 @@ export default async function GamePage({ params }: Props) {
     <>
       <section className='flex flex-col gap-10 pt-8'>
         <div className='flex flex-col gap-4'>
-          {/* The game card's serial; its season part is the way back. */}
+          {/* The game card's serial, its season part the way back. */}
           <Heading
             as='h1'
-            aboveLine={
-              <>
-                <Link
-                  href={`/sesong/${sesong}`}
-                  aria-label={`Tilbake til sesong ${Number(sesong)}`}
-                  className='hover:text-text-accent focus-visible:outline-accent relative underline underline-offset-2 transition-colors duration-150 after:absolute after:inset-x-0 after:-inset-y-3 focus-visible:outline-2 focus-visible:outline-offset-2'
-                >
-                  GG-{sesong}
-                </Link>{' '}
-                / Spill / {String(gameNumber).padStart(2, '0')}
-              </>
-            }
+            serial={[
+              <SerialLink key='index' href='/sesong'>
+                Sesonger
+              </SerialLink>,
+              <SerialLink
+                key='season'
+                href={`/sesong/${sesong}`}
+                label={`Tilbake til sesong ${Number(sesong)}`}
+              >
+                {sesong}
+              </SerialLink>,
+              'Spill',
+              String(gameNumber).padStart(2, '0'),
+            ]}
           >
             {game.title}
           </Heading>
@@ -168,7 +165,7 @@ export default async function GamePage({ params }: Props) {
 
       {stages.length > 0 && (
         <section className='flex flex-col gap-6'>
-          <SectionLabel as='h2'>{LABELS.details}</SectionLabel>
+          <SectionLabel as='h2'>Resultater</SectionLabel>
           <div className='flex flex-col gap-20'>
             {stages.map((stage) => (
               <div key={stage.ordinal} className='flex flex-col gap-10'>
@@ -182,8 +179,8 @@ export default async function GamePage({ params }: Props) {
                     </span>
                     <Heading as='h3' styleAs='h5'>
                       {stage.kind === 'rounds' && stage.rounds.length === 1
-                        ? LABELS.singleRound
-                        : LABELS.stages[stage.kind]}
+                        ? 'Score'
+                        : STAGE_LABELS[stage.kind]}
                     </Heading>
                   </div>
                 )}
@@ -209,7 +206,7 @@ export default async function GamePage({ params }: Props) {
 
       {hasPowerUps && (
         <section className='flex flex-col gap-6'>
-          <SectionLabel as='h2'>{LABELS.powerUps}</SectionLabel>
+          <SectionLabel as='h2'>Power-ups</SectionLabel>
           <PowerUpUseList id={`${id}-pu`} rows={results} />
         </section>
       )}

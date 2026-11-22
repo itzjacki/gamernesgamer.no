@@ -22,7 +22,9 @@ export default async function RecordsPage() {
       <section className='flex flex-col gap-4 pt-8'>
         <Heading
           as='h1'
-          aboveLine={`GG / S${records.seasons[0]?.seasonNumber}–S${records.seasons.at(-1)?.seasonNumber}`}
+          serial={[
+            `S${records.seasons[0]?.seasonNumber}–S${records.seasons.at(-1)?.seasonNumber}`,
+          ]}
         >
           Rekorder
         </Heading>

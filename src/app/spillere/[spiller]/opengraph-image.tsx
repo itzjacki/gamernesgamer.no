@@ -11,7 +11,6 @@ import {
   Readouts,
   Title,
 } from '@/lib/og/frame';
-import { OG_LABELS } from '@/lib/og/labels';
 
 export const alt = 'En spiller i Gamernes Gamer med titler og snittplassering';
 export const size = OG_SIZE;
@@ -33,7 +32,6 @@ export default async function Image({ params }: Props) {
 
   const { hero, ledger, trophies } = career;
   const titles = trophies.filter((t) => t.kind === 'season-gold').length;
-  const labels = OG_LABELS.career;
 
   return new ImageResponse(
     <OgFrame
@@ -54,12 +52,12 @@ export default async function Image({ params }: Props) {
         </div>
         <Readouts
           items={[
-            { label: labels.titles, value: titles, accent: titles > 0 },
+            { label: 'Titler', value: titles, accent: titles > 0 },
             {
-              label: labels.average,
+              label: 'Snittplassering',
               value: ledger.averagePlacement.toFixed(1),
             },
-            { label: labels.points, value: ledger.careerPoints },
+            { label: 'Karrierepoeng', value: ledger.careerPoints },
           ]}
         />
       </div>

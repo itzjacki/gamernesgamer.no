@@ -40,7 +40,7 @@ export default async function SeasonsIndexPage() {
   return (
     <>
       <section className='flex flex-col gap-4 pt-8'>
-        <Heading as='h1' aboveLine={`GG / ${entries.length} sesonger`}>
+        <Heading as='h1' serial={[`${entries.length} sesonger`]}>
           Sesonger
         </Heading>
       </section>

@@ -9,9 +9,10 @@ interface Props {
 }
 
 // The hero draws these glyphs into its scene (TrophyHero, `drawNumerals`);
-// once it does, the HTML ones turn transparent but stay for screen readers.
+// once it does, the HTML ones fade to transparent (in step with TrophyHero's
+// NUMERAL_FADE) but stay for screen readers.
 const NUMERALS =
-  'text-text font-sans leading-none font-extrabold [section:has(canvas[data-numerals])_&]:text-transparent';
+  'text-text font-sans leading-none font-extrabold transition-colors duration-700 ease-out motion-reduce:transition-none [section:has(canvas[data-numerals])_&]:text-transparent';
 
 const LABEL =
   'text-text font-mono text-[10px] tracking-wide sm:tracking-widest whitespace-nowrap uppercase min-[701px]:tracking-[0.2em]';

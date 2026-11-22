@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { allPlayers } from '@/lib/players/roster';
 import { getHeroPlayers, getPairKeys } from '@/lib/results/queries';
+import CatalogueLine from '@/components/CatalogueLine';
 import PairHero from '@/components/PairHero';
 
 export const metadata: Metadata = { title: 'VS' };
@@ -13,6 +14,7 @@ export default function VsIndexPage() {
 
   return (
     <section className='flex flex-col gap-6 pt-8'>
+      <CatalogueLine parts={['VS']} />
       <h1 className='sr-only'>Velg to spillere å sammenligne</h1>
       <PairHero
         players={players}

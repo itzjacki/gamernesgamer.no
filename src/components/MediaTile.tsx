@@ -1,4 +1,3 @@
-import { MEDIA_LABELS } from '@/lib/media/labels';
 import { mediaAnchor, type MediaItemView } from '@/lib/media/view-models';
 import MediaImageViewer from './MediaImageViewer';
 import MediaPlayer from './MediaPlayer';
@@ -16,7 +15,7 @@ interface Props {
 }
 
 export function seasonCode(season: number | null): string {
-  return season === null ? MEDIA_LABELS.noSeasonCode : `S${season}`;
+  return season === null ? 'GG' : `S${season}`;
 }
 
 /** The footer row shared by tiles, the viewer and Dagens content. */

@@ -19,12 +19,6 @@ import {
  * the figure opens the breakdown.
  */
 
-const LABELS = {
-  placement: 'POS.',
-  player: 'Spiller',
-  points: 'Poeng',
-};
-
 interface Props {
   /** Namespaces popover ids. */
   id: string;
@@ -36,13 +30,9 @@ export default function GameStandings({ id, rows }: Props) {
     <table className={TABLE}>
       <thead>
         <tr className={HEAD_ROW}>
-          <th className={`${RANK_CELL} ${PAD} ${HEAD_CELL}`}>
-            {LABELS.placement}
-          </th>
-          <th className={`${PAD} ${HEAD_CELL} lg:min-w-40`}>{LABELS.player}</th>
-          <th className={`${FIGURE_CELL} ${PAD} ${HEAD_CELL}`}>
-            {LABELS.points}
-          </th>
+          <th className={`${RANK_CELL} ${PAD} ${HEAD_CELL}`}>POS.</th>
+          <th className={`${PAD} ${HEAD_CELL} lg:min-w-40`}>Spiller</th>
+          <th className={`${FIGURE_CELL} ${PAD} ${HEAD_CELL}`}>Poeng</th>
         </tr>
       </thead>
       <tbody>
