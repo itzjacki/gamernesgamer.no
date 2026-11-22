@@ -45,6 +45,3 @@ next-env.d.ts
 .playwright-mcp/
 # temporary files
 /.temp
-# leftovers from the old Astro version
-/.astro/
-/dist/

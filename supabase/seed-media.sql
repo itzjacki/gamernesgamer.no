@@ -6,6 +6,16 @@
 -- it restores an item deleted in /admin. Titles are the YouTube titles.
 -- =============================================================================
 
+-- Production guard: seed files are local-only. Prod's database comment marks
+-- it (set once by hand), so `db push --include-seed` fails here instead of
+-- overwriting real data.
+do $$
+begin
+  if shobj_description((select oid from pg_database where datname = current_database()), 'pg_database') like 'gamernes-gamer: production%' then
+    raise exception 'Refusing to seed: this is the production database. Seed files are local-only (see .claude/rules/tech.md).';
+  end if;
+end $$;
+
 begin;
 
 with items (kind, youtube_id, title, season_number, game_slug, players) as (

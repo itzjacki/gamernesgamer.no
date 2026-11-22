@@ -371,7 +371,7 @@ export default function MediaForm({ initial, options }: Props) {
         ) : null}
         {saved ? (
           <span className='text-text-muted font-mono text-xs' role='status'>
-            Lagret. Det er live nå.
+            Lagt til
           </span>
         ) : null}
       </div>

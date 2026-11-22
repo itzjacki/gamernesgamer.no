@@ -69,7 +69,3 @@ export const YOUTUBE_PLACEHOLDER_WIDTH = 120;
 export function youtubeEmbedUrl(id: string): string {
   return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&playsinline=1&rel=0`;
 }
-
-export function youtubeWatchUrl(id: string): string {
-  return `https://www.youtube.com/watch?v=${id}`;
-}
