@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "predev": "node scripts/media-manifest.mjs",
     "build": "next build",
+    "prebuild": "node scripts/media-manifest.mjs",
     "start": "next start",
     "lint": "eslint .",
     "test": "vitest run",

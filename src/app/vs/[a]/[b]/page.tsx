@@ -19,6 +19,9 @@ import RecordLines from '@/components/RecordLines';
 import GameListPopover from '@/components/GameListPopover';
 import UnrankedRows, { unrankedCaption } from '@/components/UnrankedRows';
 import { HEAD_ROW, ROW } from '@/components/table-classes';
+import MediaSection from '@/components/MediaSection';
+import { getAllMedia } from '@/lib/media/queries';
+import { byKind, forPair } from '@/lib/media/select';
 
 interface Props {
   params: Promise<{ a: string; b: string }>;
@@ -57,6 +60,7 @@ export default async function PairPage({ params }: Props) {
   }
 
   const { a, b, finishedAhead, matches, matchRuns, gameRuns, moments } = pair;
+  const media = byKind(forPair(await getAllMedia(), slugA, slugB));
   const names = { a: a.name, b: b.name };
   const player = (side: PairSide) => (side === 'a' ? a : b);
   const other = (side: PairSide) => (side === 'a' ? b : a);
@@ -428,6 +432,8 @@ export default async function PairPage({ params }: Props) {
           </div>
         </section>
       )}
+
+      <MediaSection items={media} />
     </>
   );
 }

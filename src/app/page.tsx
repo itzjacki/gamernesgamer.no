@@ -21,8 +21,8 @@ import {
 import TrophyHero, { type TrophyHeroAlign } from '@/components/TrophyHero';
 
 // Static, rebuilt in the background at most hourly: the site state, the
-// countdown and the record of the day all follow the Norwegian date. Data
-// edits should also call revalidatePath('/') (none change it yet).
+// countdown and the record and content of the day all follow the Norwegian
+// date. Admin edits revalidate it too (revalidateSite).
 export const revalidate = 3600;
 
 // The state switcher and `?tilstand=` are for local development only. In a
@@ -171,7 +171,9 @@ export default async function HomePage({ searchParams }: Props) {
         <Suspense>
           <RecordOfTheDay />
         </Suspense>
-        <ContentOfTheDay />
+        <Suspense>
+          <ContentOfTheDay />
+        </Suspense>
       </div>
 
       <Suspense>

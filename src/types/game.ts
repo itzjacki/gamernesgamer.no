@@ -24,7 +24,6 @@ export interface Game {
   duration: string;
   shortDescription: string;
   longDescription?: string;
-  videoEmbedUrl?: string;
   // Only for games with a rounds stage. Unset: a multi-round table shows plain
   // numbers and a one-round table is hidden.
   roundScore?: RoundScoreKind;

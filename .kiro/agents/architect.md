@@ -17,7 +17,7 @@ Always read AGENTS.md before making changes.
 - Supabase schema design: results table(s), player/season/game relationships
 - Dynamic routes: `generateStaticParams()` shapes driven by data
 - Cross-season consistency: when types or components can be shared vs. when per-season variation justifies forking
-- Data split: static content (gamers, games, power-ups) stays in `src/data/` as TypeScript; only results/scores go in Supabase
+- Data split: static content (gamers, games, power-ups) stays in `src/data/` as TypeScript; only results/scores and the media mapping go in Supabase (AGENTS.md)
 
 ## Approach
 
