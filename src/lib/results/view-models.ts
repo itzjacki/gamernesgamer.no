@@ -714,6 +714,12 @@ export interface PairPlayerView extends RecordPlayer {
   imagePath: string | null;
 }
 
+/** One side of the /vs hero, which offers every player. */
+export type HeroPlayer = Pick<
+  PairPlayerView,
+  'slug' | 'name' | 'nickname' | 'imagePath'
+>;
+
 export interface PairView extends Omit<PairStats, 'a' | 'b'> {
   a: PairPlayerView;
   b: PairPlayerView;

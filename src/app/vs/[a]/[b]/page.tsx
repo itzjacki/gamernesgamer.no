@@ -1,7 +1,12 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { getAllPairSlugs, getPairView } from '@/lib/results/queries';
+import {
+  getAllPairSlugs,
+  getHeroPlayers,
+  getPairKeys,
+  getPairView,
+} from '@/lib/results/queries';
 import type {
   PairGame,
   PairMatch,
@@ -172,7 +177,13 @@ export default async function PairPage({ params }: Props) {
         <h1 className='sr-only'>
           {a.name} mot {b.name}
         </h1>
-        <PairHero a={a} b={b} scope={`${span} · ${gameCount(games.length)}`}>
+        <PairHero
+          key={`${slugA}|${slugB}`}
+          players={getHeroPlayers()}
+          pairs={getPairKeys()}
+          initial={{ a: slugA, b: slugB }}
+          scope={`${span} · ${gameCount(games.length)}`}
+        >
           <PairRow
             id='foran'
             label='Innbyrdes oppgjør: Spill'
