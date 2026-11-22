@@ -16,7 +16,9 @@ import type {
 import { tagLabels } from '@/data/tag-labels';
 import { MIN_RANKED_GAMES } from '@/lib/tag-ranking';
 import SectionLabel from '@/components/SectionLabel';
+import CatalogueLine from '@/components/CatalogueLine';
 import PairHero from '@/components/PairHero';
+import SerialLink from '@/components/SerialLink';
 import PairTrace from '@/components/PairTrace';
 import PairMoment from '@/components/PairMoment';
 import { PairLine, PairMini, PairMinis, PairRow } from '@/components/PairRow';
@@ -174,6 +176,13 @@ export default async function PairPage({ params }: Props) {
   return (
     <>
       <section className='flex flex-col gap-6 pt-8'>
+        <CatalogueLine
+          parts={[
+            <SerialLink key='index' href='/vs'>
+              VS
+            </SerialLink>,
+          ]}
+        />
         <h1 className='sr-only'>
           {a.name} mot {b.name}
         </h1>

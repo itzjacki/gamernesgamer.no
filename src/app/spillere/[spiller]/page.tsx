@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
+import CatalogueLine from '@/components/CatalogueLine';
+import SerialLink from '@/components/SerialLink';
 import {
   getCareerView,
   getAllPlayerSlugs,
@@ -69,18 +70,16 @@ export default async function PlayerCareerPage({ params }: Props) {
   return (
     <>
       <section className='flex flex-col gap-6 pt-8'>
-        {/* Catalogue line (design.md, Notation): the player's mark on the
-            index, whose name part is the way back. */}
-        <p className='text-text-muted font-mono text-xs tracking-wide uppercase sm:tracking-widest'>
-          GG /{' '}
-          <Link
-            href='/spillere'
-            className='hover:text-text-accent focus-visible:outline-accent relative underline underline-offset-2 transition-colors duration-150 after:absolute after:inset-x-0 after:-inset-y-3 focus-visible:outline-2 focus-visible:outline-offset-2'
-          >
-            Spillere
-          </Link>
-          {rank !== undefined && <> / {String(rank).padStart(2, '0')}</>}
-        </p>
+        {/* The hero carries the name, so the line stands alone: the
+            player's mark on the index. */}
+        <CatalogueLine
+          parts={[
+            <SerialLink key='index' href='/spillere'>
+              Spillere
+            </SerialLink>,
+            ...(rank !== undefined ? [String(rank).padStart(2, '0')] : []),
+          ]}
+        />
         <PlayerHero hero={hero} />
         {trophies.length > 0 && <TrophyShelf trophies={trophies} />}
       </section>

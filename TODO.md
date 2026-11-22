@@ -29,7 +29,6 @@ page, the lineup, the career gallery and `/kort`.
 Built: the power-up effect (points with and without) and the season's beaten
 records, under the results; a recap slot above them.
 
-- [ ] **Copy:** the new section labels and column heads (`TODO(copy)`).
 - [ ] **Recaps (Jakob):** an editorial title and paragraphs per season, in
       its `meta.ts` (`recap`). Nothing shows until one is written.
 

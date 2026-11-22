@@ -77,7 +77,7 @@ export default async function Image({ params }: Props) {
         )}
         {winners.length > 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <Label>{OG_LABELS.gameWinner}</Label>
+            <Label>Vinner</Label>
             <Title size={72} color={COLOR.textAccent}>
               {winners.join(' & ')}
             </Title>

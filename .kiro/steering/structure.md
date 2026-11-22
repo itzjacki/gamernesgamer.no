@@ -56,7 +56,9 @@ supabase/
   migrations/           Source of truth for the schema.
   schema.sql            GENERATED snapshot. Never hand-edit.
   seed.sql              All historical results (S1–S4). Data, not schema.
-scripts/                media-manifest.mjs (runs as predev / prebuild).
+scripts/                media-manifest.mjs (runs as predev / prebuild);
+                        power-up-art/ (draws the power-up SVGs; run by hand,
+                        needs Python)
 working-docs/           Secondary reference: decisions, format inventory, raw CSVs.
 ```
 

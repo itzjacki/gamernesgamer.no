@@ -37,7 +37,7 @@ export default async function PlayersIndexPage() {
   return (
     <>
       <section className='flex flex-col gap-4 pt-8'>
-        <Heading as='h1' aboveLine={`GG / ${entries.length} spillere`}>
+        <Heading as='h1' serial={[`${entries.length} spillere`]}>
           Spillere
         </Heading>
       </section>

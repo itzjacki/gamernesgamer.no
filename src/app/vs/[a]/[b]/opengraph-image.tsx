@@ -12,7 +12,6 @@ import {
   OgFrame,
   Title,
 } from '@/lib/og/frame';
-import { OG_LABELS } from '@/lib/og/labels';
 
 export const alt = 'To spillere i Gamernes Gamer mot hverandre';
 export const size = OG_SIZE;
@@ -76,8 +75,8 @@ export default async function Image({ params }: Props) {
   const games = finishedAhead.games;
   const scope = [
     games.length > 0 && seasonSpan(games.map((g) => g.seasonNumber)),
-    OG_LABELS.vs.games(games.length),
-    finishedAhead.level > 0 && OG_LABELS.vs.level(finishedAhead.level),
+    `${games.length} spill`,
+    finishedAhead.level > 0 && `${finishedAhead.level} likt`,
   ]
     .filter(Boolean)
     .join(' · ');
@@ -172,7 +171,7 @@ export default async function Image({ params }: Props) {
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Label>{OG_LABELS.vs.headline}</Label>
+            <Label>Innbyrdes oppgjør: Spill</Label>
             <Label>{scope}</Label>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>

@@ -1,5 +1,4 @@
 import { HEADLINE_KINDS, type MediaItemView } from '@/lib/media/view-models';
-import { MEDIA_LABELS } from '@/lib/media/labels';
 import MediaTile from './MediaTile';
 import SectionLabel from './SectionLabel';
 
@@ -18,7 +17,7 @@ interface Props {
  */
 export default function MediaSection({
   items,
-  label = MEDIA_LABELS.section,
+  label = 'Content',
   leadKinds = [...HEADLINE_KINDS, 'welcome'],
   id = 'content',
 }: Props) {

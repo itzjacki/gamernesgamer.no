@@ -8,7 +8,7 @@ import {
   type MediaKind,
 } from '@/lib/media/view-models';
 import { byKind } from '@/lib/media/select';
-import { KIND_HEADINGS, MEDIA_LABELS } from '@/lib/media/labels';
+import { KIND_HEADINGS } from '@/lib/media/labels';
 import { MediaGrid } from './MediaSection';
 import SectionLabel from './SectionLabel';
 
@@ -51,7 +51,7 @@ export default function MediaBrowser({ items, seasons, players }: Props) {
   const groups: Group[] = [
     {
       key: 'headline',
-      label: MEDIA_LABELS.headline,
+      label: 'Fremhevet',
       items: shown
         .filter(isHeadline)
         .sort((a, b) => (b.season ?? 0) - (a.season ?? 0)),
@@ -63,7 +63,7 @@ export default function MediaBrowser({ items, seasons, players }: Props) {
     })),
     {
       key: 'none',
-      label: MEDIA_LABELS.unseasoned,
+      label: 'Sesonguavhengig',
       items: byKind(shown.filter((i) => i.season === null && !isHeadline(i))),
     },
   ].filter((group) => group.items.length > 0);
@@ -75,21 +75,21 @@ export default function MediaBrowser({ items, seasons, players }: Props) {
       <div className='grid grid-cols-1 gap-6 sm:grid-cols-3'>
         <FilterSelect
           id='filter-kind'
-          label={MEDIA_LABELS.filterKind}
+          label='Kategori'
           value={kind}
           onChange={(v) => setKind(v as MediaKind | '')}
           options={kinds.map((k) => ({ value: k, label: KIND_HEADINGS[k] }))}
         />
         <FilterSelect
           id='filter-season'
-          label={MEDIA_LABELS.filterSeason}
+          label='Sesong'
           value={season === null ? '' : String(season)}
           onChange={(v) => setSeason(v ? Number(v) : null)}
           options={seasons.map((n) => ({ value: String(n), label: `S${n}` }))}
         />
         <FilterSelect
           id='filter-player'
-          label={MEDIA_LABELS.filterPlayer}
+          label='Spiller'
           value={player}
           onChange={setPlayer}
           options={players.map((p) => ({ value: p.slug, label: p.name }))}
@@ -98,7 +98,7 @@ export default function MediaBrowser({ items, seasons, players }: Props) {
 
       {groups.length === 0 ? (
         <p className='text-text-muted font-mono text-xs tracking-wide uppercase sm:tracking-widest'>
-          {MEDIA_LABELS.noMatches}
+          Ingen treff
         </p>
       ) : (
         groups.map((group) => (
@@ -148,7 +148,7 @@ function FilterSelect({
         onChange={(e) => onChange(e.target.value)}
         className={selectClass}
       >
-        <option value=''>{MEDIA_LABELS.filterAll}</option>
+        <option value=''>Alle</option>
         {options.map((o) => (
           <option key={o.value} value={o.value}>
             {o.label}

@@ -2,7 +2,6 @@ import { ImageResponse } from 'next/og';
 import { getRecordsView } from '@/lib/results/queries';
 import { ogFonts } from '@/lib/og/assets';
 import { COLOR, Label, OG_SIZE, OG_TYPE, OgFrame, Title } from '@/lib/og/frame';
-import { OG_LABELS } from '@/lib/og/labels';
 
 export const alt = 'Rekordene i Gamernes Gamer og sammenlagtlista';
 export const size = OG_SIZE;
@@ -31,7 +30,7 @@ export default async function Image() {
               gap: 24,
             }}
           >
-            <Label>{OG_LABELS.records.board}</Label>
+            <Label>Sammenlagtscore</Label>
             <div
               style={{
                 display: 'flex',
@@ -89,7 +88,7 @@ export default async function Image() {
       }
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-        <Title>{OG_LABELS.records.title}</Title>
+        <Title>Rekorder</Title>
         {first !== undefined && (
           <Label size={24}>
             {first === last ? `S${first}` : `S${first}–S${last}`}

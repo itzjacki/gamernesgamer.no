@@ -8,11 +8,6 @@ import Popover from './Popover';
  * The sign carries direction, never colour.
  */
 
-const LABELS = {
-  powerUp: 'Power-up',
-  curse: 'Curse',
-};
-
 interface Props {
   /** Namespaces popover ids. */
   id: string;
@@ -55,7 +50,7 @@ export default function PowerUpUseList({ id, rows }: Props) {
               </Popover>
             </span>
             <span className='text-text-muted shrink-0 font-mono text-xs tracking-wide uppercase sm:tracking-widest'>
-              {use.isCurse ? LABELS.curse : LABELS.powerUp}
+              {use.isCurse ? 'Curse' : 'Power-up'}
             </span>
           </span>
           <span className='text-text truncate'>{player.name}</span>

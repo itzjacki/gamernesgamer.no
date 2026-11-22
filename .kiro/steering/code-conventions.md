@@ -59,6 +59,19 @@ comment earns its place, leave it out.
   rule it enforces isn't obvious from its name.
 - A wrong comment is a bug: update or delete it with the code it describes.
 
+## Copy
+
+Public copy is Jakob's (AGENTS.md). Its lifecycle:
+
+1. **Draft:** new text starts as an obvious placeholder marked `TODO(copy)`,
+   in a file-local `LABELS` object at the top of the file, so a page's text
+   can be checked in one place.
+2. **Reviewed:** Jakob removes the marker (no marker means approved).
+3. **Inline:** then move each single-use string into the markup and delete
+   the object. Only two kinds of label constant stay: typed lookups
+   (`Record<Union, string>`, e.g. `STAGE_LABELS`) and text used by more than
+   one file (`src/lib/og/labels.ts`, admin's `labels.ts`).
+
 ## Imports & data files
 
 - `@/*` alias for all cross-directory imports.

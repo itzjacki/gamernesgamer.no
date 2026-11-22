@@ -1,12 +1,11 @@
 import type { Metadata } from 'next';
 import { allPlayers } from '@/lib/players/roster';
 import { getAllMedia } from '@/lib/media/queries';
-import { MEDIA_LABELS } from '@/lib/media/labels';
 import Heading from '@/components/Heading';
 import MediaBrowser from '@/components/MediaBrowser';
 
 export const metadata: Metadata = {
-  title: MEDIA_LABELS.pageTitle,
+  title: 'Content',
 };
 
 export default async function MediaIndexPage() {
@@ -22,7 +21,14 @@ export default async function MediaIndexPage() {
   return (
     <>
       <section className='flex flex-col gap-4 pt-8'>
-        <Heading as='h1'>{MEDIA_LABELS.pageTitle}</Heading>
+        <Heading
+          as='h1'
+          serial={
+            seasons.length > 0 ? [`S${seasons.at(-1)}–S${seasons[0]}`] : []
+          }
+        >
+          Content
+        </Heading>
       </section>
 
       <MediaBrowser items={items} seasons={seasons} players={players} />

@@ -9,6 +9,7 @@ import { FS, VS } from './trophy-hero-shader';
  * trophy-hero-shader.ts). The server renders a static poster (silhouette,
  * glow, fold line) that the canvas paints over once it runs; if WebGL is
  * missing, the shader fails or the context is lost, the poster simply stays.
+ * The canvas fades in over the poster once its first frame is drawn.
  * Rendering pauses while off-screen or in a hidden tab, and reduced motion
  * draws single frames only when something changes.
  */
@@ -80,6 +81,14 @@ const HEIGHT_PHONE = 0.56;
 const MAX_WIDTH_PHONE = 0.55;
 const ASPECT = 935 / 1080; // trophy.svg
 const PHONE = 700;
+/** The canvas's fade over the poster, ms (keep the class's duration in step). */
+const FADE = 700;
+/**
+ * The HTML numerals' fade-out, ms, ending with the canvas's fade (keep
+ * SeasonCountdown's duration in step): the drawn glyphs don't line up with
+ * them exactly, so a hard swap jumps.
+ */
+const NUMERAL_FADE = 700;
 
 export default function TrophyHero({ state, align }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -88,6 +97,7 @@ export default function TrophyHero({ state, align }: Props) {
   // Redraws a frame on demand (reduced motion has no loop to pick changes up).
   const kick = useRef<() => void>(() => {});
   const [failed, setFailed] = useState(false);
+  const [shown, setShown] = useState(false);
 
   useEffect(() => {
     live.current = { state, align };
@@ -96,7 +106,9 @@ export default function TrophyHero({ state, align }: Props) {
 
   useEffect(() => {
     const canvas = canvasRef.current!;
+    let dead = false;
     const fail = (why: string) => {
+      dead = true;
       // Loud in dev, so a shader bug can't hide behind the poster.
       if (process.env.NODE_ENV === 'development')
         console.error(`TrophyHero: ${why}`);
@@ -186,17 +198,19 @@ export default function TrophyHero({ state, align }: Props) {
     }
 
     function drawMask() {
+      // Resizing also clears the canvas and resets its state.
       mask.width = canvas.width;
       mask.height = canvas.height;
       const c = mask.getContext('2d')!;
-      c.fillStyle = '#000';
-      c.fillRect(0, 0, mask.width, mask.height);
-      c.filter = 'invert(1)';
+      // The trophy's shape, filled red: the red channel only, so numerals
+      // over it keep their own. Compositing, not the context's `filter`,
+      // which Safari doesn't support (the trophy came out black, i.e. absent).
       c.drawImage(img, box.x, box.y, box.w, box.h);
-      c.filter = 'none';
-      // Trophy to the red channel only, so numerals over it keep their own.
-      c.globalCompositeOperation = 'multiply';
+      c.globalCompositeOperation = 'source-in';
       c.fillStyle = '#f00';
+      c.fillRect(0, 0, mask.width, mask.height);
+      c.globalCompositeOperation = 'destination-over';
+      c.fillStyle = '#000';
       c.fillRect(0, 0, mask.width, mask.height);
       c.globalCompositeOperation = 'lighter';
       drawNumerals(c);
@@ -221,17 +235,23 @@ export default function TrophyHero({ state, align }: Props) {
      * over the trophy) become part of the scene: drawn into the mask's green
      * channel at the
      * element's own place and font, then the HTML glyphs go transparent
-     * (`data-numerals` on the canvas) so they are not drawn twice. Screen
-     * readers and the poster keep the HTML text.
+     * (`data-numerals` on the canvas) so they are not drawn twice: they fade
+     * out over the end of the canvas's fade-in (NUMERAL_FADE). Screen
+     * readers keep the HTML text.
      */
+    let hasNumerals = false;
+    let faded = false;
+    const syncNumerals = () => {
+      if (hasNumerals && faded && !dead) canvas.dataset.numerals = '';
+      else delete canvas.dataset.numerals;
+    };
     function drawNumerals(c: CanvasRenderingContext2D) {
       const el = canvas
         .closest('section')
         ?.querySelector<HTMLElement>('[data-hero-numerals]');
-      if (!el) {
-        delete canvas.dataset.numerals;
-        return;
-      }
+      hasNumerals = !!el;
+      syncNumerals();
+      if (!el) return;
       const r = el.getBoundingClientRect();
       const cr = canvas.getBoundingClientRect();
       const cs = getComputedStyle(el);
@@ -249,7 +269,6 @@ export default function TrophyHero({ state, align }: Props) {
       const baseline =
         top + (height - ink) / 2 + metrics.actualBoundingBoxAscent;
       c.fillText(text, (r.left - cr.left + r.width / 2) * dpr, baseline);
-      canvas.dataset.numerals = '';
     }
 
     function resize() {
@@ -359,12 +378,25 @@ export default function TrophyHero({ state, align }: Props) {
     let raf = 0;
     let onScreen = true;
     let lost = false;
+    let drawn = false;
+    let fadeTimer = 0;
     const running = () =>
       ready && !lost && onScreen && document.visibilityState === 'visible';
     const loop = (now: number) => {
       raf = 0;
       if (!running()) return;
       draw(now);
+      if (!drawn) {
+        drawn = true;
+        setShown(true);
+        fadeTimer = window.setTimeout(
+          () => {
+            faded = true;
+            syncNumerals();
+          },
+          reduce ? 0 : FADE - NUMERAL_FADE,
+        );
+      }
       if (!reduce) raf = requestAnimationFrame(loop);
     };
     kick.current = () => {
@@ -403,6 +435,7 @@ export default function TrophyHero({ state, align }: Props) {
 
     return () => {
       cancelAnimationFrame(raf);
+      clearTimeout(fadeTimer);
       kick.current = () => {};
       ro.disconnect();
       io.disconnect();
@@ -433,7 +466,9 @@ export default function TrophyHero({ state, align }: Props) {
       <canvas
         ref={canvasRef}
         aria-hidden='true'
-        className={`absolute inset-0 h-full w-full ${failed ? 'hidden' : ''}`}
+        className={`absolute inset-0 h-full w-full transition-opacity duration-700 ease-out motion-reduce:transition-none ${
+          failed ? 'hidden' : shown ? 'opacity-100' : 'opacity-0'
+        }`}
       />
       {/* The fold's hairline, on a grid row (placed exactly by layout; the
           poster's 74% is its server-side estimate): the trophy stands on it. */}
