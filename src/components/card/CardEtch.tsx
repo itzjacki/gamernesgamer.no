@@ -5,6 +5,8 @@ interface Props {
   imagePath: string;
   /** Zero-padded season slug: the big figure behind the portrait. */
   season: string;
+  /** The champion's season points, engraved in one ring. */
+  points?: number;
 }
 
 // A full-art face, whose content sits inset by the border's width (7px). The
@@ -21,6 +23,9 @@ const RINGS = Array.from({ length: 96 }, (_, i) => 4 + i * 4.2);
 // The displacement shifts lines by up to half its scale, so the lines start
 // this far outside the face and the filter region covers them.
 const BLEED = 30;
+// The points run along the gap where these rings are left out.
+const POINTS_RING = 144.6;
+const POINTS_GAP = new Set([33, 34]);
 
 /**
  * The full-art etch, in three zones cut by masks: the season figure takes
@@ -28,7 +33,7 @@ const BLEED = 30;
  * the photo itself, and the stock around them takes concentric rings
  * centred on the player. The panel has its own etch in CSS.
  */
-export default function CardEtch({ imagePath, season }: Props) {
+export default function CardEtch({ imagePath, season, points }: Props) {
   // Stripped to characters that are safe inside url(#…).
   const id = useId().replace(/[^\w-]/g, '');
   const ref = (name: string) => `url(#${id}-${name})`;
@@ -126,10 +131,31 @@ export default function CardEtch({ imagePath, season }: Props) {
       </defs>
 
       <g mask={ref('stock')} fill='none' stroke='#fff' strokeWidth='1'>
-        {RINGS.map((r) => (
-          <circle key={r} cx={CENTRE.x} cy={CENTRE.y} r={r} />
-        ))}
+        {RINGS.map((r, i) =>
+          points !== undefined && POINTS_GAP.has(i) ? null : (
+            <circle key={r} cx={CENTRE.x} cy={CENTRE.y} r={r} />
+          ),
+        )}
       </g>
+      {points !== undefined && (
+        <g mask={ref('stock')} className={styles.etchPoints}>
+          <path
+            id={`${id}-ring`}
+            fill='none'
+            d={`M ${CENTRE.x - POINTS_RING} ${CENTRE.y} a ${POINTS_RING} ${POINTS_RING} 0 1 1 ${2 * POINTS_RING} 0 a ${POINTS_RING} ${POINTS_RING} 0 1 1 ${-2 * POINTS_RING} 0`}
+          />
+          <text
+            fill='#fff'
+            fontSize='6'
+            letterSpacing='1.2'
+            dominantBaseline='central'
+          >
+            <textPath href={`#${id}-ring`}>
+              {`${points} · `.repeat(70)}
+            </textPath>
+          </text>
+        </g>
+      )}
       <rect
         mask={ref('figure')}
         x='0'

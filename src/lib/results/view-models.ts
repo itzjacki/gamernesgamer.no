@@ -4,7 +4,6 @@
  * re-sorts standings; snake_case DB rows stay inside fetch/compose/derive.
  */
 
-import type { GamerStats } from '@/types/gamer';
 import type { Tag } from '@/types/tag';
 
 export interface PlayerRef {
@@ -356,13 +355,14 @@ export interface CareerTrophyView extends CareerTrophy {
   gameTitle?: string;
 }
 
-/** Nickname, image and stats vary per season. */
+/**
+ * A season the player took part in; the card itself comes from
+ * `gamerCards`. The nickname varies per season (the hero uses the latest).
+ */
 export interface CareerCard {
   seasonNumber: number;
   seasonSlug: string;
   nickname: string;
-  imagePath: string;
-  stats?: GamerStats;
 }
 
 /** Isolated so the OG card can export this exact shape. */
@@ -370,9 +370,8 @@ export interface CareerHero {
   name: string;
   /** Latest season's. */
   nickname: string;
-  /** The dedicated hero image when present, else the latest card art. */
-  imagePath: string;
-  heroImageIsFallback: boolean;
+  /** The hero portrait (public/images/heroes); none, no picture. */
+  imagePath: string | null;
 }
 
 export interface CareerView {
@@ -711,8 +710,8 @@ export interface PairStats {
 export interface PairPlayerView extends RecordPlayer {
   /** Latest season's. */
   nickname: string;
-  /** The dedicated hero portrait when one exists, else the latest card art. */
-  imagePath: string;
+  /** The hero portrait (public/images/heroes); none, no picture. */
+  imagePath: string | null;
 }
 
 export interface PairView extends Omit<PairStats, 'a' | 'b'> {

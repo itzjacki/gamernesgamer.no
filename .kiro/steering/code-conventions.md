@@ -21,7 +21,7 @@ Prefer readable duplication over configurable generics. Avoid clever code.
   `portrait-tone.ts`) instead of re-inlining surface, button, eyebrow or popover
   markup. Add a new primitive only when a real second use appears.
 - Type props with a local `interface Props` above the component. Components that
-  represent a data type (e.g. `GamerCard.tsx`) also export that interface. Types
+  represent a data type (e.g. `card/Card.tsx`) also export that interface. Types
   not tied to one component live in `src/types/`.
 - Define small rendering helpers inline above the return.
 
@@ -75,7 +75,7 @@ comment earns its place, leave it out.
 
 ## Naming
 
-- Components: PascalCase (`GamerCard.tsx`). Data and type files: kebab-case
+- Components: PascalCase (`GameCard.tsx`). Data and type files: kebab-case
   (`power-ups.ts`).
 - Season dirs are zero-padded (`01`–`04`). Game slugs are kebab-case and double
   as data key and route segment.

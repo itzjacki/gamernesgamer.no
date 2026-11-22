@@ -9,7 +9,8 @@ export interface RosterEntry {
   name: string;
   /** Already quoted in the data, e.g. '"The Professor"'. */
   nickname: string;
-  imagePath: string;
+  /** The hero portrait; none, no picture. */
+  imagePath: string | null;
   /** Absent for a player with no finished season yet. */
   career?: {
     /** 1-based, by average placement; shared when tied. */
@@ -117,12 +118,14 @@ function PlayerPlate({ entry }: { entry: RosterEntry }) {
           clipPath: `polygon(${DIAGONAL_INSET}% 0, 100% 0, 100% 100%, 0 100%)`,
         }}
       >
-        <img
-          src={entry.imagePath}
-          alt=''
-          aria-hidden='true'
-          className={`h-full w-full object-cover object-top ${PORTRAIT_TONE_LINK}`}
-        />
+        {entry.imagePath && (
+          <img
+            src={entry.imagePath}
+            alt=''
+            aria-hidden='true'
+            className={`h-full w-full object-cover object-top ${PORTRAIT_TONE_LINK}`}
+          />
+        )}
       </span>
       <svg
         viewBox='0 0 100 100'

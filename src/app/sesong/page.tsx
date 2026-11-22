@@ -17,7 +17,6 @@ async function toEntry(slug: Season): Promise<SeasonEntry> {
   // Only a decided season has a champion; the season page reads the same view.
   const view = meta.status === 'upcoming' ? null : await getSeasonView(number);
   const winner = view?.standings.find((row) => row.isChampion);
-  const card = winner && gamers.find((g) => g.name === winner.player.name);
   const photo = findSeasonImage(slug);
 
   return {
@@ -30,11 +29,7 @@ async function toEntry(slug: Season): Promise<SeasonEntry> {
     champion: winner
       ? { name: winner.player.name, points: winner.totalPoints }
       : undefined,
-    image: photo
-      ? { path: photo, landscape: true }
-      : card
-        ? { path: card.imagePath, landscape: false }
-        : undefined,
+    image: photo ? { path: photo, landscape: true } : undefined,
   };
 }
 

@@ -1,17 +1,5 @@
-export interface GamerStats {
-  overall: number;
-  focus: number;
-  strategy: number;
-  mechanics: number;
-  mental: number;
-  versatility: number;
-  consistency: number;
-  tactics: number;
-}
-
+/** Who played a season. Everything printed on their cards is in `cards.ts`. */
 export interface Gamer {
   name: string;
   nickname: string;
-  imagePath: string;
-  stats?: GamerStats;
 }

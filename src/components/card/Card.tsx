@@ -2,21 +2,23 @@
 
 import { useEffect, useRef } from 'react';
 import Image from 'next/image';
-import type { CardData } from '@/types/card';
-import type { GamerStats } from '@/types/gamer';
+import type { CardData, CardStats } from '@/types/card';
 import { CARD_TYPES } from './card-types';
 import { MATTE_GRAIN } from './card-art';
 import CardEtch from './CardEtch';
 import styles from './Card.module.css';
 
 export interface Props {
-  card: CardData;
-  /** Start face-down, e.g. to show the back. */
-  showBack?: boolean;
+  /**
+   * The card's face. Without one the card is sealed (an unrevealed season):
+   * it shows only the back and can't be flipped, and no data reaches the
+   * client.
+   */
+  card?: CardData;
 }
 
 const MAX_TILT = 14;
-const STAT_ORDER: Exclude<keyof GamerStats, 'overall'>[] = [
+const STAT_ORDER: Exclude<keyof CardStats, 'overall'>[] = [
   'focus',
   'strategy',
   'mechanics',
@@ -30,7 +32,7 @@ function capitalizeFirst(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-/** 50–99 maps onto the gauge, as on the old card. */
+/** 50–99 maps onto the gauge; anything outside it pins to an end. */
 function gaugeWidth(value: number) {
   return `${Math.min(100, Math.max(0, ((value - 50) / 49) * 100))}%`;
 }
@@ -41,14 +43,9 @@ function gaugeWidth(value: number) {
  * tilt sets, so a card type is styling only. Clicking flips it to the shared
  * back.
  */
-export default function Card({ card, showBack = false }: Props) {
-  const skin = CARD_TYPES[card.type];
-  const pad = (n: number) => String(n).padStart(2, '0');
-  const serial = [
-    `GG-${card.season}`,
-    skin.code,
-    `${pad(card.number)}/${pad(card.of)}`,
-  ].join(' · ');
+export default function Card({ card }: Props) {
+  const showBack = !card;
+  const skin = card ? CARD_TYPES[card.type] : undefined;
 
   const cardRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number | null>(null);
@@ -94,6 +91,9 @@ export default function Card({ card, showBack = false }: Props) {
       '--card-light',
       `${(Math.atan2(ny, nx) * 180) / Math.PI + 90}deg`,
     );
+    // The light's direction, -1..1; at rest it falls from above.
+    el.style.setProperty('--card-lx', String(nx));
+    el.style.setProperty('--card-ly', String(Math.max(-1, ny - 0.6)));
     el.dataset.side =
       Math.cos((c.flip * Math.PI) / 180) >= 0 ? 'front' : 'back';
 
@@ -130,8 +130,6 @@ export default function Card({ card, showBack = false }: Props) {
     schedule();
   }
 
-  const stats = STAT_ORDER.map((key) => [key, card.stats[key]] as const);
-
   return (
     // The listener sits on an untransformed wrapper, so the tilting card
     // never moves its own hit box out from under the pointer.
@@ -146,89 +144,133 @@ export default function Card({ card, showBack = false }: Props) {
         ref={cardRef}
         className={styles.card}
         data-side={showBack ? 'back' : 'front'}
-        data-stock={skin.stock}
-        data-ink={skin.ink}
-        data-bleed={skin.bleed || undefined}
+        data-stock={skin?.stock}
+        data-ink={skin?.ink}
+        data-bleed={skin?.bleed || undefined}
         style={
-          showBack
-            ? ({
-                '--card-transform': 'perspective(900px) rotateY(180deg)',
-              } as React.CSSProperties)
-            : undefined
+          {
+            '--card-grain': MATTE_GRAIN,
+            ...(showBack && {
+              '--card-transform': 'perspective(900px) rotateY(180deg)',
+            }),
+          } as React.CSSProperties
         }
       >
-        <div className={styles.front}>
-          <div className={styles.stock} aria-hidden='true' />
-          <p className={styles.seasonFigure} aria-hidden='true'>
-            {card.season}
-          </p>
-          <div className={styles.portrait}>
-            <Image
-              src={card.imagePath}
-              alt=''
-              fill
-              sizes='300px'
-              className={styles.portraitImage}
-            />
-          </div>
+        {card && <Front card={card} />}
 
-          <div className={styles.overall}>
-            <p className={styles.overallFigure}>{card.stats.overall}</p>
-            {/* TODO(copy) */}
-            <p className={styles.overallLabel}>Overall</p>
-            <p className={styles.overallLabel}>S{Number(card.season)}</p>
-          </div>
-
-          <div className={styles.panel}>
-            <p className={styles.name}>{card.name}</p>
-            <p className={styles.nickname}>{card.nickname}</p>
-            <dl className={styles.stats}>
-              {stats.map(([key, value]) => (
-                <div key={key} className={styles.stat}>
-                  <dt>{capitalizeFirst(key)}</dt>
-                  <dd>{value}</dd>
-                  <span className={styles.gauge} aria-hidden='true'>
-                    <span style={{ width: gaugeWidth(value) }} />
-                  </span>
-                </div>
-              ))}
-            </dl>
-            <p className={styles.serial}>
-              {serial}
-              <span className={styles.markFoil} aria-hidden='true' />
-            </p>
-          </div>
-
-          {skin.foil === 'texture' && (
-            <>
-              <CardEtch imagePath={card.imagePath} season={card.season} />
-              <div className={styles.panelEtch} aria-hidden='true' />
-            </>
-          )}
-          <div className={styles.sheen} aria-hidden='true' />
-        </div>
-
-        <div
-          className={styles.back}
-          aria-hidden='true'
-          style={
-            {
-              '--card-grain': MATTE_GRAIN,
-            } as React.CSSProperties
-          }
-        >
+        <div className={styles.back} aria-hidden='true'>
           <div className={styles.backLogo} />
         </div>
 
         <div className={styles.edge} aria-hidden='true' />
       </div>
 
-      <button
-        type='button'
-        className={styles.flipButton}
-        onClick={handleFlip}
-        aria-label={`Snu kortet til ${card.name}`}
-      />
+      {card ? (
+        <button
+          type='button'
+          className={styles.flipButton}
+          onClick={handleFlip}
+          aria-label={`Snu kortet til ${card.name}`}
+        />
+      ) : (
+        <span
+          className={styles.flipButton}
+          role='img'
+          aria-label='Forseglet kort'
+        />
+      )}
+    </div>
+  );
+}
+
+function Front({ card }: { card: CardData }) {
+  const skin = CARD_TYPES[card.type];
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const serial = [
+    `GG-${card.season}`,
+    skin.code,
+    `${pad(card.number)}/${pad(card.of)}`,
+  ].join(' · ');
+  const stats = STAT_ORDER.map((key) => [key, card.stats[key]] as const);
+  const delta = card.overallChange;
+
+  return (
+    <div className={styles.front}>
+      <div className={styles.stock} aria-hidden='true' />
+      <p className={styles.seasonFigure} aria-hidden='true'>
+        {card.season}
+      </p>
+      <div className={styles.portrait}>
+        <Image
+          src={card.imagePath}
+          alt=''
+          fill
+          sizes='300px'
+          className={styles.portraitImage}
+        />
+      </div>
+
+      <div className={styles.overall}>
+        <p className={styles.overallFigure}>{card.stats.overall}</p>
+        <p className={styles.overallLabel}>Overall</p>
+        <p className={styles.overallLabel}>
+          S{Number(card.season)}
+          {delta !== undefined && (
+            <span className={styles.delta}>
+              {delta > 0 ? '▲' : delta < 0 ? '▼' : '±'}
+              {Math.abs(delta)}
+            </span>
+          )}
+        </p>
+      </div>
+
+      <div className={styles.panel}>
+        <p className={styles.name}>
+          {card.name}
+          {card.titles !== undefined && (
+            <span
+              className={styles.stars}
+              aria-label={`${card.titles} mestertitler`}
+            >
+              {Array.from({ length: card.titles }, (_, i) => (
+                <span key={i} className={styles.star} />
+              ))}
+            </span>
+          )}
+        </p>
+        <p className={styles.nickname}>{card.nickname}</p>
+        <dl className={styles.stats}>
+          {stats.map(([key, value]) => (
+            <div key={key} className={styles.stat}>
+              <dt>{capitalizeFirst(key)}</dt>
+              <dd>{value}</dd>
+              <span className={styles.gauge} aria-hidden='true'>
+                <span style={{ width: gaugeWidth(value) }} />
+              </span>
+            </div>
+          ))}
+        </dl>
+        <p className={styles.serial}>
+          <span className={styles.serialText}>{serial}</span>
+          {/* The wrapper carries the bite's shadows: a filter on the
+                  masked mark itself would be masked away. */}
+          <span className={styles.markBite} aria-hidden='true'>
+            <span className={styles.markFoil} />
+          </span>
+        </p>
+      </div>
+
+      {skin.foil === 'texture' && (
+        <>
+          <CardEtch
+            imagePath={card.imagePath}
+            season={card.season}
+            points={card.points}
+          />
+          <div className={styles.panelEtch} aria-hidden='true' />
+        </>
+      )}
+      <div className={styles.sheen} aria-hidden='true' />
     </div>
   );
 }

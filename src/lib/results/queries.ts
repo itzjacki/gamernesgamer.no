@@ -178,7 +178,7 @@ export async function getPairView(
 
   const withHero = (side: PairView['a']) => ({
     ...side,
-    imagePath: findHeroImage(side.slug) ?? side.imagePath,
+    imagePath: findHeroImage(side.slug),
   });
   return { ...view, a: withHero(view.a), b: withHero(view.b) };
 }
@@ -209,6 +209,5 @@ function resolveHeroImage(
   slug: string,
   hero: CareerView['hero'],
 ): CareerView['hero'] {
-  const imagePath = findHeroImage(slug);
-  return imagePath ? { ...hero, imagePath, heroImageIsFallback: false } : hero;
+  return { ...hero, imagePath: findHeroImage(slug) };
 }

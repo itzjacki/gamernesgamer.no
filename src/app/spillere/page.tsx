@@ -25,7 +25,7 @@ export default async function PlayersIndexPage() {
       slug: p.slug,
       name: p.name,
       nickname: p.latest.nickname,
-      imagePath: findHeroImage(p.slug) ?? p.latest.imagePath,
+      imagePath: findHeroImage(p.slug),
       career: careerBySlug.get(p.slug),
     }))
     .sort(

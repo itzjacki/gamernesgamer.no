@@ -231,17 +231,13 @@ describe('composeCareerView — static content join', () => {
     expect(view.cards.map((c) => c.seasonNumber)).toEqual([1, 2]);
     for (const card of view.cards) {
       expect(card.nickname).toBeTruthy();
-      expect(card.imagePath).toBeTruthy();
     }
   });
 
-  it('derives the hero from the latest season with a card-art fallback', () => {
+  it('derives the hero from the latest season, leaving the portrait to queries.ts', () => {
     expect(view.hero.name).toBe('Tobias');
-    // compose always sets the fallback flag; queries.ts flips it if a hero file exists.
-    expect(view.hero.heroImageIsFallback).toBe(true);
-    expect(view.hero.imagePath).toBe(
-      view.cards[view.cards.length - 1].imagePath,
-    );
+    expect(view.hero.nickname).toBe(view.cards[view.cards.length - 1].nickname);
+    expect(view.hero.imagePath).toBeNull();
   });
 
   it('aggregates a genre tag through the title (Tobias won all three racing games)', () => {

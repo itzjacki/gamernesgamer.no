@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { seasonData, isSeason } from '@/data/sesong';
+import { seasonData, isSeason, type Season } from '@/data/sesong';
+import { gamerCards } from '@/lib/cards';
 import { formatSeasonDates } from '@/lib/season-dates';
 import type { PowerUp } from '@/types/power-up';
 import { getSeasonView } from '@/lib/results/queries';
@@ -12,7 +13,8 @@ import type { MediaItemView } from '@/lib/media/view-models';
 import { composeSeasonView } from '@/lib/results/compose';
 import type { ComposedSeasonView } from '@/lib/results/compose';
 import type { SeasonView } from '@/lib/results/view-models';
-import GamerCard from '@/components/GamerCard';
+import Card from '@/components/card/Card';
+import GamerCards from '@/components/card/GamerCards';
 import GameCard from '@/components/GameCard';
 import PowerUpCard from '@/components/PowerUpCard';
 import Heading from '@/components/Heading';
@@ -147,16 +149,10 @@ function toMatrix(
   return { players, games };
 }
 
-/** Prefers a cutout at public/images/champions/<NN>.png, checked at build time. */
-function resolveChampionImage(
-  seasonSlug: string,
-  fallback: string,
-): { imagePath: string; isCutout: boolean } {
+/** The cutout at public/images/champions/<NN>.png, checked at build time. */
+function findChampionCutout(seasonSlug: string): string | null {
   const rel = `/images/champions/${seasonSlug}.png`;
-  const abs = path.join(process.cwd(), 'public', rel);
-  return existsSync(abs)
-    ? { imagePath: rel, isCutout: true }
-    : { imagePath: fallback, isCutout: false };
+  return existsSync(path.join(process.cwd(), 'public', rel)) ? rel : null;
 }
 
 interface FinishedProps {
@@ -184,9 +180,6 @@ function FinishedSeason({
   dates,
 }: FinishedProps) {
   const champion = composed.standings.find((s) => s.isChampion);
-  const championImage = champion
-    ? resolveChampionImage(composed.seasonSlug, champion.gamer.imagePath)
-    : null;
 
   const standingsRows = composed.standings.map((s) => ({
     placement: s.placement,
@@ -204,14 +197,13 @@ function FinishedSeason({
         </Heading>
       </section>
 
-      {champion && championImage && (
+      {champion && (
         <ChampionHero
           name={champion.player.name}
           nickname={champion.gamer.nickname}
           seasonNumber={seasonNumber}
           totalPoints={champion.totalPoints}
-          imagePath={championImage.imagePath}
-          isCutout={championImage.isCutout}
+          imagePath={findChampionCutout(composed.seasonSlug)}
         />
       )}
 
@@ -240,41 +232,23 @@ function FinishedSeason({
         )}
       </div>
 
-      <section id='participants' className='flex flex-col gap-6'>
-        <SectionLabel as='h2'>Spillere</SectionLabel>
-        {composed.standings.some((s) => s.gamer.stats) ? (
+      {seasonData[composed.seasonSlug as Season].cards.length > 0 && (
+        <section id='participants' className='flex flex-col gap-6'>
+          <SectionLabel as='h2'>Spillere</SectionLabel>
           <ul className='grid grid-cols-1 justify-items-center gap-10 sm:grid-cols-2'>
             {composed.standings.map((s) => (
               <li key={s.player.name}>
-                <GamerCard
-                  name={s.gamer.name}
-                  nickname={s.gamer.nickname}
-                  imagePath={s.gamer.imagePath}
-                  stats={s.gamer.stats}
-                  revealed
+                <GamerCards
+                  cards={gamerCards(
+                    composed.seasonSlug as Season,
+                    s.gamer.name,
+                  )}
                 />
               </li>
             ))}
           </ul>
-        ) : (
-          <ul className='grid grid-cols-1 gap-10 sm:grid-cols-2'>
-            {composed.standings.map((s) => (
-              <li key={s.player.name}>
-                <div className='border-border-accent bg-bg flex w-full flex-col items-center border py-4'>
-                  <img
-                    src={s.gamer.imagePath}
-                    alt={`Bilde av ${s.gamer.name}`}
-                    className='mb-2 h-48'
-                  />
-                  <p className='border-border text-text w-full border-t px-3 pt-3 text-center text-sm font-semibold'>
-                    {s.gamer.name} – {s.gamer.nickname}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+        </section>
+      )}
 
       <section id='games' className='flex flex-col gap-6'>
         <SectionLabel as='h2'>Spill</SectionLabel>
@@ -362,43 +336,25 @@ function UpcomingSeason({
       {/* Before the event the welcome video does the hype job, so it leads. */}
       <MediaSection items={media} />
 
-      <section id='participants' className='flex flex-col gap-6'>
-        <SectionLabel as='h2'>Spillere</SectionLabel>
-        {gamers.some((g) => g.stats) ? (
+      {/* Sealed, the backs stand in for the roster; revealed, the cards. */}
+      {(meta.revealGamerCards ? season.cards.length : gamers.length) > 0 && (
+        <section id='participants' className='flex flex-col gap-6'>
+          <SectionLabel as='h2'>Spillere</SectionLabel>
           <ul className='grid grid-cols-1 justify-items-center gap-10 sm:grid-cols-2'>
-            {gamers.map((gamer, i) => (
-              <li key={gamer.name}>
-                <GamerCard
-                  name={gamer.name}
-                  nickname={gamer.nickname}
-                  imagePath={gamer.imagePath}
-                  stats={gamer.stats}
-                  revealed={meta.revealGamerCards}
-                  season={sesong}
-                  number={i + 1}
-                />
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <ul className='grid grid-cols-1 gap-10 sm:grid-cols-2'>
             {gamers.map((gamer) => (
               <li key={gamer.name}>
-                <div className='border-border-accent bg-bg flex w-full flex-col items-center border py-4'>
-                  <img
-                    src={gamer.imagePath}
-                    alt={`Bilde av ${gamer.name}`}
-                    className='mb-2 h-48'
+                {meta.revealGamerCards ? (
+                  <GamerCards
+                    cards={gamerCards(sesong as Season, gamer.name)}
                   />
-                  <p className='border-border text-text w-full border-t px-3 pt-3 text-center text-sm font-semibold'>
-                    {gamer.name} – {gamer.nickname}
-                  </p>
-                </div>
+                ) : (
+                  <Card />
+                )}
               </li>
             ))}
           </ul>
-        )}
-      </section>
+        </section>
+      )}
 
       <section id='games' className='flex flex-col gap-6'>
         <SectionLabel as='h2'>Spill</SectionLabel>

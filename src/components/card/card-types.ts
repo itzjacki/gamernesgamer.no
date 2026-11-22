@@ -6,7 +6,7 @@ import type { CardType } from '@/types/card';
  * type that needs more is a new chassis, decided on purpose.
  */
 export interface CardTypeSkin {
-  /** The serial's middle part: `GG-04 / S / 01/04`. */
+  /** The serial's middle part: `GG-04 · S · 01/04`. */
   code: string;
   /**
    * How much of the card the foil covers, read as rarity: the small silver

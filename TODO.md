@@ -29,14 +29,9 @@ cards"). Built as one family: a variant is a type code in the serial plus a
 skin (`card-types.ts`), not a new component. Card data is content in code
 (`src/data/sesong/<NN>/cards.ts`), never the DB.
 
-- [ ] **Prototype at `/kort`** (public, unlinked, noindex): workshop the
-      look until Jakob calls it (next: tune the MESTER etch), then write
-      the copy (stat labels in full words).
-- [ ] **Swap in:** `Card` replaces `GamerCard` on the season page, the
-      lineup and the career gallery, then `GamerCard` and `Statbar` go. A
-      MESTER card shows as a toggle on the winner's base card.
-- [ ] **Reveal for upcoming seasons:** the new card has no sealed state yet;
-      until it does, keep the old card's sealed face or show the back.
+Live on the season page, the lineup and the career gallery; a sealed card
+(unrevealed season) shows only the back. `/kort` shows every card; linking
+it is in Navigation below.
 
 ### 2. Content centre
 
@@ -45,7 +40,6 @@ career and /vs pages, `/content` and "Dagens content".
 
 - [ ] **Deploy:** the migration and the day-one media are on prod; the code
       isn't yet.
-- [ ] **Navigation:** `/content` has no header key; only Dagens links to it.
 - [ ] **Check on a preview deploy:** after a media save, hero and champion art
       still resolve. `existsSync(public/…)` in `queries.ts`,
       `ChampionSideBlock` and the season page ran only at build time before
@@ -64,6 +58,14 @@ More per-season views, stats and content; scoped when we start.
       dominant game win, power-up impact from each `powerUpUse`). All-time
       bests stay on /records; don't repeat its plates. When a season's
       moment is also the all-time record, say so and link to /records.
+
+### 4. Navigation
+
+One pass over the header for the pages phase 4 added, with Jakob's other
+nav fixes.
+
+- [ ] **`/kort`:** no header key yet.
+- [ ] **`/content`:** no header key; only Dagens links to it.
 
 ### Decided against (don't re-propose)
 
@@ -90,6 +92,14 @@ Visual "tried and dropped" items are in design.md.
 - Holo on the back, and gloss patterns on it (rays, rings, guilloche,
   pinstripe, dots): the back is a matte black with a satin-black logo.
 - A compact card size: one target size only.
+- Tried and dropped: gloss vs matte (spot gloss, a reflection band), a
+  blind-debossed season figure, an inner keyline, instrument ticks and a
+  needle on the gauges, the portrait fading into the panel, and MESTER
+  layout shapes (a black corner; wedge, peak, arc, shoulder or sawtooth
+  panel edges).
+- A flavour line per card; a season set symbol.
+- Derived card numbers (overall change, title count): every printed number
+  is entered by hand, so a card stands alone.
 
 **Front page**
 
@@ -189,7 +199,8 @@ Visual "tried and dropped" items are in design.md.
 
 - [ ] **Final hero portraits (Jakob, waiting on the players):** replace the
       placeholders in `public/images/heroes/<slug>.png` (copies of earlier
-      card art), then revisit the player index's top crop. Not a blocker.
+      card art; a new player needs one, or their pages have no picture), then
+      revisit the player index's top crop. Not a blocker.
 - [ ] **Cards part 2:** more card styles (moments: MVP, record-breaker, "the
       collapse"), FIFA-style shareable gamer cards, a place to view all
       cards; maybe a collection, a pack simulator, physical cards. Sealed

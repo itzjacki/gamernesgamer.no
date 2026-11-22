@@ -1,5 +1,5 @@
 import type { Game } from '@/types/game';
-import type { SpecialCard } from '@/types/card';
+import type { SeasonCard } from '@/types/card';
 import type { Gamer } from '@/types/gamer';
 import type { PowerUp } from '@/types/power-up';
 import type { SeasonMeta } from '@/types/season-meta';
@@ -13,7 +13,7 @@ export type SeasonData = {
   meta: SeasonMeta;
   games: Game[];
   gamers: Gamer[];
-  cards: SpecialCard[];
+  cards: SeasonCard[];
   powerUps?: PowerUp[];
   curses?: PowerUp[];
 };
