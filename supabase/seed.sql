@@ -249,13 +249,13 @@ begin
   insert into stage (game_id, ordinal, kind) values (v_game, 1, 'round-robin')
     returning id into v_stage;
   -- Jakob 9-4 Tobias, Jørgen 0-9 William, Jakob 9-0 Jørgen, William 9-4 Tobias,
-  -- William 9-1 Jakob, Tobias 3-9 Jørgen.
+  -- William 9-1 Jakob, Tobias 9-3 Jørgen.
   perform pg_temp.seed_h2h_match(v_stage, null, 'bo1', sp_jakob,   sp_tobias,  array[9], array[4]);
   perform pg_temp.seed_h2h_match(v_stage, null, 'bo1', sp_william, sp_jorgen,  array[9], array[0]);
   perform pg_temp.seed_h2h_match(v_stage, null, 'bo1', sp_jakob,   sp_jorgen,  array[9], array[0]);
   perform pg_temp.seed_h2h_match(v_stage, null, 'bo1', sp_william, sp_tobias,  array[9], array[4]);
   perform pg_temp.seed_h2h_match(v_stage, null, 'bo1', sp_william, sp_jakob,   array[9], array[1]);
-  perform pg_temp.seed_h2h_match(v_stage, null, 'bo1', sp_jorgen,  sp_tobias,  array[9], array[3]);
+  perform pg_temp.seed_h2h_match(v_stage, null, 'bo1', sp_tobias,  sp_jorgen,  array[9], array[3]);
 
   -- Stage 2: single-elim. Group wins: William 3, Jakob 2, Tobias 1, Jørgen 0.
   -- SF1 1v4 William-Jørgen, SF2 2v3 Jakob-Tobias, BR, F.

@@ -137,6 +137,7 @@ function toMatrix(
     return {
       ordinal: g.ordinal,
       label: g.game.title,
+      href: `/sesong/${composed.seasonSlug}/${g.game.slug}`,
       cells: players.map((p) => {
         const r = byPlayer.get(p.seasonPlayerId);
         return {

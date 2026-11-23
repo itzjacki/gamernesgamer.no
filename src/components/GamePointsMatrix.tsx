@@ -1,6 +1,7 @@
+import Link from 'next/link';
 import Popover from './Popover';
 import RecordLines, { pointsBreakdownLines } from './RecordLines';
-import { HEAD_ROW, ROW, TABLE } from '@/components/table-classes';
+import { HEAD_ROW, NAME_LINK, ROW, TABLE } from '@/components/table-classes';
 
 /**
  * Games are rows and players columns on purpose: a season has more games than
@@ -29,6 +30,7 @@ export interface MatrixGameRow {
   /** Play order; also part of popover ids. */
   ordinal: number;
   label: string;
+  href: string;
   /** Same order as `players`. */
   cells: MatrixCell[];
 }
@@ -110,7 +112,9 @@ export default function GamePointsMatrix({
             {games.map((game) => (
               <tr key={game.ordinal} className={ROW}>
                 <td className='text-text px-3 py-2 font-semibold'>
-                  {game.label}
+                  <Link href={game.href} className={NAME_LINK}>
+                    {game.label}
+                  </Link>
                 </td>
                 {game.cells.map((cell) =>
                   cell.powerUpUses.length > 0 ? (
